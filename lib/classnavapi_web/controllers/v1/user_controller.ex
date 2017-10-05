@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
         render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
       {:error, changeset} ->
         conn
-        |> put_status(400)
+        |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
