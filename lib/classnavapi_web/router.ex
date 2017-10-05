@@ -20,7 +20,11 @@ defmodule ClassnavapiWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", ClassnavapiWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ClassnavapiWeb.Api do
+    pipe_through :api
+
+    scope "/v1", V1, as: :v1 do
+      resources "/users", UserController
+    end
+  end
 end
