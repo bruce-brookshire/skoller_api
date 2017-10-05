@@ -1,12 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.UserController do
   use ClassnavapiWeb, :controller
 
-  def create(conn, params = %{"name_first" => name_first, 
-                              "name_last" => name_last,
-                              "password" => password,
-                              "email" => email,
-                              "phone" => phone,
-                              "major" => major}) do
+  def create(conn, params = %{}) do
 
     changeset = Classnavapi.User.changeset(%Classnavapi.User{}, params)
 
