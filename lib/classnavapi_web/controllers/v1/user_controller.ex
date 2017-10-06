@@ -14,4 +14,14 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def index(conn, _) do
+    users = Classnavapi.Repo.all(Classnavapi.User)
+    render(conn, ClassnavapiWeb.UserView, "index.json", users: users)
+  end
+
+  def show(conn, %{"id" => id}) do
+    user = Classnavapi.Repo.get!(Classnavapi.User, id)
+      render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
+  end
 end
