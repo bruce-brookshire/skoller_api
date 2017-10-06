@@ -24,7 +24,9 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api
 
     scope "/v1", V1, as: :v1 do
-      resources "/users", UserController
+      resources "/users", UserController, except: [:new,:delete,:edit,:update] do
+        post "/roles/:id", RoleController, :create
+      end
     end
   end
 end

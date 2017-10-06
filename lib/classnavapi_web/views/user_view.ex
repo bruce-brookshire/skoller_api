@@ -13,8 +13,4 @@ defmodule ClassnavapiWeb.UserView do
     %{id: user.id,
       email: user.email}
   end
-
-  def render("error.json", %{changeset: changeset}) do
-    %{errors: changeset.errors}
-  end
 end
