@@ -9,3 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+Classnavapi.Repo.insert!(%Classnavapi.Role{id: 100, name: "Student"})
+Classnavapi.Repo.insert!(%Classnavapi.Role{id: 200, name: "Admin"})
+Classnavapi.Repo.insert!(%Classnavapi.Role{id: 300, name: "Syllabus Editor"})

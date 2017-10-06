@@ -3,9 +3,8 @@ defmodule Classnavapi.Role do
   import Ecto.Changeset
   alias Classnavapi.Role
 
-
+  @primary_key {:id, :integer, []}
   schema "roles" do
-    field :id, :bigserial
     field :name, :string
 
     timestamps()
@@ -14,8 +13,8 @@ defmodule Classnavapi.Role do
   @doc false
   def changeset(%Role{} = role, attrs) do
     role
-    |> cast(attrs, [:id, :name])
-    |> validate_required([:id, :name])
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
     |> unique_constraint(:name)
   end
 end

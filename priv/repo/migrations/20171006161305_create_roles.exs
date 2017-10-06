@@ -3,7 +3,7 @@ defmodule Classnavapi.Repo.Migrations.CreateRoles do
 
   def change do
     create table(:roles, primary_key: false) do
-      add :id, :bigserial, primary_key: true
+      add :id, :integer, primary_key: true
       add :name, :string
 
       timestamps()
