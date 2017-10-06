@@ -22,11 +22,6 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
 
   def show(conn, %{"id" => id}) do
     user = Classnavapi.Repo.get!(Classnavapi.User, id)
-      # {user} ->
-        render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
-      # {:error} ->
-      #   render(conn, ClassnavapiWeb.)s
-    # end
-    
+      render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
   end
 end
