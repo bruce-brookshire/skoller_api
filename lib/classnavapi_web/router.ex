@@ -28,6 +28,7 @@ defmodule ClassnavapiWeb.Router do
         post "/roles/:id", RoleController, :create
         resources "/roles/", RoleController, only: [:index,:delete]
       end
+      post "/users/login", AuthController, :create
     end
   end
 end
