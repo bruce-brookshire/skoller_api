@@ -10,6 +10,8 @@ defmodule Classnavapi.Student do
     field :name_first, :string
     field :name_last, :string
     field :phone, :string
+    field :major, :string
+    has_many :users, Classnavapi.User
 
     timestamps()
   end
@@ -17,7 +19,7 @@ defmodule Classnavapi.Student do
   @doc false
   def changeset(%Student{} = student, attrs) do
     student
-    |> cast(attrs, [:name_first, :name_last, :phone, :birthday, :gender])
-    |> validate_required([:name_first, :name_last, :phone, :birthday, :gender])
+    |> cast(attrs, [:name_first, :name_last, :phone, :birthday, :gender, :major])
+    |> validate_required([:name_first, :name_last, :phone, :birthday, :gender, :major])
   end
 end

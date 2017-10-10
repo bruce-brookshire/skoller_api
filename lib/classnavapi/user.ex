@@ -1,13 +1,13 @@
 defmodule Classnavapi.User do
   use Ecto.Schema
   import Ecto.Changeset
+  
   alias Classnavapi.User
-
 
   schema "users" do
     field :email, :string
     field :password, :string
-    field :student_id, :id
+    belongs_to :student, Classnavapi.Student
 
     timestamps()
   end
@@ -19,5 +19,6 @@ defmodule Classnavapi.User do
     |> validate_required([:email, :password])
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
+    |> cast_assoc(:student)
   end
 end
