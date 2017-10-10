@@ -1,13 +1,17 @@
 defmodule ClassnavapiWeb.Api.V1.UserController do
   use ClassnavapiWeb, :controller
 
+  alias Classnavapi.User
+  alias Classnavapi.Repo
+  alias ClassnavapiWeb.UserView
+
   def create(conn, params = %{}) do
 
-    changeset = Classnavapi.User.changeset(%Classnavapi.User{}, params)
+    changeset = User.changeset(%User{}, params)
 
-    case Classnavapi.Repo.insert(changeset) do
+    case Repo.insert(changeset) do
       {:ok, user} ->
-        render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
+        render(conn, UserView, "show.json", user: user)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -16,12 +20,12 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   end
 
   def index(conn, _) do
-    users = Classnavapi.Repo.all(Classnavapi.User)
-    render(conn, ClassnavapiWeb.UserView, "index.json", users: users)
+    users = Repo.all(User)
+    render(conn, UserView, "index.json", users: users)
   end
 
   def show(conn, %{"id" => id}) do
-    user = Classnavapi.Repo.get!(Classnavapi.User, id)
-      render(conn, ClassnavapiWeb.UserView, "show.json", user: user)
+    user = Repo.get!(User, id)
+      render(conn, UserView, "show.json", user: user)
   end
 end
