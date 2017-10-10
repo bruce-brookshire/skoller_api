@@ -12,7 +12,7 @@ defmodule Classnavapi.Student do
     field :phone, :string
     field :major, :string
     has_many :users, Classnavapi.User
-
+ 
     timestamps()
   end
 

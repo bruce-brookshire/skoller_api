@@ -1,7 +1,7 @@
 defmodule Classnavapi.User do
   use Ecto.Schema
   import Ecto.Changeset
-  
+
   alias Classnavapi.User
 
   schema "users" do
@@ -12,6 +12,20 @@ defmodule Classnavapi.User do
     timestamps()
   end
 
+  def student_assoc(changeset, nil), do: changeset
+  def student_assoc(changeset, student_obj) do
+    if student_obj["id"] == nil do
+      Ecto.Changeset.cast_assoc(changeset, :student)
+    else
+      student_assoc = Classnavapi.Repo.get(Classnavapi.Student, student_obj["id"])
+      if student_assoc != nil do
+        Ecto.Changeset.put_assoc(changeset, :student, student_assoc)
+      else
+        Ecto.Changeset.cast_assoc(changeset, :student)
+      end
+    end
+  end
+
   @doc false
   def changeset(%User{} = user, attrs) do
     user
@@ -19,6 +33,6 @@ defmodule Classnavapi.User do
     |> validate_required([:email, :password])
     |> validate_format(:email, ~r/@/)
     |> unique_constraint(:email)
-    |> cast_assoc(:student)
+    |> student_assoc(attrs["student"])
   end
 end
