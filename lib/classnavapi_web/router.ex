@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.Router do
     scope "/v1", V1, as: :v1 do
       resources "/users", UserController, except: [:new,:delete,:edit,:update] do
         post "/roles/:id", RoleController, :create
-        get "/roles/", RoleController, :index
+        resources "/roles/", RoleController, only: [:index,:delete]
       end
     end
   end
