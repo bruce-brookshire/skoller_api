@@ -15,7 +15,7 @@ defmodule Classnavapi.School do
     field :is_active, :boolean, default: false
     field :name, :string
     field :timezone, :string
-    # has_many :students, Classnavapi.Student
+    has_many :students, Classnavapi.Student
 
     timestamps()
   end
