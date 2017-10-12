@@ -5,10 +5,10 @@ defmodule Classnavapi.Auth do
     {:ok, to_string(resource.id)}
   end
 
-  def subject_for_token(_, _) do
-    {:error, :reason_for_error}
+  def resource_from_claims(%{"sub" => sub}) do
+    {:ok, sub}
   end
-  
+
   def resource_from_claims(_claims) do
     {:error, :reason_for_error}
   end

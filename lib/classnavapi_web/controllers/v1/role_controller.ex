@@ -6,7 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.RoleController do
   alias ClassnavapiWeb.UserRoleView
 
   import Ecto.Query
-  
+
   def create(conn, %{"user_id" => user_id, "id" => role_id}) do
 
     changeset = UserRole.changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
@@ -24,7 +24,7 @@ defmodule ClassnavapiWeb.Api.V1.RoleController do
   def delete(conn, %{"user_id" => user_id, "id" => role_id}) do
     user_role = Repo.get_by!(UserRole, user_id: user_id, role_id: role_id)
     case Repo.delete(user_role) do
-      {:ok, struct} ->
+      {:ok, _struct} ->
         conn
         |> send_resp(200, "")
       {:error, changeset} ->
