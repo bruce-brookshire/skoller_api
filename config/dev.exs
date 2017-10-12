@@ -56,3 +56,8 @@ config :classnavapi, Classnavapi.Repo,
   database: "classnavapi_dev",
   hostname: "localhost",
   pool_size: 10
+
+# Configure Guardian Token Generation
+config :classnavapi, Classnavapi.Auth,
+            issuer: "Classnavapi",
+            secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"

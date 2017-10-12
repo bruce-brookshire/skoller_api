@@ -1,6 +1,10 @@
 defmodule ClassnavapiWeb.ErrorView do
   use ClassnavapiWeb, :view
 
+  def render("401.html", _assigns) do
+    "Not Authorized"
+  end
+
   def render("404.html", _assigns) do
     "Page not found"
   end
