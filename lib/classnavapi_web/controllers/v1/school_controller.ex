@@ -23,4 +23,9 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
     schools = Repo.all(School)
     render(conn, SchoolView, "index.json", schools: schools)
   end
+
+  def show(conn, %{"id" => id}) do
+    school = Repo.get!(School, id)
+    render(conn, SchoolView, "show.json", school: school)
+  end
 end
