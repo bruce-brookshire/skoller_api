@@ -12,7 +12,8 @@ defmodule ClassnavapiWeb.SchoolView do
   end
 
   def render("school.json", %{school: school}) do
-    %{name: school.name,
+    %{id: school.id,
+      name: school.name,
       adr_line_1: school.adr_line_1,
       adr_line_2: school.adr_line_2,
       adr_city: school.adr_city,
