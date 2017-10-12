@@ -11,7 +11,7 @@ defmodule Classnavapi.Student do
     field :name_last, :string
     field :phone, :string
     field :major, :string
-    field :school_id, :integer
+    field :school_id, :id
     has_many :users, Classnavapi.User
     belongs_to :school, Classnavapi.School, define_field: false
  
