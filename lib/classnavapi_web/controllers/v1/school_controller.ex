@@ -18,4 +18,9 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def index(conn, _) do
+    schools = Repo.all(School)
+    render(conn, SchoolView, "index.json", schools: schools)
+  end
 end
