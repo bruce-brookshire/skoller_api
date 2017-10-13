@@ -14,8 +14,8 @@ defmodule Classnavapi.User do
     timestamps()
   end
 
-  def student_assoc(changeset, nil), do: changeset
-  def student_assoc(changeset, student_obj) do
+  def student_create_assoc(changeset, nil), do: changeset
+  def student_create_assoc(changeset, student_obj) do
     if student_obj["id"] == nil do
       Ecto.Changeset.cast_assoc(changeset, :student)
     else
@@ -50,7 +50,7 @@ defmodule Classnavapi.User do
     |> cast(attrs, [:email, :password])
     |> validate_required([:email, :password])
     |> unique_constraint(:email)
-    |> student_assoc(attrs["student"])
+    |> student_create_assoc(attrs["student"])
     |> validate_email(attrs["student"])
   end
 
