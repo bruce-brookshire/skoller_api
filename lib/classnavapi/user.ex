@@ -53,4 +53,13 @@ defmodule Classnavapi.User do
     |> student_assoc(attrs["student"])
     |> validate_email(attrs["student"])
   end
+
+  def update_changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:email, :password])
+    |> validate_required([:email, :password])
+    |> unique_constraint(:email)
+    |> cast_assoc(:student)
+    |> validate_email(attrs["student"])
+  end
 end
