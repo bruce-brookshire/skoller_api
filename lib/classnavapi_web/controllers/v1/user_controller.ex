@@ -32,7 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   def update(conn, params = %{"id" => id}) do
     user_old = Repo.get!(User, id)
     user_old = Repo.preload user_old, :student
-    changeset = User.update_changeset(user_old, params)
+    changeset = User.changeset(user_old, params)
 
     case Repo.update(changeset) do
       {:ok, user} ->
