@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
 
   def create(conn, %{} = params) do
 
-    changeset = School.changeset(%School{}, params)
+    changeset = School.changeset_insert(%School{}, params)
 
     case Repo.insert(changeset) do
       {:ok, school} ->
@@ -27,5 +27,19 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
   def show(conn, %{"id" => id}) do
     school = Repo.get!(School, id)
     render(conn, SchoolView, "show.json", school: school)
+  end
+
+  def update(conn, params = %{"id" => id}) do
+    school_old = Repo.get!(School, id)
+    changeset = School.changeset_update(school_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, school} ->
+        render(conn, SchoolView, "show.json", school: school)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 end
