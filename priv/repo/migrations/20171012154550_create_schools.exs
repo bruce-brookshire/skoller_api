@@ -13,6 +13,7 @@ defmodule Classnavapi.Repo.Migrations.CreateSchools do
       add :email_domain, :string
       add :email_domain_prof, :string
       add :is_active, :boolean, default: false, null: false
+      add :is_editable, :boolean, default: false, null: false
 
       timestamps()
     end
