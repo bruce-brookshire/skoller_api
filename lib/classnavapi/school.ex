@@ -21,10 +21,20 @@ defmodule Classnavapi.School do
     timestamps()
   end
 
+  @all_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active, :is_editable]
+  @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :is_active, :is_editable]
+  @upd_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain_prof, :is_active, :is_editable]
+
   @doc false
-  def changeset(%School{} = school, attrs) do
+  def changeset_insert(%School{} = school, attrs) do
     school
-    |> cast(attrs, [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active, :is_editable])
-    |> validate_required([:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :is_active, :is_editable])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
+  end
+
+  def changeset_update(%School{} = school, attrs) do
+    school
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@req_fields)
   end
 end
