@@ -14,6 +14,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville",
-                                    is_active: true})
+                                    is_active: true,
+                                    is_editable: true})
   end
 end

@@ -13,6 +13,7 @@ defmodule Classnavapi.School do
     field :email_domain, :string
     field :email_domain_prof, :string
     field :is_active, :boolean, default: false
+    field :is_editable, :boolean, default: false
     field :name, :string
     field :timezone, :string
     has_many :students, Classnavapi.Student
@@ -23,7 +24,7 @@ defmodule Classnavapi.School do
   @doc false
   def changeset(%School{} = school, attrs) do
     school
-    |> cast(attrs, [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active])
-    |> validate_required([:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :is_active])
+    |> cast(attrs, [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active, :is_editable])
+    |> validate_required([:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :is_active, :is_editable])
   end
 end

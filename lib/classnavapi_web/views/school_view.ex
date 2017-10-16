@@ -22,6 +22,7 @@ defmodule ClassnavapiWeb.SchoolView do
       timezone: school.timezone,
       email_domain: school.email_domain,
       email_domain_prof: school.email_domain_prof,
-      is_active: school.is_active}
+      is_active: school.is_active,
+      is_editable: school.is_editable}
   end
 end
