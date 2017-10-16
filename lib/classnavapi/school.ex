@@ -23,7 +23,7 @@ defmodule Classnavapi.School do
 
   @all_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active, :is_editable]
   @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :is_active, :is_editable]
-  @upd_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain_prof, :is_active, :is_editable]
+  @upd_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :email_domain, :email_domain_prof, :is_active, :is_editable]
 
   @doc false
   def changeset_insert(%School{} = school, attrs) do

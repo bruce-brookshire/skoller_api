@@ -12,11 +12,14 @@ defmodule ClassnavapiWeb.StudentView do
   end
 
   def render("student.json", %{student: student}) do
-    %{name_first: student.name_first,
+    %{
+      id: student.id,
+      name_first: student.name_first,
       name_last: student.name_last,
       phone: student.phone,
       major: student.major,
       birthday: student.birthday,
-      gender: student.gender}
+      gender: student.gender
+    }
   end
 end

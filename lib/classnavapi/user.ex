@@ -30,13 +30,24 @@ defmodule Classnavapi.User do
     end
   end
 
+  @all_fields [:email, :password]
+  @req_fields [:email, :password]
+  @upd_fields [:password]
+
   @doc false
-  def changeset(%User{} = user, attrs) do
+  def changeset_insert(%User{} = user, attrs) do
     user
-    |> cast(attrs, [:email, :password])
-    |> validate_required([:email, :password])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_email(attrs["student"])
+  end
+
+  def changeset_update(%User{} = user, attrs) do
+    user
+    |> cast(attrs, @upd_fields)
+    |> validate_required([:email, :password])
+    |> cast_assoc(:student)
   end
 end
