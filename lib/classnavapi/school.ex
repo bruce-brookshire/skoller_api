@@ -1,8 +1,9 @@
 defmodule Classnavapi.School do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.School
 
+  alias Classnavapi.School
+  alias Classnavapi.Repo
 
   schema "schools" do
     field :adr_city, :string
@@ -15,7 +16,7 @@ defmodule Classnavapi.School do
     field :name, :string
     field :timezone, :string
     has_many :students, Classnavapi.Student
-    has_many :email_domains, School.EmailDomain
+    has_many :email_domains, School.EmailDomain, on_replace: :delete
 
     timestamps()
   end
@@ -33,6 +34,8 @@ defmodule Classnavapi.School do
   end
 
   def changeset_update(%School{} = school, attrs) do
+    school = Repo.preload school, :email_domains
+
     school
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
