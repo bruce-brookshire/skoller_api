@@ -28,4 +28,18 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
     professor = Repo.get!(Professor, id)
     render(conn, ProfessorView, "show.json", professor: professor)
   end
+
+  def update(conn, params = %{"id" => id}) do
+    professor_old = Repo.get!(Professor, id)
+    changeset = Professor.changeset_update(professor_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, professor} ->
+        render(conn, ProfessorView, "show.json", professor: professor)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end

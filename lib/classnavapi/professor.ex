@@ -19,12 +19,19 @@ defmodule Classnavapi.Professor do
 
   @all_fields [:name_first, :name_last, :email, :phone, :office_location, :office_availability, :class_period_id]
   @req_fields [:name_last, :class_period_id]
+  @upd_fields [:name_first, :name_last, :email, :phone, :office_location, :office_availability]
 
   @doc false
-  def changeset(%Professor{} = professor, attrs) do
+  def changeset_insert(%Professor{} = professor, attrs) do
     professor
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
+  end
+
+  def changeset_update(%Professor{} = professor, attrs) do
+    professor
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@req_fields)
   end
 end
