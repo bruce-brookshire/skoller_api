@@ -23,12 +23,23 @@ defmodule Classnavapi.ClassPeriod do
     end
   end
 
+  @all_fields [:name, :start_date, :end_date, :school_id]
+  @req_fields [:name, :start_date, :end_date, :school_id]
+  @upd_fields [:name, :start_date, :end_date]
+
   @doc false
-  def changeset(%ClassPeriod{} = class_period, attrs) do
+  def changeset_insert(%ClassPeriod{} = class_period, attrs) do
     class_period
-    |> cast(attrs, [:name, :start_date, :end_date, :school_id])
-    |> validate_required([:name, :start_date, :end_date, :school_id])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
+    |> validate_dates
+  end
+  
+  def changeset_update(%ClassPeriod{} = class_period, attrs) do
+    class_period
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@req_fields)
     |> validate_dates
   end
 end
