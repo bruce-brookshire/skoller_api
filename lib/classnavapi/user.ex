@@ -20,9 +20,10 @@ defmodule Classnavapi.User do
     if (school == nil) do
       add_error(changeset, :student, "Invalid school")
     else
-      email_domain = school.email_domain
-      user_email = get_field(changeset, :email)
-      if tl(String.split(email_domain, "@")) != tl(String.split(user_email, "@")) do
+      school = Repo.preload school, :email_domains
+      email_domains = school.email_domains
+      user_email_domain = "@" <> List.first(Enum.take(String.split(get_field(changeset, :email), "@"), -1))
+      if Enum.find(email_domains, fn(x) -> x.email_domain == user_email_domain end) == nil do
         add_error(changeset, :student, "Invalid email for school.")
       else
         changeset
