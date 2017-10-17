@@ -25,5 +25,6 @@ defmodule Classnavapi.Professor do
     professor
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:class_period_id)
   end
 end
