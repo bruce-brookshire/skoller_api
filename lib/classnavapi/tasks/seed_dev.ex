@@ -9,7 +9,12 @@ defmodule Mix.Tasks.Seed.Dev do
     Repo.insert!(%Classnavapi.User{email: "tyler@fortyau.com", password: "test"})
     Repo.insert!(%Classnavapi.School{name: "Hard Knocks University",
                                     timezone: "CST",
-                                    email_domain: "@hku.edu",
+                                    email_domains: [
+                                      %Classnavapi.School.EmailDomain{
+                                        email_domain: "@hku.edu",
+                                        is_professor_only: false
+                                      }
+                                    ],
                                     adr_zip: "37201",
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",

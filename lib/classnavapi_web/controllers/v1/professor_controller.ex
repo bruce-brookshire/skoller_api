@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
 
   def create(conn, %{} = params) do
 
-    changeset = Professor.changeset(%Professor{}, params)
+    changeset = Professor.changeset_insert(%Professor{}, params)
 
     case Repo.insert(changeset) do
       {:ok, professor} ->
