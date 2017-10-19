@@ -50,8 +50,27 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     |> post(v1_user_path(build_conn(), :create, email: "test@example.com", password: "test"))
     |> json_response(200)
 
+    assert response["id"] |> is_integer
     assert response["id"] > 0
     assert response["email"] == "test@example.com"
     assert response["student"] == nil
+  end
+
+  test "Update/2 does not update email and updates other fields when valid", %{jwt: jwt} do
+    user = User.changeset_insert(%User{}, %{email: "test@example.com", password: "test"})
+    |> Repo.insert!
+
+    response = build_conn()
+    |> put_req_header("authorization", "Bearer #{jwt}")
+    |> put(v1_user_path(build_conn(), :update, user.id, email: "update@example.com", password: "update"))
+    |> json_response(200)
+
+    user_updated = Repo.get(User, response["id"])
+
+    assert response["id"] |> is_integer
+    assert response["id"] == user.id
+    assert response["email"] == "test@example.com"
+    assert response["student"] == nil
+    assert user_updated.password == "update"
   end
 end
