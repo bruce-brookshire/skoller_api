@@ -35,10 +35,10 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> get(v1_user_path(build_conn(), :index))
+    |> get(v1_user_path(build_conn(), :show, user.id))
     |> json_response(200)
 
-    expected = [%{ "email" => "test@example.com", "id" => user.id}]
+    expected = %{ "email" => "test@example.com", "id" => user.id, "student" => nil}
 
     assert  response == expected
   end
