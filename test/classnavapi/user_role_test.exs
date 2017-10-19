@@ -10,12 +10,12 @@ defmodule Classnavapi.UserRoleTest do
     assert changeset.valid?
   end
 
-  test "user insert with no email" do
+  test "user insert with no user_id" do
     changeset = UserRole.changeset(%UserRole{}, Map.delete(@valid_attrs, :user_id))
     refute changeset.valid?
   end
 
-  test "user insert with no password" do
+  test "user insert with no role_id" do
     changeset = UserRole.changeset(%UserRole{}, Map.delete(@valid_attrs, :role_id))
     refute changeset.valid?
   end
