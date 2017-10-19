@@ -12,8 +12,8 @@ defmodule Classnavapi.School.EmailDomain do
     timestamps()
   end
 
-  @all_fields [:email_domain, :is_professor_only]
   @req_fields [:email_domain, :is_professor_only]
+  @all_fields @req_fields
 
   @doc false
   def changeset(%EmailDomain{} = email_domain, attrs) do
