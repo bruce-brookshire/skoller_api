@@ -42,6 +42,7 @@ defmodule Classnavapi.User do
     |> validate_required(@req_fields)
     |> unique_constraint(:email)
     |> cast_assoc(:student)
+    |> validate_format(:email, ~r/@/)
     |> validate_email(attrs["student"])
   end
 
