@@ -43,6 +43,15 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     assert  response == expected
   end
 
+  test "show/2 responds with an error when no user is found", %{jwt: jwt} do
+    assert_raise Ecto.NoResultsError, fn ->
+        build_conn()
+        |> put_req_header("authorization", "Bearer #{jwt}")
+        |> get(v1_user_path(build_conn(), :show, 1))
+        |> json_response(404)
+    end
+  end
+
   test "Create/2 creates and responds with a newly created user if attributes are valid", %{jwt: jwt} do
 
     response = build_conn()
