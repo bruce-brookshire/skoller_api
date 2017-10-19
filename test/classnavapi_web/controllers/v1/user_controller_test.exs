@@ -42,4 +42,16 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     assert  response == expected
   end
+
+  test "Create/2 creates and responds with a newly created user if attributes are valid", %{jwt: jwt} do
+
+    response = build_conn()
+    |> put_req_header("authorization", "Bearer #{jwt}")
+    |> post(v1_user_path(build_conn(), :create, email: "test@example.com", password: "test"))
+    |> json_response(200)
+
+    assert response["id"] > 0
+    assert response["email"] == "test@example.com"
+    assert response["student"] == nil
+  end
 end
