@@ -37,11 +37,15 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
                           major: "CS", 
                           school_id: 1}
 
+  @valid_user_john %{email: "john@example.com", password: "test"}
+  @valid_user_jane %{email: "jane@example.com", password: "test"}
+  @invalid_user %{email: "", password: ""}
+
   test "index/2 responds with all Users", %{jwt: jwt} do
-    john = User.changeset_insert(%User{}, %{email: "john@example.com", password: "test"})
+    john = User.changeset_insert(%User{}, @valid_user_john)
     |> Repo.insert!
     
-    jane = User.changeset_insert(%User{}, %{email: "jane@example.com", password: "test"})
+    jane = User.changeset_insert(%User{}, @valid_user_jane)
     |> Repo.insert!
 
     response = build_conn()
@@ -50,15 +54,15 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     |> json_response(200)
 
     expected = [
-        %{ "email" => "john@example.com", "id" => john.id},
-        %{ "email" => "jane@example.com", "id" => jane.id}
+        %{ "email" => @valid_user_john.email, "id" => john.id},
+        %{ "email" => @valid_user_jane.email, "id" => jane.id}
     ]
 
     assert  response == expected
   end
 
   test "show/2 responds with a users id if the user is found", %{jwt: jwt} do
-    user = User.changeset_insert(%User{}, %{email: "test@example.com", password: "test"})
+    user = User.changeset_insert(%User{}, @valid_user_john)
     |> Repo.insert!
 
     response = build_conn()
@@ -66,7 +70,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     |> get(v1_user_path(build_conn(), :show, user.id))
     |> json_response(200)
 
-    expected = %{ "email" => "test@example.com", "id" => user.id, "student" => nil}
+    expected = %{ "email" => @valid_user_john.email, "id" => user.id, "student" => nil}
 
     assert  response == expected
   end
@@ -84,12 +88,12 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> post(v1_user_path(build_conn(), :create, email: "test@example.com", password: "test"))
+    |> post(v1_user_path(build_conn(), :create, @valid_user_john))
     |> json_response(200)
 
     assert response["id"] |> is_integer
     assert response["id"] > 0
-    assert response["email"] == "test@example.com"
+    assert response["email"] == @valid_user_john.email
     assert response["student"] == nil
   end
 
@@ -102,23 +106,39 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> post(v1_user_path(build_conn(), :create, email: "test@example.com", password: "test", student: student))
+    |> post(v1_user_path(build_conn(), :create, Map.put(@valid_user_john, :student, student)))
     |> json_response(200)
 
     assert response["id"] |> is_integer
     assert response["id"] > 0
-    assert response["email"] == "test@example.com"
     assert response["student"]["id"] |> is_integer
     assert response["student"]["id"] > 0
   end
 
-  test "Create/2 responds in error if school does not exist", %{jwt: jwt} do
+  test "Create/2 responds in error if email is invalid for school", %{jwt: jwt} do
+    
+    school = Classnavapi.School.changeset_insert(%Classnavapi.School{}, @valid_school_attrs)
+    |> Repo.insert!
+    
+    student = %{@valid_student_attrs | school_id: school.id}
 
-    student = @valid_student_attrs
+    invalid_user = %{@valid_user_john | email: "test@nottheemaildomain.com"}
 
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> post(v1_user_path(build_conn(), :create, email: "test@example.com", password: "test", student: student))
+    |> post(v1_user_path(build_conn(), :create, Map.put(invalid_user, :student, student)))
+    |> json_response(422)
+
+    expected = %{"errors" => %{"student" => ["Invalid email for school."]}}
+    
+    assert response == expected
+  end
+
+  test "Create/2 responds in error if school does not exist", %{jwt: jwt} do
+
+    response = build_conn()
+    |> put_req_header("authorization", "Bearer #{jwt}")
+    |> post(v1_user_path(build_conn(), :create, Map.put(@valid_user_john, :student, @valid_student_attrs)))
     |> json_response(422)
 
     expected = %{"errors" => %{"student" => ["Invalid school"]}}
@@ -130,7 +150,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> post(v1_user_path(build_conn(), :create, email: "test.com", password: "test"))
+    |> post(v1_user_path(build_conn(), :create, %{@valid_user_john | email: "john.com"}))
     |> json_response(422)
 
     expected = %{"errors" => %{"email" => ["has invalid format"]}}
@@ -142,7 +162,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     
     response = build_conn()
     |> put_req_header("authorization", "Bearer #{jwt}")
-    |> post(v1_user_path(build_conn(), :create, email: "", password: ""))
+    |> post(v1_user_path(build_conn(), :create, @invalid_user))
     |> json_response(422)
 
     expected = %{"errors" => %{"email" => ["can't be blank"], "password" => ["can't be blank"]}}
@@ -151,7 +171,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
   end
 
   test "Update/2 does not update email and updates other fields when valid", %{jwt: jwt} do
-    user = User.changeset_insert(%User{}, %{email: "test@example.com", password: "test"})
+    user = User.changeset_insert(%User{}, @valid_user_john)
     |> Repo.insert!
 
     response = build_conn()
@@ -163,13 +183,34 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     assert response["id"] |> is_integer
     assert response["id"] == user.id
-    assert response["email"] == "test@example.com"
+    assert response["email"] == @valid_user_john.email
     assert response["student"] == nil
     assert user_updated.password == "update"
   end
 
+  test "Update/2 updates students when id is provided", %{jwt: jwt} do
+    school = Classnavapi.School.changeset_insert(%Classnavapi.School{}, @valid_school_attrs)
+    |> Repo.insert!
+    
+    student = %{@valid_student_attrs | school_id: school.id}
+
+    user = User.changeset_insert(%User{}, Map.put(@valid_user_john, :student, student))
+    |> Repo.insert!
+
+    response = build_conn()
+    |> put_req_header("authorization", "Bearer #{jwt}")
+    |> put(v1_user_path(build_conn(), :update, user.id, student: Map.put(%{student | name_first: "Smashville"}, :id, user.student.id)))
+    |> json_response(200)
+
+    assert response["id"] |> is_integer
+    assert response["id"] == user.id
+    assert response["student"]["id"] |> is_integer
+    assert response["student"]["id"] == user.student.id
+    assert response["student"]["name_first"] == "Smashville"
+  end
+
   test "Update/2 does not update when required fields missing", %{jwt: jwt} do
-    user = User.changeset_insert(%User{}, %{email: "test@example.com", password: "test"})
+    user = User.changeset_insert(%User{}, @valid_user_john)
     |> Repo.insert!
 
     response = build_conn()
