@@ -1,7 +1,7 @@
-defmodule ClassnavapiWeb.Syllabus.StatusView do
+defmodule ClassnavapiWeb.Class.StatusView do
     use ClassnavapiWeb, :view
   
-    alias ClassnavapiWeb.Syllabus.StatusView
+    alias ClassnavapiWeb.Class.StatusView
   
     def render("index.json", %{statuses: statuses}) do
       render_many(statuses, StatusView, "status.json")

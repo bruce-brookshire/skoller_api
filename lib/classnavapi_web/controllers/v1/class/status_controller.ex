@@ -1,9 +1,9 @@
-defmodule ClassnavapiWeb.Api.V1.Syllabus.StatusController do
+defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     use ClassnavapiWeb, :controller
     
-    alias Classnavapi.Syllabus.Status
+    alias Classnavapi.Class.Status
     alias Classnavapi.Repo
-    alias ClassnavapiWeb.Syllabus.StatusView
+    alias ClassnavapiWeb.Class.StatusView
   
     def index(conn, %{}) do
       statuses = Repo.all(Status)

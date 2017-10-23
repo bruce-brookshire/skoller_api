@@ -42,7 +42,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/professors", ProfessorController, except: [:new,:delete,:edit]
         resources "/classes", ClassController, except: [:new,:delete,:edit]
       end
-      resources "/syllabus-statuses", Syllabus.StatusController, only: [:index]
+      resources "/class-statuses", Class.StatusController, only: [:index]
     end
   end
 

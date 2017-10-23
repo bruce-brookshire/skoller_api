@@ -1,10 +1,10 @@
-defmodule Classnavapi.Syllabus.Status do
+defmodule Classnavapi.Class.Status do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.Syllabus.Status
+  alias Classnavapi.Class.Status
 
   @primary_key {:id, :integer, []}
-  schema "syllabus_statuses" do
+  schema "class_statuses" do
     field :is_complete, :boolean
     field :is_editable, :boolean
     field :name, :string
