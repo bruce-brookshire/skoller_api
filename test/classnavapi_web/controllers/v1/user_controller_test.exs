@@ -222,4 +222,13 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
 
     assert response == expected
   end
+
+  test "update/2 responds with an error when no user is found", %{jwt: jwt} do
+    assert_raise Ecto.NoResultsError, fn ->
+        build_conn()
+        |> put_req_header("authorization", "Bearer #{jwt}")
+        |> put(v1_user_path(build_conn(), :show, 1))
+        |> json_response(404)
+    end
+  end
 end
