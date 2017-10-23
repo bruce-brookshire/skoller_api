@@ -17,8 +17,9 @@ defmodule Classnavapi.Professor do
     timestamps()
   end
 
-  @all_fields [:name_first, :name_last, :email, :phone, :office_location, :office_availability, :class_period_id]
   @req_fields [:name_last, :class_period_id]
+  @opt_fields [:name_first, :email, :phone, :office_location, :office_availability]
+  @all_fields @req_fields ++ @opt_fields
   @upd_fields [:name_first, :name_last, :email, :phone, :office_location, :office_availability]
 
   @doc false
@@ -26,6 +27,7 @@ defmodule Classnavapi.Professor do
     professor
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> validate_format(:email, ~r/@/)
     |> foreign_key_constraint(:class_period_id)
   end
 
@@ -33,5 +35,6 @@ defmodule Classnavapi.Professor do
     professor
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
+    |> validate_format(:email, ~r/@/)
   end
 end

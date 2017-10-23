@@ -10,11 +10,14 @@ defmodule Classnavapi.Role do
     timestamps()
   end
 
+  @req_fields [:id, :name]
+  @all_fields @req_fields
+
   @doc false
   def changeset(%Role{} = role, attrs) do
     role
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
     |> unique_constraint(:name)
   end
 end

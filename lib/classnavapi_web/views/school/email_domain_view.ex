@@ -13,7 +13,6 @@ defmodule ClassnavapiWeb.School.EmailDomainView do
 
   def render("email_domain.json", %{email_domain: email_domain}) do
     %{
-      id: email_domain.id,
       email_domain: email_domain.email_domain,
       is_professor_only: email_domain.is_professor_only
     }

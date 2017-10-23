@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.SchoolView do
     render_one(school, SchoolView, "school.json")
     |> Map.merge(
       %{
-        email_domain: render_many(school.email_domains, ClassnavapiWeb.School.EmailDomainView, "email_domain.json")
+        email_domains: render_many(school.email_domains, ClassnavapiWeb.School.EmailDomainView, "email_domain.json")
       }
     )
   end

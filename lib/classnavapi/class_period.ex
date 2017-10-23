@@ -23,8 +23,8 @@ defmodule Classnavapi.ClassPeriod do
     end
   end
 
-  @all_fields [:name, :start_date, :end_date, :school_id]
   @req_fields [:name, :start_date, :end_date, :school_id]
+  @all_fields @req_fields
   @upd_fields [:name, :start_date, :end_date]
 
   @doc false

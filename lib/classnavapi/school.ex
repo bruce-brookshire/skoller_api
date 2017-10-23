@@ -11,8 +11,8 @@ defmodule Classnavapi.School do
     field :adr_line_2, :string
     field :adr_state, :string
     field :adr_zip, :string
-    field :is_active, :boolean, default: false
-    field :is_editable, :boolean, default: false
+    field :is_active, :boolean
+    field :is_editable, :boolean
     field :name, :string
     field :timezone, :string
     has_many :students, Classnavapi.Student
@@ -21,9 +21,10 @@ defmodule Classnavapi.School do
     timestamps()
   end
 
-  @all_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :is_active, :is_editable]
   @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :is_active, :is_editable]
-  @upd_fields [:name, :adr_line_1, :adr_line_2, :adr_city, :adr_state, :adr_zip, :timezone, :is_active, :is_editable]
+  @opt_fields [:adr_line_2]
+  @all_fields @req_fields ++ @opt_fields
+  @upd_fields @all_fields
 
   @doc false
   def changeset_insert(%School{} = school, attrs) do

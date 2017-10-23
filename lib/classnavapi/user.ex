@@ -31,8 +31,8 @@ defmodule Classnavapi.User do
     end
   end
 
-  @all_fields [:email, :password]
   @req_fields [:email, :password]
+  @all_fields @req_fields
   @upd_fields [:password]
 
   @doc false

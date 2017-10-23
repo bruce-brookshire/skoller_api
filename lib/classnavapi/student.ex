@@ -18,12 +18,15 @@ defmodule Classnavapi.Student do
     timestamps()
   end
 
+  @req_fields [:name_first, :name_last, :phone, :birthday, :gender, :major, :school_id]
+  @all_fields @req_fields
+
   @doc false
   def changeset(%Student{} = student, attrs) do
 
     student
-    |> cast(attrs, [:name_first, :name_last, :phone, :birthday, :gender, :major, :school_id])
-    |> validate_required([:name_first, :name_last, :phone, :birthday, :gender, :major, :school_id])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
   end
 end
