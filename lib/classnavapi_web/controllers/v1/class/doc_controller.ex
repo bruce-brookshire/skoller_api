@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    scope = Repo.get!(Classnavapi.Class, class_id)
+    scope = %{"id" => Ecto.UUID.generate()}
     case Classnavapi.DocUpload.store({file, scope}) do
       {:ok, inserted} ->
         location = Classnavapi.DocUpload.url({inserted, scope})

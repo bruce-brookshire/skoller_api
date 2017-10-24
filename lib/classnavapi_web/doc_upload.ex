@@ -3,7 +3,7 @@ defmodule Classnavapi.DocUpload do
   use Arc.Ecto.Definition
 
   @versions [:original]
-  @extensions ~w(.pdf .doc .docx .txt .rtf)
+  @extensions ~w(.pdf .txt .rtf .jpg .png .jpeg)
   @acl :public_read
 
   # Whitelist file extensions:
@@ -12,13 +12,13 @@ defmodule Classnavapi.DocUpload do
   end
 
   # Override the persisted filenames:
-  # def filename(version, _) do
-  #   version
-  # end
+  def filename(version, {file, scope}) do
+    scope["id"]
+  end
 
   # Override the storage directory:
-  def storage_dir(version, {file, scope}) do
-    "uploads/class/docs/#{scope.id}"
+  def storage_dir(version, _) do
+    "uploads/class/docs/"
   end
 
   # Specify custom headers for s3 objects
