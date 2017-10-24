@@ -5,6 +5,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.DocView
 
+  import Ecto.Query
+
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
     scope = Repo.get!(Classnavapi.Class, class_id)
@@ -25,5 +27,10 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def index(conn, %{"class_id" => class_id}) do
+    docs = Repo.all(from docs in Doc, where: docs.class_id == ^class_id)
+    render(conn, DocView, "index.json", docs: docs)
   end
 end
