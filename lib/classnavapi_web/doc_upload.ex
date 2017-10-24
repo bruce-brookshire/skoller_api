@@ -3,7 +3,8 @@ defmodule Classnavapi.DocUpload do
   use Arc.Ecto.Definition
 
   @versions [:original]
-  @extensions ~w(.pdf .doc .docx)
+  @extensions ~w(.pdf .doc .docx .txt .rtf)
+  @acl :public_read
 
   # Whitelist file extensions:
   def validate({file, _}) do
