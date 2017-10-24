@@ -41,7 +41,13 @@ defmodule Classnavapi.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:guardian, "~> 1.0-beta"}
+      {:guardian, "~> 1.0-beta"},
+      {:arc, "~> 0.8.0"},
+      {:arc_ecto, "~> 0.7.0"},
+      {:ex_aws, "~> 1.1"},
+      {:hackney, "~> 1.6"},
+      {:poison, "~> 3.1"},
+      {:sweet_xml, "~> 0.6"}
     ]
   end
 
@@ -53,7 +59,7 @@ defmodule Classnavapi.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs", "seed.dev"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "test": ["ecto.create --quiet", "ecto.migrate", "test"]
     ]

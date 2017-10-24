@@ -19,11 +19,13 @@ defmodule Classnavapi.Repo.Migrations.CreateClasses do
       add :is_syllabus, :boolean, default: false, null: false
       add :professor_id, references(:professors, on_delete: :nothing)
       add :class_period_id, references(:class_periods, on_delete: :nothing)
+      add :class_status_id, references(:class_statuses, on_delete: :nothing)
 
       timestamps()
     end
 
     create index(:classes, [:professor_id])
     create index(:classes, [:class_period_id])
+    create index(:classes, [:class_status_id])
   end
 end
