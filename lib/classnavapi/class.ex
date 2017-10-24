@@ -22,6 +22,7 @@ defmodule Classnavapi.Class do
     field :professor_id, :id
     field :class_period_id, :id
     field :class_status_id, :id
+    has_many :docs, Classnavapi.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
 
