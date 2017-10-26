@@ -25,18 +25,31 @@ defmodule Classnavapi.Class do
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
-    has_many :weights, Class.Weight, on_replace: :delete
+    has_many :weights, Class.Weight
 
     timestamps()
   end
 
+  defp sum_weight(list) do
+    case list do 
+      [] -> list
+      _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
+    end
+  end
+
   defp validate_weight_totals(changeset) do
-    case Ecto.Changeset.get_field(changeset, :weights) do
-      [] -> changeset
-      weights -> case Decimal.to_integer(Decimal.compare(Decimal.new(100), Enum.reduce(weights, fn(x, acc) -> Decimal.add(Map.get(x, :weight),Map.get(acc, :weight))  end))) do
-        0 -> changeset
-        _ -> add_error(changeset, :weights, "Weights do not add to 100")
-      end
+    sum = changeset
+          |> Ecto.Changeset.get_field(:weights)
+          |> Enum.map(&Map.get(&1, :weight))
+          |> Enum.filter(& &1)
+          |> sum_weight
+
+    target = Decimal.new(100)
+
+    cond do
+      sum == [] -> changeset
+      sum == target -> changeset
+      sum != target -> changeset |> add_error(:weights, "Weights do not add to 100")
     end
   end
 
