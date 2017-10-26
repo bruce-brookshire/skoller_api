@@ -1,6 +1,7 @@
 defmodule Classnavapi.Class.Weight do
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Classnavapi.Class.Weight
 
 
@@ -13,7 +14,7 @@ defmodule Classnavapi.Class.Weight do
     timestamps()
   end
 
-  @req_fields [:name, :weight, :class_id]
+  @req_fields [:name, :weight]
   @all_fields @req_fields
 
   @doc false
@@ -21,5 +22,6 @@ defmodule Classnavapi.Class.Weight do
     weight
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> validate_number(:weight, greater_than: 0, less_than_or_equal_to: 100)
   end
 end

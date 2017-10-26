@@ -7,15 +7,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   import Ecto.Query
 
-  def create(conn, %{"file" => file, "class_id" => class_id} = params) do
+  def create(conn, %{"file" => file} = params) do
 
     scope = %{"id" => Ecto.UUID.generate()}
-    case Classnavapi.DocUpload.store({file, scope}) do
-      {:ok, inserted} ->
-        location = Classnavapi.DocUpload.url({inserted, scope})
-      _ ->
-        location = nil
-    end
+    location = 
+      case Classnavapi.DocUpload.store({file, scope}) do
+        {:ok, inserted} ->
+          Classnavapi.DocUpload.url({inserted, scope})
+        _ ->
+          nil
+      end
 
     changeset = Doc.changeset(%Doc{}, Map.put(params, "path", location))
 
