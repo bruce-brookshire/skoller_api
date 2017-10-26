@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Class.WeightView do
 
     def render("weight.json", %{weight: weight}) do
         %{
+            id: weight.id,
             name: weight.name,
             weight: weight.weight
         }

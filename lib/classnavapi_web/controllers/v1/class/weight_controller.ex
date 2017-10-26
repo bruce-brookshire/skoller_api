@@ -7,11 +7,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.WeightController do
   
     import Ecto.Query
   
-    def create(conn, %{} = params) do
+    def update(conn, %{"id" => id} = params) do
     
-      changeset = Weight.changeset(%Weight{}, params)
+      weight_old = Repo.get!(Weight, id)
+      changeset = Weight.changeset(weight_old, params)
   
-      case Repo.insert(changeset) do
+      case Repo.update(changeset) do
         {:ok, weight} ->
           render(conn, WeightView, "show.json", weight: weight)
         {:error, changeset} ->
