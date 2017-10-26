@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   
     def create(conn, %{} = params) do
   
-      changeset = Class.changeset(%Class{}, params)
+      changeset = Class.changeset_insert(%Class{}, params)
   
       case Repo.insert(changeset) do
         {:ok, class} ->
@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   
     def update(conn, params = %{"id" => id}) do
       class_old = Repo.get!(Class, id)
-      changeset = Class.changeset(class_old, params)
+      changeset = Class.changeset_update(class_old, params)
   
       case Repo.update(changeset) do
         {:ok, class} ->

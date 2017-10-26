@@ -22,11 +22,35 @@ defmodule Classnavapi.Class do
     field :professor_id, :id
     field :class_period_id, :id
     field :class_status_id, :id
-    has_many :docs, Classnavapi.Doc
+    has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
+    has_many :weights, Class.Weight
 
     timestamps()
+  end
+
+  defp sum_weight(list) do
+    case list do 
+      [] -> list
+      _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
+    end
+  end
+
+  defp validate_weight_totals(changeset) do
+    sum = changeset
+          |> Ecto.Changeset.get_field(:weights)
+          |> Enum.map(&Map.get(&1, :weight))
+          |> Enum.filter(& &1)
+          |> sum_weight
+
+    target = Decimal.new(100)
+
+    cond do
+      sum == [] -> changeset
+      sum == target -> changeset
+      sum != target -> changeset |> add_error(:weights, "Weights do not add to 100")
+    end
   end
 
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time, :seat_count, :class_start, :class_end, :is_enrollable, :is_editable, :class_period_id, :is_syllabus, :class_status_id]
@@ -34,12 +58,25 @@ defmodule Classnavapi.Class do
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
-  def changeset(%Class{} = class, attrs) do
+  def changeset_insert(%Class{} = class, attrs) do
     class
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> foreign_key_constraint(:class_status_id)
+  end
+
+  def changeset_update(%Class{} = class, attrs) do
+    class = Classnavapi.Repo.preload class, :weights
+
+    class
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
+    |> foreign_key_constraint(:class_period_id)
+    |> foreign_key_constraint(:professor_id)
+    |> foreign_key_constraint(:class_status_id)
+    |> cast_assoc(:weights)
+    |> validate_weight_totals()
   end
 end
