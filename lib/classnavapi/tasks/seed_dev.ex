@@ -6,8 +6,12 @@ defmodule Mix.Tasks.Seed.Dev do
 
   def run(_) do
     ensure_started(Repo, [])
+
+    {:ok, date1} = Date.new(2017, 10, 12)
+    {:ok, date2} = Date.new(2018, 10, 12)
+
     Repo.insert!(%Classnavapi.User{email: "tyler@fortyau.com", password: "test"})
-    Repo.insert!(%Classnavapi.School{name: "Hard Knocks University",
+    school = Repo.insert!(%Classnavapi.School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     email_domains: [
                                       %Classnavapi.School.EmailDomain{
@@ -21,5 +25,27 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_city: "Nashville",
                                     is_active: true,
                                     is_editable: true})
+
+    period = Repo.insert!(%Classnavapi.ClassPeriod{
+      name: "Q1",
+      school_id: school.id,
+      start_date: date1,
+      end_date: date2
+    })
+    
+    Repo.insert!(%Classnavapi.Class{name: "Big Money",
+                  number: "8001-01",
+                  meet_days: "MWF",
+                  meet_start_time: "8:30",
+                  meet_end_time: "12",
+                  seat_count: 200,
+                  class_start: date1,
+                  class_end: date2,
+                  is_enrollable: true,
+                  is_editable: true,
+                  is_syllabus: false,
+                  class_period_id: period.id,
+                  class_status_id: 100
+    })
   end
 end
