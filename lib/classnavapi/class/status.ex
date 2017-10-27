@@ -1,4 +1,13 @@
 defmodule Classnavapi.Class.Status do
+
+  @moduledoc """
+  
+  Defines schema and changeset for class_statuses
+
+  The primary key is not seeded.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Status

@@ -1,4 +1,13 @@
 defmodule Classnavapi.ClassPeriod do
+
+  @moduledoc """
+  
+  Changeset and schema for class_periods
+
+  Validates that the end date is after the start date
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.ClassPeriod

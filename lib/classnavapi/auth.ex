@@ -1,4 +1,15 @@
 defmodule Classnavapi.Auth do
+
+  @moduledoc """
+  
+  Guardian Token Auth module.
+
+  subject_for_token/2 is used during encode_and_sign/2
+
+  resource_from_claims/1 is used during Guardian.Plug.LoadResource
+
+  """
+
   use Guardian, otp_app: :classnavapi
 
   def subject_for_token(resource, _claims) do

@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
 
-  def create(conn, params = %{}) do
+  def create(conn, %{} = params) do
 
     changeset = User.changeset_insert(%User{}, params)
 
@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
       render(conn, UserView, "show.json", user: user)
   end
 
-  def update(conn, params = %{"id" => id}) do
+  def update(conn, %{"id" => id} = params) do
     user_old = Repo.get!(User, id)
     user_old = Repo.preload user_old, :student
     changeset = User.changeset_update(user_old, params)

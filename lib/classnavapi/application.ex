@@ -1,4 +1,11 @@
 defmodule Classnavapi.Application do
+
+  @moduledoc """
+  
+  Classnavapi startup.
+
+  """
+
   use Application
 
   # See https://hexdocs.pm/elixir/Application.html

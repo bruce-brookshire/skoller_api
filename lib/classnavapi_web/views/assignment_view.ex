@@ -15,7 +15,7 @@ defmodule ClassnavapiWeb.AssignmentView do
         %{
             due: assignment.due,
             name: assignment.name,
-            relative_weight: assignment.relative_weight
+            weight_id: assignment.weight_id
         }
     end
 end

@@ -1,4 +1,13 @@
 defmodule Classnavapi.Role do
+
+  @moduledoc """
+  
+  Defines schema and changeset for roles.
+
+  The primary key is not seeded.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Role

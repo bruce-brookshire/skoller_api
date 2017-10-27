@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
       render(conn, ClassView, "show.json", class: class)
     end
   
-    def update(conn, params = %{"id" => id}) do
+    def update(conn, %{"id" => id} = params) do
       class_old = Repo.get!(Class, id)
       changeset = Class.changeset_update(class_old, params)
   

@@ -18,7 +18,8 @@ defmodule ClassnavapiWeb.UserView do
 
   def render("user_detail.json", %{user: user}) do
     user = Classnavapi.Repo.preload(user, :student)
-    render_one(user, UserView, "user.json")
+    user 
+    |> render_one(UserView, "user.json")
     |> Map.merge(
       %{
         student: render_one(user.student, ClassnavapiWeb.StudentView, "student.json")

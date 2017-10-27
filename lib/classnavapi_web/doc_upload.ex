@@ -1,4 +1,10 @@
 defmodule Classnavapi.DocUpload do
+  @moduledoc """
+    Provides doc upload utilities.
+
+    Defines valid extensions, filename, and storage path.
+  """
+  
   use Arc.Definition
   use Arc.Ecto.Definition
 
@@ -12,12 +18,12 @@ defmodule Classnavapi.DocUpload do
   end
 
   # Override the persisted filenames:
-  def filename(version, {file, scope}) do
+  def filename(_version, {_file, scope}) do
     scope["id"]
   end
 
   # Override the storage directory:
-  def storage_dir(version, _) do
+  def storage_dir(_, _) do
     "uploads/class/docs/"
   end
 

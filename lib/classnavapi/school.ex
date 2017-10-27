@@ -1,4 +1,11 @@
 defmodule Classnavapi.School do
+
+  @moduledoc """
+  
+  Defines schema and changeset for school
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

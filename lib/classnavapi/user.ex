@@ -1,4 +1,13 @@
 defmodule Classnavapi.User do
+
+  @moduledoc """
+  
+  Defines changeset and schema for users.
+  
+  Email will be validated against school email domains if the user is a student.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -17,7 +26,7 @@ defmodule Classnavapi.User do
   def validate_email(changeset, nil), do: changeset
   def validate_email(changeset, student_obj) do
     school = Repo.get(Classnavapi.School, student_obj["school_id"])
-    if (school == nil) do
+    if school == nil do
       add_error(changeset, :student, "Invalid school")
     else
       school = Repo.preload school, :email_domains
