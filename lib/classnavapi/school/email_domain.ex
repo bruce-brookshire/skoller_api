@@ -1,4 +1,13 @@
 defmodule Classnavapi.School.EmailDomain do
+
+  @moduledoc """
+  
+  Defines changeset and schema for email_domains.
+
+  Email domains will be validated for format.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.School.EmailDomain

@@ -1,4 +1,11 @@
 defmodule Classnavapi.Class.Doc do
+
+  @moduledoc """
+  
+  The changeset and schema for docs.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Doc

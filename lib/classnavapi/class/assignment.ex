@@ -1,4 +1,11 @@
 defmodule Classnavapi.Class.Assignment do
+
+  @moduledoc """
+  
+  Changeset and schema for assignments
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Assignment

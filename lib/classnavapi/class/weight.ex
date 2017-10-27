@@ -1,4 +1,11 @@
 defmodule Classnavapi.Class.Weight do
+
+  @moduledoc """
+  
+  Changeset and schema for class_weights
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

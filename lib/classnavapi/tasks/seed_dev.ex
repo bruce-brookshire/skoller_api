@@ -1,4 +1,11 @@
 defmodule Mix.Tasks.Seed.Dev do
+
+  @moduledoc """
+
+  Utility for developers to seed the db with data for manipulating and testing.
+
+  """
+
   use Mix.Task
   import Mix.Ecto
 

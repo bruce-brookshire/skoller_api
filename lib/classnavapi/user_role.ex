@@ -1,4 +1,11 @@
 defmodule Classnavapi.UserRole do
+
+  @moduledoc """
+
+  Defines schema and changeset for user_roles.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.UserRole

@@ -1,4 +1,15 @@
 defmodule Classnavapi.Class do
+
+  @moduledoc """
+  
+  Changeset and schema for classes.
+
+  Weights are validated for summing to 100.
+
+  Weights can only be added through editing the class initially. Weights are edited individually after.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class

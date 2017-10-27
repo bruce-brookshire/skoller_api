@@ -1,4 +1,11 @@
 defmodule Classnavapi.AuthErrorHandler do
+
+  @moduledoc """
+  
+  Guardian error handler.
+
+  """
+
   import Plug.Conn
 
   def auth_error(conn, {type, _reason}, _opts) do

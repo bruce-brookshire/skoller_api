@@ -1,4 +1,11 @@
 defmodule Classnavapi.Professor do
+
+  @moduledoc """
+  
+  Changeset and schema for professors.
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Professor
