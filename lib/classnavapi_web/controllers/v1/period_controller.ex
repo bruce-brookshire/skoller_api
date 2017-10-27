@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.PeriodController do
     render(conn, PeriodView, "show.json", period: period)
   end
 
-  def update(conn, params = %{"id" => id}) do
+  def update(conn, %{"id" => id} = params) do
     period_old = Repo.get!(ClassPeriod, id)
     changeset = ClassPeriod.changeset_update(period_old, params)
 

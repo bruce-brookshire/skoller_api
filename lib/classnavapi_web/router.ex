@@ -33,17 +33,17 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
-      resources "/users", UserController, except: [:new,:delete,:edit] do
+      resources "/users", UserController, except: [:new, :delete, :edit] do
         post "/roles/:id", RoleController, :create
-        resources "/roles/", RoleController, only: [:index,:delete]
+        resources "/roles/", RoleController, only: [:index, :delete]
       end
-      resources "/schools", SchoolController, except: [:new,:delete,:edit] do
-        resources "/periods", PeriodController, except: [:new,:delete,:edit]
-        resources "/professors", ProfessorController, except: [:new,:delete,:edit]
-        resources "/classes", ClassController, except: [:new,:delete,:edit] do
-          resources "/docs", Class.DocController, only: [:create,:index]
-          resources "/assignments", Class.AssignmentController, only: [:create,:index]
-          resources "/weights", Class.WeightController, only: [:update,:index]
+      resources "/schools", SchoolController, except: [:new, :delete, :edit] do
+        resources "/periods", PeriodController, except: [:new, :delete, :edit]
+        resources "/professors", ProfessorController, except: [:new, :delete, :edit]
+        resources "/classes", ClassController, except: [:new, :delete, :edit] do
+          resources "/docs", Class.DocController, only: [:create, :index]
+          resources "/assignments", Class.AssignmentController, only: [:create, :index]
+          resources "/weights", Class.WeightController, only: [:update, :index]
         end
       end
       resources "/class-statuses", Class.StatusController, only: [:index]

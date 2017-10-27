@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
     render(conn, ProfessorView, "show.json", professor: professor)
   end
 
-  def update(conn, params = %{"id" => id}) do
+  def update(conn, %{"id" => id} = params) do
     professor_old = Repo.get!(Professor, id)
     changeset = Professor.changeset_update(professor_old, params)
 

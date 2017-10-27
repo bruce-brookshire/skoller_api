@@ -33,7 +33,7 @@ defmodule Mix.Tasks.Seed.Dev do
       end_date: date2
     })
     
-    Repo.insert!(%Classnavapi.Class{name: "Big Money",
+    class = Repo.insert!(%Classnavapi.Class{name: "Big Money",
                   number: "8001-01",
                   meet_days: "MWF",
                   meet_start_time: "8:30",
@@ -47,5 +47,18 @@ defmodule Mix.Tasks.Seed.Dev do
                   class_period_id: period.id,
                   class_status_id: 100
     })
+
+    Repo.insert!(%Classnavapi.Class.Weight{
+      name: "Assignments",
+      weight: 50,
+      class_id: class.id
+    })
+
+    Repo.insert!(%Classnavapi.Class.Weight{
+      name: "Tests",
+      weight: 50,
+      class_id: class.id
+    })
+
   end
 end
