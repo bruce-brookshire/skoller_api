@@ -7,14 +7,15 @@ defmodule Classnavapi.Class.Assignment do
   schema "assignments" do
     field :due, :date
     field :name, :string
-    field :relative_weight, :decimal
+    field :weight_id, :id
     field :class_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
+    belongs_to :weight, Classnavapi.Class.Weight, define_field: false
 
     timestamps()
   end
 
-  @req_fields [:due, :name, :class_id, :relative_weight]
+  @req_fields [:due, :name, :class_id, :weight_id]
   @all_fields @req_fields
 
   @doc false
