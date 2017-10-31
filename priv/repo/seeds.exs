@@ -19,3 +19,8 @@ Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 200, name: "Assignments",
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 300, name: "Review", is_editable: true, is_complete: false})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 400, name: "Help", is_editable: false, is_complete: false})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 500, name: "Complete", is_editable: false, is_complete: true})
+
+Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 100, status: "Incorrect"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 200, status: "Confusing"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 300, status: "File"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 400, status: "Other"})
