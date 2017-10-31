@@ -27,7 +27,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
 
     def hub(conn, %{}) do
       statuses = Repo.all(Status)
-      |> put_class_status_counts
+
+      statuses = statuses |> put_class_status_counts
+
       render(conn, HubStatusView, "index.json", statuses: statuses)
     end
   end
