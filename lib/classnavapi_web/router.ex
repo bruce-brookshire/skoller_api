@@ -47,6 +47,7 @@ defmodule ClassnavapiWeb.Router do
         end
       end
       resources "/class-statuses", Class.StatusController, only: [:index]
+      get "/class-statuses/hub", Class.StatusController, :hub
     end
   end
 

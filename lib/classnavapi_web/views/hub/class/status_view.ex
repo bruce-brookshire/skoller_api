@@ -1,7 +1,7 @@
-defmodule ClassnavapiWeb.Class.StatusView do
+defmodule ClassnavapiWeb.Hub.Class.StatusView do
     use ClassnavapiWeb, :view
   
-    alias ClassnavapiWeb.Class.StatusView
+    alias ClassnavapiWeb.Hub.Class.StatusView
   
     def render("index.json", %{statuses: statuses}) do
       render_many(statuses, StatusView, "status.json")
@@ -15,8 +15,7 @@ defmodule ClassnavapiWeb.Class.StatusView do
       %{
         id: status.id,
         name: status.name,
-        is_editable: status.is_editable,
-        is_complete: status.is_complete
+        classes: status.classes
       }
     end
   end
