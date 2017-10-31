@@ -12,7 +12,7 @@ defmodule Classnavapi.Role do
   import Ecto.Changeset
   alias Classnavapi.Role
 
-  @primary_key {:id, :integer, []}
+  @primary_key {:id, :id, []}
   schema "roles" do
     field :name, :string
 

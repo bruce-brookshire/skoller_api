@@ -12,7 +12,7 @@ defmodule Classnavapi.Class.Status do
   import Ecto.Changeset
   alias Classnavapi.Class.Status
 
-  @primary_key {:id, :integer, []}
+  @primary_key {:id, :id, []}
   schema "class_statuses" do
     field :is_complete, :boolean
     field :is_editable, :boolean
