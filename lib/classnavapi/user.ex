@@ -31,21 +31,30 @@ defmodule Classnavapi.User do
     |> List.first()
   end
 
-  def validate_email(changeset, nil), do: changeset
-  def validate_email(changeset, student_obj) do
-    school = Repo.get(Classnavapi.School, student_obj["school_id"])
-    if school == nil do
-      add_error(changeset, :student, "Invalid school")
+  defp preload_school(nil), do: nil
+  defp preload_school(school) do
+    Repo.preload school, :email_domains
+  end
+
+  defp compare_domains(changeset, nil), do: changeset |> add_error(:student, "Invalid school")
+  defp compare_domains(changeset, school) do
+    email_domains = school.email_domains
+    user_email_domain = "@" <> extract_domain(changeset)
+    if Enum.find(email_domains, fn(x) -> x.email_domain == user_email_domain end) == nil do
+      add_error(changeset, :student, "Invalid email for school.")
     else
-      school = Repo.preload school, :email_domains
-      email_domains = school.email_domains
-      user_email_domain = "@" <> extract_domain(changeset)
-      if Enum.find(email_domains, fn(x) -> x.email_domain == user_email_domain end) == nil do
-        add_error(changeset, :student, "Invalid email for school.")
-      else
-        changeset
-      end
+      changeset
     end
+  end
+
+  defp validate_email(changeset, nil), do: changeset
+  defp validate_email(changeset, student_obj) do
+    school = Repo.get(Classnavapi.School, student_obj["school_id"])
+
+    school = school |> preload_school
+
+    changeset
+    |> compare_domains(school)
   end
 
   @req_fields [:email, :password]
