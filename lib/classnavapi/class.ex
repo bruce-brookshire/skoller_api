@@ -13,7 +13,7 @@ defmodule Classnavapi.Class do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class
-
+  alias Classnavapi.Helpers.ChangesetValidation
 
   schema "classes" do
     field :class_end, :date
@@ -77,6 +77,7 @@ defmodule Classnavapi.Class do
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> foreign_key_constraint(:class_status_id)
+    |> ChangesetValidation.validate_dates(:class_start, :class_end)
   end
 
   def changeset_update(%Class{} = class, attrs) do
@@ -88,6 +89,7 @@ defmodule Classnavapi.Class do
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> foreign_key_constraint(:class_status_id)
+    |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> cast_assoc(:weights)
     |> validate_weight_totals()
   end

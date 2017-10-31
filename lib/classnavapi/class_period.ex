@@ -11,6 +11,7 @@ defmodule Classnavapi.ClassPeriod do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.ClassPeriod
+  alias Classnavapi.Helpers.ChangesetValidation
 
 
   schema "class_periods" do
@@ -23,15 +24,6 @@ defmodule Classnavapi.ClassPeriod do
     timestamps()
   end
 
-  def validate_dates(changeset) do
-    start_date = get_field(changeset, :start_date)
-    end_date = get_field(changeset, :end_date)
-    case start_date < end_date do
-      true -> changeset
-      false -> add_error(changeset, :start_date, "Start date occurs after end date.")
-    end
-  end
-
   @req_fields [:name, :start_date, :end_date, :school_id]
   @all_fields @req_fields
   @upd_fields [:name, :start_date, :end_date]
@@ -42,13 +34,13 @@ defmodule Classnavapi.ClassPeriod do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
-    |> validate_dates
+    |> ChangesetValidation.validate_dates(:start_date, :end_date)
   end
   
   def changeset_update(%ClassPeriod{} = class_period, attrs) do
     class_period
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
-    |> validate_dates
+    |> ChangesetValidation.validate_dates(:start_date, :end_date)
   end
 end
