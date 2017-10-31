@@ -37,6 +37,7 @@ defmodule Classnavapi.Class do
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
     has_many :weights, Class.Weight
+    belongs_to :class_status, Classnavapi.Class.Status, define_field: false
 
     timestamps()
   end
