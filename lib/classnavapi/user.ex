@@ -23,6 +23,14 @@ defmodule Classnavapi.User do
     timestamps()
   end
 
+  defp extract_domain(changeset) do
+    changeset
+    |> get_field(:email)
+    |> String.split("@")
+    |> Enum.take(-1)
+    |> List.first()
+  end
+
   def validate_email(changeset, nil), do: changeset
   def validate_email(changeset, student_obj) do
     school = Repo.get(Classnavapi.School, student_obj["school_id"])
@@ -31,7 +39,7 @@ defmodule Classnavapi.User do
     else
       school = Repo.preload school, :email_domains
       email_domains = school.email_domains
-      user_email_domain = "@" <> List.first(Enum.take(String.split(get_field(changeset, :email), "@"), -1))
+      user_email_domain = "@" <> extract_domain(changeset)
       if Enum.find(email_domains, fn(x) -> x.email_domain == user_email_domain end) == nil do
         add_error(changeset, :student, "Invalid email for school.")
       else
