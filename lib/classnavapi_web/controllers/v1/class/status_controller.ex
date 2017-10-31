@@ -3,14 +3,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     
     alias Classnavapi.Class.Status
     alias Classnavapi.Repo
-    alias ClassnavapiWeb.Class.StatusView, as: ClassStatusView
-    alias ClassnavapiWeb.Hub.Class.StatusView, as: HubStatusView
+    alias ClassnavapiWeb.Class.StatusView
 
     import Ecto.Query
   
     def index(conn, %{}) do
       statuses = Repo.all(Status)
-      render(conn, ClassStatusView, "index.json", statuses: statuses)
+      render(conn, StatusView, "index.json", statuses: statuses)
     end
 
     defp get_class_count_by_status(status) do
@@ -30,6 +29,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
 
       statuses = statuses |> put_class_status_counts
 
-      render(conn, HubStatusView, "index.json", statuses: statuses)
+      render(conn, StatusView, "index.json", statuses: statuses)
     end
   end
