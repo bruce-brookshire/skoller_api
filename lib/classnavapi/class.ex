@@ -81,9 +81,8 @@ defmodule Classnavapi.Class do
   end
 
   def changeset_update(%Class{} = class, attrs) do
-    class = Classnavapi.Repo.preload class, :weights
-
     class
+    |> Classnavapi.Repo.preload(:weights)
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
