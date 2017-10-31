@@ -20,15 +20,15 @@ defmodule Classnavapi.Class.Issue do
     timestamps()
   end
 
-  @req_fields [:notes, :class_id, :class_issue_status_id]
+  @req_fields [:class_id, :class_issue_status_id]
   @opt_fields [:note]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
   def changeset(%Issue{} = issue, attrs) do
     issue
-    |> cast(attrs, [:note])
-    |> validate_required([:note])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
     |> unique_constraint(:class_issues, name: :class_issues_class_id_class_issues_status_id_index)
   end
 end

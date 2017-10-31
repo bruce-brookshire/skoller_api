@@ -12,15 +12,13 @@ defmodule Classnavapi.Class.Issue.Status do
 
   @primary_key {:id, :id, []}
   schema "class_issue_statuses" do
-    field :notes, :string
     field :status, :string
 
     timestamps()
   end
 
   @req_fields [:id, :status]
-  @opt_fields [:notes]
-  @all_fields @req_fields ++ @opt_fields
+  @all_fields @req_fields
 
   @doc false
   def changeset(%Status{} = status, attrs) do

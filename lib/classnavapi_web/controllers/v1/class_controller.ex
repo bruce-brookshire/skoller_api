@@ -29,6 +29,23 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
       render(conn, ClassView, "show.json", class: class)
     end
   
+    def update(conn, %{"id" => id, "weights" => _} = params) do
+      class_old = Repo.get!(Class, id)
+      changeset = Class.changeset_update(class_old, params)
+      
+      changeset = changeset
+      |> Ecto.Changeset.change(%{class_status_id: 200})
+
+      case Repo.update(changeset) do
+        {:ok, class} ->
+          render(conn, ClassView, "show.json", class: class)
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+      end
+    end
+
     def update(conn, %{"id" => id} = params) do
       class_old = Repo.get!(Class, id)
       changeset = Class.changeset_update(class_old, params)
