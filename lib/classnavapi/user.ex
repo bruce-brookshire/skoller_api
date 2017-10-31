@@ -36,15 +36,18 @@ defmodule Classnavapi.User do
     Repo.preload school, :email_domains
   end
 
+  defp validate_match(changeset, nil), do: changeset |> add_error(:student, "Invalid email for school.")
+  defp validate_match(changeset, _), do: changeset
+
   defp compare_domains(changeset, nil), do: changeset |> add_error(:student, "Invalid school")
   defp compare_domains(changeset, school) do
     email_domains = school.email_domains
-    user_email_domain = "@" <> extract_domain(changeset)
-    if Enum.find(email_domains, fn(x) -> x.email_domain == user_email_domain end) == nil do
-      add_error(changeset, :student, "Invalid email for school.")
-    else
-      changeset
-    end
+    
+    match = email_domains
+    |> Enum.find(& &1.email_domain == "@" <> extract_domain(changeset))
+
+    changeset
+    |> validate_match(match)
   end
 
   defp validate_email(changeset, nil), do: changeset
