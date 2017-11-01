@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
 
-  def complete(conn, %{"class_id" => id, "is_diy" => true}) do
+  def complete(conn, %{"class_id" => id, "is_diy" => false}) do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, %{"class_status_id" => 300})
 
