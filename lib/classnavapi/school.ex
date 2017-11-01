@@ -10,8 +10,7 @@ defmodule Classnavapi.School do
   import Ecto.Changeset
 
   alias Classnavapi.School
-  alias Classnavapi.Repo
-
+  
   schema "schools" do
     field :adr_city, :string
     field :adr_line_1, :string
@@ -45,8 +44,6 @@ defmodule Classnavapi.School do
   end
 
   def changeset_update(%School{} = school, attrs) do
-    school = Repo.preload school, :email_domains
-
     school
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
