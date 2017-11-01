@@ -16,14 +16,20 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     end
   end
 
-  defp school_accepting_enrollment(changeset, true), do: changeset
-  defp school_accepting_enrollment(changeset, false), do: changeset |> Ecto.Changeset.add_error(:school_id, "School is not accepting enrollment.")
+  defp school_enrolling(changeset, true), do: changeset
+  defp school_enrolling(changeset, false), do: changeset |> Ecto.Changeset.add_error(:student, "School not accepting enrollment.")
+
+  defp school_accepting_enrollment(changeset, nil), do: changeset
+  defp school_accepting_enrollment(changeset, school) do
+    changeset
+    |> school_enrolling(school.is_active_enrollment)
+  end
 
   def create(conn, %{"student" => student} = params) do
-    school = Repo.get!(Classnavapi.School, student["school_id"])
+    school = Repo.get(Classnavapi.School, student["school_id"])
 
     changeset = User.changeset_insert(%User{}, params)
-    changeset = changeset |> school_accepting_enrollment(school.is_active_enrollment)
+    changeset = changeset |> school_accepting_enrollment(school)
 
     conn
     |> insert_user(changeset)
