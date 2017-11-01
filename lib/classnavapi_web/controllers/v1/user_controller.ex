@@ -5,10 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
 
-  def create(conn, %{} = params) do
-
-    changeset = User.changeset_insert(%User{}, params)
-
+  defp insert_user(conn, changeset) do
     case Repo.insert(changeset) do
       {:ok, user} ->
         render(conn, UserView, "show.json", user: user)
@@ -17,6 +14,26 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp school_accepting_enrollment(changeset, true), do: changeset
+  defp school_accepting_enrollment(changeset, false), do: changeset |> Ecto.Changeset.add_error(:school_id, "School is not accepting enrollment.")
+
+  def create(conn, %{"student" => student} = params) do
+    school = Repo.get!(Classnavapi.School, student["school_id"])
+
+    changeset = User.changeset_insert(%User{}, params)
+    changeset = changeset |> school_accepting_enrollment(school.is_active_enrollment)
+
+    conn
+    |> insert_user(changeset)
+  end
+
+  def create(conn, %{} = params) do    
+    changeset = User.changeset_insert(%User{}, params)
+
+    conn
+    |> insert_user(changeset)
   end
 
   def index(conn, _) do
