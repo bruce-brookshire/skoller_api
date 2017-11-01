@@ -43,6 +43,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/classes", ClassController, except: [:new, :delete, :edit] do
           resources "/docs", Class.DocController, only: [:create, :index]
           resources "/assignments", Class.AssignmentController, only: [:create, :index]
+          post "/assignments/complete", ClassController, :complete
           resources "/weights", Class.WeightController, only: [:update, :index]
         end
       end
