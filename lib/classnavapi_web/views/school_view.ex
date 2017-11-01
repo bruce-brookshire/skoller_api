@@ -2,6 +2,8 @@ defmodule ClassnavapiWeb.SchoolView do
   use ClassnavapiWeb, :view
 
   alias ClassnavapiWeb.SchoolView
+  alias ClassnavapiWeb.School.EmailDomainView
+  alias Classnavapi.Repo
 
   def render("index.json", %{schools: schools}) do
     render_many(schools, SchoolView, "school.json")
@@ -30,12 +32,13 @@ defmodule ClassnavapiWeb.SchoolView do
   end
 
   def render("school_detail.json", %{school: school}) do
-    school = Classnavapi.Repo.preload(school, :email_domains)
+    school = Repo.preload(school, :email_domains)
     school
     |> render_one(SchoolView, "school.json")
     |> Map.merge(
       %{
-        email_domains: render_many(school.email_domains, ClassnavapiWeb.School.EmailDomainView, "email_domain.json")
+        email_domains: render_many(school.email_domains,
+                                  EmailDomainView, "email_domain.json")
       }
     )
   end

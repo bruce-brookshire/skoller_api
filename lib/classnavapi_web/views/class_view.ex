@@ -2,6 +2,9 @@ defmodule ClassnavapiWeb.ClassView do
     use ClassnavapiWeb, :view
 
     alias ClassnavapiWeb.ClassView
+    alias ClassnavapiWeb.Class.StatusView
+    alias Classnavapi.Class.Status
+    alias Classnavapi.Repo
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -32,14 +35,13 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class_detail.json", %{class: class}) do
-        status = Classnavapi.Repo.get!(Classnavapi.Class.Status, class.class_status_id)
+        status = Repo.get!(Status, class.class_status_id)
         class
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                status: render_one(status, ClassnavapiWeb.Class.StatusView, "status.json")
+                status: render_one(status, StatusView, "status.json")
             }
         )
     end
 end
-  

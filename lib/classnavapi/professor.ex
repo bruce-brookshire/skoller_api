@@ -10,7 +10,6 @@ defmodule Classnavapi.Professor do
   import Ecto.Changeset
   alias Classnavapi.Professor
 
-
   schema "professors" do
     field :email, :string
     field :name_first, :string
@@ -25,9 +24,11 @@ defmodule Classnavapi.Professor do
   end
 
   @req_fields [:name_last, :class_period_id]
-  @opt_fields [:name_first, :email, :phone, :office_location, :office_availability]
+  @opt_fields [:name_first, :email, :phone, :office_location,
+              :office_availability]
   @all_fields @req_fields ++ @opt_fields
-  @upd_fields [:name_first, :name_last, :email, :phone, :office_location, :office_availability]
+  @upd_fields [:name_first, :name_last, :email, :phone, :office_location,
+              :office_availability]
 
   @doc false
   def changeset_insert(%Professor{} = professor, attrs) do

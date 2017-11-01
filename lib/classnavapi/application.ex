@@ -19,7 +19,8 @@ defmodule Classnavapi.Application do
       supervisor(Classnavapi.Repo, []),
       # Start the endpoint when the application starts
       supervisor(ClassnavapiWeb.Endpoint, []),
-      # Start your own worker by calling: Classnavapi.Worker.start_link(arg1, arg2, arg3)
+      # Start your own worker by calling:
+      # Classnavapi.Worker.start_link(arg1, arg2, arg3)
       # worker(Classnavapi.Worker, [arg1, arg2, arg3]),
     ]
 

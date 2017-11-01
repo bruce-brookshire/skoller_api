@@ -10,6 +10,12 @@ defmodule Mix.Tasks.Seed.Dev do
   import Mix.Ecto
 
   alias Classnavapi.Repo
+  alias Classnavapi.User
+  alias Classnavapi.School
+  alias Classnavapi.School.EmailDomain
+  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Weight
 
   def run(_) do
     ensure_started(Repo, [])
@@ -17,11 +23,11 @@ defmodule Mix.Tasks.Seed.Dev do
     {:ok, date1} = Date.new(2017, 10, 12)
     {:ok, date2} = Date.new(2018, 10, 12)
 
-    Repo.insert!(%Classnavapi.User{email: "tyler@fortyau.com", password: "test"})
-    school = Repo.insert!(%Classnavapi.School{name: "Hard Knocks University",
+    Repo.insert!(%User{email: "tyler@fortyau.com", password: "test"})
+    school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     email_domains: [
-                                      %Classnavapi.School.EmailDomain{
+                                      %EmailDomain{
                                         email_domain: "@hku.edu",
                                         is_professor_only: false
                                       }
@@ -31,14 +37,14 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
 
-    period = Repo.insert!(%Classnavapi.ClassPeriod{
+    period = Repo.insert!(%ClassPeriod{
       name: "Q1",
       school_id: school.id,
       start_date: date1,
       end_date: date2
     })
-    
-    class = Repo.insert!(%Classnavapi.Class{name: "Big Money",
+
+    class = Repo.insert!(%Class{name: "Big Money",
                   number: "8001-01",
                   meet_days: "MWF",
                   meet_start_time: "8:30",
@@ -53,13 +59,13 @@ defmodule Mix.Tasks.Seed.Dev do
                   class_status_id: 100
     })
 
-    Repo.insert!(%Classnavapi.Class.Weight{
+    Repo.insert!(%Weight{
       name: "Assignments",
       weight: 50,
       class_id: class.id
     })
 
-    Repo.insert!(%Classnavapi.Class.Weight{
+    Repo.insert!(%Weight{
       name: "Tests",
       weight: 50,
       class_id: class.id

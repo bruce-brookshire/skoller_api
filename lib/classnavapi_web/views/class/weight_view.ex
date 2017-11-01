@@ -19,4 +19,3 @@ defmodule ClassnavapiWeb.Class.WeightView do
         }
     end
 end
-  

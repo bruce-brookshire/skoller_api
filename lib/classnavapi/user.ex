@@ -14,7 +14,6 @@ defmodule Classnavapi.User do
   alias Classnavapi.User
   alias Classnavapi.Repo
 
-
   schema "users" do
     field :email, :string
     field :password, :string
@@ -42,7 +41,7 @@ defmodule Classnavapi.User do
   defp compare_domains(changeset, nil), do: changeset |> add_error(:student, "Invalid school")
   defp compare_domains(changeset, school) do
     email_domains = school.email_domains
-    
+
     match = email_domains
     |> Enum.find(& &1.email_domain == "@" <> extract_domain(changeset))
 

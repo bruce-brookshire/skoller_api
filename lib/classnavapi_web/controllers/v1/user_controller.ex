@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.User
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
+  alias Ecto.Changeset
 
   defp insert_user(conn, changeset) do
     case Repo.insert(changeset) do
@@ -17,7 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   end
 
   defp school_enrolling(changeset, true), do: changeset
-  defp school_enrolling(changeset, false), do: changeset |> Ecto.Changeset.add_error(:student, "School not accepting enrollment.")
+  defp school_enrolling(changeset, false), do: changeset |> Changeset.add_error(:student, "School not accepting enrollment.")
 
   defp school_accepting_enrollment(changeset, nil), do: changeset
   defp school_accepting_enrollment(changeset, school) do
@@ -35,7 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     |> insert_user(changeset)
   end
 
-  def create(conn, %{} = params) do    
+  def create(conn, %{} = params) do
     changeset = User.changeset_insert(%User{}, params)
 
     conn
