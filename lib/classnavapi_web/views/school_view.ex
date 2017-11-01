@@ -20,8 +20,8 @@ defmodule ClassnavapiWeb.SchoolView do
       adr_state: school.adr_state,
       adr_zip: school.adr_zip,
       timezone: school.timezone,
-      is_active: school.is_active,
-      is_editable: school.is_editable}
+      is_active_enrollment: school.is_active_enrollment,
+      is_readonly: school.is_readonly}
   end
 
   def render("school_detail.json", %{school: school}) do
