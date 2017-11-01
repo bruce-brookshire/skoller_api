@@ -12,7 +12,8 @@ defmodule ClassnavapiWeb.SchoolView do
   end
 
   def render("school.json", %{school: school}) do
-    %{id: school.id,
+    %{
+      id: school.id,
       name: school.name,
       adr_line_1: school.adr_line_1,
       adr_line_2: school.adr_line_2,
@@ -20,8 +21,12 @@ defmodule ClassnavapiWeb.SchoolView do
       adr_state: school.adr_state,
       adr_zip: school.adr_zip,
       timezone: school.timezone,
-      is_active: school.is_active,
-      is_editable: school.is_editable}
+      is_active_enrollment: school.is_active_enrollment,
+      is_readonly: school.is_readonly,
+      is_diy_enabled: school.is_diy_enabled,
+      is_diy_preferred: school.is_diy_preferred,
+      is_auto_syllabus: school.is_auto_syllabus
+    }
   end
 
   def render("school_detail.json", %{school: school}) do

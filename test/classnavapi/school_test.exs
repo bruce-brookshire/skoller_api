@@ -8,8 +8,8 @@ defmodule Classnavapi.SchoolTest do
                 adr_line_2: "Suite 405", 
                 adr_state: "TN", 
                 adr_zip: "6158675309",
-                is_active: true,
-                is_editable: true,
+                is_active_enrollment: true,
+                is_readonly: true,
                 name: "HKU",
                 timezone: "-8",
                 email_domains: [
@@ -34,13 +34,13 @@ defmodule Classnavapi.SchoolTest do
   end
 
   test "school insert without active flag" do
-    changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :is_active))
-    refute changeset.valid?
+    changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :is_active_enrollment))
+    assert changeset.valid?
   end
 
   test "school insert without editable flag" do
-    changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :is_editable))
-    refute changeset.valid?
+    changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :is_readonly))
+    assert changeset.valid?
   end
 
   test "school insert with no city" do

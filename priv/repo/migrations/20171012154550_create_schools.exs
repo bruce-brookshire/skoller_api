@@ -10,8 +10,11 @@ defmodule Classnavapi.Repo.Migrations.CreateSchools do
       add :adr_state, :string
       add :adr_zip, :string
       add :timezone, :string
-      add :is_active, :boolean, default: false, null: false
-      add :is_editable, :boolean, default: false, null: false
+      add :is_active_enrollment, :boolean, default: true, null: false
+      add :is_readonly, :boolean, default: false, null: false
+      add :is_diy_enabled, :boolean, default: true, null: false
+      add :is_diy_preferred, :boolean, default: false, null: false
+      add :is_auto_syllabus, :boolean, default: true, null: false
 
       timestamps()
     end
