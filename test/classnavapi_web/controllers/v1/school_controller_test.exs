@@ -53,6 +53,9 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
                             "adr_zip" => @valid_school_hku.adr_zip, 
                             "is_active_enrollment" => @valid_school_hku.is_active_enrollment, 
                             "is_readonly" => @valid_school_hku.is_readonly, 
+                            "is_auto_syllabus" => true, 
+                            "is_diy_enabled" => true, 
+                            "is_diy_preferred" => false, 
                             "name" => @valid_school_hku.name, 
                             "timezone" => @valid_school_hku.timezone}
 
@@ -79,6 +82,9 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
                         "adr_zip" => @valid_school_bmu.adr_zip, 
                         "is_active_enrollment" => @valid_school_bmu.is_active_enrollment, 
                         "is_readonly" => @valid_school_bmu.is_readonly, 
+                        "is_auto_syllabus" => true, 
+                        "is_diy_enabled" => true, 
+                        "is_diy_preferred" => false, 
                         "name" => @valid_school_bmu.name, 
                         "timezone" => @valid_school_bmu.timezone}
 
