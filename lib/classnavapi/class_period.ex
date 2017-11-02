@@ -19,6 +19,7 @@ defmodule Classnavapi.ClassPeriod do
     field :start_date, :date
     field :school_id, :id
     belongs_to :school, Classnavapi.School, define_field: false
+    has_many :classes, Classnavapi.Class
 
     timestamps()
   end
