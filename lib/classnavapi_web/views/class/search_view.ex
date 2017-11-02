@@ -2,6 +2,16 @@ defmodule ClassnavapiWeb.Class.SearchView do
     use ClassnavapiWeb, :view
   
     alias ClassnavapiWeb.Class.SearchView
+
+    defp extract_name(_, true), do: "None"
+    defp extract_name(professor, false) do
+        professor.name_last
+    end
+
+    defp professor_name(professor) do
+        professor
+        |> extract_name(is_nil(professor))
+    end
   
     def render("index.json", %{classes: classes}) do
         render_many(classes, SearchView, "class.json", as: :class)
@@ -18,7 +28,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 seat_count: class.seat_count
             },
             professor: %{
-                name: class.professor.name_last
+                name: professor_name(class.professor)
             },
             school: %{
                 name: class.school.name
