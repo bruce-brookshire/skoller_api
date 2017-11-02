@@ -26,6 +26,8 @@ defmodule Classnavapi.School do
     field :timezone, :string
     has_many :students, Classnavapi.Student
     has_many :email_domains, School.EmailDomain, on_replace: :delete
+    has_many :class_periods, Classnavapi.ClassPeriod
+    has_many :classes, through: [:class_periods, :classes]
 
     timestamps()
   end

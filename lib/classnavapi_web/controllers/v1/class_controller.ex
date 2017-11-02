@@ -4,6 +4,9 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias Classnavapi.Class
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
+  alias ClassnavapiWeb.Class.SearchView
+
+  import Ecto.Query
 
   def create(conn, %{} = params) do
 
@@ -17,6 +20,14 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def search(conn, _) do
+    date = Date.utc_today()
+    active_periods = from(period in Classnavapi.ClassPeriod, where: period.start_date <= ^date and period.end_date >= ^date)
+    classes = Repo.all(from class in Class, join: period in subquery(active_periods), on: class.class_period_id == period.id)
+    classes = classes |> Repo.preload([:school, :professor, :class_status])
+    render(conn, SearchView, "index.json", classes: classes)
   end
 
   def index(conn, _) do
