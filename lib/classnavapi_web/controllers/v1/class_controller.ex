@@ -60,6 +60,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp filter(query, %{} = params) do
     query
     |> prof_filter(params)
+    |> status_filter(params)
   end
 
   defp prof_filter(query, %{"professor.name" => filter}) do
@@ -67,6 +68,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     query |> where([class, period, prof], ilike(prof.name_last, ^prof_filter))
   end
   defp prof_filter(query, _), do: query
+
+  defp status_filter(query, %{"status" => filter}) do
+    query |> where([class, period, prof], class.class_status_id == ^filter)
+  end
+  defp status_filter(query, _), do: query
 
   defp render_class_search(classes, conn) do
     classes = classes |> Repo.preload([:school, :professor, :class_status])
