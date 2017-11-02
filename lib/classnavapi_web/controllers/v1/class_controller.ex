@@ -59,11 +59,17 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   defp filter(query, %{} = params) do
     query
+    |> school_filter(params)
     |> prof_filter(params)
     |> status_filter(params)
     |> name_filter(params)
     |> number_filter(params)
   end
+
+  defp school_filter(query, %{"school" => filter}) do
+    query |> where([class, period, prof], period.school_id == ^filter)
+  end
+  defp school_filter(query, _), do: query
 
   defp prof_filter(query, %{"professor.name" => filter}) do
     prof_filter = "%" <> filter <> "%"
