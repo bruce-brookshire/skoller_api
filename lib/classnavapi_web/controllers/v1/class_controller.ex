@@ -22,12 +22,15 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  def search(conn, _) do
+  def search(conn, %{} = params) do
     date = Date.utc_today()
-    active_periods = from(period in Classnavapi.ClassPeriod, where: period.start_date <= ^date and period.end_date >= ^date)
-    classes = Repo.all(from class in Class, join: period in subquery(active_periods), on: class.class_period_id == period.id)
-    classes = classes |> Repo.preload([:school, :professor, :class_status])
-    render(conn, SearchView, "index.json", classes: classes)
+    from(class in Class)
+    |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
+    |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
+    |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
+    |> filter(params)
+    |> Repo.all()
+    |> render_class_search(conn)
   end
 
   def index(conn, _) do
@@ -52,5 +55,53 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp filter(query, %{} = params) do
+    query
+    |> school_filter(params)
+    |> prof_filter(params)
+    |> status_filter(params)
+    |> name_filter(params)
+    |> number_filter(params)
+    |> day_filter(params)
+  end
+
+  defp school_filter(query, %{"school" => filter}) do
+    query |> where([class, period, prof], period.school_id == ^filter)
+  end
+  defp school_filter(query, _), do: query
+
+  defp prof_filter(query, %{"professor.name" => filter}) do
+    prof_filter = "%" <> filter <> "%"
+    query |> where([class, period, prof], ilike(prof.name_last, ^prof_filter))
+  end
+  defp prof_filter(query, _), do: query
+
+  defp status_filter(query, %{"class.status" => filter}) do
+    query |> where([class, period, prof], class.class_status_id == ^filter)
+  end
+  defp status_filter(query, _), do: query
+
+  defp name_filter(query, %{"class.name" => filter}) do
+    name_filter = "%" <> filter <> "%"
+    query |> where([class, period, prof], ilike(class.name, ^name_filter))
+  end
+  defp name_filter(query, _), do: query
+
+  defp number_filter(query, %{"class.number" => filter}) do
+    number_filter = "%" <> filter <> "%"
+    query |> where([class, period, prof], ilike(class.number, ^number_filter))
+  end
+  defp number_filter(query, _), do: query
+
+  defp day_filter(query, %{"class.meet_days" => filter}) do
+    query |> where([class, period, prof], ilike(class.meet_days, ^filter))
+  end
+  defp day_filter(query, _), do: query
+
+  defp render_class_search(classes, conn) do
+    classes = classes |> Repo.preload([:school, :professor, :class_status])
+    render(conn, SearchView, "index.json", classes: classes)
   end
 end
