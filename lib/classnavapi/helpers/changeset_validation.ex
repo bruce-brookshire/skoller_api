@@ -5,7 +5,7 @@ defmodule Classnavapi.Helpers.ChangesetValidation do
   Provides helper functions for changeset validation
 
   """
-  
+
   import Ecto.Changeset
 
   def validate_dates(changeset, start_date, end_date) do

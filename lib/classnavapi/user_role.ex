@@ -10,7 +10,6 @@ defmodule Classnavapi.UserRole do
   import Ecto.Changeset
   alias Classnavapi.UserRole
 
-
   schema "user_roles" do
     field :user_id, :id
     field :role_id, :id

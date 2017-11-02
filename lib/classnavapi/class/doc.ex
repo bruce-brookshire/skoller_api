@@ -9,13 +9,13 @@ defmodule Classnavapi.Class.Doc do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Doc
-
+  alias Classnavapi.Class
 
   schema "docs" do
     field :is_syllabus, :boolean, default: false
     field :path, :string
     field :class_id, :id
-    belongs_to :class, Classnavapi.Class, define_field: false
+    belongs_to :class, Class, define_field: false
 
     timestamps()
   end

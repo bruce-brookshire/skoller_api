@@ -1,6 +1,6 @@
 defmodule ClassnavapiWeb.Api.V1.RoleController do
   use ClassnavapiWeb, :controller
-  
+
   alias Classnavapi.UserRole
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserRoleView

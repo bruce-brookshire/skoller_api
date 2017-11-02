@@ -1,19 +1,22 @@
 defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   use ClassnavapiWeb, :controller
-  
+
   alias Classnavapi.Class.Doc
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.DocView
+  alias Classnavapi.DocUpload
+  alias ClassnavapiWeb.ChangesetView
+  alias Ecto.UUID
 
   import Ecto.Query
 
   def create(conn, %{"file" => file} = params) do
 
-    scope = %{"id" => Ecto.UUID.generate()}
+    scope = %{"id" => UUID.generate()}
     location = 
-      case Classnavapi.DocUpload.store({file, scope}) do
+      case DocUpload.store({file, scope}) do
         {:ok, inserted} ->
-          Classnavapi.DocUpload.url({inserted, scope})
+          DocUpload.url({inserted, scope})
         _ ->
           nil
       end
@@ -26,7 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 

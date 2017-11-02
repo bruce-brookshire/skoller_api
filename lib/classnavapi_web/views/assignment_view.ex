@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.AssignmentView do
 
     import Ecto.Query
 
+    alias Classnavapi.Class.Assignment
     alias ClassnavapiWeb.AssignmentView
     alias Classnavapi.Repo
 
@@ -27,9 +28,9 @@ defmodule ClassnavapiWeb.AssignmentView do
 
     defp get_weight_ratio(assignment) do
         weight = Repo.get!(Classnavapi.Class.Weight, assignment.weight_id)
-        assignments = Repo.all(from a in Classnavapi.Class.Assignment, where: a.class_id == ^assignment.class_id and a.weight_id == ^Map.get(weight, :id))
+        assignments = Repo.all(from a in Assignment, where: a.class_id == ^assignment.class_id and a.weight_id == ^Map.get(weight, :id))
         assignment_count = assignments |> Enum.count(& &1)
-        Map.put(assignment, :worth, Decimal.div(Map.get(weight, :weight), Decimal.new(assignment_count)))
+        Map.put(assignment, :worth, Decimal.div(Map.get(weight, :weight), 
+                                                Decimal.new(assignment_count)))
     end
 end
-  

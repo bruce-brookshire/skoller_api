@@ -13,7 +13,6 @@ defmodule Classnavapi.ClassPeriod do
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Helpers.ChangesetValidation
 
-
   schema "class_periods" do
     field :end_date, :date
     field :name, :string
@@ -36,7 +35,7 @@ defmodule Classnavapi.ClassPeriod do
     |> foreign_key_constraint(:school_id)
     |> ChangesetValidation.validate_dates(:start_date, :end_date)
   end
-  
+
   def changeset_update(%ClassPeriod{} = class_period, attrs) do
     class_period
     |> cast(attrs, @upd_fields)

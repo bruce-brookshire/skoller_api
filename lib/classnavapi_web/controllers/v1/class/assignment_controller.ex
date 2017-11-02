@@ -1,6 +1,6 @@
 defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   use ClassnavapiWeb, :controller
-  
+
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AssignmentView

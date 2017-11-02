@@ -1,6 +1,6 @@
 defmodule ClassnavapiWeb.Api.V1.SchoolController do
   use ClassnavapiWeb, :controller
-  
+
   alias Classnavapi.School
   alias Classnavapi.Repo
   alias ClassnavapiWeb.SchoolView
@@ -31,6 +31,8 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
 
   def update(conn, %{"id" => id} = params) do
     school_old = Repo.get!(School, id)
+    school_old = school_old |> Repo.preload(:email_domains)
+    
     changeset = School.changeset_update(school_old, params)
 
     case Repo.update(changeset) do

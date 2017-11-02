@@ -1,6 +1,6 @@
 defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   use ClassnavapiWeb, :controller
-  
+
   alias Classnavapi.Professor
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ProfessorView
