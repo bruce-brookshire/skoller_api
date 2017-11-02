@@ -96,7 +96,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp number_filter(query, _), do: query
 
   defp day_filter(query, %{"class.meet_days" => filter}) do
-    query |> where([class, period, prof], ilike(class.meet_days, ^filter))
+    query |> where([class, period, prof], class.meet_days == ^filter)
   end
   defp day_filter(query, _), do: query
 
