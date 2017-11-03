@@ -55,6 +55,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   is_enrollable: true,
                   is_editable: true,
                   is_syllabus: false,
+                  grade_scale: "A,90|B,80|C,70|D,60",
                   class_period_id: period.id,
                   class_status_id: 100
     })

@@ -22,6 +22,7 @@ defmodule ClassnavapiWeb.ClassView do
             class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
+            grade_scale: class.grade_scale,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,

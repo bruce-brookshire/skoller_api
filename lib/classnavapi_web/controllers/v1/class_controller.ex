@@ -8,8 +8,23 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   import Ecto.Query
 
-  def create(conn, %{} = params) do
+  def create(conn, %{"grade_scale" => _} = params) do
 
+    changeset = Class.changeset_insert(%Class{}, params)
+
+    case Repo.insert(changeset) do
+      {:ok, class} ->
+        class = class |> Repo.preload(:class_period)
+        render(conn, ClassView, "show.json", class: class)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def create(conn, %{} = params) do
+    params = params |> Map.put("grade_scale", "A,90|B,80|C,70|D,60")
     changeset = Class.changeset_insert(%Class{}, params)
 
     case Repo.insert(changeset) do
