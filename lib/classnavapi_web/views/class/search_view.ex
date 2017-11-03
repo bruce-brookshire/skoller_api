@@ -2,6 +2,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
     use ClassnavapiWeb, :view
   
     alias ClassnavapiWeb.Class.SearchView
+    alias ClassnavapiWeb.Helpers.ViewCalcs
 
     defp extract_name(_, true), do: "None"
     defp extract_name(professor, false) do
@@ -31,7 +32,8 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 meet_start_time: class.meet_start_time,
                 name: class.name,
                 number: class.number,
-                enrolled: get_enrolled(class.students)
+                enrolled: get_enrolled(class.students),
+                length: ViewCalcs.get_class_length(class, class.class_period)
             },
             professor: %{
                 name: professor_name(class.professor)
@@ -44,16 +46,5 @@ defmodule ClassnavapiWeb.Class.SearchView do
             }
         }
     end
-
-    # def render("class_detail.json", %{class: class}) do
-    #     status = Repo.get!(Status, class.class_status_id)
-    #     class
-    #     |> render_one(SearchView, "class.json")
-    #     |> Map.merge(
-    #         %{
-    #             status: render_one(status, StatusView, "status.json")
-    #         }
-    #     )
-    # end
   end
   

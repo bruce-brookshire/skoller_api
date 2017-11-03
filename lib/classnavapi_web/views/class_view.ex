@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.ClassView do
     alias ClassnavapiWeb.Class.StatusView
     alias Classnavapi.Class.Status
     alias Classnavapi.Repo
+    alias ClassnavapiWeb.Helpers.ViewCalcs
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -30,7 +31,8 @@ defmodule ClassnavapiWeb.ClassView do
             seat_count: class.seat_count,
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
-            is_syllabus: class.is_syllabus
+            is_syllabus: class.is_syllabus,
+            length: ViewCalcs.get_class_length(class, class.class_period)
         }
     end
 

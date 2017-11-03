@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     case Repo.insert(changeset) do
       {:ok, class} ->
+        class = class |> Repo.preload(:class_period)
         render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
         conn
@@ -35,11 +36,13 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   def index(conn, _) do
     classes = Repo.all(Class)
+    classes = classes |> Repo.preload(:class_period)
     render(conn, ClassView, "index.json", classes: classes)
   end
 
   def show(conn, %{"id" => id}) do
     class = Repo.get!(Class, id)
+    class = class |> Repo.preload(:class_period)
     render(conn, ClassView, "show.json", class: class)
   end
 
@@ -49,6 +52,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     case Repo.update(changeset) do
       {:ok, class} ->
+        class = class |> Repo.preload(:class_period)
         render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
         conn
