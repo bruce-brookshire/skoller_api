@@ -41,6 +41,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/periods", PeriodController, except: [:new,:delete,:edit]
         resources "/professors", ProfessorController, except: [:new,:delete,:edit]
         resources "/classes", ClassController, except: [:new,:delete,:edit] do
+          resources "/students", Class.StudentController, only: [:create]
           resources "/docs", Class.DocController, only: [:create,:index]
         end
       end
