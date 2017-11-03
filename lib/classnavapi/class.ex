@@ -41,6 +41,7 @@ defmodule Classnavapi.Class do
     has_many :weights, Class.Weight
     belongs_to :class_status, Classnavapi.Class.Status, define_field: false
     has_one :school, through: [:class_period, :school]
+    many_to_many :students, Classnavapi.Student, join_through: "student_classes"
 
     timestamps()
   end

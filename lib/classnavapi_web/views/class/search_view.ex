@@ -12,6 +12,12 @@ defmodule ClassnavapiWeb.Class.SearchView do
         professor
         |> extract_name(is_nil(professor))
     end
+
+    defp get_enrolled(nil), do: 0
+    defp get_enrolled(students) do
+        students 
+        |> Enum.count(& &1)
+    end
   
     def render("index.json", %{classes: classes}) do
         render_many(classes, SearchView, "class.json", as: :class)
@@ -25,7 +31,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 meet_start_time: class.meet_start_time,
                 name: class.name,
                 number: class.number,
-                seat_count: class.seat_count
+                enrolled: get_enrolled(class.students)
             },
             professor: %{
                 name: professor_name(class.professor)

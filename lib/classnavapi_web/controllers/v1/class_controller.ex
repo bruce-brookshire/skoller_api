@@ -101,7 +101,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp day_filter(query, _), do: query
 
   defp render_class_search(classes, conn) do
-    classes = classes |> Repo.preload([:school, :professor, :class_status])
+    classes = classes |> Repo.preload([:school, :professor, :class_status, :students])
     render(conn, SearchView, "index.json", classes: classes)
   end
 end
