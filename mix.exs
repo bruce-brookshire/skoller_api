@@ -49,7 +49,9 @@ defmodule Classnavapi.Mixfile do
       {:ex_aws, "~> 1.1"},
       {:hackney, "~> 1.6"},
       {:poison, "~> 3.1"},
-      {:sweet_xml, "~> 0.6"}
+      {:sweet_xml, "~> 0.6"},
+      {:comeonin, "~> 4.0"},
+      {:bcrypt_elixir, "~> 1.0"}
     ]
   end
 

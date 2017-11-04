@@ -22,8 +22,9 @@ defmodule Mix.Tasks.Seed.Dev do
 
     {:ok, date1} = Date.new(2017, 10, 12)
     {:ok, date2} = Date.new(2018, 10, 12)
+    pass = Comeonin.Bcrypt.add_hash("test")
 
-    Repo.insert!(%User{email: "tyler@fortyau.com", password: "test"})
+    Repo.insert!(%User{email: "tyler@fortyau.com", password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     email_domains: [

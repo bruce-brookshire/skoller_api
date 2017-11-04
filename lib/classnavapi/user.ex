@@ -16,7 +16,8 @@ defmodule Classnavapi.User do
 
   schema "users" do
     field :email, :string
-    field :password, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
     belongs_to :student, Classnavapi.Student
 
     timestamps()
@@ -59,6 +60,12 @@ defmodule Classnavapi.User do
     |> compare_domains(school)
   end
 
+  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
+                      %{password: password}} = changeset) do
+    change(changeset, Comeonin.Bcrypt.add_hash(password))
+  end
+  defp put_pass_hash(changeset), do: changeset
+
   @req_fields [:email, :password]
   @all_fields @req_fields
   @upd_fields [:password]
@@ -72,12 +79,14 @@ defmodule Classnavapi.User do
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
     |> validate_email(attrs["student"])
+    |> put_pass_hash()
   end
 
   def changeset_update(%User{} = user, attrs) do
     user
     |> cast(attrs, @upd_fields)
-    |> validate_required([:email, :password])
+    |> validate_required(@upd_fields)
     |> cast_assoc(:student)
+    |> put_pass_hash()
   end
 end

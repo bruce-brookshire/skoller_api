@@ -8,7 +8,8 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
 
   def create(conn, %{"email" => email, "password" => password}) do
     user = Repo.get_by(User, email: email)
-    if user.password == password do
+    
+    if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
         {:ok, token, _} = Auth.encode_and_sign(%{:id => user.id}, %{typ: "access"})
         render(conn, AuthView, "show.json", token: token)
     else
