@@ -17,6 +17,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Class
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentGrade
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Student
 
@@ -76,7 +77,7 @@ defmodule Mix.Tasks.Seed.Dev do
 
     assign_weight = Repo.insert!(%Weight{
       name: "Assignments",
-      weight: 50,
+      weight: 15,
       class_id: class.id
     })
 
@@ -86,37 +87,67 @@ defmodule Mix.Tasks.Seed.Dev do
       class_id: class.id
     })
 
-    Repo.insert!(%Assignment{
+    lab_weight = Repo.insert!(%Weight{
+      name: "Labs",
+      weight: 35,
+      class_id: class.id
+    })
+
+    a1 = Repo.insert!(%Assignment{
       name: "Assignment 1",
       due: date2,
       weight_id: assign_weight.id,
       class_id: class.id
     })
 
-    Repo.insert!(%Assignment{
+    a2 = Repo.insert!(%Assignment{
       name: "Assignment 2",
       due: date2,
       weight_id: assign_weight.id,
       class_id: class.id
     })
 
-    Repo.insert!(%Assignment{
+    a3 = Repo.insert!(%Assignment{
       name: "Assignment 3",
       due: date2,
       weight_id: assign_weight.id,
       class_id: class.id
     })
 
-    Repo.insert!(%Assignment{
+    t1 = Repo.insert!(%Assignment{
       name: "Final",
       due: date2,
       weight_id: test_weight.id,
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc = Repo.insert!(%StudentClass{
       student_id: student.student.id,
       class_id: class.id
+    })
+
+    Repo.insert!(%StudentGrade{
+      student_class_id: sc.id,
+      assignment_id: a1.id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentGrade{
+      student_class_id: sc.id,
+      assignment_id: a2.id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentGrade{
+      student_class_id: sc.id,
+      assignment_id: a3.id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentGrade{
+      student_class_id: sc.id,
+      assignment_id: t1.id,
+      grade: 100
     })
   end
 end
