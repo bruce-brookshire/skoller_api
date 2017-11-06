@@ -209,20 +209,6 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
     assert response["student"]["name_first"] == "Smashville"
   end
 
-  test "Update/2 does not update when required fields missing", %{jwt: jwt} do
-    user = User.changeset_insert(%User{}, @valid_user_john)
-    |> Repo.insert!
-
-    response = build_conn()
-    |> put_req_header("authorization", "Bearer #{jwt}")
-    |> put(v1_user_path(build_conn(), :update, user.id, email: "update@example.com", password: ""))
-    |> json_response(422)
-    
-    expected = %{"errors" => %{"password" => ["can't be blank"]}}
-
-    assert response == expected
-  end
-
   test "update/2 responds with an error when no user is found", %{jwt: jwt} do
     assert_raise Ecto.NoResultsError, fn ->
         build_conn()
