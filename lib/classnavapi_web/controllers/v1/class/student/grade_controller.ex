@@ -9,10 +9,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
   import Ecto.Query
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-  
-    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
-    params = params
-    |> Map.put("student_class_id", student_class.id)
+
+    params = params |> get_student_class(class_id, student_id)
     changeset = StudentGrade.changeset(%StudentGrade{}, params)
 
     case Repo.insert(changeset) do
@@ -26,7 +24,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
   end
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
-    grades = Repo.all(from a in StudentGrade, where: a.class_id == ^class_id and a.student_id == ^student_id)
-    render(conn, StudentGradeView, "index.json", grades: grades)
+    params = get_student_class(%{}, class_id, student_id)
+    student_grades = Repo.all(from a in StudentGrade, where: a.student_class_id == ^params["student_class_id"])
+    render(conn, StudentGradeView, "index.json", student_grades: student_grades)
+  end
+
+  defp get_student_class(map, class_id, student_id) do
+    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
+    map |> Map.put("student_class_id", student_class.id)
   end
 end
