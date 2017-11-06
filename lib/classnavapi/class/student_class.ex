@@ -1,4 +1,11 @@
 defmodule Classnavapi.Class.StudentClass do
+
+  @moduledoc """
+  
+  Changeset and Schema for student_classes
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.StudentClass

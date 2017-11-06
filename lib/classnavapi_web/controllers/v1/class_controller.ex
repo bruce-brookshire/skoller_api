@@ -40,7 +40,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   def search(conn, %{} = params) do
     date = Date.utc_today()
-    from(class in Class)
+    query = from(class in Class)
+    query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
