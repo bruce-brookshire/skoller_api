@@ -25,7 +25,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     params = get_student_class(%{}, class_id, student_id)
-    student_grades = Repo.all(from a in StudentGrade, where: a.student_class_id == ^params["student_class_id"])
+    student_grades = from(grade in StudentGrade)
+    |> where([grade], grade.student_class_id == ^params["student_class_id"])
+    |> Repo.all()
     render(conn, StudentGradeView, "index.json", student_grades: student_grades)
   end
 
