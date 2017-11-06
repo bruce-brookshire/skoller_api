@@ -16,6 +16,9 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Class
   alias Classnavapi.Class.Weight
+  alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.Assignment
+  alias Classnavapi.Student
 
   def run(_) do
     ensure_started(Repo, [])
@@ -38,6 +41,16 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
 
+    student = Repo.insert!(%User{email: "tyler@hku.edu", 
+                                password_hash: pass.password_hash,
+                                student: %Student{name_first: "Tyler",
+                                   name_last: "Witt",
+                                   school_id: school.id,
+                                   major: "Computer Science",
+                                   phone: "6158675309",
+                                   birthday: date1,
+                                   gender: "Male"}})
+                            
     period = Repo.insert!(%ClassPeriod{
       name: "Q1",
       school_id: school.id,
@@ -61,17 +74,49 @@ defmodule Mix.Tasks.Seed.Dev do
                   class_status_id: 100
     })
 
-    Repo.insert!(%Weight{
+    assign_weight = Repo.insert!(%Weight{
       name: "Assignments",
       weight: 50,
       class_id: class.id
     })
 
-    Repo.insert!(%Weight{
+    test_weight = Repo.insert!(%Weight{
       name: "Tests",
       weight: 50,
       class_id: class.id
     })
 
+    Repo.insert!(%Assignment{
+      name: "Assignment 1",
+      due: date2,
+      weight_id: assign_weight.id,
+      class_id: class.id
+    })
+
+    Repo.insert!(%Assignment{
+      name: "Assignment 2",
+      due: date2,
+      weight_id: assign_weight.id,
+      class_id: class.id
+    })
+
+    Repo.insert!(%Assignment{
+      name: "Assignment 3",
+      due: date2,
+      weight_id: assign_weight.id,
+      class_id: class.id
+    })
+
+    Repo.insert!(%Assignment{
+      name: "Final",
+      due: date2,
+      weight_id: test_weight.id,
+      class_id: class.id
+    })
+
+    Repo.insert!(%StudentClass{
+      student_id: student.student.id,
+      class_id: class.id
+    })
   end
 end
