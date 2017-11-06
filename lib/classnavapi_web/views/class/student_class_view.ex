@@ -11,12 +11,10 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
     render_one(student_class, StudentClassView, "student_class.json")
   end
 
-  def render("student_class.json", %{} = params) do
-    require IEx
-    IEx.pry
+  def render("student_class.json", %{student_class: student_class}) do
     %{
-      student_id: params.student_id,
-      class_id: params.class_id
+      student_id: student_class.student_id,
+      class_id: student_class.class_id
     }
   end
 end

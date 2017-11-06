@@ -19,6 +19,8 @@ defmodule Classnavapi.Class.StudentClass do
     student_class
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:class_id)
+    |> foreign_key_constraint(:student_id)
     |> unique_constraint(:student_class, name: :student_classes_student_id_class_id_index)
   end
 end

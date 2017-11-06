@@ -10,8 +10,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentController do
     changeset = StudentClass.changeset(%StudentClass{}, params)
 
     case Repo.insert(changeset) do
-      {:ok, class} ->
-        render(conn, StudentClassView, "show.json", class: class)
+      {:ok, student_class} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
