@@ -36,6 +36,7 @@ defmodule Classnavapi.Class do
     field :class_period_id, :id
     field :class_status_id, :id
     field :grade_scale, :string
+    field :class_type, :string
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
@@ -73,7 +74,7 @@ defmodule Classnavapi.Class do
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
                 :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
                 :is_editable, :class_period_id, :is_syllabus, :class_status_id]
-  @opt_fields [:crn, :credits, :location, :professor_id]
+  @opt_fields [:crn, :credits, :location, :professor_id, :class_type]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false

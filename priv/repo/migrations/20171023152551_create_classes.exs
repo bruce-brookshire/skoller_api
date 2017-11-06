@@ -15,6 +15,7 @@ defmodule Classnavapi.Repo.Migrations.CreateClasses do
       add :seat_count, :integer
       add :class_start, :date
       add :class_end, :date
+      add :class_type, :string
       add :is_enrollable, :boolean, default: false, null: false
       add :is_editable, :boolean, default: false, null: false
       add :is_syllabus, :boolean, default: false, null: false

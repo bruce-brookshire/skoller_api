@@ -33,6 +33,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
+            type: class.class_type,
             length: ViewCalcs.get_class_length(class, class.class_period)
         }
     end
