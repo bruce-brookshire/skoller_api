@@ -68,7 +68,9 @@ defmodule Classnavapi.User do
 
   @req_fields [:email, :password]
   @all_fields @req_fields
-  @upd_fields [:password]
+  @upd_req []
+  @upd_opt [:password]
+  @upd_fields @upd_req ++ @upd_opt
 
   @doc false
   def changeset_insert(%User{} = user, attrs) do
@@ -85,7 +87,7 @@ defmodule Classnavapi.User do
   def changeset_update(%User{} = user, attrs) do
     user
     |> cast(attrs, @upd_fields)
-    |> validate_required(@upd_fields)
+    |> validate_required(@upd_req)
     |> cast_assoc(:student)
     |> put_pass_hash()
   end

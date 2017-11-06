@@ -1,4 +1,11 @@
 defmodule Classnavapi.Class.StudentClass do
+
+  @moduledoc """
+  
+  Changeset and Schema for student_classes
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.StudentClass
@@ -7,6 +14,9 @@ defmodule Classnavapi.Class.StudentClass do
   schema "student_classes" do
     field :student_id, :id
     field :class_id, :id
+    belongs_to :class, Classnavapi.Class, define_field: false
+    belongs_to :student, Classnavapi.Student, define_field: false
+    has_many :student_grades, Classnavapi.Class.StudentGrade
 
     timestamps()
   end
