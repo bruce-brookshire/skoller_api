@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
 
   alias Classnavapi.Class.StudentGrade
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.Assignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentGradeView
 
@@ -25,9 +26,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     params = get_student_class(%{}, class_id, student_id)
-    student_grades = from(grade in StudentGrade)
-    |> where([grade], grade.student_class_id == ^params["student_class_id"])
+    student_grades = from(assign in Assignment)
+    |> join(:left, [assign], grade in StudentGrade, assign.id == grade.assignment_id and grade.student_class_id == ^params["student_class_id"])
+    |> where([assign, grade], assign.class_id == ^class_id)
     |> Repo.all()
+    |> Repo.preload([:student_grades])
     render(conn, StudentGradeView, "index.json", student_grades: student_grades)
   end
 
