@@ -11,13 +11,11 @@ defmodule ClassnavapiWeb.Class.StudentGradeView do
     render_one(student_grade, StudentGradeView, "student_grade.json")
   end
 
-  def render("student_grade.json", %{} = params) do
-    require IEx
-    IEx.pry
+  def render("student_grade.json", %{student_grade: student_grade}) do
     %{
-      student_class_id: params.student_class_id,
-      assignment_id: params.assignment_id,
-      grade: params.grade
+      student_class_id: student_grade.student_class_id,
+      assignment_id: student_grade.assignment_id,
+      grade: student_grade.grade
     }
   end
 end

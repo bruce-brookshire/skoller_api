@@ -30,5 +30,6 @@ defmodule Classnavapi.Class.StudentGrade do
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:assignment_id)
     |> foreign_key_constraint(:student_class_id)
+    |> unique_constraint(:student_grade, name: :student_grades_assignment_id_student_class_id_index)
   end
 end

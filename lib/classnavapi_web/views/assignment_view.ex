@@ -19,6 +19,7 @@ defmodule ClassnavapiWeb.AssignmentView do
         assignment = assignment |> get_weight_ratio()
 
         %{
+            id: assignment.id,
             due: assignment.due,
             name: assignment.name,
             weight_id: assignment.weight_id,
