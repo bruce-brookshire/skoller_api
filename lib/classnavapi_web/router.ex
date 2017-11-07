@@ -38,8 +38,10 @@ defmodule ClassnavapiWeb.Router do
         resources "/roles/", RoleController, only: [:index, :delete]
       end
       resources "/schools", SchoolController, except: [:new, :delete, :edit] do
-        resources "/periods", PeriodController, except: [:new, :delete, :edit]
+        resources "/periods", PeriodController, only: [:index, :create]
         resources "/professors", ProfessorController, except: [:new, :delete, :edit]
+      end
+      resources "/periods", PeriodController, only: [:update, :show] do
         resources "/classes", ClassController, only: [:create]
       end
       resources "/classes", ClassController, only: [:update, :show, :index] do
