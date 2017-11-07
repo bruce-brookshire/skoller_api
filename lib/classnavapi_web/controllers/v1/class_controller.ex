@@ -38,7 +38,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  def search(conn, %{} = params) do
+  def index(conn, %{} = params) do
     date = Date.utc_today()
     query = from(class in Class)
     query
@@ -48,12 +48,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> filter(params)
     |> Repo.all()
     |> render_class_search(conn)
-  end
-
-  def index(conn, _) do
-    classes = Repo.all(Class)
-    classes = classes |> Repo.preload(:class_period)
-    render(conn, ClassView, "index.json", classes: classes)
   end
 
   def show(conn, %{"id" => id}) do
