@@ -23,25 +23,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-
-    subquery = (from assign in Assignment)
-    assign_count = subquery
-                    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
-                    |> where([assign], assign.class_id == ^class_id)
-                    |> group_by([assign, weight], [assign.weight_id, weight.weight])
-                    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
-                    |> Repo.all()
-
     query = (from assign in Assignment)
     assignments = query
-                  #|> join(:inner, [assign], ac in subquery(assign_count), ac.weight_id == assign.weight_id)
                   |> where([assign], assign.class_id == ^class_id)
-                  #|> select([assign, ac], %{assignment: assign, weight: ac})
                   |> Repo.all()
     
-    assign_weights = assign_count
-                      |> get_relative_weight_by_id()
-    
+    assign_weights = get_relative_weight_by_id(class_id)
+
     assignments = assignments
     |> Enum.map(&Map.put(&1, :weight, get_weight(&1, assign_weights)))
 
@@ -54,11 +42,19 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     |> Map.get(:relative)
   end
 
-  defp get_relative_weight_by_id(enumerable) do
-    weight_sum = enumerable 
+  defp get_relative_weight_by_id(class_id) do
+    query = (from assign in Assignment)
+    assign_count = query
+                    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+                    |> where([assign], assign.class_id == ^class_id)
+                    |> group_by([assign, weight], [assign.weight_id, weight.weight])
+                    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
+                    |> Repo.all()
+
+    weight_sum = assign_count 
                   |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
     
-    enumerable
+    assign_count
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
 
