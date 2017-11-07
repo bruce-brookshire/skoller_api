@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.Class.StudentController do
+defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Class.StudentClass
@@ -24,8 +24,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    student_class = Repo.get!(StudentClass, id)
+  def show(conn, %{"student_id" => student_id, "id" => class_id}) do
+    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
     query = from(grades in StudentGrade)
     student_grades = query
                     |> join(:inner, [grades], assign in Assignment, grades.assignment_id == assign.id)
