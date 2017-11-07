@@ -9,11 +9,13 @@ defmodule Classnavapi.Repo.Migrations.CreateClasses do
       add :credits, :string
       add :location, :string
       add :meet_days, :string
+      add :grade_scale, :string
       add :meet_start_time, :string
       add :meet_end_time, :string
       add :seat_count, :integer
       add :class_start, :date
       add :class_end, :date
+      add :class_type, :string
       add :is_enrollable, :boolean, default: false, null: false
       add :is_editable, :boolean, default: false, null: false
       add :is_syllabus, :boolean, default: false, null: false

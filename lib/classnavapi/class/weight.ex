@@ -10,13 +10,13 @@ defmodule Classnavapi.Class.Weight do
   import Ecto.Changeset
 
   alias Classnavapi.Class.Weight
-
+  alias Classnavapi.Class
 
   schema "class_weights" do
     field :name, :string
     field :weight, :decimal
     field :class_id, :id
-    belongs_to :class, Classnavapi.Class, define_field: false
+    belongs_to :class, Class, define_field: false
 
     timestamps()
   end

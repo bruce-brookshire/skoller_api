@@ -10,7 +10,6 @@ defmodule Classnavapi.Student do
   import Ecto.Changeset
   alias Classnavapi.Student
 
-
   schema "students" do
     field :birthday, :date
     field :gender, :string
@@ -21,11 +20,12 @@ defmodule Classnavapi.Student do
     field :school_id, :id
     has_many :users, Classnavapi.User
     belongs_to :school, Classnavapi.School, define_field: false
- 
+
     timestamps()
   end
 
-  @req_fields [:name_first, :name_last, :phone, :birthday, :gender, :major, :school_id]
+  @req_fields [:name_first, :name_last, :phone, :birthday, :gender, :major,
+              :school_id]
   @all_fields @req_fields
 
   @doc false

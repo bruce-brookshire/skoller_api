@@ -4,7 +4,7 @@ defmodule Classnavapi.DocUpload do
 
     Defines valid extensions, filename, and storage path.
   """
-  
+
   use Arc.Definition
   use Arc.Ecto.Definition
 

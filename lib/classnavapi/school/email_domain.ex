@@ -11,12 +11,13 @@ defmodule Classnavapi.School.EmailDomain do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.School.EmailDomain
+  alias Classnavapi.School
 
   schema "email_domains" do
     field :email_domain, :string
     field :is_professor_only, :boolean
     field :school_id, :id
-    belongs_to :school, Classnavapi.School, define_field: false
+    belongs_to :school, School, define_field: false
 
     timestamps()
   end

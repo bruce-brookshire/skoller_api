@@ -14,6 +14,8 @@ defmodule Classnavapi.Class do
   import Ecto.Changeset
   alias Classnavapi.Class
   alias Classnavapi.Helpers.ChangesetValidation
+  alias Classnavapi.Repo
+  alias Ecto.Changeset
 
   schema "classes" do
     field :class_end, :date
@@ -33,17 +35,21 @@ defmodule Classnavapi.Class do
     field :professor_id, :id
     field :class_period_id, :id
     field :class_status_id, :id
+    field :grade_scale, :string
+    field :class_type, :string
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
     has_many :weights, Class.Weight
     belongs_to :class_status, Classnavapi.Class.Status, define_field: false
+    has_one :school, through: [:class_period, :school]
+    many_to_many :students, Classnavapi.Student, join_through: "student_classes"
 
     timestamps()
   end
 
   defp sum_weight(list) do
-    case list do 
+    case list do
       [] -> list
       _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
     end
@@ -51,7 +57,7 @@ defmodule Classnavapi.Class do
 
   defp validate_weight_totals(changeset) do
     sum = changeset
-          |> Ecto.Changeset.get_field(:weights)
+          |> Changeset.get_field(:weights)
           |> Enum.map(&Map.get(&1, :weight))
           |> Enum.filter(& &1)
           |> sum_weight
@@ -65,8 +71,10 @@ defmodule Classnavapi.Class do
     end
   end
 
-  @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time, :seat_count, :class_start, :class_end, :is_enrollable, :is_editable, :class_period_id, :is_syllabus, :class_status_id]
-  @opt_fields [:crn, :credits, :location, :professor_id]
+  @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
+                :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
+                :is_editable, :class_period_id, :is_syllabus, :class_status_id]
+  @opt_fields [:crn, :credits, :location, :professor_id, :class_type]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false

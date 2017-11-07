@@ -4,7 +4,7 @@ defmodule Classnavapi.Repo.Migrations.CreateUsers do
   def change do
     create table(:users) do
       add :email, :string
-      add :password, :string
+      add :password_hash, :string
       add :student_id, references(:students)
 
       timestamps()

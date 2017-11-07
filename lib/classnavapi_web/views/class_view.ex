@@ -2,6 +2,10 @@ defmodule ClassnavapiWeb.ClassView do
     use ClassnavapiWeb, :view
 
     alias ClassnavapiWeb.ClassView
+    alias ClassnavapiWeb.Class.StatusView
+    alias Classnavapi.Class.Status
+    alias Classnavapi.Repo
+    alias ClassnavapiWeb.Helpers.ViewCalcs
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -18,6 +22,7 @@ defmodule ClassnavapiWeb.ClassView do
             class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
+            grade_scale: class.grade_scale,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,
@@ -27,7 +32,9 @@ defmodule ClassnavapiWeb.ClassView do
             seat_count: class.seat_count,
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
-            is_syllabus: class.is_syllabus
+            is_syllabus: class.is_syllabus,
+            type: class.class_type,
+            length: ViewCalcs.get_class_length(class, class.class_period)
         }
     end
 
@@ -38,21 +45,20 @@ defmodule ClassnavapiWeb.ClassView do
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                status: render_one(status, ClassnavapiWeb.Class.StatusView, "status.json")
+                status: render_one(status, ClassnavapiWeb.Class.StatusView, "status.json"),
                 issue: render_one(issue, ClassnavapiWeb.Class.IssueView, "issue.json")
             }
         )
     end
 
     def render("class_detail.json", %{class: class}) do
-        status = Classnavapi.Repo.get!(Classnavapi.Class.Status, class.class_status_id)
+        status = Repo.get!(Status, class.class_status_id)
         class
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                status: render_one(status, ClassnavapiWeb.Class.StatusView, "status.json")
+                status: render_one(status, StatusView, "status.json")
             }
         )
     end
 end
-  

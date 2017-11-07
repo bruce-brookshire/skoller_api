@@ -5,8 +5,11 @@ defmodule ClassnavapiWeb.ChangesetView do
   See `Ecto.Changeset.traverse_errors/2` and
   `Api.ErrorHelpers.translate_error/1` for more details.
   """
+
+  alias Ecto.Changeset
+
   def translate_errors(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, &translate_error/1)
+    Changeset.traverse_errors(changeset, &translate_error/1)
   end
   def render("error.json", %{changeset: changeset}) do
     # When encoded, the changeset returns its errors

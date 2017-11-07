@@ -38,14 +38,23 @@ defmodule ClassnavapiWeb.Router do
         resources "/roles/", RoleController, only: [:index, :delete]
       end
       resources "/schools", SchoolController, except: [:new, :delete, :edit] do
-        resources "/periods", PeriodController, except: [:new, :delete, :edit]
+        resources "/periods", PeriodController, only: [:index, :create]
         resources "/professors", ProfessorController, except: [:new, :delete, :edit]
-        resources "/classes", ClassController, except: [:new, :delete, :edit] do
-          resources "/docs", Class.DocController, only: [:create, :index]
-          resources "/assignments", Class.AssignmentController, only: [:create, :index]
-          post "/assignments/complete", ClassController, :complete
-          resources "/weights", Class.WeightController, only: [:update, :index]
-          post "/issues/:class_issue_status_id", Class.IssueController, :create
+      end
+      resources "/periods", PeriodController, only: [:update, :show] do
+        resources "/classes", ClassController, only: [:create]
+      end
+      resources "/classes", ClassController, only: [:update, :show, :index] do
+        resources "/docs", Class.DocController, only: [:create, :index]
+        resources "/assignments", Class.AssignmentController, only: [:create, :index]
+        resources "/weights", Class.WeightController, only: [:update, :index]
+        post "/assignments/complete", ClassController, :complete
+        post "/issues/:class_issue_status_id", Class.IssueController, :create
+      end
+      resources "/students", StudentController, only: [] do
+        post "/classes/:class_id", Student.ClassController, :create
+        resources "/classes", Student.ClassController, only: [:show] do
+          resources "/grades", Student.Class.GradeController, only: [:create, :index]
         end
       end
       resources "/class-statuses", Class.StatusController, only: [:index]

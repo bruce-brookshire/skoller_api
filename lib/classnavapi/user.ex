@@ -14,10 +14,10 @@ defmodule Classnavapi.User do
   alias Classnavapi.User
   alias Classnavapi.Repo
 
-
   schema "users" do
     field :email, :string
-    field :password, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
     belongs_to :student, Classnavapi.Student
 
     timestamps()
@@ -42,7 +42,7 @@ defmodule Classnavapi.User do
   defp compare_domains(changeset, nil), do: changeset |> add_error(:student, "Invalid school")
   defp compare_domains(changeset, school) do
     email_domains = school.email_domains
-    
+
     match = email_domains
     |> Enum.find(& &1.email_domain == "@" <> extract_domain(changeset))
 
@@ -60,9 +60,17 @@ defmodule Classnavapi.User do
     |> compare_domains(school)
   end
 
+  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
+                      %{password: password}} = changeset) do
+    change(changeset, Comeonin.Bcrypt.add_hash(password))
+  end
+  defp put_pass_hash(changeset), do: changeset
+
   @req_fields [:email, :password]
   @all_fields @req_fields
-  @upd_fields [:password]
+  @upd_req []
+  @upd_opt [:password]
+  @upd_fields @upd_req ++ @upd_opt
 
   @doc false
   def changeset_insert(%User{} = user, attrs) do
@@ -73,12 +81,14 @@ defmodule Classnavapi.User do
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
     |> validate_email(attrs["student"])
+    |> put_pass_hash()
   end
 
   def changeset_update(%User{} = user, attrs) do
     user
     |> cast(attrs, @upd_fields)
-    |> validate_required([:email, :password])
+    |> validate_required(@upd_req)
     |> cast_assoc(:student)
+    |> put_pass_hash()
   end
 end
