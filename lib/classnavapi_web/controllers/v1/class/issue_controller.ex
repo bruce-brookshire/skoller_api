@@ -20,7 +20,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.IssueController do
     case Repo.transaction(multi) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
-      {:error, failed_operation, failed_value, changes_so_far} ->
+      {:error, _, failed_value, _} ->
         conn
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: failed_value)

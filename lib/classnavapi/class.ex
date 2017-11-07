@@ -90,7 +90,7 @@ defmodule Classnavapi.Class do
 
   def changeset_update(%Class{} = class, attrs) do
     class
-    |> Classnavapi.Repo.preload(:weights)
+    |> Repo.preload(:weights)
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
