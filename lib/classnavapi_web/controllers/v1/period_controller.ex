@@ -26,8 +26,8 @@ defmodule ClassnavapiWeb.Api.V1.PeriodController do
     render(conn, PeriodView, "index.json", periods: periods)
   end
 
-  def show(conn, %{"school_id" => school_id, "id" => id}) do
-    period = Repo.get_by!(ClassPeriod, school_id: school_id, id: id)
+  def show(conn, %{"id" => id}) do
+    period = Repo.get!(ClassPeriod, id)
     render(conn, PeriodView, "show.json", period: period)
   end
 

@@ -8,7 +8,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   import Ecto.Query
 
-  def create(conn, %{"grade_scale" => _} = params) do
+  def create(conn, %{"grade_scale" => _, "period_id" => period_id} = params) do
+    params = params |> Map.put("class_period_id", period_id)
 
     changeset = Class.changeset_insert(%Class{}, params)
 
@@ -23,8 +24,10 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  def create(conn, %{} = params) do
+  def create(conn, %{"period_id" => period_id} = params) do
     params = params |> Map.put("grade_scale", "A,90|B,80|C,70|D,60")
+    params = params |> Map.put("class_period_id", period_id)
+
     changeset = Class.changeset_insert(%Class{}, params)
 
     case Repo.insert(changeset) do
@@ -38,7 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  def search(conn, %{} = params) do
+  def index(conn, %{} = params) do
     date = Date.utc_today()
     query = from(class in Class)
     query
@@ -48,12 +51,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> filter(params)
     |> Repo.all()
     |> render_class_search(conn)
-  end
-
-  def index(conn, _) do
-    classes = Repo.all(Class)
-    classes = classes |> Repo.preload(:class_period)
-    render(conn, ClassView, "index.json", classes: classes)
   end
 
   def show(conn, %{"id" => id}) do

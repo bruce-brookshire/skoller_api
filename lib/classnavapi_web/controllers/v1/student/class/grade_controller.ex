@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.Class.Student.GradeController do
+defmodule ClassnavapiWeb.Api.V1.Student.Class.GradeController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Class.StudentGrade
