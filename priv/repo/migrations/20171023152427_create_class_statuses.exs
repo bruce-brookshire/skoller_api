@@ -21,7 +21,6 @@ defmodule Classnavapi.Repo.Migrations.CreateClassStatuses do
     create table(:class_statuses, primary_key: false) do
       add :id, :bigint, primary_key: true
       add :name, :string
-      add :is_editable, :boolean, null: false
       add :is_complete, :boolean, null: false
 
       timestamps()

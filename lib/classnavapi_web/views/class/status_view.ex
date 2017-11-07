@@ -23,7 +23,6 @@ defmodule ClassnavapiWeb.Class.StatusView do
     %{
       id: status.id,
       name: status.name,
-      is_editable: status.is_editable,
       is_complete: status.is_complete
     }
   end
