@@ -38,8 +38,33 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
                   |> where([assign], assign.class_id == ^class_id)
                   #|> select([assign, ac], %{assignment: assign, weight: ac})
                   |> Repo.all()
-    require IEx
-    IEx.pry
+    
+    assign_weights = assign_count
+                      |> get_relative_weight_by_id()
+    
+    assignments = assignments
+    |> Enum.map(&Map.put(&1, :weight, get_weight(&1, assign_weights)))
+
     render(conn, AssignmentView, "index.json", assignments: assignments)
+  end
+
+  defp get_weight(%{weight_id: weight_id}, enumerable) do
+    enumerable
+    |> Enum.find(nil, & &1.weight_id == weight_id)
+    |> Map.get(:relative)
+  end
+
+  defp get_relative_weight_by_id(enumerable) do
+    weight_sum = enumerable 
+                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+    
+    enumerable
+    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
+  end
+
+  defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
+    weight
+    |> Decimal.div(weight_sum)
+    |> Decimal.div(Decimal.new(count))
   end
 end
