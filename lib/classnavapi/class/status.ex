@@ -15,7 +15,6 @@ defmodule Classnavapi.Class.Status do
   @primary_key {:id, :id, []}
   schema "class_statuses" do
     field :is_complete, :boolean
-    field :is_editable, :boolean
     field :name, :string
 
     timestamps()

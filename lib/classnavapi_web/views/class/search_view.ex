@@ -42,7 +42,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 name: class.school.name
             },
             status: %{
-                name: class.class_status.name
+                name: ViewCalcs.get_status(class)
             }
         }
     end

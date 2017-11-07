@@ -24,6 +24,7 @@ defmodule Classnavapi.Class do
     field :crn, :string
     field :is_editable, :boolean, default: false
     field :is_enrollable, :boolean, default: false
+    field :is_ghost, :boolean, default: true
     field :is_syllabus, :boolean, default: true
     field :location, :string
     field :meet_days, :string
