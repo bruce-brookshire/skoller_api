@@ -12,28 +12,14 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, %{"class_status_id" => 300})
 
-    case Repo.update(changeset) do
-      {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
+    conn |> update_class(changeset)
   end
 
   def complete(conn, %{"class_id" => id}) do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, %{"class_status_id" => 500})
 
-    case Repo.update(changeset) do
-      {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
+    conn |> update_class(changeset)
   end
 
   def create(conn, %{"grade_scale" => _, "period_id" => period_id} = params) do
@@ -41,15 +27,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     changeset = Class.changeset_insert(%Class{}, params)
 
-    case Repo.insert(changeset) do
-      {:ok, class} ->
-        class = class |> Repo.preload(:class_period)
-        render(conn, ClassView, "show.json", class: class)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
+    conn |> create_class(changeset)
   end
 
   def create(conn, %{"period_id" => period_id} = params) do
@@ -58,15 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     changeset = Class.changeset_insert(%Class{}, params)
 
-    case Repo.insert(changeset) do
-      {:ok, class} ->
-        class = class |> Repo.preload(:class_period)
-        render(conn, ClassView, "show.json", class: class)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
+    conn |> create_class(changeset)
   end
 
   def index(conn, %{} = params) do
@@ -94,9 +64,21 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     changeset = changeset
     |> Ecto.Changeset.change(%{class_status_id: 200})
 
-    case Repo.update(changeset) do
+    conn |> update_class(changeset)
+  end
+
+  def update(conn, %{"id" => id} = params) do
+    class_old = Repo.get!(Class, id)
+    changeset = Class.changeset_update(class_old, params)
+
+    conn |> update_class(changeset)
+  end
+
+  defp create_class(conn, changeset) do
+    case Repo.insert(changeset) do
       {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
+        conn
+        |> render_class(class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -104,13 +86,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  def update(conn, %{"id" => id} = params) do
-    class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, params)
-
+  defp update_class(conn, changeset) do
     case Repo.update(changeset) do
       {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
+        conn
+        |> render_class(class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -160,6 +140,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     query |> where([class, period, prof], class.meet_days == ^filter)
   end
   defp day_filter(query, _), do: query
+
+  defp render_class(conn, class) do
+    class = class |> Repo.preload(:class_period)
+    render(conn, ClassView, "show.json", class: class)
+  end
 
   defp render_class_search(classes, conn) do
     classes = classes |> Repo.preload([:school, :professor, :class_status, :students])
