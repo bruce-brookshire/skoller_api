@@ -39,6 +39,10 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_syllabus(params)
     |> check_needs_weight(params)
   end
+  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
+    changeset
+    |> check_needs_assignments(params)
+  end
   def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   def confirm_class(%Ecto.Changeset{data: %{class_status_id: @new_class_status}} = changeset, %{}) do
@@ -71,6 +75,12 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     changeset |> change_changeset_status(@weight_status)
   end
   defp check_needs_weight(changeset, %{}), do: changeset
+
+  defp check_needs_assignments(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
+  defp check_needs_assignments(%Ecto.Changeset{changes: %{weights: _}} = changeset, %{"weights" => _}) do
+    changeset |> change_changeset_status(@assignment_status)
+  end
+  defp check_needs_assignments(changeset, %{}), do: changeset
 
   defp change_changeset_status(changeset, new_status) do
     changeset |> Ecto.Changeset.change(%{class_status_id: new_status})
