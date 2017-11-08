@@ -72,7 +72,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   is_syllabus: false,
                   grade_scale: "A,90|B,80|C,70|D,60",
                   class_period_id: period.id,
-                  class_status_id: 600
+                  class_status_id: 700
     })
 
     assign_weight = Repo.insert!(%Weight{
