@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
       {:error, _, failed_value, _} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: failed_value)
+        |> render(ChangesetView, "error.json", changeset: failed_value)
     end
   end
 

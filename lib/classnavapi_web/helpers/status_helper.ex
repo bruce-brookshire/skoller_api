@@ -90,7 +90,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp check_needs_assignments(changeset, %{}), do: changeset
 
   defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_complete(changeset, %{} = params) do
+  defp check_needs_complete(changeset, %{}) do
     changeset |> change_changeset_status(@complete_status)
   end
 
