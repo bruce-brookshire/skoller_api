@@ -8,6 +8,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   import Ecto.Query
 
+  @default_grade_scale "A,90|B,80|C,70|D,60"
+
   def complete(conn, %{"class_id" => id, "is_diy" => false}) do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, %{"class_status_id" => 300})
@@ -22,17 +24,10 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     conn |> update_class(changeset)
   end
 
-  def create(conn, %{"grade_scale" => _, "period_id" => period_id} = params) do
-    params = params |> Map.put("class_period_id", period_id)
-
-    changeset = Class.changeset_insert(%Class{}, params)
-
-    conn |> create_class(changeset)
-  end
-
   def create(conn, %{"period_id" => period_id} = params) do
-    params = params |> Map.put("grade_scale", "A,90|B,80|C,70|D,60")
-    params = params |> Map.put("class_period_id", period_id)
+    params = params
+            |> grade_scale()
+            |> Map.put("class_period_id", period_id)
 
     changeset = Class.changeset_insert(%Class{}, params)
 
@@ -72,6 +67,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     changeset = Class.changeset_update(class_old, params)
 
     conn |> update_class(changeset)
+  end
+
+  defp grade_scale(%{"grade_scale" => _} = params), do: params
+  defp grade_scale(%{} = params) do
+    params |> Map.put("grade_scale", @default_grade_scale)
   end
 
   defp create_class(conn, changeset) do
