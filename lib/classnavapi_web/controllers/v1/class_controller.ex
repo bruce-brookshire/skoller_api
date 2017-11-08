@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
+  alias ClassnavapiWeb.Helpers.StatusHelper
 
   import Ecto.Query
 
@@ -30,6 +31,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
             |> Map.put("class_period_id", period_id)
 
     changeset = Class.changeset_insert(%Class{}, params)
+    changeset = changeset
+                |> StatusHelper.check_changeset_status(params)
 
     conn |> create_class(changeset)
   end

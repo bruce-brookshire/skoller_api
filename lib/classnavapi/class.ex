@@ -74,7 +74,7 @@ defmodule Classnavapi.Class do
 
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
                 :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
-                :is_editable, :class_period_id, :is_syllabus, :class_status_id]
+                :is_editable, :class_period_id, :is_syllabus]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type]
   @all_fields @req_fields ++ @opt_fields
 
@@ -85,7 +85,6 @@ defmodule Classnavapi.Class do
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
-    |> foreign_key_constraint(:class_status_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
   end
 
@@ -96,7 +95,6 @@ defmodule Classnavapi.Class do
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
-    |> foreign_key_constraint(:class_status_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> cast_assoc(:weights)
     |> validate_weight_totals()

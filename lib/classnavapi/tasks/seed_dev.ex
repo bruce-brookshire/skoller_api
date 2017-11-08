@@ -87,7 +87,7 @@ defmodule Mix.Tasks.Seed.Dev do
       class_id: class.id
     })
 
-    lab_weight = Repo.insert!(%Weight{
+    Repo.insert!(%Weight{
       name: "Labs",
       weight: 35,
       class_id: class.id
