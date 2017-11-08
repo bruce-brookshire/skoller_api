@@ -19,8 +19,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   @weight_status 300
   @assignment_status 400
   # @review_status 500
-  # @help_status 600
+  @help_status 600
   @complete_status 700
+  @change_status 800
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
@@ -35,6 +36,14 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     end
   end
   def check_status(%{}, %{}), do: {:ok, nil}
+
+  def set_help_status(%{issue: %{class_id: class_id}}, %{id: id} = class) 
+  do
+    case class_id == id do
+      true -> help_status_check(class)
+      false -> {:error, %{class_id: "Class and issue do not match."}}
+    end
+  end
 
   def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: nil}} = changeset, %{} = params) do
     changeset
@@ -110,4 +119,16 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> Repo.update()
   end
   defp syllabus_status_check(%{}), do: {:ok, nil}
+
+  defp help_status_check(%{class_status: %{is_complete: true}} = params) do
+    params
+    |> Ecto.Changeset.change(%{class_status_id: @change_status})
+    |> Repo.update()
+  end
+  defp help_status_check(%{class_status: %{is_complete: false}} = params) do
+    params
+    |> Ecto.Changeset.change(%{class_status_id: @help_status})
+    |> Repo.update()
+  end
+  defp help_status_check(%{}), do: {:ok, nil}
 end

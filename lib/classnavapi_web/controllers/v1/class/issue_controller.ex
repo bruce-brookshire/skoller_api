@@ -5,17 +5,18 @@ defmodule ClassnavapiWeb.Api.V1.Class.IssueController do
     alias Classnavapi.Class.Issue
     alias Classnavapi.Repo
     alias ClassnavapiWeb.ClassView
+    alias ClassnavapiWeb.Helpers.StatusHelper
 
   def create(conn, %{"class_id" => class_id} = params) do
 
     class = Repo.get!(Class, class_id)
+    class = class |> Repo.preload([:class_status, :class_period])
 
     changeset = Issue.changeset(%Issue{}, params)
-    class_changeset = Class.changeset_update(class, %{class_status_id: 400})
 
     multi = Ecto.Multi.new
             |> Ecto.Multi.insert(:issue, changeset)
-            |> Ecto.Multi.update(:class, class_changeset)
+            |> Ecto.Multi.run(:class, &StatusHelper.set_help_status(&1, class))
 
     case Repo.transaction(multi) do
       {:ok, %{class: class}} ->

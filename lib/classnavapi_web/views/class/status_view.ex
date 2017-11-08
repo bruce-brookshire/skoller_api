@@ -21,6 +21,7 @@ defmodule ClassnavapiWeb.Class.StatusView do
 
   def render("status.json", %{status: status}) do
     %{
+      id: status.id,
       name: status.name
     }
   end
