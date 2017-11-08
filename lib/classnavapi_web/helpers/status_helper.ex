@@ -6,6 +6,8 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   
   Manages class statuses.
 
+  All functions return either {:ok, value} or {:error, value}
+
   """
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
@@ -14,6 +16,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
+  def check_status(%{}, %{is_ghost: false}), do: {:ok, nil}
 
   defp remove_ghost(%{} = params) do
     params
