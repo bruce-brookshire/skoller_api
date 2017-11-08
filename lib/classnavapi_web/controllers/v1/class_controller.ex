@@ -47,8 +47,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   def show(conn, %{"id" => id}) do
     class = Repo.get!(Class, id)
-    class = class |> Repo.preload(:class_period)
-    render(conn, ClassView, "show.json", class: class)
+    conn
+    |> render_class(class)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -134,7 +134,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp day_filter(query, _), do: query
 
   defp render_class(conn, class) do
-    class = class |> Repo.preload(:class_period)
+    class = class |> Repo.preload([:class_period, :class_status])
     render(conn, ClassView, "show.json", class: class)
   end
 
