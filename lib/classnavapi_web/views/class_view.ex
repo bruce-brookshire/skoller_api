@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.ClassView do
     alias ClassnavapiWeb.ClassView
     alias ClassnavapiWeb.Class.StatusView
     alias ClassnavapiWeb.Helpers.ViewCalcs
+    alias ClassnavapiWeb.Class.IssueView
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -41,7 +42,8 @@ defmodule ClassnavapiWeb.ClassView do
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                status: render_one(class.class_status, StatusView, "status.json")
+                status: render_one(class.class_status, StatusView, "status.json"),
+                issues: render_many(class.issues, IssueView, "issue.json")
             }
         )
     end

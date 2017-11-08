@@ -45,6 +45,7 @@ defmodule Classnavapi.Class do
     belongs_to :class_status, Classnavapi.Class.Status, define_field: false
     has_one :school, through: [:class_period, :school]
     many_to_many :students, Classnavapi.Student, join_through: "student_classes"
+    has_many :issues, Classnavapi.Class.Issue
 
     timestamps()
   end

@@ -134,7 +134,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp day_filter(query, _), do: query
 
   defp render_class(conn, class) do
-    class = class |> Repo.preload([:class_period, :class_status])
+    class = class |> Repo.preload([:class_period, :class_status, :issues])
     render(conn, ClassView, "show.json", class: class)
   end
 

@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.IssueController do
   def create(conn, %{"class_id" => class_id} = params) do
 
     class = Repo.get!(Class, class_id)
-    class = class |> Repo.preload([:class_status, :class_period])
+    class = class |> Repo.preload([:class_status, :class_period, :issues])
 
     changeset = Issue.changeset(%Issue{}, params)
 

@@ -4,6 +4,7 @@ defmodule Classnavapi.Repo.Migrations.CreateClassIssues do
   def change do
     create table(:class_issues) do
       add :note, :string
+      add :is_completed, :boolean, default: false, null: false
       add :class_id, references(:classes, on_delete: :nothing)
       add :class_issue_status_id, references(:class_issue_statuses, on_delete: :nothing)
 

@@ -12,6 +12,7 @@ defmodule Classnavapi.Class.Issue do
 
   schema "class_issues" do
     field :note, :string
+    field :is_completed, :boolean, default: false
     field :class_id, :id
     field :class_issue_status_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
