@@ -47,8 +47,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   def show(conn, %{"id" => id}) do
     class = Repo.get!(Class, id)
-    conn
-    |> render_class(class)
+    render(conn, ClassView, "show.json", class: class)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -69,8 +68,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp create_class(conn, changeset) do
     case Repo.insert(changeset) do
       {:ok, class} ->
-        conn
-        |> render_class(class)
+        render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -81,8 +79,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp update_class(conn, changeset) do
     case Repo.update(changeset) do
       {:ok, class} ->
-        conn
-        |> render_class(class)
+        render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -132,11 +129,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     query |> where([class, period, prof], class.meet_days == ^filter)
   end
   defp day_filter(query, _), do: query
-
-  defp render_class(conn, class) do
-    class = class |> Repo.preload([:class_period, :class_status, :issues])
-    render(conn, ClassView, "show.json", class: class)
-  end
 
   defp render_class_search(classes, conn) do
     classes = classes |> Repo.preload([:school, :professor, :class_status, :students])
