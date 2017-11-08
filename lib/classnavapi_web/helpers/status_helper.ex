@@ -25,7 +25,13 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
-  def check_status(%{}, %{is_ghost: false}), do: {:ok, nil}
+  def check_status(%{doc: %{class_id: class_id, is_syllabus: true}}, %{id: id} = class) do
+    case class_id == id do
+      true -> syllabus_status_check(class)
+      false -> {:error, %{class_id: "Class id enrolled into does not match"}}
+    end
+  end
+  def check_status(%{}, %{}), do: {:ok, nil}
 
   def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: nil}} = changeset, %{} = params) do
     changeset
@@ -75,4 +81,11 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> Ecto.Changeset.change(%{is_ghost: false})
     |> Repo.update()
   end
+
+  defp syllabus_status_check(%{class_status_id: @syllabus_status} = params) do
+    params
+    |> Ecto.Changeset.change(%{class_status_id: @weight_status})
+    |> Repo.update()
+  end
+  defp syllabus_status_check(%{}), do: {:ok, nil}
 end
