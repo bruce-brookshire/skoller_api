@@ -1,26 +1,34 @@
 defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   use ClassnavapiWeb, :controller
 
+  alias Classnavapi.Class
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentGrade
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentClassView
+  alias ClassnavapiWeb.Helpers.StatusHelper
 
   import Ecto.Query
 
-  def create(conn, %{} = params) do
+  def create(conn, %{"class_id" => class_id} = params) do
 
     changeset = StudentClass.changeset(%StudentClass{}, params)
 
-    case Repo.insert(changeset) do
-      {:ok, student_class} ->
+    class = Repo.get(Class, class_id)
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+
+    case Repo.transaction(multi) do
+      {:ok, %{student_class: student_class}} ->
         render(conn, StudentClassView, "show.json", student_class: student_class)
-      {:error, changeset} ->
+        {:error, _, failed_value, _} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: failed_value)
     end
   end
 
