@@ -22,7 +22,7 @@ defmodule Classnavapi.Class.Issue do
   end
 
   @req_fields [:class_id, :class_issue_status_id]
-  @opt_fields [:note]
+  @opt_fields [:note, :is_completed]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false

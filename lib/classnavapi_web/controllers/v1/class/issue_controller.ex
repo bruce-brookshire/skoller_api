@@ -1,11 +1,27 @@
 defmodule ClassnavapiWeb.Api.V1.Class.IssueController do
-    use ClassnavapiWeb, :controller
-    
-    alias Classnavapi.Class
-    alias Classnavapi.Class.Issue
-    alias Classnavapi.Repo
-    alias ClassnavapiWeb.ClassView
-    alias ClassnavapiWeb.Helpers.StatusHelper
+  use ClassnavapiWeb, :controller
+  
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Issue
+  alias Classnavapi.Repo
+  alias ClassnavapiWeb.ClassView
+  alias ClassnavapiWeb.Class.IssueView
+  alias ClassnavapiWeb.Helpers.StatusHelper
+
+  def complete(conn, %{"id" => id}) do
+    issue_old = Repo.get!(Issue, id)
+
+    changeset = Issue.changeset(issue_old, %{is_completed: true})
+
+    case Repo.update(changeset) do
+      {:ok, issue} ->
+        render(conn, IssueView, "show.json", issue: issue)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 
   def create(conn, %{"class_id" => class_id} = params) do
 
