@@ -10,11 +10,14 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   check_changeset_status/2 takes a changeset and params and returns a changeset.
 
+  confirm_class/2 takes a changeset and params and returns a changeset.
+
   """
 
   @new_class_status 100
   @syllabus_status 200
   @weight_status 300
+  @assignment_status 400
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
@@ -24,30 +27,48 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   end
   def check_status(%{}, %{is_ghost: false}), do: {:ok, nil}
 
-  def check_changeset_status(changeset, %{} = params) do
+  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: nil}} = changeset, %{} = params) do
     changeset
     |> check_new_class(params)
     |> check_needs_syllabus(params)
     |> check_needs_weight(params)
   end
+  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
+
+  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @new_class_status}} = changeset, %{}) do
+    changeset
+    |> check_needs_syllabus(changeset.data)
+    |> check_needs_weight(changeset.data)
+  end
+  def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   defp check_new_class(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
   defp check_new_class(changeset, %{"is_student" => true}) do
-    changeset |> Ecto.Changeset.change(%{class_status_id: @new_class_status})
+    changeset |> change_changeset_status(@new_class_status)
   end
   defp check_new_class(changeset, %{}), do: changeset
 
   defp check_needs_syllabus(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
   defp check_needs_syllabus(changeset, %{"is_syllabus" => true}) do
-    changeset |> Ecto.Changeset.change(%{class_status_id: @syllabus_status})
+    changeset |> change_changeset_status(@syllabus_status)
+  end
+  defp check_needs_syllabus(changeset, %{is_syllabus: true}) do
+    changeset |> change_changeset_status(@syllabus_status)
   end
   defp check_needs_syllabus(changeset, %{}), do: changeset
 
   defp check_needs_weight(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
   defp check_needs_weight(changeset, %{"is_syllabus" => false}) do
-    changeset |> Ecto.Changeset.change(%{class_status_id: @weight_status})
+    changeset |> change_changeset_status(@weight_status)
+  end
+  defp check_needs_weight(changeset, %{is_syllabus: false}) do
+    changeset |> change_changeset_status(@weight_status)
   end
   defp check_needs_weight(changeset, %{}), do: changeset
+
+  defp change_changeset_status(changeset, new_status) do
+    changeset |> Ecto.Changeset.change(%{class_status_id: new_status})
+  end
 
   defp remove_ghost(%{} = params) do
     params

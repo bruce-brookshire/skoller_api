@@ -11,16 +11,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   @default_grade_scale "A,90|B,80|C,70|D,60"
 
-  def complete(conn, %{"class_id" => id, "is_diy" => false}) do
+  def confirm(conn, %{"class_id" => id} = params) do
     class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, %{"class_status_id" => 300})
+    changeset = Class.changeset_update(class_old, %{})
 
-    conn |> update_class(changeset)
-  end
-
-  def complete(conn, %{"class_id" => id}) do
-    class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, %{"class_status_id" => 500})
+    changeset = changeset
+                |> StatusHelper.confirm_class(params)
 
     conn |> update_class(changeset)
   end
@@ -55,19 +51,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     render(conn, ClassView, "show.json", class: class)
   end
 
-  def update(conn, %{"id" => id, "weights" => _} = params) do
+  def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, params)
     
     changeset = changeset
-    |> Ecto.Changeset.change(%{class_status_id: 200})
-
-    conn |> update_class(changeset)
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, params)
+    |> StatusHelper.check_changeset_status(params)
 
     conn |> update_class(changeset)
   end
