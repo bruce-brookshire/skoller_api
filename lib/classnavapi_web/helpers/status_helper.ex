@@ -18,6 +18,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   @syllabus_status 200
   @weight_status 300
   @assignment_status 400
+  # @review_status 500
+  # @help_status 600
+  @complete_status 700
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
@@ -28,7 +31,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def check_status(%{doc: %{class_id: class_id, is_syllabus: true}}, %{id: id} = class) do
     case class_id == id do
       true -> syllabus_status_check(class)
-      false -> {:error, %{class_id: "Class id enrolled into does not match"}}
+      false -> {:error, %{class_id: "Doc upload and class do not match."}}
     end
   end
   def check_status(%{}, %{}), do: {:ok, nil}
@@ -49,6 +52,10 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     changeset
     |> check_needs_syllabus(changeset.data)
     |> check_needs_weight(changeset.data)
+  end
+  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{}) do
+    changeset
+    |> check_needs_complete(changeset.data)
   end
   def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
@@ -81,6 +88,11 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     changeset |> change_changeset_status(@assignment_status)
   end
   defp check_needs_assignments(changeset, %{}), do: changeset
+
+  defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
+  defp check_needs_complete(changeset, %{} = params) do
+    changeset |> change_changeset_status(@complete_status)
+  end
 
   defp change_changeset_status(changeset, new_status) do
     changeset |> Ecto.Changeset.change(%{class_status_id: new_status})
