@@ -108,8 +108,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
   defp prof_filter(query, _), do: query
 
+  defp status_filter(query, %{"class.status" => "0"}) do
+    query |> where([class, period, prof], class.is_ghost == true)
+  end
   defp status_filter(query, %{"class.status" => filter}) do
-    query |> where([class, period, prof], class.class_status_id == ^filter)
+    query |> where([class, period, prof], class.class_status_id == ^filter and class.is_ghost == false)
   end
   defp status_filter(query, _), do: query
 
