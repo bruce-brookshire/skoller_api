@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   # @review_status 500
   @help_status 600
   @complete_status 700
-  @change_status 800
+  # @change_status 800
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
