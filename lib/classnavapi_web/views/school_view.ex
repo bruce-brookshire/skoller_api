@@ -13,10 +13,11 @@ defmodule ClassnavapiWeb.SchoolView do
     render_one(school, SchoolView, "school_detail.json")
   end
 
-  def render("school.json", %{school: %{school: school, students: students}}) do
+  def render("school.json", %{school: %{school: school, students: students, classes: classes}}) do
     school
     |> base_school_view()
     |> Map.put(:enrollment, floor_enrollment(students))
+    |> Map.put(:classes, classes)
   end
 
   def render("school.json", %{school: school}) do
