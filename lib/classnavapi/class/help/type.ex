@@ -2,7 +2,7 @@ defmodule Classnavapi.Class.Help.Type do
 
   @moduledoc """
   
-  Defines schema and changeset for class issue statuses.
+  Defines schema and changeset for class help types.
 
   """
 
