@@ -18,11 +18,5 @@ defmodule Classnavapi.Repo.Migrations.CreateSchools do
 
       timestamps()
     end
-
-    alter table(:students) do
-      add :school_id, references(:schools)
-    end
-
-    create index(:students, [:school_id])
   end
 end
