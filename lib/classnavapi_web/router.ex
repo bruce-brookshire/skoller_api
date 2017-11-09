@@ -61,6 +61,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
+      resources "/class-change-types", Class.Change.TypeController, only: [:index]
     end
   end
 
