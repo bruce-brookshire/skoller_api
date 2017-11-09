@@ -275,6 +275,155 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "Fields of Study",
+					"description": "",
+					"item": [
+						{
+							"name": "Add Field of Study",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field of Study by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Fields of Study",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Update Field of Study",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Compute Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Create School",
 					"request": {
 						"method": "POST",
@@ -1146,6 +1295,138 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "Help",
+					"description": "",
+					"item": [
+						{
+							"name": "Add Help Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/2/help/100",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"2",
+										"help",
+										"100"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Resolve Help Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/2/help/1/complete",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"2",
+										"help",
+										"1",
+										"complete"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Changes",
+					"description": "",
+					"item": [
+						{
+							"name": "Add Change Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/changes/100",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"changes",
+										"100"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Resolve Change Request",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/changes/3/complete",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"changes",
+										"3",
+										"complete"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Get Classes",
 					"request": {
 						"method": "GET",
@@ -1261,94 +1542,6 @@
 								"classes",
 								"5",
 								"confirm"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Resolve Issue",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/1/issues/1/complete",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"classes",
-								"1",
-								"issues",
-								"1",
-								"complete"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Add Help Request",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/2/help/100",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"classes",
-								"2",
-								"help",
-								"100"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Add Change Request",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/1/changes/100",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"classes",
-								"1",
-								"changes",
-								"100"
 							]
 						},
 						"description": ""

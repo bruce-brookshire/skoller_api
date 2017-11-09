@@ -9,9 +9,11 @@ defmodule Classnavapi.Repo.Migrations.CreateStudents do
       add :phone, :string
       add :birthday, :date
       add :gender, :string
+      add :school_id, references(:schools)
 
       timestamps()
     end
 
+    create index(:students, [:school_id])
   end
 end
