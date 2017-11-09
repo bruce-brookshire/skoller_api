@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.School.FieldOfStudyView do
 
   def render("field.json", %{field: field}) do
     %{
+      id: field.id,
       field: field.field
     }
   end
