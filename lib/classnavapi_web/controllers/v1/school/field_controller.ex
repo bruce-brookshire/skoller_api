@@ -2,6 +2,7 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.School.FieldOfStudy
+  alias Classnavapi.School.StudentField
   alias Classnavapi.Repo
   alias ClassnavapiWeb.School.FieldOfStudyView
 
@@ -22,7 +23,13 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   end
 
   def index(conn, %{"school_id" => school_id}) do
-    fields = Repo.all(from fs in FieldOfStudy, where: fs.school_id == ^school_id)
+    query = (from fs in FieldOfStudy)
+    fields = query
+            |> join(:inner, [fs], st in StudentField, fs.id == st.field_of_study_id)
+            |> where([fs], fs.school_id == ^school_id)
+            |> group_by([fs, st], [fs.field, fs.id])
+            |> select([fs, st], %{field: fs, count: count(st.id)})
+            |> Repo.all()
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 
