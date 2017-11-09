@@ -543,6 +543,33 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Get Schools Hub",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/hub",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								"hub"
+							]
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
