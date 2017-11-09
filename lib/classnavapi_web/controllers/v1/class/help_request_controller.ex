@@ -28,28 +28,23 @@ defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
     class = Repo.get!(Class, class_id)
     class = class |> Repo.preload(:class_status)
 
-    transaction = 
-      case StatusHelper.get_help_type(class.class_status) do
-        :help -> class |> create_help(params)
-        _ -> nil
-      end
+    changeset = HelpRequest.changeset(%HelpRequest{}, params)
+    
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:help_request, changeset)
+    |> Ecto.Multi.run(:class, &StatusHelper.set_help_status(&1, class))
 
-    case transaction do
+    case Repo.transaction(multi) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
+      {:error, _t1, %Ecto.Changeset{} = changeset, _t2} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
       {:error, _, failed_value, _} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: failed_value)
+        |> render(ClassnavapiWeb.ErrorView, "error.json", error: failed_value)
     end
-  end
-
-  defp create_help(class, params) do
-    changeset = HelpRequest.changeset(%HelpRequest{}, params)
-
-    Ecto.Multi.new
-    |> Ecto.Multi.insert(:issue, changeset)
-    |> Ecto.Multi.run(:class, &StatusHelper.set_help_status(&1, class))
-    |> Repo.transaction()
   end
 end

@@ -1242,35 +1242,6 @@
 					"response": []
 				},
 				{
-					"name": "Add Class Issue",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/1/issues/100",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"classes",
-								"1",
-								"issues",
-								"100"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
 					"name": "Resolve Issue",
 					"request": {
 						"method": "POST",
@@ -1294,6 +1265,35 @@
 								"issues",
 								"1",
 								"complete"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add Help Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/classes/2/help/100",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"classes",
+								"2",
+								"help",
+								"100"
 							]
 						},
 						"description": ""
