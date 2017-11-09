@@ -20,6 +20,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Class.StudentGrade
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Student
+  alias Classnavapi.School.FieldOfStudy
 
   def run(_) do
     ensure_started(Repo, [])
@@ -148,6 +149,11 @@ defmodule Mix.Tasks.Seed.Dev do
       student_class_id: sc.id,
       assignment_id: t1.id,
       grade: 100
+    })
+
+    Repo.insert!(%FieldOfStudy{
+      field: "Computer Science",
+      school_id: school.id
     })
   end
 end

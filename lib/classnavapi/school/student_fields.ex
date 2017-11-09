@@ -1,7 +1,14 @@
-defmodule Classnavapi.School.StudentFields do
+defmodule Classnavapi.School.StudentField do
+
+  @moduledoc """
+  
+  Schema and Changeset for student fields of study
+
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.School.StudentFields
+  alias Classnavapi.School.StudentField
 
   schema "student_fields_of_study" do
     field :field_of_study_id, :id
@@ -14,7 +21,7 @@ defmodule Classnavapi.School.StudentFields do
   @all_fields @req_fields
 
   @doc false
-  def changeset(%StudentFields{} = student_fields, attrs) do
+  def changeset(%StudentField{} = student_fields, attrs) do
     student_fields
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
