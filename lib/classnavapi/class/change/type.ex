@@ -1,17 +1,17 @@
-defmodule Classnavapi.Class.Help.Type do
+defmodule Classnavapi.Class.Change.Type do
 
   @moduledoc """
   
-  Defines schema and changeset for class help types.
+  Defines schema and changeset for class change types.
 
   """
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.Class.Help.Type
+  alias Classnavapi.Class.Change.Type
 
   @primary_key {:id, :id, []}
-  schema "class_help_types" do
+  schema "class_change_types" do
     field :name, :string
 
     timestamps()

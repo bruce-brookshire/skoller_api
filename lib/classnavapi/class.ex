@@ -46,6 +46,7 @@ defmodule Classnavapi.Class do
     has_one :school, through: [:class_period, :school]
     many_to_many :students, Classnavapi.Student, join_through: "student_classes"
     has_many :help_requests, Classnavapi.Class.HelpRequest
+    has_many :change_requests, Classnavapi.Class.ChangeRequest
 
     timestamps()
   end

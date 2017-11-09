@@ -27,3 +27,7 @@ Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 100, name: "Incorrect"
 Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 200, name: "Confusing"})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 300, name: "File"})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 400, name: "Other"})
+
+Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 100, name: "Grade Scale"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 200, name: "Weights"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 300, name: "Professor Info"})

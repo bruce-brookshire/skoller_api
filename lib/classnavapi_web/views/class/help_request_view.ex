@@ -15,7 +15,7 @@ defmodule ClassnavapiWeb.Class.HelpRequestView do
       note: help_request.note,
       is_completed: help_request.is_completed,
       id: help_request.id,
-      issue_status: render_one(help_request.class_help_type, TypeView, "type.json")
+      help_type: render_one(help_request.class_help_type, TypeView, "type.json")
     }
   end
 end
