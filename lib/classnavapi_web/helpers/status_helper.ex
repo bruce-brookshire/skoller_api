@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   # @review_status 500
   @help_status 600
   @complete_status 700
-  # @change_status 800
+  @change_status 800
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
@@ -40,6 +40,13 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def set_help_status(%{help_request: %{class_id: class_id}}, %{id: id} = class) do
     case class_id == id do
       true -> help_status_check(class)
+      false -> {:error, %{class_id: "Class and issue do not match."}}
+    end
+  end
+
+  def set_change_status(%{change_request: %{class_id: class_id}}, %{id: id} = class) do
+    case class_id == id do
+      true -> change_status_check(class)
       false -> {:error, %{class_id: "Class and issue do not match."}}
     end
   end
@@ -118,6 +125,16 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> Repo.update()
   end
   defp syllabus_status_check(%{}), do: {:ok, nil}
+
+  defp change_status_check(%{class_status: %{is_complete: false}}) do
+    {:error, "Class is incomplete, use Help Request."}
+  end
+  defp change_status_check(%{class_status: %{is_complete: true}} = params) do
+    params
+    |> Ecto.Changeset.change(%{class_status_id: @change_status})
+    |> Repo.update()
+  end
+  defp change_status_check(%{}), do: {:ok, nil}
 
   defp help_status_check(%{class_status: %{is_complete: true}}) do
     {:error, "Class is complete, use Change Request."}
