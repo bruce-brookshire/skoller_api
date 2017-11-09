@@ -867,6 +867,105 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "Fields",
+					"description": "",
+					"item": [
+						{
+							"name": "Get Student Fields of Study",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Add Student Field of Study",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field_of_study_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Student Field of Study",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Enroll In Class",
 					"request": {
 						"method": "POST",

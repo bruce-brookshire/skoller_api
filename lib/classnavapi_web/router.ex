@@ -60,6 +60,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/classes", Student.ClassController, only: [:show] do
           resources "/grades", Student.Class.GradeController, only: [:create, :index]
         end
+        resources "/fields", Student.FieldController, only: [:create, :delete, :index]
       end
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
