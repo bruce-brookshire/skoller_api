@@ -3,9 +3,9 @@ defmodule ClassnavapiWeb.ClassView do
 
     alias ClassnavapiWeb.ClassView
     alias ClassnavapiWeb.Class.StatusView
-    alias Classnavapi.Class.Status
-    alias Classnavapi.Repo
     alias ClassnavapiWeb.Helpers.ViewCalcs
+    alias ClassnavapiWeb.Class.HelpRequestView
+    alias Classnavapi.Repo
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -34,17 +34,18 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             type: class.class_type,
-            length: ViewCalcs.get_class_length(class, class.class_period)
+            length: ViewCalcs.get_class_length(class)
         }
     end
 
     def render("class_detail.json", %{class: class}) do
-        status = Repo.get!(Status, class.class_status_id)
+        class = class |> Repo.preload([:class_status, :help_requests])
         class
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                status: render_one(status, StatusView, "status.json")
+                status: render_one(class.class_status, StatusView, "status.json"),
+                help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json")
             }
         )
     end

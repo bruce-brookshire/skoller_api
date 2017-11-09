@@ -33,7 +33,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 name: class.name,
                 number: class.number,
                 enrolled: get_enrolled(class.students),
-                length: ViewCalcs.get_class_length(class, class.class_period)
+                length: ViewCalcs.get_class_length(class)
             },
             professor: %{
                 name: professor_name(class.professor)
@@ -42,7 +42,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 name: class.school.name
             },
             status: %{
-                name: class.class_status.name
+                name: ViewCalcs.get_status(class)
             }
         }
     end

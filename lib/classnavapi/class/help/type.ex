@@ -1,19 +1,17 @@
-defmodule Classnavapi.Role do
+defmodule Classnavapi.Class.Help.Type do
 
   @moduledoc """
   
-  Defines schema and changeset for roles.
-
-  The primary key is not seeded.
+  Defines schema and changeset for class issue statuses.
 
   """
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.Role
+  alias Classnavapi.Class.Help.Type
 
   @primary_key {:id, :id, []}
-  schema "roles" do
+  schema "class_help_types" do
     field :name, :string
 
     timestamps()
@@ -23,10 +21,9 @@ defmodule Classnavapi.Role do
   @all_fields @req_fields
 
   @doc false
-  def changeset(%Role{} = role, attrs) do
-    role
+  def changeset(%Type{} = type, attrs) do
+    type
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> unique_constraint(:name)
   end
 end

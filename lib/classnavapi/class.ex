@@ -24,6 +24,7 @@ defmodule Classnavapi.Class do
     field :crn, :string
     field :is_editable, :boolean, default: false
     field :is_enrollable, :boolean, default: false
+    field :is_ghost, :boolean, default: true
     field :is_syllabus, :boolean, default: true
     field :location, :string
     field :meet_days, :string
@@ -44,6 +45,7 @@ defmodule Classnavapi.Class do
     belongs_to :class_status, Classnavapi.Class.Status, define_field: false
     has_one :school, through: [:class_period, :school]
     many_to_many :students, Classnavapi.Student, join_through: "student_classes"
+    has_many :help_requests, Classnavapi.Class.HelpRequest
 
     timestamps()
   end
@@ -73,7 +75,7 @@ defmodule Classnavapi.Class do
 
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
                 :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
-                :is_editable, :class_period_id, :is_syllabus, :class_status_id]
+                :is_editable, :class_period_id, :is_syllabus]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type]
   @all_fields @req_fields ++ @opt_fields
 
@@ -84,19 +86,16 @@ defmodule Classnavapi.Class do
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
-    |> foreign_key_constraint(:class_status_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
   end
 
   def changeset_update(%Class{} = class, attrs) do
-    class = Repo.preload class, :weights
-
     class
+    |> Repo.preload(:weights)
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
-    |> foreign_key_constraint(:class_status_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> cast_assoc(:weights)
     |> validate_weight_totals()
