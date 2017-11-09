@@ -2,8 +2,11 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.School
+  alias Classnavapi.Student
   alias Classnavapi.Repo
   alias ClassnavapiWeb.SchoolView
+
+  import Ecto.Query
 
   def create(conn, %{} = params) do
 
@@ -20,7 +23,17 @@ defmodule ClassnavapiWeb.Api.V1.SchoolController do
   end
 
   def index(conn, _) do
-    schools = Repo.all(School)
+    student_subquery = from(student in Student)
+    student_subquery = student_subquery
+              |> group_by([student], student.school_id)
+              |> select([student], %{school_id: student.school_id, count: count(student.id)})
+
+    query = from(school in School)
+    schools = query
+              |> join(:left, [school], student in subquery(student_subquery), student.school_id == school.id)
+              |> select([school, student], %{school: school, students: student.count})
+              |> Repo.all()
+    
     render(conn, SchoolView, "index.json", schools: schools)
   end
 
