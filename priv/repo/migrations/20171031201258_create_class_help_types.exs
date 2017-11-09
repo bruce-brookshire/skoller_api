@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassIssueStatuses do
+defmodule Classnavapi.Repo.Migrations.CreateClassHelpTypes do
 
   @moduledoc """
 
@@ -16,13 +16,13 @@ defmodule Classnavapi.Repo.Migrations.CreateClassIssueStatuses do
   use Ecto.Migration
 
   def change do
-    create table(:class_issue_statuses, primary_key: false) do
+    create table(:class_help_types, primary_key: false) do
       add :id, :bigint, primary_key: true
-      add :status, :string
+      add :name, :string
 
       timestamps()
     end
 
-    create unique_index(:class_issue_statuses, [:status])
+    create unique_index(:class_help_types, [:name])
   end
 end

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Class.Issue.Status do
+defmodule Classnavapi.Class.Help.Type do
 
   @moduledoc """
   
@@ -8,21 +8,21 @@ defmodule Classnavapi.Class.Issue.Status do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.Class.Issue.Status
+  alias Classnavapi.Class.Help.Type
 
   @primary_key {:id, :id, []}
-  schema "class_issue_statuses" do
-    field :status, :string
+  schema "class_help_types" do
+    field :name, :string
 
     timestamps()
   end
 
-  @req_fields [:id, :status]
+  @req_fields [:id, :name]
   @all_fields @req_fields
 
   @doc false
-  def changeset(%Status{} = status, attrs) do
-    status
+  def changeset(%Type{} = type, attrs) do
+    type
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
   end

@@ -23,7 +23,7 @@ Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 600, name: "Help", is_com
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 700, name: "Complete", is_complete: true})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 800, name: "Change", is_complete: true})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 100, status: "Incorrect"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 200, status: "Confusing"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 300, status: "File"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Issue.Status{id: 400, status: "Other"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 100, name: "Incorrect"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 200, name: "Confusing"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 300, name: "File"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 400, name: "Other"})

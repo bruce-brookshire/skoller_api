@@ -49,8 +49,8 @@ defmodule ClassnavapiWeb.Router do
         resources "/assignments", Class.AssignmentController, only: [:create, :index]
         resources "/weights", Class.WeightController, only: [:update, :index]
         post "/confirm", ClassController, :confirm
-        post "/issues/:id/complete", Class.IssueController, :complete
-        post "/issues/:class_issue_status_id", Class.IssueController, :create
+        post "/help/:id/complete", Class.HelpController, :complete
+        post "/help/:class_help_type_id", Class.HelpController, :create
       end
       resources "/students", StudentController, only: [] do
         post "/classes/:class_id", Student.ClassController, :create
@@ -60,7 +60,7 @@ defmodule ClassnavapiWeb.Router do
       end
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
-      resources "/class-issue-statuses", Class.Issue.StatusController, only: [:index]
+      resources "/class-help-types", Class.Help.TypeController, only: [:index]
     end
   end
 

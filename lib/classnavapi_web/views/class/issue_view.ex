@@ -1,21 +1,21 @@
-defmodule ClassnavapiWeb.Class.IssueView do
+defmodule ClassnavapiWeb.Class.HelpRequestView do
   use ClassnavapiWeb, :view
 
   alias Classnavapi.Repo
-  alias ClassnavapiWeb.Class.IssueView
-  alias ClassnavapiWeb.Class.Issue.StatusView
+  alias ClassnavapiWeb.Class.HelpRequestView
+  alias ClassnavapiWeb.Class.Help.TypeView
 
-  def render("show.json", %{issue: issue}) do
-    render_one(issue, IssueView, "issue.json")
+  def render("show.json", %{help_request: help_request}) do
+    render_one(help_request, HelpRequestView, "help_request.json")
   end
 
-  def render("issue.json", %{issue: issue}) do
-    issue = issue |> Repo.preload(:class_issue_status)
+  def render("help_request.json", %{help_request: help_request}) do
+    help_request = help_request |> Repo.preload(:class_help_type)
     %{
-      note: issue.note,
-      is_completed: issue.is_completed,
-      id: issue.id,
-      issue_status: render_one(issue.class_issue_status, StatusView, "status.json")
+      note: help_request.note,
+      is_completed: help_request.is_completed,
+      id: help_request.id,
+      issue_status: render_one(help_request.class_help_type, TypeView, "type.json")
     }
   end
 end
