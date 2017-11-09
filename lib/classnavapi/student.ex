@@ -19,6 +19,7 @@ defmodule Classnavapi.Student do
     field :major, :string
     field :school_id, :id
     has_many :users, Classnavapi.User
+    many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"
     belongs_to :school, Classnavapi.School, define_field: false
 
     timestamps()
