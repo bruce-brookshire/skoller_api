@@ -9,13 +9,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
   alias ClassnavapiWeb.Helpers.StatusHelper
 
   def complete(conn, %{"id" => id}) do
-    issue_old = Repo.get!(HelpRequest, id)
+    help_request_old = Repo.get!(HelpRequest, id)
 
-    changeset = HelpRequest.changeset(issue_old, %{is_completed: true})
+    changeset = HelpRequest.changeset(help_request_old, %{is_completed: true})
 
     case Repo.update(changeset) do
-      {:ok, issue} ->
-        render(conn, HelpRequestView, "show.json", issue: issue)
+      {:ok, help_request} ->
+        render(conn, HelpRequestView, "show.json", help_request: help_request)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
