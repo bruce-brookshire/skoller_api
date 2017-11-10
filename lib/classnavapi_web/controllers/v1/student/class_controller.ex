@@ -32,6 +32,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     end
   end
 
+  def index(conn, %{"student_id" => student_id}) do
+    query = from(classes in StudentClass)
+    student_classes = query
+                      |> where([classes], classes.student_id == ^student_id)
+                      |> Repo.all()
+    render(conn, StudentClassView, "index.json", student_classes: student_classes)
+  end
+
   def show(conn, %{"student_id" => student_id, "id" => class_id}) do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
     query = from(grades in StudentGrade)
