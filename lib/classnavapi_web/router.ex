@@ -20,9 +20,10 @@ defmodule ClassnavapiWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       resources "/users", UserController, only: [:update, :show, :index] do
-        post "/roles/:id", RoleController, :create
-        resources "/roles/", RoleController, only: [:index, :delete]
+        post "/roles/:id", User.RoleController, :create
+        resources "/roles/", User.RoleController, only: [:index, :delete]
       end
+      resources "/roles", RoleController, only: [:show, :index]
       get "/schools/hub", SchoolController, :hub
       resources "/schools", SchoolController, except: [:new, :delete, :edit] do
         resources "/periods", PeriodController, only: [:index, :create]
