@@ -1,0 +1,1 @@
+web: mix compile && mix ecto.migrate && mix phx.server
