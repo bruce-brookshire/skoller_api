@@ -28,6 +28,15 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(Decimal.div(Decimal.mult(&1.weight, &1.grade), weight_sum), &2))
   end
 
+  def get_class_completion(student_class_id, class_id) do
+    relative_weights = get_relative_weight_by_class_id(class_id)
+
+    student_class_id
+    |> get_completed_assignments()
+    |> Repo.preload(:assignment)
+    |> Enum.reduce(Decimal.new(0), &Decimal.add(get_relative_weight_by_weight(&1.assignment.weight_id, relative_weights), &2))
+  end
+
   def get_relative_weight_by_class_id(class_id) do
     query = (from assign in Assignment)
     assign_count = query
@@ -42,6 +51,20 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     
     assign_count
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
+  end
+
+  defp get_relative_weight_by_weight(weight_id, relative_weights) do
+    relative_weights
+    |> Enum.find(0, & &1.weight_id == weight_id)
+    |> Map.get(:relative, 0)
+  end
+
+  defp get_completed_assignments(student_class_id) do
+    query = from(grades in StudentGrade)
+    query
+        |> join(:inner, [grades], assign in Assignment, grades.assignment_id == assign.id)
+        |> where([grades], grades.student_class_id == ^student_class_id)
+        |> Repo.all()
   end
 
   defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
