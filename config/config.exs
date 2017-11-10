@@ -13,7 +13,7 @@ config :classnavapi,
 config :classnavapi, ClassnavapiWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
-  render_errors: [view: ClassnavapiWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: ClassnavapiWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Classnavapi.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
