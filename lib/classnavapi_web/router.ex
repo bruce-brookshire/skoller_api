@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
-      resources "/users", UserController, except: [:new, :delete, :edit] do
+      resources "/users", UserController, only: [:update, :show, :index] do
         post "/roles/:id", RoleController, :create
         resources "/roles/", RoleController, only: [:index, :delete]
       end
@@ -61,6 +61,7 @@ defmodule ClassnavapiWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :create
+      resources "/users", UserController, only: [:create]
     end
   end
 end
