@@ -35,6 +35,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     student_classes = query
                       |> where([classes], classes.student_id == ^student_id)
                       |> Repo.all()
+                      |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.class_id)))
+
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
 

@@ -21,6 +21,14 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
     })
   end
 
+  def render("student_class.json", %{student_class: student_class, grade: grade}) do
+    student_class
+    |> base_student_class()
+    |> Map.merge(%{
+      grade: grade
+    })
+  end
+
   def render("student_class.json", %{student_class: student_class}) do
     base_student_class(student_class)
   end
