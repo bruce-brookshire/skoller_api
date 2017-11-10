@@ -28,4 +28,26 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(Decimal.div(Decimal.mult(&1.weight, &1.grade), weight_sum), &2))
   end
 
+  def get_relative_weight_by_class_id(class_id) do
+    query = (from assign in Assignment)
+    assign_count = query
+                    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+                    |> where([assign], assign.class_id == ^class_id)
+                    |> group_by([assign, weight], [assign.weight_id, weight.weight])
+                    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
+                    |> Repo.all()
+
+    weight_sum = assign_count 
+                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+    
+    assign_count
+    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
+  end
+
+  defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
+    weight
+    |> Decimal.div(weight_sum)
+    |> Decimal.div(Decimal.new(count))
+  end
+
 end
