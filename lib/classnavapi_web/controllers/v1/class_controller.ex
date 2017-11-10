@@ -95,6 +95,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> name_filter(params)
     |> number_filter(params)
     |> day_filter(params)
+    |> length_filter(params)
   end
 
   defp school_filter(query, %{"school" => filter}) do
@@ -132,6 +133,20 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     query |> where([class, period, prof], class.meet_days == ^filter)
   end
   defp day_filter(query, _), do: query
+
+  defp length_filter(query, %{"class.length" => "1st Half"}) do
+    query |> where([class, period, prof], period.start_date == class.class_start and period.end_date != class.class_end)
+  end
+  defp length_filter(query, %{"class.length" => "2nd Half"}) do
+    query |> where([class, period, prof], period.end_date == class.class_end and period.start_date != class.class_start)
+  end
+  defp length_filter(query, %{"class.length" => "Full Term"}) do
+    query |> where([class, period, prof], period.start_date == class.class_start and period.end_date == class.class_end)
+  end
+  defp length_filter(query, %{"class.length" => "Custom"}) do
+    query |> where([class, period, prof], period.start_date != class.class_start and period.end_date != class.class_end)
+  end
+  defp length_filter(query, _), do: query
 
   defp render_class_search(classes, conn) do
     classes = classes |> Repo.preload([:school, :professor, :class_status, :students])
