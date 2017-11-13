@@ -7,6 +7,12 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
 
   import Ecto.Query
 
+  @ghost_status "Ghost"
+  @first_half "1st Half"
+  @second_half "2nd Half"
+  @full_term "Full Term"
+  @custom "Custom"
+
   @moduledoc """
   
   Gets enrollment, grades, completion, etc. for controllers.
@@ -51,6 +57,45 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     
     assign_count
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
+  end
+
+  def get_enrollment(class) do
+    class = class |> Repo.preload(:students)
+    get_enrolled(class.students)
+  end
+
+  def professor_name(class) do
+    class = class |> Repo.preload(:professor)
+    extract_name(class.professor, is_nil(class.professor))
+  end
+
+  def get_class_length(class) do
+    class = class |> Repo.preload(:class_period)
+    compare_classes(class.class_start == class.class_period.start_date, class.class_end == class.class_period.end_date)
+  end
+
+  def get_class_status(class) do
+    class = class |> Repo.preload(:class_status)
+    get_status(class)
+  end
+
+  defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_status
+  defp get_status(%{class_status: status}), do: status.name
+
+  defp compare_classes(true, true), do: @full_term
+  defp compare_classes(true, false), do: @first_half
+  defp compare_classes(false, true), do: @second_half
+  defp compare_classes(false, false), do: @custom
+
+  defp extract_name(_, true), do: "None"
+  defp extract_name(professor, false) do
+      professor.name_last
+  end
+
+  defp get_enrolled(nil), do: 0
+  defp get_enrolled(students) do
+      students 
+      |> Enum.count(& &1)
   end
 
   defp get_relative_weight_by_weight(weight_id, relative_weights) do

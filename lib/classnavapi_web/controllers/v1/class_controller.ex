@@ -36,13 +36,14 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   def index(conn, %{} = params) do
     date = Date.utc_today()
     query = from(class in Class)
-    query
+    classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> filter(params)
     |> Repo.all()
-    |> render_class_search(conn)
+
+    render(conn, SearchView, "index.json", classes: classes)
   end
 
   def show(conn, %{"id" => id}) do
@@ -147,9 +148,4 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     query |> where([class, period, prof], period.start_date != class.class_start and period.end_date != class.class_end)
   end
   defp length_filter(query, _), do: query
-
-  defp render_class_search(classes, conn) do
-    classes = classes |> Repo.preload([:school, :professor, :class_status, :students])
-    render(conn, SearchView, "index.json", classes: classes)
-  end
 end
