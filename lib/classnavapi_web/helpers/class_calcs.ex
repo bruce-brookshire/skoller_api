@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentGrade
+  alias Classnavapi.Class
 
   import Ecto.Query
 
@@ -59,7 +60,13 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
 
-  def get_enrollment(class) do
+  def get_enrollment(%{students: _students} = class) do
+    class = class |> Repo.preload(:students)
+    get_enrolled(class.students)
+  end
+
+  def get_enrollment(class_id) do
+    class = Repo.get!(Class, class_id)
     class = class |> Repo.preload(:students)
     get_enrolled(class.students)
   end
