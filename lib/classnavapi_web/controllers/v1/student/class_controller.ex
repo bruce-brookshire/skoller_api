@@ -44,9 +44,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   def show(conn, %{"student_id" => student_id, "id" => class_id}) do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
 
-    grade = ClassCalcs.get_class_grade(student_class.id)
+    student_class = student_class
+                    |> Map.put(:grade, ClassCalcs.get_class_grade(student_class.id))
+                    |> Map.put(:completion, ClassCalcs.get_class_completion(student_class.id, class_id))
 
-    student_class = student_class |> Map.put(:grade, grade)
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
 end
