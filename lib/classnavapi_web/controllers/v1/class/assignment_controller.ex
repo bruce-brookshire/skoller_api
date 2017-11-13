@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     assign_weights = ClassCalcs.get_relative_weight_by_class_id(class_id)
 
     assignments = assignments
-    |> Enum.map(&Map.put(&1, :weight, get_weight(&1, assign_weights)))
+    |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
 
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
