@@ -45,6 +45,7 @@ defmodule ClassnavapiWeb.Router do
       end
       resources "/students", StudentController, only: [] do
         post "/classes/:class_id", Student.ClassController, :create
+        get "/classes/:class_id/speculate", Student.Class.SpeculateController, :speculate
         resources "/classes", Student.ClassController, only: [:show, :index] do
           resources "/grades", Student.Class.GradeController, only: [:create, :index]
         end

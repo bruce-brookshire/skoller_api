@@ -6,8 +6,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias ClassnavapiWeb.AssignmentView
   alias ClassnavapiWeb.Helpers.ClassCalcs
 
-  import Ecto.Query
-
   def create(conn, %{} = params) do
   
     changeset = Assignment.changeset(%Assignment{}, params)
@@ -23,22 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    query = (from assign in Assignment)
-    assignments = query
-                  |> where([assign], assign.class_id == ^class_id)
-                  |> Repo.all()
-    
-    assign_weights = ClassCalcs.get_relative_weight_by_class_id(class_id)
-
-    assignments = assignments
-    |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
-
+    assignments = ClassCalcs.get_assignments_with_relative_weight(class_id)
     render(conn, AssignmentView, "index.json", assignments: assignments)
-  end
-
-  defp get_weight(%{weight_id: weight_id}, enumerable) do
-    enumerable
-    |> Enum.find(nil, & &1.weight_id == weight_id)
-    |> Map.get(:relative)
   end
 end
