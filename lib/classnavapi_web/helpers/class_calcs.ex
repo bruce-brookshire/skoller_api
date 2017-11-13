@@ -65,12 +65,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     get_enrolled(class.students)
   end
 
-  def get_enrollment(class_id) do
-    class = Repo.get!(Class, class_id)
-    class = class |> Repo.preload(:students)
-    get_enrolled(class.students)
-  end
-
   def professor_name(class) do
     class = class |> Repo.preload(:professor)
     extract_name(class.professor, is_nil(class.professor))
