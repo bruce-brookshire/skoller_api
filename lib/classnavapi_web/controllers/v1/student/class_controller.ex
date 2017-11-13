@@ -39,6 +39,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
                       |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
                       |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1.id, &1.class_id)))
                       |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
+                      |> Enum.map(&Map.put(&1, :status, ClassCalcs.get_class_status(&1.class)))
 
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
@@ -47,11 +48,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
 
     student_class = student_class |> Repo.preload(:class)
-    
+
     student_class = student_class
                     |> Map.put(:grade, ClassCalcs.get_class_grade(student_class.id))
                     |> Map.put(:completion, ClassCalcs.get_class_completion(student_class.id, class_id))
                     |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
+                    |> Map.put(:status, ClassCalcs.get_class_status(student_class.class))
 
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
