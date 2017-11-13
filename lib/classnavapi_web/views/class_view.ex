@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.ClassView do
 
     alias ClassnavapiWeb.ClassView
     alias ClassnavapiWeb.Class.StatusView
-    alias ClassnavapiWeb.Helpers.ViewCalcs
+    alias ClassnavapiWeb.Helpers.ClassCalcs
     alias ClassnavapiWeb.Class.HelpRequestView
     alias ClassnavapiWeb.Class.ChangeRequestView
     alias Classnavapi.Repo
@@ -35,7 +35,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             type: class.class_type,
-            length: ViewCalcs.get_class_length(class)
+            length: ClassCalcs.get_class_length(class)
         }
     end
 
