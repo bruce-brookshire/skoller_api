@@ -30,6 +30,9 @@ defmodule Classnavapi.Class.StudentAssignment do
     @req_fields [:due, :name, :weight_id, :student_class_id]
     @opt_fields [:assignment_id, :grade]
     @all_fields @req_fields ++ @opt_fields
+
+    @req_grd_fields [:grade]
+    @grd_fields @req_grd_fields
   
     @doc false
     def changeset(%StudentAssignment{} = assignment, attrs) do
@@ -38,6 +41,12 @@ defmodule Classnavapi.Class.StudentAssignment do
       |> validate_required(@req_fields)
       |> foreign_key_constraint(:student_class_id)
       |> foreign_key_constraint(:weight_id)
+    end
+
+    def grade_changeset(%StudentAssignment{} = assignment, attrs) do
+      assignment
+      |> cast(attrs, @grd_fields)
+      |> validate_required(@req_grd_fields)
     end
   end
   

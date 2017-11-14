@@ -43,413 +43,38 @@
 			]
 		},
 		{
-			"name": "School",
+			"name": "Assignment",
 			"description": "",
 			"item": [
 				{
-					"name": "Period",
-					"description": "",
-					"item": [
-						{
-							"name": "Create School Class Period",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/periods",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"periods"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get School Class Periods",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/periods/",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"periods",
-										""
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Professors",
-					"description": "",
-					"item": [
-						{
-							"name": "Create Professor",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"class_period_id\": 1,\n  \"name_last\": \"Jimbo\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/professors",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"professors"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get School Professors",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"professors",
-										""
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get School Professors by Id",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"professors",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Update Professor",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"class_period_id\": 1,\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"professors",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Fields of Study",
-					"description": "",
-					"item": [
-						{
-							"name": "Add Field of Study",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"fields-of-study"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get Field of Study by Id",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"fields-of-study",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get Fields of Study",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"fields-of-study"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Update Field of Study",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field\": \"Compute Science\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"schools",
-										"1",
-										"fields-of-study",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Create School",
+					"name": "Add Assignment Grade",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"name\":\"Hard Knocks University\",\n\"timezone\": \"CST\",\n\"email_domains\": [\n  {\n    \"email_domain\": \"@hku.edu\",\n    \"is_professor_only\": false\n  },\n  {\n    \"email_domain\": \"@hk123u.edu\",\n    \"is_professor_only\": true\n  }\n],\n\"adr_zip\": \"37201\",\n\"adr_state\": \"TN\",\n\"adr_line_1\": \"530 Church St\",\n\"adr_city\": \"Nashville\",\n\"is_active\":true}"
+							"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/schools",
+							"raw": "{{BaseUrl}}/api/v1/assignments/5/grades",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"schools"
+								"assignments",
+								"5",
+								"grades"
 							]
 						},
 						"description": ""
@@ -457,699 +82,39 @@
 					"response": []
 				},
 				{
-					"name": "Get Schools",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/schools/",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"schools",
-								""
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Get School by Id",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/schools/1",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"schools",
-								"1"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Update School",
+					"name": "Add Assignment Grade",
 					"request": {
 						"method": "PUT",
 						"header": [
 							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\":\"Hard Knocks Utopiaz\",\n  \"timezone\": \"CST\",\n  \"email_domains\": [\n    {\n      \"email_domain\":\"@123hku.edu\",\n      \"is_professor_only\": false\n    },\n    {\n      \"email_domain\":\"@hkutest.edu\",\n      \"is_professor_only\": true\n    }\n  ],\n  \"adr_zip\": \"37202\",\n  \"adr_state\": \"TN\",\n  \"adr_line_1\": \"530 Church St\",\n  \"adr_city\": \"Nashville\",\n  \"email_domain_prof\": \"\",\n  \"is_active\":true,\n  \"is_editable\":true\n}"
+							"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/schools/1",
+							"raw": "{{BaseUrl}}/api/v1/assignments/5/grades",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"schools",
-								"1"
+								"assignments",
+								"5",
+								"grades"
 							]
 						},
 						"description": ""
 					},
 					"response": []
-				},
-				{
-					"name": "Get Schools Hub",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/schools/hub",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"schools",
-								"hub"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"description": "",
-			"item": [
-				{
-					"name": "Roles",
-					"description": "",
-					"item": [
-						{
-							"name": "Add Role To User",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"disabled": true
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"1",
-										"roles",
-										"200"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get Roles by User",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"disabled": true
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users/1/roles/",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"1",
-										"roles",
-										""
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Remove Role From User",
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"disabled": true
-									},
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"1",
-										"roles",
-										"200"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Create User",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\":\"dchappele@hku.edu\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/users",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Get Users",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/users",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Get User by Id",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/users/1",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"1"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\": \"test\",\n\"student\": {\n  \"name_first\": \"David\",\n  \"name_last\": \"Chapelletteville\",\n  \"school_id\": 1,\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/users/1",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"users",
-								"1"
-							]
-						},
-						"description": ""
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Students",
-			"description": "",
-			"item": [
-				{
-					"name": "Grades",
-					"description": "",
-					"item": [
-						{
-							"name": "Get Student Assignment Grades",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/grades",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										"1",
-										"grades"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Add Assignment Grade",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/grades",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										"1",
-										"grades"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Speculate Grades",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										"1",
-										"speculate"
-									],
-									"query": [
-										{
-											"key": "grade",
-											"value": "A",
-											"equals": true
-										}
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Fields",
-					"description": "",
-					"item": [
-						{
-							"name": "Get Student Fields of Study",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"fields"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Add Student Field of Study",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field_of_study_id\": 1\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"fields"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Student Field of Study",
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"fields",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Classes",
-					"description": "",
-					"item": [
-						{
-							"name": "Get Student Classes",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"student_id\": 1\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										""
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get Student Class by Id",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"student_id\": 1\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Enroll In Class",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"classes",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
 				}
 			]
 		},
@@ -1942,6 +907,1080 @@
 								"v1",
 								"roles",
 								"100"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "School",
+			"description": "",
+			"item": [
+				{
+					"name": "Period",
+					"description": "",
+					"item": [
+						{
+							"name": "Create School Class Period",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/periods",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"periods"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get School Class Periods",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/periods/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"periods",
+										""
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Professors",
+					"description": "",
+					"item": [
+						{
+							"name": "Create Professor",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"class_period_id\": 1,\n  \"name_last\": \"Jimbo\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/professors",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"professors"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get School Professors",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"professors",
+										""
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get School Professors by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"professors",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Update Professor",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"class_period_id\": 1,\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"professors",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Fields of Study",
+					"description": "",
+					"item": [
+						{
+							"name": "Add Field of Study",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field of Study by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Fields of Study",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Update Field of Study",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field\": \"Compute Science\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"fields-of-study",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Create School",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"Hard Knocks University\",\n\"timezone\": \"CST\",\n\"email_domains\": [\n  {\n    \"email_domain\": \"@hku.edu\",\n    \"is_professor_only\": false\n  },\n  {\n    \"email_domain\": \"@hk123u.edu\",\n    \"is_professor_only\": true\n  }\n],\n\"adr_zip\": \"37201\",\n\"adr_state\": \"TN\",\n\"adr_line_1\": \"530 Church St\",\n\"adr_city\": \"Nashville\",\n\"is_active\":true}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schools",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								""
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get School by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								"1"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update School",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\":\"Hard Knocks Utopiaz\",\n  \"timezone\": \"CST\",\n  \"email_domains\": [\n    {\n      \"email_domain\":\"@123hku.edu\",\n      \"is_professor_only\": false\n    },\n    {\n      \"email_domain\":\"@hkutest.edu\",\n      \"is_professor_only\": true\n    }\n  ],\n  \"adr_zip\": \"37202\",\n  \"adr_state\": \"TN\",\n  \"adr_line_1\": \"530 Church St\",\n  \"adr_city\": \"Nashville\",\n  \"email_domain_prof\": \"\",\n  \"is_active\":true,\n  \"is_editable\":true\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								"1"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get Schools Hub",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/hub",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								"hub"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students",
+			"description": "",
+			"item": [
+				{
+					"name": "Assignments",
+					"description": "",
+					"item": [
+						{
+							"name": "Speculate Grades",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"classes",
+										"1",
+										"speculate"
+									],
+									"query": [
+										{
+											"key": "grade",
+											"value": "A",
+											"equals": true
+										}
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Student Assignments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/assignments",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"classes",
+										"1",
+										"assignments"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Fields",
+					"description": "",
+					"item": [
+						{
+							"name": "Get Student Fields of Study",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Add Student Field of Study",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field_of_study_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Student Field of Study",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Classes",
+					"description": "",
+					"item": [
+						{
+							"name": "Get Student Classes",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"student_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"classes",
+										""
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Student Class by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"student_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"classes",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Enroll In Class",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"classes",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "",
+			"item": [
+				{
+					"name": "Roles",
+					"description": "",
+					"item": [
+						{
+							"name": "Add Role To User",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1",
+										"roles",
+										"200"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Get Roles by User",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/1/roles/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1",
+										"roles",
+										""
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Role From User",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1",
+										"roles",
+										"200"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"dchappele@hku.edu\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\": \"test\",\n\"student\": {\n  \"name_first\": \"David\",\n  \"name_last\": \"Chapelletteville\",\n  \"school_id\": 1,\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1"
 							]
 						},
 						"description": ""
