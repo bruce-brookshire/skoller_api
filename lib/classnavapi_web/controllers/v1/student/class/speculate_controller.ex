@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
     end
   end
 
-  defp get_class_weighted_grade(%StudentClass{id: id} = params) do
+  defp get_class_weighted_grade(%StudentClass{} = params) do
     assignments = ClassCalcs.get_assignments_with_relative_weight(params)
 
     assignments

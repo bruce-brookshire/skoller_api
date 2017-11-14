@@ -74,16 +74,16 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
 
   defp get_assignments(%StudentClass{id: id}) do #good
     query = (from assign in StudentAssignment)
-    assignments = query
-                  |> where([assign], assign.student_class_id == ^id)
-                  |> Repo.all()
+    query
+    |> where([assign], assign.student_class_id == ^id)
+    |> Repo.all()
   end
 
   defp get_assignments(%{class_id: class_id}) do
     query = (from assign in Assignment)
-    assignments = query
-                  |> where([assign], assign.class_id == ^class_id)
-                  |> Repo.all()
+    query
+    |> where([assign], assign.class_id == ^class_id)
+    |> Repo.all()
   end
 
   defp get_relative_weight(%{} = params) do #good
