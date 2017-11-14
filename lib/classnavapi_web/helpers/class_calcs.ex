@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   alias Classnavapi.Repo
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
-  alias Classnavapi.Class.StudentGrade
+  alias Classnavapi.Class.StudentAssignment
 
   import Ecto.Query
 
@@ -20,13 +20,12 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   """
 
   def get_class_grade(student_class_id) do
-    query = from(grades in StudentGrade)
+    query = from(assign in StudentAssignment)
     student_grades = query
-                    |> join(:inner, [grades], assign in Assignment, grades.assignment_id == assign.id)
-                    |> join(:inner, [grades, assign], weight in Weight, weight.id == assign.weight_id)
-                    |> where([grades], grades.student_class_id == ^student_class_id)
-                    |> group_by([grades, assign, weight], [assign.weight_id, weight.weight])
-                    |> select([grades, assign, weight], %{grade: avg(grades.grade), weight_id: assign.weight_id, weight: weight.weight})
+                    |> join(:inner, [assign], weight in Weight, weight.id == assign.weight_id)
+                    |> where([assign], assign.student_class_id == ^student_class_id)
+                    |> group_by([assign, weight], [assign.weight_id, weight.weight])
+                    |> select([assign, weight], %{grade: avg(assign.grade), weight_id: assign.weight_id, weight: weight.weight})
                     |> Repo.all()
 
     weight_sum = student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
@@ -127,10 +126,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   end
 
   defp get_completed_assignments(student_class_id) do
-    query = from(grades in StudentGrade)
+    query = from(assign in StudentAssignment)
     query
-        |> join(:inner, [grades], assign in Assignment, grades.assignment_id == assign.id)
-        |> where([grades], grades.student_class_id == ^student_class_id)
+        |> where([assign], assign.student_class_id == ^student_class_id)
+        |> where([assign], not(is_nil(assign.grade)))
         |> Repo.all()
   end
 
