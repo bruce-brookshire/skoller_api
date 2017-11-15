@@ -10,6 +10,7 @@ defmodule Classnavapi.Class.Assignment do
   import Ecto.Changeset
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.Weight
 
   schema "assignments" do
@@ -19,7 +20,7 @@ defmodule Classnavapi.Class.Assignment do
     field :class_id, :id
     belongs_to :class, Class, define_field: false
     belongs_to :weight, Weight, define_field: false
-    has_many :student_grades, Class.StudentGrade
+    has_many :student_assignments, StudentAssignment
 
     timestamps()
   end

@@ -17,7 +17,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Class
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class.StudentGrade
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Student
   alias Classnavapi.School.FieldOfStudy
@@ -128,27 +128,39 @@ defmodule Mix.Tasks.Seed.Dev do
       class_id: class.id
     })
 
-    Repo.insert!(%StudentGrade{
+    Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
       assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
       grade: 80
     })
 
-    Repo.insert!(%StudentGrade{
+    Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
       assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
       grade: 80
     })
 
-    Repo.insert!(%StudentGrade{
+    Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
       assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
       grade: 80
     })
 
-    Repo.insert!(%StudentGrade{
+    Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
       assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
       grade: 100
     })
 

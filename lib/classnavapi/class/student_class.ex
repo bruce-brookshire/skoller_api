@@ -8,15 +8,15 @@ defmodule Classnavapi.Class.StudentClass do
 
   use Ecto.Schema
   import Ecto.Changeset
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
-
 
   schema "student_classes" do
     field :student_id, :id
     field :class_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
     belongs_to :student, Classnavapi.Student, define_field: false
-    has_many :student_grades, Classnavapi.Class.StudentGrade
+    has_many :student_assignments, StudentAssignment
 
     timestamps()
   end

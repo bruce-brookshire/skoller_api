@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
 
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class.StudentGrade
+  alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Class.SpeculationView
 
@@ -13,7 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
     student_class = student_class |> Repo.preload(:class)
 
     grade_speculation = student_class
-                  |> Map.put(:completion, ClassCalcs.get_class_completion(student_class.id, class_id))
+                  |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
                   |> speculate_grade(grade)
     
     case grade_speculation do
@@ -26,18 +26,21 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
     end
   end
 
-  defp get_class_weighted_grade(%{class_id: class_id, id: id}) do
-    assignments = ClassCalcs.get_assignments_with_relative_weight(class_id)
+  defp get_class_weighted_grade(%StudentClass{} = params) do
+    assignments = ClassCalcs.get_assignments_with_relative_weight(params)
 
     assignments
-    |> Enum.reduce(Decimal.new(0), &Decimal.add(&2, Decimal.mult(&1.relative_weight, get_assignment_grade(&1.id, id))))
+    |> Enum.reduce(Decimal.new(0), &Decimal.add(&2, Decimal.mult(&1.relative_weight, get_assignment_grade(&1))))
   end
 
-  defp get_assignment_grade(assign_id, student_class_id) do
-    assign = Repo.get_by(StudentGrade, assignment_id: assign_id, student_class_id: student_class_id)
-    case assign do
+  defp get_assignment_grade(%StudentAssignment{id: id}) do
+    assign = Repo.get!(StudentAssignment, id)
+    grade = assign
+    |> Map.get(:grade)
+
+    case grade do
       nil -> Decimal.new(0)
-      _ -> assign |> Map.get(:grade, Decimal.new(0))
+      _ -> grade
     end
   end
 

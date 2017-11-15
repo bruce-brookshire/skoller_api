@@ -7,6 +7,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   alias ClassnavapiWeb.Class.StudentClassView
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.ClassCalcs
+  alias ClassnavapiWeb.Helpers.AssignmentHelper
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
 
@@ -19,14 +21,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
     |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_class: student_class}} ->
         render(conn, StudentClassView, "show.json", student_class: student_class)
-        {:error, _, failed_value, _} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: failed_value)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
@@ -37,7 +39,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
                       |> Repo.all()
                       |> Repo.preload(:class)
                       |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
-                      |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1.id, &1.class_id)))
+                      |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
                       |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
                       |> Enum.map(&Map.put(&1, :status, ClassCalcs.get_class_status(&1.class)))
 
@@ -51,7 +53,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
 
     student_class = student_class
                     |> Map.put(:grade, ClassCalcs.get_class_grade(student_class.id))
-                    |> Map.put(:completion, ClassCalcs.get_class_completion(student_class.id, class_id))
+                    |> Map.put(:completion, ClassCalcs.get_class_completion(%{student_class_id: student_class.id}))
                     |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
                     |> Map.put(:status, ClassCalcs.get_class_status(student_class.class))
 

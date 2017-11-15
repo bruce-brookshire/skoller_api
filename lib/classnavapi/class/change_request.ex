@@ -3,6 +3,12 @@ defmodule Classnavapi.Class.ChangeRequest do
   import Ecto.Changeset
   alias Classnavapi.Class.ChangeRequest
 
+  @moduledoc """
+  
+  Schema and changeset for class change requests.
+
+  """
+
   schema "class_change_requests" do
     field :is_completed, :boolean, default: false
     field :note, :string

@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.ChangeRequestView
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   def complete(conn, %{"id" => id}) do
     change_request_old = Repo.get!(ChangeRequest, id)
@@ -37,14 +38,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
     case Repo.transaction(multi) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
-      {:error, _t1, %Ecto.Changeset{} = changeset, _t2} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
       {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ErrorView, "error.json", error: failed_value)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 end
