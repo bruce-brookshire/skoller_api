@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.AssignmentHelper
 
   import Ecto.Query
 
@@ -48,7 +49,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     assign_weights = get_relative_weight(params)
 
     params
-    |> get_assignments()
+    |> AssignmentHelper.get_assignments()
     |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
   end
 
@@ -70,20 +71,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   def get_class_status(class) do
     class = class |> Repo.preload(:class_status)
     get_status(class)
-  end
-
-  defp get_assignments(%StudentClass{id: id}) do #good
-    query = (from assign in StudentAssignment)
-    query
-    |> where([assign], assign.student_class_id == ^id)
-    |> Repo.all()
-  end
-
-  defp get_assignments(%{class_id: class_id}) do
-    query = (from assign in Assignment)
-    query
-    |> where([assign], assign.class_id == ^class_id)
-    |> Repo.all()
   end
 
   defp get_relative_weight(%{} = params) do #good
