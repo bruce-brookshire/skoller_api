@@ -53,7 +53,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
 
     student_class = student_class
                     |> Map.put(:grade, ClassCalcs.get_class_grade(student_class.id))
-                    |> Map.put(:completion, ClassCalcs.get_class_completion(%{student_class_id: student_class.id}))
+                    |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
                     |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
                     |> Map.put(:status, ClassCalcs.get_class_status(student_class.class))
 

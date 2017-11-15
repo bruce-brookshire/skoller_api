@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
   alias ClassnavapiWeb.Class.StudentClassView
   alias ClassnavapiWeb.ClassView
   alias Classnavapi.Repo
+  alias ClassnavapiWeb.Class.StudentAssignmentView
 
   def render("index.json", %{student_classes: student_classes}) do
     render_many(student_classes, StudentClassView, "student_class.json")
@@ -29,13 +30,14 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
   end
 
   defp base_student_class(student_class) do
-    student_class = student_class |> Repo.preload(:class)
+    student_class = student_class |> Repo.preload([:class, :student_assignments])
     %{
       student_id: student_class.student_id
     } 
     |> Map.merge(
         %{
-          class: render_one(student_class.class, ClassView, "class.json")
+          class: render_one(student_class.class, ClassView, "class.json"),
+          assignments: render_many(student_class.student_assignments, StudentAssignmentView, "student_assignment.json")
         })
   end
 end
