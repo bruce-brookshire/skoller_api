@@ -3,7 +3,6 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
 
   alias Classnavapi.Class
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentClassView
   alias ClassnavapiWeb.Helpers.StatusHelper

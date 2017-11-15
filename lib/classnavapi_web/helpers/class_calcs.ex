@@ -74,8 +74,9 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   end
 
   defp get_relative_weight(%{} = params) do #good
-    assign_count = relative_weight_subquery(params)
-                    |> Repo.all()
+    assign_count = params
+                  |> relative_weight_subquery()
+                  |> Repo.all()
 
     weight_sum = assign_count 
                   |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))

@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.Assignment
-  alias Classnavapi.Class
 
   import Ecto.Query
 
