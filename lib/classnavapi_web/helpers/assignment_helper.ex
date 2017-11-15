@@ -7,11 +7,19 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
 
   import Ecto.Query
 
-  def insert_student_assignments(%{student_class: %StudentClass{} = student_class}) do
+  def insert_student_assignments(%{student_class: %StudentClass{} = student_class} = params) do
     assignments = get_assignments(%{class_id: student_class.class_id})
     case assignments do
       [] -> {:ok, nil}
       _ -> convert_and_insert(assignments, student_class)
+    end
+  end
+
+  def insert_student_assignments(%{assignment: %Assignment{} = assignment}) do
+    students = get_students(%{class_id: assignment.class_id})
+    case students do
+      [] -> {:ok, nil}
+      _ -> convert_and_insert(assignment, students)
     end
   end
 
@@ -22,6 +30,13 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     |> Repo.all()
   end
 
+  def get_assignments(%Assignment{id: id}) do
+    query = (from assign in StudentAssignment)
+    query
+    |> where([assign], assign.assignment_id == ^id)
+    |> Repo.all()
+  end
+
   def get_assignments(%{class_id: class_id}) do
     query = (from assign in Assignment)
     query
@@ -29,18 +44,31 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     |> Repo.all()
   end
 
-  defp convert_and_insert(assignments, %StudentClass{} = student_class) do
-    assignments
+  defp get_students(%{class_id: class_id}) do
+    Repo.all(from sc in StudentClass, where: sc.class_id == ^class_id)
+  end
+
+  defp convert_and_insert(assignment, student_class) do
+    assignment
     |> convert_assignments(student_class)
     |> insert_assignments()
-    
-    inserted = student_class
-    |> get_assignments
+
+    inserted = get_inserted(student_class, assignment)
 
     case inserted do
       [] -> {:error, %{student_class: "Student Assignments not inserted"}}
       _ -> {:ok, inserted}
     end
+  end
+
+  defp get_inserted(%StudentClass{} = student_class, _enumerable) do
+    student_class
+    |> get_assignments
+  end
+
+  defp get_inserted(_enumerable, %Assignment{} = assignment) do
+    assignment
+    |> get_assignments
   end
 
   defp insert_assignments(enumerable) do
@@ -50,6 +78,10 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
 
   defp convert_assignments(enumerable, %StudentClass{} = student_class) do
     enumerable |> Enum.map(&convert_assignment(&1, student_class))
+  end
+
+  defp convert_assignments(%Assignment{} = assign, enumerable) do
+    enumerable |> Enum.map(&convert_assignment(assign, &1))
   end
 
   defp convert_assignment(%Assignment{} = assign, %StudentClass{id: id}) do
