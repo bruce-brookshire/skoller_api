@@ -7,7 +7,13 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
 
   import Ecto.Query
 
-  def insert_student_assignments(%{student_class: %StudentClass{} = student_class} = params) do
+  @moduledoc """
+  
+  Contains helper functions for inserting student assignments on enroll and assignment creation.
+
+  """
+
+  def insert_student_assignments(%{student_class: %StudentClass{} = student_class}) do
     assignments = get_assignments(%{class_id: student_class.class_id})
     case assignments do
       [] -> {:ok, nil}

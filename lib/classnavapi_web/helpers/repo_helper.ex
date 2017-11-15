@@ -1,6 +1,12 @@
 defmodule ClassnavapiWeb.Helpers.RepoHelper do
   use ClassnavapiWeb, :controller
 
+  @moduledoc """
+  
+  Helper for Ecto.Multi errors.
+
+  """
+
   def multi_error(conn, %Ecto.Changeset{} = changeset) do
     conn
     |> put_status(:unprocessable_entity)

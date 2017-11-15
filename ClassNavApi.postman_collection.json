@@ -115,6 +115,74 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Delete Student Assignments",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/assignments/4",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assignments",
+								"4"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student Assignments",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"weight_id\": null\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/assignments/4",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assignments",
+								"4"
+							]
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -646,10 +714,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\":\"Mo Money\",\n  \"number\": \"8002-01\",\n  \"meet_days\": \"MWF\",\n  \"meet_start_time\": \"8:30\",\n  \"meet_end_time\": \"12\",\n  \"seat_count\": 201,\n  \"class_start\":\"2017-10-12T00:00:00Z\",\n  \"class_end\": \"2019-10-12T00:00:00Z\",\n  \"is_enrollable\":true,\n  \"is_editable\":true,\n  \"is_syllabus\":false,\n  \"class_period_id\": 1\n}"
+							"raw": "{\n  \"name\":\"Cryptocurrencies 101\",\n  \"number\": \"8002-01\",\n  \"meet_days\": \"MWF\",\n  \"meet_start_time\": \"8:30\",\n  \"meet_end_time\": \"12\",\n  \"seat_count\": 200,\n  \"class_start\":\"2017-08-30T00:00:00Z\",\n  \"class_end\": \"2017-11-11T00:00:00Z\",\n  \"is_enrollable\":true,\n  \"is_editable\":true,\n  \"is_syllabus\":true,\n  \"class_period_id\": 1,\n  \"weights\": [\n  \t{\n  \t\t\"name\": \"Tests\",\n  \t\t\"weight\": 50\n  \t},\n  \t{\n  \t\t\"name\": \"Assignments\",\n  \t\t\"weight\": 20\n  \t},\n  \t{\n  \t\t\"name\": \"Projects\",\n  \t\t\"weight\": 30\n  \t}\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/2",
+							"raw": "{{BaseUrl}}/api/v1/classes/1",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -657,7 +725,7 @@
 								"api",
 								"v1",
 								"classes",
-								"2"
+								"1"
 							]
 						},
 						"description": ""
@@ -752,7 +820,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\"name\":\"Big Money\",\n\"number\": \"8001-01\",\n\"meet_days\": \"MWF\",\n\"meet_start_time\": \"8:30\",\n\"meet_end_time\": \"12\",\n\"seat_count\": 200,\n\"class_start\":\"2016-10-12T18:51:53Z\",\n\"class_end\": \"2017-10-12T18:51:53Z\",\n\"is_enrollable\":true,\n\"is_editable\":true,\n\"is_syllabus\":true,\n\"grade_scale\": \"A,91|B,80|C,70|D,60\",\n\"is_student\": false\n}"
+									"raw": "{\"name\":\"Cryptocurrencies 101\",\n\"number\": \"8001-01\",\n\"meet_days\": \"MWF\",\n\"meet_start_time\": \"8:30\",\n\"meet_end_time\": \"12\",\n\"seat_count\": 200,\n\"class_start\":\"2017-08-30T00:00:00Z\",\n\"class_end\": \"2017-12-11T00:00:00Z\",\n\"is_enrollable\":true,\n\"is_editable\":true,\n\"is_syllabus\":true,\n\"grade_scale\": \"A,90|B,80|C,70|D,60\",\n\"is_student\": false\n}"
 								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/periods/1/classes/",
@@ -939,7 +1007,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+									"raw": "{\n  \"name\": \"Fall Semester\",\n  \"start_date\": \"2017-08-30T00:00:00Z\",\n  \"end_date\": \"2017-12-11T00:00:00Z\"\n}"
 								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/periods",
@@ -1534,44 +1602,9 @@
 								"description": ""
 							},
 							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Fields",
-					"description": "",
-					"item": [
-						{
-							"name": "Get Student Fields of Study",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
-										"1",
-										"fields"
-									]
-								},
-								"description": ""
-							},
-							"response": []
 						},
 						{
-							"name": "Add Student Field of Study",
+							"name": "Create Student Assignments",
 							"request": {
 								"method": "POST",
 								"header": [
@@ -1586,10 +1619,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"field_of_study_id\": 1\n}"
+									"raw": "{\n\t\"due\": \"2017-11-11T00:00:00Z\",\n\t\"name\": \"Test 2\",\n\t\"weight_id\": 1\n}"
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/assignments",
 									"host": [
 										"{{BaseUrl}}"
 									],
@@ -1598,36 +1631,9 @@
 										"v1",
 										"students",
 										"1",
-										"fields"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Student Field of Study",
-							"request": {
-								"method": "DELETE",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"students",
+										"classes",
 										"1",
-										"fields",
-										"1"
+										"assignments"
 									]
 								},
 								"description": ""
@@ -1742,6 +1748,105 @@
 										"students",
 										"1",
 										"classes",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Fields",
+					"description": "",
+					"item": [
+						{
+							"name": "Get Student Fields of Study",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Add Student Field of Study",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"field_of_study_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Student Field of Study",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"fields",
 										"1"
 									]
 								},

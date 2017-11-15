@@ -14,8 +14,9 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
   end
 
   def render("student_assignment.json", %{student_assignment: student_assignment}) do
-    student_assignment = student_assignment |> Repo.preload(:assignment)
-    render_one(student_assignment, AssignmentView, "assignment.json")
+    student_assignment
+    |> Repo.preload(:assignment)
+    |> render_one(AssignmentView, "assignment.json")
     |> Map.merge(%{
       id: student_assignment.id,
       student_class_id: student_assignment.student_class_id,
