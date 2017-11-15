@@ -7,6 +7,23 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.ClassCalcs
   alias Classnavapi.Class.StudentAssignment
 
+  def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
+    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
+
+    params = params |> Map.put("student_class_id", student_class.id)
+
+    changeset = StudentAssignment.changeset(%StudentAssignment{}, params)
+    
+    case Repo.insert(changeset) do
+      {:ok, student_assignment} ->
+        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
     student_assignments = ClassCalcs.get_assignments_with_relative_weight(student_class)

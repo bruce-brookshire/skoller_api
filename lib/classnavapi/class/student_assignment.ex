@@ -35,8 +35,7 @@ defmodule Classnavapi.Class.StudentAssignment do
     @upd_opt_fields [:weight_id]
     @upd_fields @upd_opt_fields ++ @upd_req_fields
 
-    @req_grd_fields [:grade]
-    @grd_fields @req_grd_fields
+    @grd_fields [:grade]
   
     @doc false
     def changeset(%StudentAssignment{} = assignment, attrs) do
@@ -57,7 +56,6 @@ defmodule Classnavapi.Class.StudentAssignment do
     def grade_changeset(%StudentAssignment{} = assignment, attrs) do
       assignment
       |> cast(attrs, @grd_fields)
-      |> validate_required(@req_grd_fields)
     end
   end
   

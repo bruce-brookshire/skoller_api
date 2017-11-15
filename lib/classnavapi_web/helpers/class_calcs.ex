@@ -29,6 +29,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
                     |> group_by([assign, weight], [assign.weight_id, weight.weight])
                     |> select([assign, weight], %{grade: avg(assign.grade), weight_id: assign.weight_id, weight: weight.weight})
                     |> Repo.all()
+                    |> Enum.filter(&not(is_nil(&1.grade)))
 
     weight_sum = student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
 
@@ -40,8 +41,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
 
     student_class_id
     |> get_completed_assignments()
-    |> Repo.preload(:assignment)
-    |> Enum.reduce(Decimal.new(0), &Decimal.add(get_relative_weight_by_weight(&1.assignment.weight_id, relative_weights), &2))
+    |> Enum.reduce(Decimal.new(0), &Decimal.add(get_weight(&1, relative_weights), &2))
   end
 
   # Gets assignments with relative weights by either StudentAssignment or Assignments based on params.
@@ -122,16 +122,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
       |> Enum.count(& &1)
   end
 
-  defp get_relative_weight_by_weight(weight_id, relative_weights) do
-    relative_weights
-    |> Enum.find(0, & &1.weight_id == weight_id)
-    |> Map.get(:relative, 0)
-  end
-
   defp get_weight(%{weight_id: weight_id}, enumerable) do
     enumerable
-    |> Enum.find(nil, & &1.weight_id == weight_id)
-    |> Map.get(:relative)
+    |> Enum.find(%{}, & &1.weight_id == weight_id)
+    |> Map.get(:relative, Decimal.new(0))
   end
 
   defp get_completed_assignments(student_class_id) do
@@ -139,6 +133,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     query
         |> where([assign], assign.student_class_id == ^student_class_id)
         |> where([assign], not(is_nil(assign.grade)))
+        |> where([assign], not(is_nil(assign.weight_id)))
         |> Repo.all()
   end
 
