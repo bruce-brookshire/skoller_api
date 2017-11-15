@@ -51,7 +51,7 @@ defmodule ClassnavapiWeb.Router do
         end
         resources "/fields", Student.FieldController, only: [:create, :delete, :index]
       end
-      resources "/assignments", Student.Class.AssignmentController, only: [:delete] do
+      resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update] do
         resources "/grades", Student.Class.GradeController, only: [:create]
         put "/grades", Student.Class.GradeController, :create
       end
