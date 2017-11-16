@@ -12,6 +12,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
 
+  import Ecto.Query
+
   @name_assignment_mod 100
   @weight_assignment_mod 200
   @due_assignment_mod 300
@@ -66,9 +68,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
-    case old_due == due do
-      false -> due |> insert_due_mod(student_assignment, params)
-      true -> nil
+    case Date.compare(old_due, due) do
+      :eq -> nil
+      _ -> due |> insert_due_mod(student_assignment, params)
     end
   end
 
@@ -91,7 +93,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       student_id: student.id,
       assignment_id: student_assignment.assignment.id
     }
-    mod |> insert_mod()
+    
+    case find_mod(mod) do
+      [] -> mod |> insert_mod()
+      _ -> nil
+    end
   end
 
   defp insert_due_mod(due, %{} = student_assignment, params) do
@@ -106,7 +112,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       student_id: student.id,
       assignment_id: student_assignment.assignment.id
     }
-    mod |> insert_mod()
+
+    case find_mod(mod) do
+      [] -> mod |> insert_mod()
+      _ -> nil
+    end
   end
 
   defp insert_name_mod(name, %{} = student_assignment, params) do
@@ -121,7 +131,19 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       student_id: student.id,
       assignment_id: student_assignment.assignment.id
     }
-    mod |> insert_mod()
+
+    case find_mod(mod) do
+      [] -> mod |> insert_mod()
+      _ -> nil
+    end
+  end
+  
+  defp find_mod(mod) do
+    from(mod in Mod)
+    |> where([mod], mod.is_private == false)
+    |> where([mod], mod.assignment_id == ^mod.assignment_id)
+    |> where([mod], mod.data == ^mod.data)
+    |> Repo.all()
   end
 
   defp insert_mod(mod) do
