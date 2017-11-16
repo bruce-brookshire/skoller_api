@@ -44,13 +44,16 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     changeset = StudentAssignment.changeset_update(assign_old, params)
 
-    case Repo.update(changeset) do
-      {:ok, student_assignment} ->
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.update(:student_assignment, changeset)
+    |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
+
+    case Repo.transaction(multi) do
+      {:ok, %{student_assignment: student_assignment}} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
