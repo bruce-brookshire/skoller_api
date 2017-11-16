@@ -47,6 +47,7 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     query = (from assign in Assignment)
     query
     |> where([assign], assign.class_id == ^class_id)
+    |> where([assign], assign.from_mod == false)
     |> Repo.all()
   end
 

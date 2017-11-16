@@ -19,7 +19,7 @@ defmodule Classnavapi.Repo.Migrations.CreateAssignments do
       add :due, :date
       add :weight_id, references(:class_weights, on_delete: :nothing)
       add :student_class_id, references(:student_classes, on_delete: :nothing)
-      add :assignment_id, references(:assignments, on_delete: :nothing), null: true
+      add :assignment_id, references(:assignments, on_delete: :nothing)
       add :grade, :decimal
 
       timestamps()

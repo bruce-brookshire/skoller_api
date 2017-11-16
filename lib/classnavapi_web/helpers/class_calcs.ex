@@ -99,6 +99,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     query
     |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
     |> where([assign], assign.class_id == ^class_id)
+    |> where([assign], assign.from_mod == false)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
     |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
   end

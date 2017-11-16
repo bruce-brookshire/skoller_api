@@ -18,6 +18,7 @@ defmodule Classnavapi.Class.Assignment do
     field :name, :string
     field :weight_id, :id
     field :class_id, :id
+    field :from_mod, :boolean, default: false
     belongs_to :class, Class, define_field: false
     belongs_to :weight, Weight, define_field: false
     has_many :student_assignments, StudentAssignment

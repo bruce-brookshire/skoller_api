@@ -15,5 +15,9 @@ defmodule Classnavapi.Repo.Migrations.CreateAssignmentModifications do
     create index(:assignment_modifications, [:assignment_id])
     create index(:assignment_modifications, [:assignment_mod_type_id])
     create index(:assignment_modifications, [:student_id])
+
+    alter table(:assignments) do
+      add :from_mod, :boolean, default: false, null: false
+    end
   end
 end

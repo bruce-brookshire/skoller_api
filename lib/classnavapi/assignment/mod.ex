@@ -9,7 +9,7 @@ defmodule Classnavapi.Assignment.Mod do
     field :assignment_id, :id
     field :assignment_mod_type_id, :id
     field :student_id, :id
-    belongs_to :assignment, Classnavapi.Assignment, define_field: false
+    belongs_to :assignment, Classnavapi.Class.Assignment, define_field: false
     belongs_to :assignment_mod_type, Classnavapi.Assignment.Mod.Type, define_field: false
     belongs_to :student, Classnavapi.Student, define_field: false
 
