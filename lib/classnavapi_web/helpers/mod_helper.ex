@@ -12,7 +12,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
 
+  @name_assignment_mod 100
   @weight_assignment_mod 200
+  @due_assignment_mod 300
   @new_assignment_mod 400
 
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
@@ -63,12 +65,18 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  defp check_change(:due, due, params) do
-    
+  defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
+    case old_due == due do
+      false -> due |> insert_due_mod(student_assignment, params)
+      true -> nil
+    end
   end
 
-  defp check_change(:name, name, params) do
-    
+  defp check_change(:name, name, %{assignment: %{name: old_name}} = student_assignment, params) do
+    case old_name == name do
+      false -> name |> insert_name_mod(student_assignment, params)
+      true -> nil
+    end
   end
 
   defp insert_weight_mod(weight_id, %{} = student_assignment, params) do
@@ -79,6 +87,36 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         weight_id: weight_id
       },
       assignment_mod_type_id: @weight_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student.id,
+      assignment_id: student_assignment.assignment.id
+    }
+    mod |> insert_mod()
+  end
+
+  defp insert_due_mod(due, %{} = student_assignment, params) do
+    student = Repo.get!(StudentClass, student_assignment.student_class_id)
+
+    mod = %{
+      data: %{
+        due: due
+      },
+      assignment_mod_type_id: @due_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student.id,
+      assignment_id: student_assignment.assignment.id
+    }
+    mod |> insert_mod()
+  end
+
+  defp insert_name_mod(name, %{} = student_assignment, params) do
+    student = Repo.get!(StudentClass, student_assignment.student_class_id)
+
+    mod = %{
+      data: %{
+        name: name
+      },
+      assignment_mod_type_id: @name_assignment_mod,
       is_private: is_private(params["is_private"]),
       student_id: student.id,
       assignment_id: student_assignment.assignment.id
