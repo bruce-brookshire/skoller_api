@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.Assignment
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.ModHelper
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
@@ -21,6 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(&1, params))
+    |> Ecto.Multi.run(:mod, &ModHelper.insert_new_mod(&1, params))
 
     case Repo.transaction(multi) do
       {:ok, %{student_assignment: student_assignment}} ->
