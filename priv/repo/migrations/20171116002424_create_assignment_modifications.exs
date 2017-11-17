@@ -19,5 +19,7 @@ defmodule Classnavapi.Repo.Migrations.CreateAssignmentModifications do
     alter table(:assignments) do
       add :from_mod, :boolean, default: false, null: false
     end
+
+    create unique_index(:student_assignments, [:student_class_id, :assignment_id])
   end
 end
