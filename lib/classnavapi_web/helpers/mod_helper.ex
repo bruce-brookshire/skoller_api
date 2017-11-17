@@ -35,7 +35,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       student_id: params["student_id"],
       assignment_id: assignment.id
     }
-    mod |> insert_mod()
+    case find_mod(mod) do
+      [] -> mod |> insert_mod()
+      mod -> {:error, {:exists, mod}}
+    end
   end
 
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
@@ -96,7 +99,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     
     case find_mod(mod) do
       [] -> mod |> insert_mod()
-      _ -> nil
+      _ -> {:ok, nil}
     end
   end
 
@@ -115,7 +118,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     case find_mod(mod) do
       [] -> mod |> insert_mod()
-      _ -> nil
+      _ -> {:ok, nil}
     end
   end
 
@@ -134,8 +137,20 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     case find_mod(mod) do
       [] -> mod |> insert_mod()
-      _ -> nil
+      _ -> {:ok, nil}
     end
+  end
+
+  defp find_mod(%{data: %{assignment: assignment}} = mod) do
+    from(mod in Mod)
+    |> join(:inner, [mod], assign in Assignment, assign.id == mod.assignment_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod], mod.assignment_mod_type_id == @new_assignment_mod)
+    |> where([mod, assign], assign.class_id == ^assignment.class_id)
+    |> where([mod, assign], assign.name == ^assignment.name)
+    |> where([mod, assign], ^assignment.weight_id == assign.weight_id)
+    |> where([mod, assign], ^assignment.due == assign.due)
+    |> Repo.all()
   end
   
   defp find_mod(mod) do
@@ -144,6 +159,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
     |> where([mod], mod.data == ^mod.data)
     |> Repo.all()
+  end
+
+  defp check_match(%{data: old_data}, %{data: data}) do
+    require IEx
+    IEx.pry
   end
 
   defp insert_mod(mod) do

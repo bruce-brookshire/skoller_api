@@ -27,6 +27,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     case Repo.transaction(multi) do
       {:ok, %{student_assignment: student_assignment}} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+      {:error, :mod, {:exists, _mod}, _} ->
+        conn
+        |> send_resp(200, "")
       {:error, _, failed_value, _} ->
         conn
         |> RepoHelper.multi_error(failed_value)
