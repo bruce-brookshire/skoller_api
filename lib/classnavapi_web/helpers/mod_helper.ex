@@ -40,16 +40,16 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] and assignment.from_mod == true ->
         # The assignment is not an original assignment, and needs a mod.
-        mod |> insert_mod_and_action()
+        mod |> insert_mod_and_action(params["student_id"])
       existing_mod == [] and assignment.from_mod == false -> 
         # The assignment is original, and should not have a mod.
         {:ok, existing_mod}
       existing_mod.is_private == true and mod.is_private == false ->
         # The assignment has a mod that needs to be published.
-        existing_mod |> publish_mod_and_action()
+        existing_mod |> publish_mod_and_action(params["student_id"])
       true -> 
         # The assignment has a mod already, and needs no changes
-        existing_mod |> add_mod_action()
+        existing_mod |> add_mod_action(params["student_id"])
     end
   end
 
@@ -171,9 +171,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  defp add_mod_action(%Mod{} = mod) do
+  defp add_mod_action(%Mod{} = mod, student_id) do
     mod = mod |> Repo.preload(:assignment)
-    student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: mod.student_id)
+    student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: student_id)
     Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
   end
 
@@ -190,20 +190,20 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp is_private(nil), do: false
   defp is_private(value), do: value
 
-  defp insert_mod_and_action(mod) do
+  defp insert_mod_and_action(mod, student_id) do
     mod = mod 
     |> insert_mod()
     case mod do
-      {:ok, mod} -> mod |> add_mod_action()
+      {:ok, mod} -> mod |> add_mod_action(student_id)
       {:error, val} -> {:error, val}
     end
   end
 
-  defp publish_mod_and_action(mod) do
+  defp publish_mod_and_action(mod, student_id) do
     mod = mod 
     |> publish_mod()
     case mod do
-      {:ok, mod} -> mod |> add_mod_action()
+      {:ok, mod} -> mod |> add_mod_action(student_id)
       {:error, val} -> {:error, val}
     end
   end
