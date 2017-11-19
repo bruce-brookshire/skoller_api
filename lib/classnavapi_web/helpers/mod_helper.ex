@@ -37,7 +37,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     }
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod()
+      existing_mod == [] and assignment.from_mod == true -> mod |> insert_mod()
+      existing_mod == [] and assignment.from_mod == false -> {:ok, existing_mod}
       existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
       true -> {:ok, existing_mod}
     end
