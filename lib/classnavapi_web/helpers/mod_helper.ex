@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Assignment.Mod
+  alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
 
@@ -37,10 +38,18 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     }
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] and assignment.from_mod == true -> mod |> insert_mod()
-      existing_mod == [] and assignment.from_mod == false -> {:ok, existing_mod}
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
-      true -> {:ok, existing_mod}
+      existing_mod == [] and assignment.from_mod == true ->
+        # The assignment is not an original assignment, and needs a mod.
+        mod |> insert_mod_and_action()
+      existing_mod == [] and assignment.from_mod == false -> 
+        # The assignment is original, and should not have a mod.
+        {:ok, existing_mod}
+      existing_mod.is_private == true and mod.is_private == false ->
+        # The assignment has a mod that needs to be published.
+        existing_mod |> publish_mod_and_action()
+      true -> 
+        # The assignment has a mod already, and needs no changes
+        existing_mod |> add_mod_action()
     end
   end
 
@@ -52,7 +61,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   defp errors(tuple) do
     case tuple do
-      {:error, val} -> true
+      {:error, _val} -> true
       _ -> false
     end
   end
@@ -162,6 +171,12 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  defp add_mod_action(%Mod{} = mod) do
+    mod = mod |> Repo.preload(:assignment)
+    student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: mod.student_id)
+    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
+  end
+
   defp insert_mod(mod) do
     changeset = Mod.changeset(%Mod{}, mod)
     Repo.insert(changeset)
@@ -174,4 +189,22 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   defp is_private(nil), do: false
   defp is_private(value), do: value
+
+  defp insert_mod_and_action(mod) do
+    mod = mod 
+    |> insert_mod()
+    case mod do
+      {:ok, mod} -> mod |> add_mod_action()
+      {:error, val} -> {:error, val}
+    end
+  end
+
+  defp publish_mod_and_action(mod) do
+    mod = mod 
+    |> publish_mod()
+    case mod do
+      {:ok, mod} -> mod |> add_mod_action()
+      {:error, val} -> {:error, val}
+    end
+  end
 end
