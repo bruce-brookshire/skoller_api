@@ -44,6 +44,8 @@ defmodule Classnavapi.Class.StudentAssignment do
       |> validate_required(@req_fields)
       |> foreign_key_constraint(:student_class_id)
       |> foreign_key_constraint(:weight_id)
+      |> foreign_key_constraint(:assignment_id)
+      |> unique_constraint(:student_class_assignments, name: :student_assignments_student_class_id_assignment_id_index)
     end
 
     def changeset_update(%StudentAssignment{} = assignment, attrs) do

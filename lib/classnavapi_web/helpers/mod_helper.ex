@@ -35,9 +35,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       student_id: params["student_id"],
       assignment_id: assignment.id
     }
-    case find_mod(mod) do
-      [] -> mod |> insert_mod()
-      mod -> {:error, {:exists, mod}}
+    existing_mod = mod |> find_mod()
+    cond do
+      existing_mod == [] -> mod |> insert_mod()
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
+      true -> {:ok, existing_mod}
     end
   end
 
@@ -97,9 +99,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       assignment_id: student_assignment.assignment.id
     }
     
-    case find_mod(mod) do
-      [] -> mod |> insert_mod()
-      _ -> {:ok, nil}
+    existing_mod = mod |> find_mod()
+    cond do
+      existing_mod == [] -> mod |> insert_mod()
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
+      true -> {:ok, existing_mod}
     end
   end
 
@@ -116,9 +120,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       assignment_id: student_assignment.assignment.id
     }
 
-    case find_mod(mod) do
-      [] -> mod |> insert_mod()
-      _ -> {:ok, nil}
+    existing_mod = mod |> find_mod()
+    cond do
+      existing_mod == [] -> mod |> insert_mod()
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
+      true -> {:ok, existing_mod}
     end
   end
 
@@ -135,40 +141,34 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       assignment_id: student_assignment.assignment.id
     }
 
-    case find_mod(mod) do
-      [] -> mod |> insert_mod()
-      _ -> {:ok, nil}
+    existing_mod = mod |> find_mod()
+    cond do
+      existing_mod == [] -> mod |> insert_mod()
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
+      true -> {:ok, existing_mod}
     end
-  end
-
-  defp find_mod(%{data: %{assignment: assignment}} = mod) do
-    from(mod in Mod)
-    |> join(:inner, [mod], assign in Assignment, assign.id == mod.assignment_id)
-    |> where([mod], mod.is_private == false)
-    |> where([mod], mod.assignment_mod_type_id == @new_assignment_mod)
-    |> where([mod, assign], assign.class_id == ^assignment.class_id)
-    |> where([mod, assign], assign.name == ^assignment.name)
-    |> where([mod, assign], ^assignment.weight_id == assign.weight_id)
-    |> where([mod, assign], ^assignment.due == assign.due)
-    |> Repo.all()
   end
   
   defp find_mod(mod) do
-    from(mod in Mod)
-    |> where([mod], mod.is_private == false)
+    mod = from(mod in Mod)
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
     |> where([mod], mod.data == ^mod.data)
     |> Repo.all()
-  end
-
-  defp check_match(%{data: old_data}, %{data: data}) do
-    require IEx
-    IEx.pry
+    |> List.first()
+    case mod do
+      nil -> []
+      mod -> mod
+    end
   end
 
   defp insert_mod(mod) do
     changeset = Mod.changeset(%Mod{}, mod)
     Repo.insert(changeset)
+  end
+
+  defp publish_mod(mod) do
+    changeset = Mod.changeset(mod, %{is_private: false})
+    Repo.update(changeset)
   end
 
   defp is_private(nil), do: false
