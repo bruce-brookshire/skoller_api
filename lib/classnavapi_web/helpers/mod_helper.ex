@@ -111,9 +111,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod()
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
-      true -> {:ok, existing_mod}
+      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action existing_mod |> add_mod_action(params["student_id"])
+      true ->  existing_mod |> add_mod_action(student.id)
     end
   end
 
@@ -132,9 +132,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod()
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
-      true -> {:ok, existing_mod}
+      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student.id)
+      true ->  existing_mod |> add_mod_action(student.id)
     end
   end
 
@@ -153,9 +153,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod()
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod()
-      true -> {:ok, existing_mod}
+      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student.id)
+      true ->  existing_mod |> add_mod_action(student.id)
     end
   end
   
