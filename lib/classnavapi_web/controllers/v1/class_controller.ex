@@ -6,8 +6,10 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias ClassnavapiWeb.Helpers.AuthPlug
 
   import Ecto.Query
+  import AuthPlug
 
   @default_grade_scale "A,90|B,80|C,70|D,60"
 

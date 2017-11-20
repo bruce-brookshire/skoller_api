@@ -1,6 +1,8 @@
 defmodule ClassnavapiWeb.Router do
   use ClassnavapiWeb, :router
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -12,6 +14,7 @@ defmodule ClassnavapiWeb.Router do
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource
+    plug :authenticate
   end
 
   # Other scopes may use custom stacks.
