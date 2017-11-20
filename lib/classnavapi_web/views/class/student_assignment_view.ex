@@ -20,7 +20,8 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
     |> Map.merge(%{
       id: student_assignment.id,
       student_class_id: student_assignment.student_class_id,
-      grade: student_assignment.grade
+      grade: student_assignment.grade,
+      assignment_id: student_assignment.assignment_id
     })
   end
 end
