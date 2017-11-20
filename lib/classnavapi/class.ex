@@ -58,7 +58,7 @@ defmodule Classnavapi.Class do
     end
   end
 
-  defp validate_weight_totals(changeset) do
+  defp validate_weight_totals(%Ecto.Changeset{changes: %{weights: _weights}} = changeset) do
     sum = changeset
           |> Changeset.get_field(:weights)
           |> Enum.map(&Map.get(&1, :weight))
@@ -67,12 +67,15 @@ defmodule Classnavapi.Class do
 
     target = Decimal.new(100)
 
+    equal = Decimal.cmp(sum, target)
+
     cond do
       sum == [] -> changeset
-      sum == target -> changeset
-      sum != target -> changeset |> add_error(:weights, "Weights do not add to 100")
+      equal == :eq -> changeset
+      true -> changeset |> add_error(:weights, "Weights do not add to 100")
     end
   end
+  defp validate_weight_totals(changeset), do: changeset
 
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
                 :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
