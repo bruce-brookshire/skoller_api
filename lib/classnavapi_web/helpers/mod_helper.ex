@@ -243,18 +243,27 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     query = from(sc in StudentClass)
     |> join(:left, [sc], act in Action, sc.id == act.student_class_id)
     |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
-    |> where([sc, act], is_nil(act.is_accepted))
+    |> where([sc, act], is_nil(act.id))
     |> Repo.all()
 
     status = query |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
     case status |> Enum.find({:ok, status}, &errors(&1)) do
-      {:ok, _} -> Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
+      {:ok, _} -> insert_or_update_self_action(mod, student_class)
       {:error, val} -> {:error, val}
     end
   end
 
-  defp insert_mod_action(%Mod{is_private: true} = mod, %StudentClass{id: id}) do
-    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: id, is_accepted: true})
+  defp insert_mod_action(%Mod{is_private: true} = mod, %StudentClass{} = student_class) do
+    insert_or_update_self_action(mod, student_class)
+  end
+
+  defp insert_or_update_self_action(%Mod{id: mod_id}, %StudentClass{id: sc_id}) do
+    case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: sc_id) do
+      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: sc_id, is_accepted: true})
+      val -> val
+              |> Ecto.Changeset.change(%{is_accepted: true})
+              |> Repo.update()
+    end
   end
 
   defp insert_mod(mod) do
