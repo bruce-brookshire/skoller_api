@@ -59,16 +59,20 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id} = params) do
     student_assignment = Repo.get!(StudentAssignment, id)
-    case Repo.delete(student_assignment) do
-      {:ok, _struct} ->
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.delete(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod, &ModHelper.insert_delete_mod(&1, params))
+
+    case Repo.transaction(multi) do
+      {:ok, _map} ->
         conn
         |> send_resp(200, "")
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 

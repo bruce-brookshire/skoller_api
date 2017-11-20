@@ -36,3 +36,4 @@ Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 100, name: "Name"}
 Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 200, name: "Weight Category"})
 Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 300, name: "Due Date"})
 Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 400, name: "New Assignment"})
+Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 500, name: "Delete Assignment"})

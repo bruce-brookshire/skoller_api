@@ -19,6 +19,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   @weight_assignment_mod 200
   @due_assignment_mod 300
   @new_assignment_mod 400
+  @delete_assignment_mod 500
 
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
@@ -57,6 +58,31 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&get_changes(&1, student_assignment, params))
     status |> Enum.find({:ok, status}, &errors(&1))
+  end
+
+  def insert_delete_mod(%{student_assignment: student_assignment}, params) do
+    student = Repo.get!(StudentClass, student_assignment.student_class_id)
+
+    mod = %{
+      data: %{},
+      assignment_mod_type_id: @delete_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student.id,
+      assignment_id: student_assignment.assignment_id
+    }
+
+    existing_mod = mod |> find_mod()
+    cond do
+      existing_mod == [] ->
+        # No current mod.
+        mod |> insert_mod_and_action(student)
+      existing_mod.is_private == true and mod.is_private == false ->
+        # The assignment has a mod that needs to be published.
+        existing_mod |> publish_mod_and_action(student)
+      true -> 
+        # The assignment has a mod already, and needs no changes
+        existing_mod |> add_mod_action(student)
+    end
   end
 
   defp errors(tuple) do
@@ -111,9 +137,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action existing_mod |> add_mod_action(params["student_id"])
-      true ->  existing_mod |> add_mod_action(student.id)
+      existing_mod == [] -> mod |> insert_mod_and_action(student)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
+      true ->  existing_mod |> add_mod_action(student)
     end
   end
 
@@ -132,9 +158,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student.id)
-      true ->  existing_mod |> add_mod_action(student.id)
+      existing_mod == [] -> mod |> insert_mod_and_action(student)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
+      true ->  existing_mod |> add_mod_action(student)
     end
   end
 
@@ -153,9 +179,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     existing_mod = mod |> find_mod()
     cond do
-      existing_mod == [] -> mod |> insert_mod_and_action(student.id)
-      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student.id)
-      true ->  existing_mod |> add_mod_action(student.id)
+      existing_mod == [] -> mod |> insert_mod_and_action(student)
+      existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
+      true ->  existing_mod |> add_mod_action(student)
     end
   end
   
@@ -169,6 +195,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       nil -> []
       mod -> mod
     end
+  end
+
+  defp add_mod_action(%Mod{} = mod, %StudentClass{id: id}) do
+    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: id, is_accepted: true})
   end
 
   defp add_mod_action(%Mod{} = mod, student_id) do
@@ -190,20 +220,20 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp is_private(nil), do: false
   defp is_private(value), do: value
 
-  defp insert_mod_and_action(mod, student_id) do
+  defp insert_mod_and_action(mod, student_class_or_student_id) do
     mod = mod 
     |> insert_mod()
     case mod do
-      {:ok, mod} -> mod |> add_mod_action(student_id)
+      {:ok, mod} -> mod |> add_mod_action(student_class_or_student_id)
       {:error, val} -> {:error, val}
     end
   end
 
-  defp publish_mod_and_action(mod, student_id) do
+  defp publish_mod_and_action(mod, student_class_or_student_id) do
     mod = mod 
     |> publish_mod()
     case mod do
-      {:ok, mod} -> mod |> add_mod_action(student_id)
+      {:ok, mod} -> mod |> add_mod_action(student_class_or_student_id)
       {:error, val} -> {:error, val}
     end
   end
