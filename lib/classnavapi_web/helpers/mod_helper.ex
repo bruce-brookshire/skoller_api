@@ -12,6 +12,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentAssignment
 
   import Ecto.Query
 
@@ -83,6 +84,30 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         # The assignment has a mod already, and needs no changes
         existing_mod |> add_mod_action(student)
     end
+  end
+
+  def apply_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+    case mod.assignment_mod_type_id do
+      @delete_assignment_mod -> apply_delete_mod(mod, student_class)
+      @new_assignment_mod -> apply_new_mod(mod, student_class)
+      _ -> apply_change_mod(mod, student_class)
+    end
+  end
+
+  defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
+    student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.delete(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod_action, &add_mod_action(&1.student_assignment, mod))
+  end
+
+  defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+
+  end
+
+  defp apply_change_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+    
   end
 
   defp errors(tuple) do
@@ -195,6 +220,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       nil -> []
       mod -> mod
     end
+  end
+
+  defp add_mod_action(%StudentAssignment{student_class_id: id}, %Mod{} = mod) do
+    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: id, is_accepted: true})
   end
 
   defp add_mod_action(%Mod{} = mod, %StudentClass{id: id}) do

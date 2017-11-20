@@ -47,6 +47,7 @@ defmodule ClassnavapiWeb.Router do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
       resources "/students", StudentController, only: [] do
+        post "/mods/:id", Student.ModController, :create
         post "/classes/:class_id", Student.ClassController, :create
         get "/classes/:class_id/speculate", Student.Class.SpeculateController, :speculate
         resources "/classes", Student.ClassController, only: [:show, :index] do
