@@ -42,7 +42,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] and assignment.from_mod == true ->
         # The assignment is not an original assignment, and needs a mod.
-        mod |> insert_mod_and_action(params["student_id"])
+        mod 
+        |> insert_mod_and_action(params["student_id"])
       existing_mod == [] and assignment.from_mod == false -> 
         # The assignment is original, and should not have a mod.
         {:ok, existing_mod}
@@ -233,7 +234,27 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp add_mod_action(%Mod{} = mod, student_id) do
     mod = mod |> Repo.preload(:assignment)
     student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: student_id)
-    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
+
+    mod = mod
+          |> insert_mod_action(student_class)
+  end
+
+  defp insert_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
+    query = from(sc in StudentClass)
+    |> join(:left, [sc], act in Action, sc.id == act.student_class_id)
+    |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
+    |> where([sc, act], is_nil(act.is_accepted))
+    |> Repo.all()
+
+    status = query |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
+    case status |> Enum.find({:ok, status}, &errors(&1)) do
+      {:ok, _} -> Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
+      {:error, val} -> {:error, val}
+    end
+  end
+
+  defp insert_mod_action(%Mod{is_private: true} = mod, %StudentClass{id: id}) do
+    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: id, is_accepted: true})
   end
 
   defp insert_mod(mod) do
