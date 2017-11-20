@@ -4,7 +4,7 @@ defmodule Classnavapi.Assignment.Mod.Action do
   alias Classnavapi.Assignment.Mod.Action
 
   schema "modification_actions" do
-    field :is_accepted, :boolean, default: false
+    field :is_accepted, :boolean
     field :assignment_modification_id, :id
     field :student_class_id, :id
 

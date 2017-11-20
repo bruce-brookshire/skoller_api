@@ -3,7 +3,7 @@ defmodule Classnavapi.Repo.Migrations.CreateModificationActions do
 
   def change do
     create table(:modification_actions) do
-      add :is_accepted, :boolean, default: false, null: false
+      add :is_accepted, :boolean, null: true
       add :assignment_modification_id, references(:assignment_modifications, on_delete: :nothing)
       add :student_class_id, references(:student_classes, on_delete: :nothing)
 
