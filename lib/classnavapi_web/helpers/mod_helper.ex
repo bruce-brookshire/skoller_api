@@ -114,8 +114,23 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
   end
 
-  defp apply_change_mod(%Mod{} = mod, %StudentClass{} = student_class) do
-    
+  defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}) do
+    student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
+
+    mod_change = mod
+    |> get_data()
+
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
+    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp get_data(mod) do
+    case mod.assignment_mod_type_id do
+      @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
+      @due_assignment_mod -> %{due: mod.data |> Map.get("due")}
+      @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
+    end
   end
 
   defp errors(tuple) do
