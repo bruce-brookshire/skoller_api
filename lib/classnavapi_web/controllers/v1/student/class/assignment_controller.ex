@@ -37,8 +37,20 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
-    student_assignments = ClassCalcs.get_assignments_with_relative_weight(student_class)
+    student_assignments = student_class
+                          |> ClassCalcs.get_assignments_with_relative_weight()
+                          |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
+  end
+
+  def show(conn, %{"id" => id}) do
+    student_assignment = StudentAssignment
+    |> Repo.get!(id)
+
+    student_assignment = student_assignment
+                        |> Map.put(:pending_mods, ModHelper.pending_mods_for_assignment(student_assignment))
+
+    render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -76,6 +88,13 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
+  defp is_pending_mods(assignment) do
+    case ModHelper.pending_mods_for_assignment(assignment) do
+      [] -> false
+      _ -> true
+    end
+  end
+
   defp insert_or_get_assignment(_, %Ecto.Changeset{valid?: false} = changeset), do: {:error, changeset}
   defp insert_or_get_assignment(_, changeset) do
     assign = from(assign in Assignment)
@@ -102,7 +121,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     case student_assign do
       [] -> Repo.insert(changeset)
-      student_assign -> {:error, %{student_assignment: "Assignment is already added."}}
+      _ -> {:error, %{student_assignment: "Assignment is already added."}}
     end
   end
 end

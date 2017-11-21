@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AssignmentView
-  alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
@@ -26,7 +25,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    assignments = ClassCalcs.get_assignments_with_relative_weight(%{class_id: class_id})
+    assignments = AssignmentHelper.get_assignments(%{class_id: class_id})
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
 end

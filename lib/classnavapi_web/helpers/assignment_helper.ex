@@ -51,6 +51,16 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     |> Repo.all()
   end
 
+  def convert_assignment(%Assignment{} = assign, %StudentClass{id: id}) do
+    %StudentAssignment{
+      name: assign.name,
+      weight_id: assign.weight_id,
+      assignment_id: assign.id,
+      student_class_id: id,
+      due: assign.due
+    }
+  end
+
   defp get_students(%{class_id: class_id}) do
     Repo.all(from sc in StudentClass, where: sc.class_id == ^class_id)
   end
@@ -89,15 +99,5 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
 
   defp convert_assignments(%Assignment{} = assign, enumerable) do
     enumerable |> Enum.map(&convert_assignment(assign, &1))
-  end
-
-  defp convert_assignment(%Assignment{} = assign, %StudentClass{id: id}) do
-    %StudentAssignment{
-      name: assign.name,
-      weight_id: assign.weight_id,
-      assignment_id: assign.id,
-      student_class_id: id,
-      due: assign.due
-    }
   end
 end

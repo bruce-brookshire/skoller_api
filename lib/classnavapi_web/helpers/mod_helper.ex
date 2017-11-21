@@ -12,6 +12,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentAssignment
+  alias ClassnavapiWeb.Helpers.AssignmentHelper
 
   import Ecto.Query
 
@@ -41,7 +43,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] and assignment.from_mod == true ->
         # The assignment is not an original assignment, and needs a mod.
-        mod |> insert_mod_and_action(params["student_id"])
+        mod 
+        |> insert_mod_and_action(params["student_id"])
       existing_mod == [] and assignment.from_mod == false -> 
         # The assignment is original, and should not have a mod.
         {:ok, existing_mod}
@@ -50,7 +53,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         existing_mod |> publish_mod_and_action(params["student_id"])
       true -> 
         # The assignment has a mod already, and needs no changes
-        existing_mod |> add_mod_action(params["student_id"])
+        existing_mod |> insert_or_update_self_action(params["student_id"])
     end
   end
 
@@ -81,7 +84,60 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         existing_mod |> publish_mod_and_action(student)
       true -> 
         # The assignment has a mod already, and needs no changes
-        existing_mod |> add_mod_action(student)
+        existing_mod |> insert_or_update_self_action(student.id)
+    end
+  end
+
+  def apply_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+    case mod.assignment_mod_type_id do
+      @delete_assignment_mod -> apply_delete_mod(mod, student_class)
+      @new_assignment_mod -> apply_new_mod(mod, student_class)
+      _ -> apply_change_mod(mod, student_class)
+    end
+  end
+
+  def pending_mods_for_assignment(%StudentAssignment{} = student_assignment) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
+    |> where([m], m.assignment_id == ^student_assignment.assignment_id)
+    |> where([m, act], is_nil(act.is_accepted))
+    |> Repo.all
+  end
+
+  defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
+    student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.delete(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+    student_assignment = Assignment
+    |> Repo.get!(mod.assignment_id)
+    |> AssignmentHelper.convert_assignment(student_class)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}) do
+    student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
+
+    mod_change = mod
+    |> get_data()
+
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
+    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp get_data(mod) do
+    case mod.assignment_mod_type_id do
+      @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
+      @due_assignment_mod -> %{due: mod.data |> Map.get("due")}
+      @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
     end
   end
 
@@ -104,13 +160,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp check_change(:weight, weight_id, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
     case old_weight_id == weight_id do
       false -> weight_id |> insert_weight_mod(student_assignment, params)
-      true -> nil
+      true -> dismiss_mods(student_assignment, @weight_assignment_mod)
     end
   end
 
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
     case Date.compare(old_due, due) do
-      :eq -> nil
+      :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
       _ -> due |> insert_due_mod(student_assignment, params)
     end
   end
@@ -118,7 +174,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp check_change(:name, name, %{assignment: %{name: old_name}} = student_assignment, params) do
     case old_name == name do
       false -> name |> insert_name_mod(student_assignment, params)
-      true -> nil
+      true -> dismiss_mods(student_assignment, @name_assignment_mod)
     end
   end
 
@@ -139,7 +195,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] -> mod |> insert_mod_and_action(student)
       existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
-      true ->  existing_mod |> add_mod_action(student)
+      true ->  existing_mod |> insert_or_update_self_action(student.id)
     end
   end
 
@@ -160,7 +216,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] -> mod |> insert_mod_and_action(student)
       existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
-      true ->  existing_mod |> add_mod_action(student)
+      true ->  existing_mod |> insert_or_update_self_action(student.id)
     end
   end
 
@@ -181,7 +237,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] -> mod |> insert_mod_and_action(student)
       existing_mod.is_private == true and mod.is_private == false -> existing_mod |> publish_mod_and_action(student)
-      true ->  existing_mod |> add_mod_action(student)
+      true ->  existing_mod |> insert_or_update_self_action(student.id)
     end
   end
   
@@ -197,16 +253,81 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  defp add_mod_action(%Mod{} = mod, %StudentClass{id: id}) do
-    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: id, is_accepted: true})
+  defp add_mod_action(%Mod{} = mod, %StudentClass{} = student_class) do
+    mod |> insert_mod_action(student_class)
   end
 
   defp add_mod_action(%Mod{} = mod, student_id) do
     mod = mod |> Repo.preload(:assignment)
     student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: student_id)
-    Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: student_class.id, is_accepted: true})
+
+    mod |> insert_mod_action(student_class)
   end
 
+  defp insert_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
+    query = from(sc in StudentClass)
+    |> join(:left, [sc], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
+    |> where([sc, act], is_nil(act.id))
+    |> Repo.all()
+
+    status = query |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
+    case status |> Enum.find({:ok, status}, &errors(&1)) do
+      {:ok, _} -> insert_or_update_self_action(mod, student_class.id)
+      {:error, val} -> {:error, val}
+    end
+  end
+
+  defp insert_mod_action(%Mod{is_private: true} = mod, %StudentClass{id: id}) do
+    insert_or_update_self_action(mod, id)
+  end
+
+  defp insert_or_update_self_action(%Mod{} = mod, student_class_id) do
+    case process_self_action(mod, student_class_id) do
+      {:ok, _new_action} -> dismiss_prior_mods(mod, student_class_id)
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp process_self_action(%Mod{id: mod_id}, student_class_id) do
+    case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
+      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true})
+      val -> val
+              |> Ecto.Changeset.change(%{is_accepted: true})
+              |> Repo.update()
+    end
+  end
+
+  defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
+    |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
+    |> where([mod], mod.assignment_id == ^mod.assignment_id)
+    |> where([mod], mod.id != ^mod.id)
+    |> where([mod, action], action.is_accepted == true)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
+  end
+
+  defp dismiss_mods(%StudentAssignment{} = student_assignment, change_type) do
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_mod_type_id == ^change_type)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+    |> where([mod, action], action.is_accepted == true)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
+  end
+
+  defp dismiss_from_results(query) do
+    case query do
+      [] -> {:ok, nil}
+      items -> items |> Enum.each(&Repo.update!(Ecto.Changeset.change(&1, %{is_accepted: false})))
+    end
+  end
+  
   defp insert_mod(mod) do
     changeset = Mod.changeset(%Mod{}, mod)
     Repo.insert(changeset)
