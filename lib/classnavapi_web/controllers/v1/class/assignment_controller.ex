@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AssignmentView
-  alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 

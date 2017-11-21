@@ -21,8 +21,14 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
       id: student_assignment.id,
       student_class_id: student_assignment.student_class_id,
       grade: student_assignment.grade,
-      assignment_id: student_assignment.assignment_id
+      assignment_id: student_assignment.assignment_id,
     })
+    |> Map.merge(get_pending_mods(student_assignment))
   end
+
+  defp get_pending_mods(%{pending_mods: pending_mods}) do
+    %{pending_mods: pending_mods}
+  end
+  defp get_pending_mods(%{}), do: %{}
 end
   

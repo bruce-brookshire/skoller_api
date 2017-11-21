@@ -96,6 +96,24 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  def get_pending_mods(enumerable) do
+    enumerable
+    |> Enum.map(&Map.put(&1, :pending_mods, pending_mods_for_assignment(&1)))
+  end
+
+  defp pending_mods_for_assignment(%StudentAssignment{} = student_assignment) do
+    query = from(m in Mod)
+        |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
+        |> where([m], m.assignment_id == ^student_assignment.assignment_id)
+        |> where([m, act], is_nil(act.is_accepted))
+        |> Repo.all
+
+    case query do
+      [] -> false
+      _ -> true
+    end
+  end
+
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
     student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
 
@@ -291,26 +309,26 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do
-    query = from(mod in Mod)
-            |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
-            |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
-            |> where([mod], mod.assignment_id == ^mod.assignment_id)
-            |> where([mod], mod.id != ^mod.id)
-            |> where([mod, action], action.is_accepted == true)
-            |> select([mod, action], action)
-            |> Repo.all()
-            |> dismiss_from_results()
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
+    |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
+    |> where([mod], mod.assignment_id == ^mod.assignment_id)
+    |> where([mod], mod.id != ^mod.id)
+    |> where([mod, action], action.is_accepted == true)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
   end
 
   defp dismiss_mods(%StudentAssignment{} = student_assignment, change_type) do
-    query = from(mod in Mod)
-            |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
-            |> where([mod], mod.assignment_mod_type_id == ^change_type)
-            |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
-            |> where([mod, action], action.is_accepted == true)
-            |> select([mod, action], action)
-            |> Repo.all()
-            |> dismiss_from_results()
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_mod_type_id == ^change_type)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+    |> where([mod, action], action.is_accepted == true)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
   end
 
   defp dismiss_from_results(query) do

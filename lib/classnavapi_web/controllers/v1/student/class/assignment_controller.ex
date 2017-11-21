@@ -37,7 +37,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
-    student_assignments = ClassCalcs.get_assignments_with_relative_weight(student_class)
+    student_assignments = student_class
+                          |> ClassCalcs.get_assignments_with_relative_weight()
+                          |> ModHelper.get_pending_mods()
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
