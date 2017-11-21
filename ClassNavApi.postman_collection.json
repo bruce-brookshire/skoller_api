@@ -183,6 +183,40 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Get Student Assignment by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/assignments/12",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"assignments",
+								"12"
+							]
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -1648,6 +1682,50 @@
 					"description": "",
 					"item": [
 						{
+							"name": "Mods",
+							"description": "",
+							"item": [
+								{
+									"name": "Get Pending New Assignments",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"student_id\": 1\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/students/3/classes/1/mods",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"students",
+												"3",
+												"classes",
+												"1",
+												"mods"
+											]
+										},
+										"description": ""
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Get Student Classes",
 							"request": {
 								"method": "GET",
@@ -1847,6 +1925,49 @@
 										"students",
 										"1",
 										"fields",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Mods",
+					"description": "",
+					"item": [
+						{
+							"name": "Respond to Mod",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"is_accepted\": true\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/students/1/mods/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"students",
+										"1",
+										"mods",
 										"1"
 									]
 								},
