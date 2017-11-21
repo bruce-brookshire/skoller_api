@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.StudentAssignment
+  alias ClassnavapiWeb.Helpers.AssignmentHelper
 
   import Ecto.Query
 
@@ -104,7 +105,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class) do
+    student_assignment = Assignment
+    |> Repo.get!(mod.assignment_id)
+    |> AssignmentHelper.convert_assignment(student_class)
 
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
   end
 
   defp apply_change_mod(%Mod{} = mod, %StudentClass{} = student_class) do
