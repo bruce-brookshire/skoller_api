@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
   alias ClassnavapiWeb.ClassView
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentAssignmentView
+  alias ClassnavapiWeb.AssignmentView
 
   def render("index.json", %{student_classes: student_classes}) do
     render_many(student_classes, StudentClassView, "student_class.json")
@@ -14,14 +15,15 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
     render_one(student_class, StudentClassView, "student_class.json")
   end
 
-  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, status: status} = student_class}) do
+  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, status: status, new_assignments: new_assignments} = student_class}) do
     student_class
     |> base_student_class()
     |> Map.merge(%{
       grade: grade,
       completion: completion,
       enrollment: enrollment,
-      status: status
+      status: status,
+      new_assignments: render_many(new_assignments, AssignmentView, "assignment.json")
     })
   end
 

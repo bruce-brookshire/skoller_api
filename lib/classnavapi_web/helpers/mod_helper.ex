@@ -104,6 +104,16 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all
   end
 
+  def get_new_assignment_mods(%StudentClass{} = student_class) do
+    from(mod in Mod)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
+    |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
+    |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
+    |> where([mod, act], is_nil(act.is_accepted))
+    |> select([mod, act, assign], assign)
+    |> Repo.all()
+  end
+
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
     student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
 

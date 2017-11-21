@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.ModHelper
 
   import Ecto.Query
 
@@ -42,6 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
                       |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
                       |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
                       |> Enum.map(&Map.put(&1, :status, ClassCalcs.get_class_status(&1.class)))
+                      |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
 
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
@@ -56,7 +58,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
                     |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
                     |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
                     |> Map.put(:status, ClassCalcs.get_class_status(student_class.class))
+                    |> Map.put(:assignments, get_new_class_assignments(student_class))
 
     render(conn, StudentClassView, "show.json", student_class: student_class)
+  end
+
+  defp get_new_class_assignments(%StudentClass{} = student_class) do
+    student_class |> ModHelper.get_new_assignment_mods()
   end
 end
