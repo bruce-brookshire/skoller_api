@@ -96,22 +96,12 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  def get_pending_mods(enumerable) do
-    enumerable
-    |> Enum.map(&Map.put(&1, :pending_mods, pending_mods_for_assignment(&1)))
-  end
-
-  defp pending_mods_for_assignment(%StudentAssignment{} = student_assignment) do
-    query = from(m in Mod)
-        |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
-        |> where([m], m.assignment_id == ^student_assignment.assignment_id)
-        |> where([m, act], is_nil(act.is_accepted))
-        |> Repo.all
-
-    case query do
-      [] -> false
-      _ -> true
-    end
+  def pending_mods_for_assignment(%StudentAssignment{} = student_assignment) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
+    |> where([m], m.assignment_id == ^student_assignment.assignment_id)
+    |> where([m, act], is_nil(act.is_accepted))
+    |> Repo.all
   end
 
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
@@ -176,7 +166,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
     case Date.compare(old_due, due) do
-      :eq -> dismiss_mods(student_assignment, @date_assignment_mod)
+      :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
       _ -> due |> insert_due_mod(student_assignment, params)
     end
   end

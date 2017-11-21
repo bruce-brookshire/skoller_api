@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
 
   alias ClassnavapiWeb.Class.StudentAssignmentView
   alias ClassnavapiWeb.AssignmentView
+  alias ClassnavapiWeb.Assignment.ModView
   alias Classnavapi.Repo
 
   def render("index.json", %{student_assignments: student_assignments}) do
@@ -27,7 +28,10 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
   end
 
   defp get_pending_mods(%{pending_mods: pending_mods}) do
-    %{pending_mods: pending_mods}
+    %{pending_mods: render_many(pending_mods, ModView, "mod.json")}
+  end
+  defp get_pending_mods(%{is_pending_mods: is_pending_mods}) do
+    %{is_pending_mods: is_pending_mods}
   end
   defp get_pending_mods(%{}), do: %{}
 end
