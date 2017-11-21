@@ -152,13 +152,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp check_change(:weight, weight_id, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
     case old_weight_id == weight_id do
       false -> weight_id |> insert_weight_mod(student_assignment, params)
-      true -> nil
+      true -> dismiss_mods(student_assignment, @weight_assignment_mod)
     end
   end
 
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
     case Date.compare(old_due, due) do
-      :eq -> nil
+      :eq -> dismiss_mods(student_assignment, @date_assignment_mod)
       _ -> due |> insert_due_mod(student_assignment, params)
     end
   end
@@ -166,7 +166,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp check_change(:name, name, %{assignment: %{name: old_name}} = student_assignment, params) do
     case old_name == name do
       false -> name |> insert_name_mod(student_assignment, params)
-      true -> nil
+      true -> dismiss_mods(student_assignment, @name_assignment_mod)
     end
   end
 
@@ -274,7 +274,14 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     insert_or_update_self_action(mod, id)
   end
 
-  defp insert_or_update_self_action(%Mod{id: mod_id}, student_class_id) do
+  defp insert_or_update_self_action(%Mod{} = mod, student_class_id) do
+    case process_self_action(mod, student_class_id) do
+      {:ok, _new_action} -> dismiss_prior_mods(mod, student_class_id)
+      {:error, error} -> {:error, error}
+    end
+  end
+
+  defp process_self_action(%Mod{id: mod_id}, student_class_id) do
     case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
       nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true})
       val -> val
@@ -283,6 +290,36 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do
+    query = from(mod in Mod)
+            |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
+            |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
+            |> where([mod], mod.assignment_id == ^mod.assignment_id)
+            |> where([mod], mod.id != ^mod.id)
+            |> where([mod, action], action.is_accepted == true)
+            |> select([mod, action], action)
+            |> Repo.all()
+            |> dismiss_from_results()
+  end
+
+  defp dismiss_mods(%StudentAssignment{} = student_assignment, change_type) do
+    query = from(mod in Mod)
+            |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+            |> where([mod], mod.assignment_mod_type_id == ^change_type)
+            |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+            |> where([mod, action], action.is_accepted == true)
+            |> select([mod, action], action)
+            |> Repo.all()
+            |> dismiss_from_results()
+  end
+
+  defp dismiss_from_results(query) do
+    case query do
+      [] -> {:ok, nil}
+      items -> items |> Enum.each(&Repo.update!(Ecto.Changeset.change(&1, %{is_accepted: false})))
+    end
+  end
+  
   defp insert_mod(mod) do
     changeset = Mod.changeset(%Mod{}, mod)
     Repo.insert(changeset)
