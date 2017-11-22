@@ -617,15 +617,13 @@
 								],
 								"body": {},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/classes/2/help/1/complete",
+									"raw": "{{BaseUrl}}/api/v1/help/1/complete",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"classes",
-										"2",
 										"help",
 										"1",
 										"complete"
