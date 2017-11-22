@@ -1,5 +1,11 @@
 defmodule ClassnavapiWeb.Api.V1.ClassController do
   use ClassnavapiWeb, :controller
+
+  @moduledoc """
+  
+  Handles functionality relating to classes.
+
+  """
   
   alias Classnavapi.Class
   alias Classnavapi.Repo
@@ -11,6 +17,16 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   @default_grade_scale "A,90|B,80|C,70|D,60"
 
+  @doc """
+   Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 
+   from a status that will not auto progress to the next step.
+
+  ## Returns:
+  * 422 `ClassnavapiWeb.ChangesetView`
+  * 404
+  * 401
+  * 200 `ClassnavapiWeb.ClassView`
+  """
   def confirm(conn, %{"class_id" => id} = params) do
     class_old = Repo.get!(Class, id)
     changeset = Class.changeset_update(class_old, %{})
@@ -21,6 +37,18 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     conn |> update_class(changeset)
   end
 
+  @doc """
+   Creates a new `Classnavapi.Class` for a `Classnavapi.ClassPeriod`
+
+  ## Behavior:
+   If there is no grade scale provided, a default is used: 
+   A,90|B,80|C,70|D,60
+
+  ## Returns:
+  * 422 `ClassnavapiWeb.ChangesetView`
+  * 401
+  * 200 `ClassnavapiWeb.ClassView`
+  """
   def create(conn, %{"period_id" => period_id} = params) do
     params = params
             |> grade_scale()
@@ -33,6 +61,37 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     conn |> create_class(changeset)
   end
 
+  @doc """
+   Shows all `Classnavapi.Class`. Can be used as a search with multiple filters.
+
+  ## Behavior:
+   Only searches the current `Classnavapi.ClassPeriod`
+
+  ## Filters:
+  * school
+    * `Classnavapi.School` :id
+  * professor.name
+    * `Classnavapi.Professor` :name
+  * class.status
+    * `Classnavapi.Class.Status` :id
+    * For ghost classes, use 0.
+  * class.name
+    * `Classnavapi.Class` :name
+  * class.number
+    * `Classnavapi.Class` :number
+  * class.meet_days
+    * `Classnavapi.Class` :meet_days
+  * class.length
+    * 1st Half
+    * 2nd Half
+    * Full Term
+    * Custom
+
+  ## Returns:
+  * 422 `ClassnavapiWeb.ChangesetView`
+  * 401
+  * 200 `ClassnavapiWeb.Class.SearchView`
+  """
   def index(conn, %{} = params) do
     date = Date.utc_today()
     query = from(class in Class)
@@ -46,11 +105,32 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     render(conn, SearchView, "index.json", classes: classes)
   end
 
+  @doc """
+   Shows a single `Classnavapi.Class`.
+
+  ## Returns:
+  * 422 `ClassnavapiWeb.ChangesetView`
+  * 404
+  * 401
+  * 200 `ClassnavapiWeb.ClassView`
+  """
   def show(conn, %{"id" => id}) do
     class = Repo.get!(Class, id)
     render(conn, ClassView, "show.json", class: class)
   end
 
+  @doc """
+   Updates a `Classnavapi.Class`.
+
+  ## Behavior:
+   If valid `Classnavapi.Class.Weight` are provided, the `Classnavapi.Class.Status` will be checked.
+
+  ## Returns:
+  * 422 `ClassnavapiWeb.ChangesetView`
+  * 404
+  * 401
+  * 200 `ClassnavapiWeb.ClassView`
+  """
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 

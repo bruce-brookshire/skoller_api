@@ -62,10 +62,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
+							"raw": "{\n\t\"grade\": 71\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/assignments/5/grades",
+							"raw": "{{BaseUrl}}/api/v1/assignments/1/grades",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -73,7 +73,7 @@
 								"api",
 								"v1",
 								"assignments",
-								"5",
+								"1",
 								"grades"
 							]
 						},
@@ -728,7 +728,7 @@
 								"classes"
 							]
 						},
-						"description": ""
+						"description": "Shows all classes. Can be used as a search with multiple filters.\n\n## Behavior:\n   Only searches the current period\n\n## Filters:\n  * school\n    * school id\n  * professor.name\n    * professor name\n  * class.status\n    * status id\n    * For ghost classes, use 0.\n  * class.name\n    * class name\n  * class.number\n    * class number\n  * class.meet_days\n    * class meet_days\n  * class.length\n    * 1st Half\n    * 2nd Half\n    * Full Term\n    * Custom"
 					},
 					"response": []
 				},
@@ -762,7 +762,7 @@
 								"2"
 							]
 						},
-						"description": "## Weights\n\n  Weights are added as an array of weights one time through this route. They require name and weight. If is_points is false, they need to sum to 100. After a class has weights, the appropriate edit route needs to be used.\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \ngrade_scale,\nis_editable, \nclass_period_id, \nis_syllabus, \nis_points\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type"
+						"description": "## Weights\n\n  Weights are added as an array of weights one time through this route. They require name and weight. If is_points is false, they need to sum to 100. After a class has weights, the appropriate edit route needs to be used.\n  \n  This should only be used if the class is in the Weights status, and it will progress the class to the Assignments status.\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \ngrade_scale,\nis_editable, \nclass_period_id, \nis_syllabus, \nis_points\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type"
 					},
 					"response": []
 				},
@@ -809,7 +809,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"is_diy\": false\n}"
+							"raw": ""
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/classes/5/confirm",
@@ -824,7 +824,7 @@
 								"confirm"
 							]
 						},
-						"description": ""
+						"description": "Confirms that a class is ready to change stages from a stage that will not auto stage to the next step.\n\n### Stages:\n * New Class -> [Syllabus, Weights]\n * Assignments -> Complete"
 					},
 					"response": []
 				}
@@ -870,7 +870,7 @@
 										""
 									]
 								},
-								"description": ""
+								"description": "Creates a class in the given class period.\n\n## Defaults\n\ngrade_scale: A,90|B,80|C,70|D,60\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \nis_editable, \nclass_period_id, \nis_syllabus, \nis_points\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type,\ngrade_scale"
 							},
 							"response": []
 						}
