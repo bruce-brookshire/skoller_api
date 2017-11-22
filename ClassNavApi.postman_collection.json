@@ -601,7 +601,7 @@
 										"100"
 									]
 								},
-								"description": ""
+								"description": "Adds a help request to a class.\n\n## Url:\nclasses/:class_id/help/:help_type"
 							},
 							"response": []
 						},
