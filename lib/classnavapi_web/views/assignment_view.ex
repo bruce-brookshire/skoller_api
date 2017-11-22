@@ -17,7 +17,7 @@ defmodule ClassnavapiWeb.AssignmentView do
             due: assignment.due,
             name: assignment.name,
             weight_id: assignment.weight_id,
-            weight: weight
+            weight: Decimal.to_float(weight)
         }
     end
 

@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
     |> Map.merge(%{
       id: student_assignment.id,
       student_class_id: student_assignment.student_class_id,
-      grade: student_assignment.grade,
+      grade: Decimal.to_float(student_assignment.grade),
       assignment_id: student_assignment.assignment_id,
     })
     |> Map.merge(get_pending_mods(student_assignment))

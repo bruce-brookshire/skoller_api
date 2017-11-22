@@ -19,8 +19,8 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
     student_class
     |> base_student_class()
     |> Map.merge(%{
-      grade: grade,
-      completion: completion,
+      grade: Decimal.to_float(grade),
+      completion: Decimal.to_float(completion),
       enrollment: enrollment,
       status: status,
       new_assignments: render_many(new_assignments, AssignmentView, "assignment.json")

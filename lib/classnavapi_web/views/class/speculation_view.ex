@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Class.SpeculationView do
 
   def render("speculation.json", %{speculation: speculation}) do
     %{
-      speculation: speculation
+      speculation: Decimal.to_float(speculation)
     }
   end
 end
