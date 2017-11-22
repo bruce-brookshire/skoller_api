@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias Classnavapi.Class.Assignment
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.ModHelper
+  alias Classnavapi.Class.Weight
 
   import Ecto.Query
 
@@ -20,6 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     changeset = Assignment.changeset(%Assignment{}, params)
     changeset = changeset
                 |> Ecto.Changeset.change(%{from_mod: true})
+                |> validate_class_weight()
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:assignment, &insert_or_get_assignment(&1, changeset))
@@ -54,9 +56,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    assign_old = Repo.get!(StudentAssignment, id)
-
-    changeset = StudentAssignment.changeset_update(assign_old, params)
+    changeset = StudentAssignment
+                |> Repo.get!(id)
+                |> StudentAssignment.changeset_update(params)
+                |> validate_class_weight()
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, changeset)
@@ -85,6 +88,22 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
       {:error, _, failed_value, _} ->
         conn
         |> RepoHelper.multi_error(failed_value)
+    end
+  end
+
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
+    class_id = changeset |> get_class_id()
+    case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
+      nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
+      _ -> changeset
+    end
+  end
+  defp validate_class_weight(changeset), do: changeset
+
+  defp get_class_id(changeset) do
+    case changeset |> Ecto.Changeset.get_field(:student_class_id) do
+      nil -> changeset |> Ecto.Changeset.get_field(:class_id)
+      val -> Repo.get!(StudentClass, val) |> Map.get(:class_id)
     end
   end
 
