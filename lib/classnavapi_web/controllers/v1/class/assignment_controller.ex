@@ -2,14 +2,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Class.Assignment
+  alias Classnavapi.Class.Weight
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AssignmentView
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
   def create(conn, %{} = params) do
-  
-    changeset = Assignment.changeset(%Assignment{}, params)
+    changeset = %Assignment{}
+                |> Assignment.changeset(params)
+                |> validate_class_weight()
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
@@ -28,4 +30,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     assignments = AssignmentHelper.get_assignments(%{class_id: class_id})
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
+
+  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset) do
+    case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
+      nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
+      _ -> changeset
+    end
+  end
+  defp validate_class_weight(changeset), do: changeset
 end
