@@ -22,30 +22,68 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
+
+      # User routes
       resources "/users", UserController, only: [:update, :show, :index] do
+
+        # User Role routes
         post "/roles/:id", User.RoleController, :create
         resources "/roles/", User.RoleController, only: [:index, :delete]
       end
+
+      # Role routes
       resources "/roles", RoleController, only: [:show, :index]
+
+      # School routes
       get "/schools/hub", SchoolController, :hub
       resources "/schools", SchoolController, except: [:new, :delete, :edit] do
+
+        # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
+
+        # School Professor routes
         resources "/professors", ProfessorController, except: [:new, :delete, :edit]
+
+        # School Field of Study routes
         resources "/fields-of-study", School.FieldController, except: [:new, :edit, :delete]
       end
+
+      # Class Period routes
       resources "/periods", PeriodController, only: [:update, :show] do
+
+        # Class Period Class routes
         resources "/classes", ClassController, only: [:create]
       end
+
+      # Class routes
+      resources "/class-statuses", Class.StatusController, only: [:index]
+      get "/class-statuses/hub", Class.StatusController, :hub
       resources "/classes", ClassController, only: [:update, :show, :index] do
-        resources "/docs", Class.DocController, only: [:create, :index]
-        resources "/assignments", Class.AssignmentController, only: [:create, :index]
-        resources "/weights", Class.WeightController, only: [:index]
         post "/confirm", ClassController, :confirm
+
+        # Class Doc routes
+        resources "/docs", Class.DocController, only: [:create, :index]
+
+        # Class Assignment routes
+        resources "/assignments", Class.AssignmentController, only: [:create, :index]
+
+        # Class Weight routes
+        resources "/weights", Class.WeightController, only: [:index]
+
+        # Class Request routes
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
-        post "/changes/:id/complete", Class.ChangeRequestController, :complete
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
+      post "/help/:id/complete", Class.HelpRequestController, :complete
+      post "/changes/:id/complete", Class.ChangeRequestController, :complete
+      resources "/class-help-types", Class.Help.TypeController, only: [:index]
+      resources "/class-change-types", Class.Change.TypeController, only: [:index]
+
+      # Student routes
       resources "/students", StudentController, only: [] do
+        resources "/fields", Student.FieldController, only: [:create, :delete, :index]
+
+        # Student Class routes
         post "/mods/:id", Student.ModController, :create
         post "/classes/:class_id", Student.ClassController, :create
         get "/classes/:class_id/speculate", Student.Class.SpeculateController, :speculate
@@ -53,18 +91,18 @@ defmodule ClassnavapiWeb.Router do
           get "/mods", Student.Class.ModController, :index
           resources "/assignments", Student.Class.AssignmentController, only: [:index, :create]
         end
-        resources "/fields", Student.FieldController, only: [:create, :delete, :index]
       end
+
+      # Assignment routes
       resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
+
+        # Assignment Grade routes
         resources "/grades", Student.Class.GradeController, only: [:create]
         put "/grades", Student.Class.GradeController, :create
       end
+
+      # Weight routes
       resources "/weights", Class.WeightController, only: [:update]
-      post "/help/:id/complete", Class.HelpRequestController, :complete
-      resources "/class-statuses", Class.StatusController, only: [:index]
-      get "/class-statuses/hub", Class.StatusController, :hub
-      resources "/class-help-types", Class.Help.TypeController, only: [:index]
-      resources "/class-change-types", Class.Change.TypeController, only: [:index]
     end
   end
 
