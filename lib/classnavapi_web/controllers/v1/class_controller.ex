@@ -62,23 +62,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     conn |> update_class(changeset)
   end
 
-  defp convert_points_to_weights(%{"is_points" => true} = params) do
-    weights = params["weights"]
-    weight_sum = weights 
-                |> Enum.reduce(0, & &1["weight"] + &2)
-                |> Decimal.new()
-    weights = weights |> Enum.map(&Map.update!(&1, "weight", fn x -> x |> convert_weight(weight_sum) end))
-    params |> Map.put("weights", weights)
-  end
-  defp convert_points_to_weights(params), do: params
-
-  defp convert_weight(x, weight_sum) do
-    x
-    |> Decimal.new()
-    |> Decimal.div(weight_sum)
-    |> Decimal.mult(Decimal.new(100))
-  end
-
   defp grade_scale(%{"grade_scale" => _} = params), do: params
   defp grade_scale(%{} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)

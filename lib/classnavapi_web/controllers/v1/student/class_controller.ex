@@ -58,7 +58,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
                     |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
                     |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
                     |> Map.put(:status, ClassCalcs.get_class_status(student_class.class))
-                    |> Map.put(:assignments, get_new_class_assignments(student_class))
+                    |> Map.put(:new_assignments, get_new_class_assignments(student_class))
 
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
