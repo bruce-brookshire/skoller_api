@@ -554,15 +554,13 @@
 									"raw": "{\n  \"name\": \"Tests\",\n  \"weight\": 87.5\n}"
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/classes/1/weights/1",
+									"raw": "{{BaseUrl}}/api/v1/weights/1",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"classes",
-										"1",
 										"weights",
 										"1"
 									]
@@ -870,7 +868,7 @@
 										""
 									]
 								},
-								"description": "Creates a class in the given class period.\n\n## Defaults\n\ngrade_scale: A,90|B,80|C,70|D,60\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \nis_editable, \nclass_period_id, \nis_syllabus, \nis_points\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type,\ngrade_scale"
+								"description": "Creates a class in the given class period.\n\n## Defaults\n\ngrade_scale: A,90|B,80|C,70|D,60\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \nis_editable, \nclass_period_id, \nis_syllabus\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type,\ngrade_scale, \nis_points"
 							},
 							"response": []
 						}

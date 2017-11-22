@@ -39,7 +39,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [:update, :show, :index] do
         resources "/docs", Class.DocController, only: [:create, :index]
         resources "/assignments", Class.AssignmentController, only: [:create, :index]
-        resources "/weights", Class.WeightController, only: [:update, :index]
+        resources "/weights", Class.WeightController, only: [:index]
         post "/confirm", ClassController, :confirm
         post "/help/:id/complete", Class.HelpRequestController, :complete
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
@@ -60,6 +60,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/grades", Student.Class.GradeController, only: [:create]
         put "/grades", Student.Class.GradeController, :create
       end
+      resources "/weights", Class.WeightController, only: [:update]
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
