@@ -8,6 +8,12 @@ defmodule Classnavapi.Class do
 
   Weights can only be added through editing the class initially. Weights are edited individually after.
 
+  Required fields: name, number, meet_days, meet_start_time, meet_end_time,
+                seat_count, class_start, class_end, is_enrollable, grade_scale,
+                is_editable, class_period_id, is_syllabus, is_points
+
+  Optional fields: crn, credits, location, professor_id, class_type
+
   """
 
   use Ecto.Schema
@@ -26,6 +32,7 @@ defmodule Classnavapi.Class do
     field :is_enrollable, :boolean, default: false
     field :is_ghost, :boolean, default: true
     field :is_syllabus, :boolean, default: true
+    field :is_points, :boolean
     field :location, :string
     field :meet_days, :string
     field :meet_end_time, :string
@@ -51,35 +58,9 @@ defmodule Classnavapi.Class do
     timestamps()
   end
 
-  defp sum_weight(list) do
-    case list do
-      [] -> list
-      _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
-    end
-  end
-
-  defp validate_weight_totals(%Ecto.Changeset{changes: %{weights: _weights}} = changeset) do
-    sum = changeset
-          |> Changeset.get_field(:weights)
-          |> Enum.map(&Map.get(&1, :weight))
-          |> Enum.filter(& &1)
-          |> sum_weight
-
-    target = Decimal.new(100)
-
-    equal = Decimal.cmp(sum, target)
-
-    cond do
-      sum == [] -> changeset
-      equal == :eq -> changeset
-      true -> changeset |> add_error(:weights, "Weights do not add to 100")
-    end
-  end
-  defp validate_weight_totals(changeset), do: changeset
-
   @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
                 :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
-                :is_editable, :class_period_id, :is_syllabus]
+                :is_editable, :class_period_id, :is_syllabus, :is_points]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type]
   @all_fields @req_fields ++ @opt_fields
 
@@ -103,5 +84,38 @@ defmodule Classnavapi.Class do
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> cast_assoc(:weights)
     |> validate_weight_totals()
+  end
+
+  defp sum_weight(list) do
+    case list do
+      [] -> list
+      _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
+    end
+  end
+
+  defp validate_weight_totals(%Ecto.Changeset{changes: %{weights: _weights}} = changeset) do
+    case changeset |> get_field(:is_points) do
+      false -> changeset |> validate_weight_pct()
+      true -> changeset
+    end
+  end
+  defp validate_weight_totals(changeset), do: changeset
+
+  defp validate_weight_pct(changeset) do
+    sum = changeset
+          |> Changeset.get_field(:weights)
+          |> Enum.map(&Map.get(&1, :weight))
+          |> Enum.filter(& &1)
+          |> sum_weight
+
+    target = Decimal.new(100)
+
+    equal = Decimal.cmp(sum, target)
+
+    cond do
+    sum == [] -> changeset
+    equal == :eq -> changeset
+    true -> changeset |> add_error(:weights, "Weights do not add to 100")
+    end
   end
 end

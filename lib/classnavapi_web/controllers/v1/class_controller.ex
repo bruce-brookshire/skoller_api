@@ -54,7 +54,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 
-    params = params |> convert_points_to_weights()
     changeset = Class.changeset_update(class_old, params)
     
     changeset = changeset
