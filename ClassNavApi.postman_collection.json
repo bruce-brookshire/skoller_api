@@ -97,7 +97,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68\n}"
+							"raw": "{\n\t\"grade\": 88\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/assignments/5/grades",
@@ -225,6 +225,83 @@
 			"description": "",
 			"item": [
 				{
+					"name": "Assignments",
+					"description": "",
+					"item": [
+						{
+							"name": "Create Class Assignment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"assign 3\",\n  \"due\": \"2017-10-12\",\n  \"weight_id\": 1\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"assignments"
+									]
+								},
+								"description": "Add an assignment to a class.\n\n## Path Params\n* class id\n\n## Body Params\n* name\n* due (date)\n* weight_id\n\n## Behavior\n\nThis will not create a mod.\n\nThis will add the assignment to all enrolled students, as well as students enroll after this is added."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Class Assignments",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"test 1\",\n  \"due\": \"2017-10-12\",\n  \"relative_weight\": 100\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"assignments"
+									]
+								},
+								"description": "Lists assignments for a class.\n\n## Path Params\n* class id"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Docs",
 					"description": "",
 					"item": [
@@ -262,7 +339,7 @@
 										"docs"
 									]
 								},
-								"description": ""
+								"description": "Uploads a file for a class to AWS.\n\n## Path Params\n* class id\n\n## Body Params\n* file\n* is_syllabus (boolean)\n\n## Behavior\nUploading a syllabus will cause class status to progress."
 							},
 							"response": []
 						},
@@ -300,7 +377,7 @@
 										"docs"
 									]
 								},
-								"description": ""
+								"description": "Gets list of all uploaded files for a class.\n\n## Path Params\n* class id"
 							},
 							"response": []
 						}
@@ -333,7 +410,7 @@
 										"class-statuses"
 									]
 								},
-								"description": ""
+								"description": "Lists the possible class statuses.\n\nNote: Ghost is also a class status, but is determined by enrollment."
 							},
 							"response": []
 						},
@@ -360,7 +437,7 @@
 										"hub"
 									]
 								},
-								"description": ""
+								"description": "Lists the count of classes in each status.\n\n## Behavior\nGhost classes also have a status, and will be listed with the status as opposed to ghost."
 							},
 							"response": []
 						},
@@ -386,7 +463,7 @@
 										"class-help-types"
 									]
 								},
-								"description": ""
+								"description": "The help types that a class can have."
 							},
 							"response": []
 						},
@@ -412,7 +489,7 @@
 										"class-change-types"
 									]
 								},
-								"description": ""
+								"description": "The change types that a class can have."
 							},
 							"response": []
 						},
@@ -447,84 +524,7 @@
 										"statuses"
 									]
 								},
-								"description": ""
-							},
-							"response": []
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Assignments",
-					"description": "",
-					"item": [
-						{
-							"name": "Create Class Assignment",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"assign 3\",\n  \"due\": \"2017-10-12\",\n  \"weight_id\": 1\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"classes",
-										"1",
-										"assignments"
-									]
-								},
-								"description": ""
-							},
-							"response": []
-						},
-						{
-							"name": "Get Class Assignments",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"test 1\",\n  \"due\": \"2017-10-12\",\n  \"relative_weight\": 100\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"classes",
-										"1",
-										"assignments"
-									]
-								},
-								"description": ""
+								"description": "Admin functionality to select a status for a class.\n\n## Path Params\n* class id\n\n## Body Params\n* class_status_id"
 							},
 							"response": []
 						}
@@ -566,7 +566,7 @@
 										"weights"
 									]
 								},
-								"description": ""
+								"description": "Lists weights for a class.\n\n## Path Params\n* class id"
 							},
 							"response": []
 						},
@@ -600,7 +600,7 @@
 										"1"
 									]
 								},
-								"description": ""
+								"description": "Updates a class weight\n\n## Path Params\n* id\n\n## Body Params\n* name\n* weight (decimal)"
 							},
 							"response": []
 						}
@@ -643,7 +643,7 @@
 										"100"
 									]
 								},
-								"description": "Adds a help request to a class.\n\n## Url:\nclasses/:class_id/help/:help_type"
+								"description": "Adds a help request to a class.\n\n## Path Params\n* class id\n* help type id\n\n## Body Params\n* note\n\n## Behavior\nThis will change class status.\n\n## Note\nThis is meant to be used when a class is <b>not</b> complete. If a class is complete, use a change request."
 							},
 							"response": []
 						},
@@ -671,7 +671,7 @@
 										"complete"
 									]
 								},
-								"description": ""
+								"description": "Marks a help request as complete.\n\n## Path Params\n* help request id\n\n## Behavior\nThis will not change class statuses. The class status needs to be set once all help requests are complete, or once an appropriate status is determined."
 							},
 							"response": []
 						}
@@ -707,7 +707,7 @@
 										"100"
 									]
 								},
-								"description": ""
+								"description": "Adds a change request to a class.\n\n## Path Params\n* class id\n* help type id\n\n## Body Params\n* note\n\n## Behavior\nThis will change class status.\n\n## Note\nThis is meant to be used when a class is complete. If a class is incomplete, use a help request."
 							},
 							"response": []
 						},
@@ -735,7 +735,7 @@
 										"complete"
 									]
 								},
-								"description": ""
+								"description": "Marks a change request as complete.\n\n## Path Params\n* change request id\n\n## Behavior\nThis will not change class statuses. The class status needs to be set once all change requests are complete, or once an appropriate status is determined."
 							},
 							"response": []
 						}
@@ -825,7 +825,7 @@
 								"1"
 							]
 						},
-						"description": ""
+						"description": "Gets a class.\n\n## Path Params\n* class id"
 					},
 					"response": []
 				},
