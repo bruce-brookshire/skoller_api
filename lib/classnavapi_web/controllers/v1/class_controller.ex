@@ -54,30 +54,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 
-    params = params |> convert_points_to_weights()
     changeset = Class.changeset_update(class_old, params)
     
     changeset = changeset
     |> StatusHelper.check_changeset_status(params)
 
     conn |> update_class(changeset)
-  end
-
-  defp convert_points_to_weights(%{"is_points" => true} = params) do
-    weights = params["weights"]
-    weight_sum = weights 
-                |> Enum.reduce(0, & &1["weight"] + &2)
-                |> Decimal.new()
-    weights = weights |> Enum.map(&Map.update!(&1, "weight", fn x -> x |> convert_weight(weight_sum) end))
-    params |> Map.put("weights", weights)
-  end
-  defp convert_points_to_weights(params), do: params
-
-  defp convert_weight(x, weight_sum) do
-    x
-    |> Decimal.new()
-    |> Decimal.div(weight_sum)
-    |> Decimal.mult(Decimal.new(100))
   end
 
   defp grade_scale(%{"grade_scale" => _} = params), do: params

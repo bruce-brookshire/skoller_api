@@ -29,6 +29,6 @@ defmodule Classnavapi.Class.Weight do
     weight
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> validate_number(:weight, greater_than: 0, less_than_or_equal_to: 100)
+    |> validate_number(:weight, greater_than: 0)
   end
 end

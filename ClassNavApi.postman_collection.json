@@ -748,10 +748,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\":\"Cryptocurrencies 101\",\n  \"number\": \"8002-01\",\n  \"meet_days\": \"MWF\",\n  \"meet_start_time\": \"8:30\",\n  \"meet_end_time\": \"12\",\n  \"seat_count\": 200,\n  \"class_start\":\"2017-08-30T00:00:00Z\",\n  \"class_end\": \"2017-11-11T00:00:00Z\",\n  \"is_enrollable\":true,\n  \"is_editable\":true,\n  \"is_syllabus\":true,\n  \"class_period_id\": 1,\n  \"weights\": [\n  \t{\n  \t\t\"name\": \"Tests\",\n  \t\t\"weight\": 50\n  \t},\n  \t{\n  \t\t\"name\": \"Assignments\",\n  \t\t\"weight\": 20\n  \t},\n  \t{\n  \t\t\"name\": \"Projects\",\n  \t\t\"weight\": 30\n  \t}\n  ]\n}"
+							"raw": "{\n  \"name\":\"Cryptocurrencies 101\",\n  \"number\": \"8002-01\",\n  \"meet_days\": \"MWF\",\n  \"meet_start_time\": \"8:30\",\n  \"meet_end_time\": \"12\",\n  \"seat_count\": 200,\n  \"class_start\":\"2017-08-30T00:00:00Z\",\n  \"class_end\": \"2017-11-11T00:00:00Z\",\n  \"is_enrollable\":true,\n  \"is_editable\":true,\n  \"is_syllabus\":true,\n  \"class_period_id\": 1,\n  \"is_points\": true,\n  \"weights\": [\n  \t{\n  \t\t\"name\": \"Tests\",\n  \t\t\"weight\": 500\n  \t},\n  \t{\n  \t\t\"name\": \"Assignments\",\n  \t\t\"weight\": 205\n  \t},\n  \t{\n  \t\t\"name\": \"Projects\",\n  \t\t\"weight\": 306\n  \t}\n  ]\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/classes/1",
+							"raw": "{{BaseUrl}}/api/v1/classes/2",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -759,10 +759,10 @@
 								"api",
 								"v1",
 								"classes",
-								"1"
+								"2"
 							]
 						},
-						"description": ""
+						"description": "## Weights\n\n  Weights are added as an array of weights one time through this route. They require name and weight. If is_points is false, they need to sum to 100. After a class has weights, the appropriate edit route needs to be used.\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \ngrade_scale,\nis_editable, \nclass_period_id, \nis_syllabus, \nis_points\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type"
 					},
 					"response": []
 				},
