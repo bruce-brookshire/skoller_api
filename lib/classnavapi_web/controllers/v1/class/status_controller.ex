@@ -2,14 +2,33 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     use ClassnavapiWeb, :controller
 
     alias Classnavapi.Class.Status
+    alias Classnavapi.Class
     alias Classnavapi.Repo
     alias ClassnavapiWeb.Class.StatusView
+    alias ClassnavapiWeb.ClassView
 
     import Ecto.Query
 
     def index(conn, %{}) do
       statuses = Repo.all(Status)
       render(conn, StatusView, "index.json", statuses: statuses)
+    end
+
+    def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
+      class = Repo.get!(Class, class_id)
+
+      results = class
+      |> Ecto.Changeset.change(%{class_status_id: id})
+      |> Repo.update()
+
+      case results do
+        {:ok, class} ->
+          render(conn, ClassView, "show.json", class: class)
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+      end
     end
 
     defp get_class_count_by_status(status) do

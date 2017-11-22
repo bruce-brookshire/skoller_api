@@ -415,6 +415,41 @@
 								"description": ""
 							},
 							"response": []
+						},
+						{
+							"name": "Update Class Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"class_status_id\": 700\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/statuses",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"statuses"
+									]
+								},
+								"description": ""
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
