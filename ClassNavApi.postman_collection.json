@@ -1297,15 +1297,13 @@
 									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"raw": "{{BaseUrl}}/api/v1/fields-of-study/1",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"schools",
-										"1",
 										"fields-of-study",
 										"1"
 									]
@@ -1368,15 +1366,13 @@
 									"raw": "{\n\t\"field\": \"Compute Science\"\n}"
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/1",
+									"raw": "{{BaseUrl}}/api/v1/fields-of-study/1",
 									"host": [
 										"{{BaseUrl}}"
 									],
 									"path": [
 										"api",
 										"v1",
-										"schools",
-										"1",
 										"fields-of-study",
 										"1"
 									]

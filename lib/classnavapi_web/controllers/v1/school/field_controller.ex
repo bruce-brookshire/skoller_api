@@ -25,7 +25,7 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   def index(conn, %{"school_id" => school_id}) do
     query = (from fs in FieldOfStudy)
     fields = query
-            |> join(:inner, [fs], st in StudentField, fs.id == st.field_of_study_id)
+            |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
             |> where([fs], fs.school_id == ^school_id)
             |> group_by([fs, st], [fs.field, fs.id])
             |> select([fs, st], %{field: fs, count: count(st.id)})
