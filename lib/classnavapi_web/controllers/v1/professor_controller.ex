@@ -5,7 +5,10 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ProfessorView
 
-  def create(conn, %{} = params) do
+  import Ecto.Query
+
+  def create(conn, %{"period_id" => class_period_id} = params) do
+    params = params |> Map.put("class_period_id", class_period_id)
 
     changeset = Professor.changeset_insert(%Professor{}, params)
 
@@ -19,8 +22,8 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
     end
   end
 
-  def index(conn, _) do
-    professors = Repo.all(Professor)
+  def index(conn, %{"period_id" => class_period_id}) do
+    professors = Repo.all(from p in Professor, where: p.class_period_id == ^class_period_id)
     render(conn, ProfessorView, "index.json", professors: professors)
   end
 
