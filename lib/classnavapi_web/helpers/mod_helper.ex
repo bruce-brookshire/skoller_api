@@ -53,7 +53,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         existing_mod |> publish_mod_and_action(params["student_id"])
       true -> 
         # The assignment has a mod already, and needs no changes
-        existing_mod |> insert_or_update_self_action(params["student_id"])
+        existing_mod |> add_backlogged_mods(params["student_id"])
     end
   end
 
@@ -274,14 +274,26 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     mod |> insert_mod_action(student_class)
   end
 
-  defp insert_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
-    query = from(sc in StudentClass)
+  defp insert_public_mod_action_query(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, %StudentClass{} = student_class) do
+    from(sc in StudentClass)
     |> join(:left, [sc], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
     |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
     |> where([sc, act], is_nil(act.id))
     |> Repo.all()
+  end
 
-    status = query |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
+  defp insert_public_mod_action_query(%Mod{} = mod) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], assign in StudentAssignment, assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
+    |> join(:left, [sc, assign], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> where([sc, assign, act], is_nil(act.id))
+    |> Repo.all()
+  end
+
+  defp insert_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
+    status = mod
+            |> insert_public_mod_action_query()
+            |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
     case status |> Enum.find({:ok, status}, &errors(&1)) do
       {:ok, _} -> insert_or_update_self_action(mod, student_class.id)
       {:error, val} -> {:error, val}
@@ -348,6 +360,28 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Repo.update(changeset)
   end
 
+  defp get_backlogged_mods(mod) do
+    from(mod in Mod)
+    |> where([mod], mod.assignment_id == ^mod.assignment_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod], mod.id != ^mod.id)
+    |> Repo.all()
+  end
+
+  defp insert_backlogged_actions([], _student_class_id), do: {:ok, nil}
+  defp insert_backlogged_actions(enumerable, student_class_id) do
+    enumerable
+    |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
+    |> Enum.map(&Repo.insert!(&1))
+    |> Enum.find({:ok, nil}, &errors(&1))
+  end
+
+  defp insert_backlogged_mods(mod, %StudentClass{id: id}) do
+    mod
+    |> get_backlogged_mods()
+    |> insert_backlogged_actions(id)
+  end
+
   defp is_private(nil), do: false
   defp is_private(value), do: value
 
@@ -365,6 +399,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> publish_mod()
     case mod do
       {:ok, mod} -> mod |> add_mod_action(student_class_or_student_id)
+      {:error, val} -> {:error, val}
+    end
+  end
+
+  defp add_backlogged_mods(mod, student_id) do
+    mod = mod |> Repo.preload(:assignment)
+    student_class = Repo.get_by(StudentClass, class_id: mod.assignment.class_id, student_id: student_id)
+    case mod |> insert_backlogged_mods(student_class) do
+      {:ok, _} -> mod |> insert_or_update_self_action(student_class.id)
       {:error, val} -> {:error, val}
     end
   end

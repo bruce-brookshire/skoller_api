@@ -31,6 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
 
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset) do
     case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")

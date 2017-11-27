@@ -11,8 +11,9 @@ defmodule Classnavapi.Assignment.Mod.Action do
     timestamps()
   end
 
-  @req_fields [:is_accepted, :assignment_modification_id, :student_class_id]
-  @all_fields @req_fields
+  @req_fields [:assignment_modification_id, :student_class_id]
+  @opt_fields [:is_accepted]
+  @all_fields @req_fields ++ @opt_fields
 
   @doc false
   def changeset(%Action{} = action, attrs) do

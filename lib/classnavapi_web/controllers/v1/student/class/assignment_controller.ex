@@ -91,6 +91,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
     class_id = changeset |> get_class_id()
     case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
