@@ -19,6 +19,7 @@ defmodule Classnavapi.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     belongs_to :student, Classnavapi.Student
+    many_to_many :roles, Classnavapi.Role, join_through: "user_roles"
 
     timestamps()
   end
