@@ -282,7 +282,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all()
   end
 
-  defp insert_public_mod_action_query(%Mod{} = mod) do
+  defp insert_public_mod_action_query(%Mod{} = mod, _student_class) do
     from(sc in StudentClass)
     |> join(:inner, [sc], assign in StudentAssignment, assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
     |> join(:left, [sc, assign], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
@@ -292,7 +292,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   defp insert_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
     status = mod
-            |> insert_public_mod_action_query()
+            |> insert_public_mod_action_query(student_class)
             |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
     case status |> Enum.find({:ok, status}, &errors(&1)) do
       {:ok, _} -> insert_or_update_self_action(mod, student_class.id)
