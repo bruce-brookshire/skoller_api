@@ -57,6 +57,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
+    student_assignment = student_assignment |> Repo.preload(:student_class)
+    student_class = Repo.get_by(StudentClass, class_id: student_assignment.student_class.class_id, student_id: params["student_id"])
+    student_assignment
+    |> find_mods()
+    |> Enum.map(&process_existing_mod(&1, student_class, params))
+    |> Enum.find({:ok, nil}, &errors(&1))
+  end
+
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&get_changes(&1, student_assignment, params))
@@ -112,6 +121,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> where([mod, act], is_nil(act.is_accepted))
     |> select([mod, act, assign], assign)
     |> Repo.all()
+  end
+
+  defp process_existing_mod(mod, %StudentClass{id: id} = student_class, params) do
+    case mod.is_private == true and is_private(params["is_private"]) == false do
+      true -> mod |> publish_mod_and_action(student_class)
+      false -> mod |> insert_or_update_self_action(id)
+    end
   end
 
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}) do
@@ -261,6 +277,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       nil -> []
       mod -> mod
     end
+  end
+
+  defp find_mods(%StudentAssignment{} = student_assignment) do
+    from(mod in Mod)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+    |> Repo.all
   end
 
   defp add_mod_action(%Mod{} = mod, %StudentClass{} = student_class) do
