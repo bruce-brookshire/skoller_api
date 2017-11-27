@@ -5,7 +5,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   alias Classnavapi.Class.ChangeRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
-  alias ClassnavapiWeb.Class.ChangeRequestView
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 

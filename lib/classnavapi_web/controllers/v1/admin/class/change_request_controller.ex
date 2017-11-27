@@ -1,13 +1,9 @@
 defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   use ClassnavapiWeb, :controller
   
-  alias Classnavapi.Class
   alias Classnavapi.Class.ChangeRequest
   alias Classnavapi.Repo
-  alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.ChangeRequestView
-  alias ClassnavapiWeb.Helpers.StatusHelper
-  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
