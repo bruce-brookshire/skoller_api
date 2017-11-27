@@ -75,8 +75,8 @@ defmodule ClassnavapiWeb.Router do
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
-      post "/help/:id/complete", Class.HelpRequestController, :complete
-      post "/changes/:id/complete", Class.ChangeRequestController, :complete
+      post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
+      post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
 

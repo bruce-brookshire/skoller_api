@@ -12,7 +12,8 @@
 
 Classnavapi.Repo.insert!(%Classnavapi.Role{id: 100, name: "Student"})
 Classnavapi.Repo.insert!(%Classnavapi.Role{id: 200, name: "Admin"})
-Classnavapi.Repo.insert!(%Classnavapi.Role{id: 300, name: "Syllabus Editor"})
+Classnavapi.Repo.insert!(%Classnavapi.Role{id: 300, name: "Syllabus Worker"})
+Classnavapi.Repo.insert!(%Classnavapi.Role{id: 400, name: "Change Requests"})
 
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 100, name: "New Class", is_complete: false})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 200, name: "Needs Syllabus", is_complete: false})
