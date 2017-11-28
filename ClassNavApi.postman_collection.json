@@ -40,7 +40,7 @@
 					},
 					"response": [
 						{
-							"id": "e79f9ff8-1795-470c-9f78-0c577f4342ab",
+							"id": "aded3425-59cb-49fa-95e9-b6428e2c7703",
 							"name": "Successful with Student Obj Login",
 							"originalRequest": {
 								"method": "POST",
@@ -149,7 +149,7 @@
 					},
 					"response": [
 						{
-							"id": "7933fae1-8519-48df-8a8a-86582111d55e",
+							"id": "11da4b34-a759-47a6-b7f0-8d3b401b45fd",
 							"name": "Sucessful Token Login w Student Obj",
 							"originalRequest": {
 								"method": "POST",
@@ -271,7 +271,87 @@
 						},
 						"description": "Adds a grade to an assignment\n\n## Path Params\n* student assignment id\n\n## Body Params\n* grade (decimal)"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "f4c0b51b-be5e-4bb3-bb11-3b8b538a057a",
+							"name": "Add Assignment Grade",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"grade\": 71\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/assignments/1/grades",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"assignments",
+										"1",
+										"grades"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "136",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 19:37:42 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "ohshu1ocfmk254h3p4975bf8e7cabu2f",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 905,
+							"body": "{\"weight_id\":1,\"student_class_id\":1,\"name\":\"Assignment 1\",\"is_completed\":false,\"id\":1,\"grade\":71.0,\"due\":\"2018-10-12\",\"assignment_id\":1}"
+						}
+					]
 				},
 				{
 					"name": "Add Assignment Grade",
@@ -306,7 +386,87 @@
 						},
 						"description": "Adds a grade to an assignment\n\n## Path Params\n* student assignment id\n\n## Body Params\n* grade (decimal)"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "2106f62a-3398-460a-b67a-e1ee8eb75f16",
+							"name": "Add Assignment Grade",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"grade\": 88\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/assignments/1/grades",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"assignments",
+										"1",
+										"grades"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "136",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 19:38:17 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "06e031qcnmrmm6huj80to2pab634hmkp",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 563,
+							"body": "{\"weight_id\":1,\"student_class_id\":1,\"name\":\"Assignment 1\",\"is_completed\":false,\"id\":1,\"grade\":88.0,\"due\":\"2018-10-12\",\"assignment_id\":1}"
+						}
+					]
 				},
 				{
 					"name": "Delete Student Assignments",
@@ -340,7 +500,80 @@
 						},
 						"description": "Deletes a student assignment.\n\n## Path Params\n* Student Assignment id\n\n## Body Params\n* is_private (boolean)\n\n## Behavior\nThis action will create a mod."
 					},
-					"response": []
+					"response": [
+						{
+							"id": "a6709be1-624b-42ca-9d8b-952006c20a2b",
+							"name": "Delete Student Assignments",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"is_private\": true\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/assignments/4",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"assignments",
+										"4"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "0",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 19:38:34 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "m17ug03a892oqli9h77r25b399hvugdn",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 566,
+							"body": ""
+						}
+					]
 				},
 				{
 					"name": "Update Student Assignments",
@@ -372,9 +605,88 @@
 								"4"
 							]
 						},
-						"description": "Updates a student assignment.\n\n## Path Params\n* Student Assignment id\n\n## Body Params\n* is_private (boolean)\n* weight_id\n* name\n* due (date)\n\n## Behavior\nThis action will create a mod."
+						"description": "Updates a student assignment.\n\n## Path Params\n* Student Assignment id\n\n## Body Params\n* is_private (boolean)\n* weight_id\n* name\n* due (date)\n* is_completed\n\n## Behavior\nThis action will create a mod if not just changing is_completed"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "3e5ff8d3-5b9d-4413-a2c1-1a1f95215cc0",
+							"name": "Update Student Assignments Weight",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"weight_id\": null\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/assignments/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"assignments",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "139",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 19:39:51 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "j7s8rqrl51985dmige0dq65o1sc08o4c",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 573,
+							"body": "{\"weight_id\":null,\"student_class_id\":1,\"name\":\"Assignment 1\",\"is_completed\":false,\"id\":1,\"grade\":88.0,\"due\":\"2018-10-12\",\"assignment_id\":1}"
+						}
+					]
 				},
 				{
 					"name": "Get Student Assignment by Id",
@@ -408,7 +720,86 @@
 						},
 						"description": "Gets a student assignment by id.\n\n## Path Params\n* student assignment id"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "f3836d4e-c664-4ae5-85f6-c22153ef811c",
+							"name": "Get Student Assignment by Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/assignments/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"assignments",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "157",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 19:40:26 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "kkcoqkpfa3a5ustkdacqkbkc3ufdoi9k",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 559,
+							"body": "{\"weight_id\":null,\"student_class_id\":1,\"pending_mods\":[],\"name\":\"Assignment 1\",\"is_completed\":false,\"id\":1,\"grade\":88.0,\"due\":\"2018-10-12\",\"assignment_id\":1}"
+						}
+					]
 				}
 			]
 		},
@@ -2339,7 +2730,7 @@
 					},
 					"response": [
 						{
-							"id": "0121d1f9-98fb-4982-838c-5df20ef0899e",
+							"id": "e9765af8-e3f0-47ce-a4d8-55cb006a1fd0",
 							"name": "Create User Success w no student",
 							"originalRequest": {
 								"method": "POST",
@@ -2416,7 +2807,7 @@
 							"body": "{\"user\":{\"student\":null,\"roles\":[],\"id\":8,\"email\":\"dcha122345ppele@hku.edu\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNzI5NiwiaWF0IjoxNTExODg4MDk2LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6IjFmZmUxNTJkLTdhNTEtNDY2MS04YmU3LTM4ZjM1NjU4MmM0OSIsIm5iZiI6MTUxMTg4ODA5NSwic3ViIjoiOCIsInR5cCI6ImFjY2VzcyJ9.FlSZPBc-fi6DsAOv_tDSWKaDstgzo_LQXOoCXh6mGbJnqinC7_f0UE2PIaqbKrD6_w69fgBSAHFD-qmqvM1Ldw\"}"
 						},
 						{
-							"id": "da05dbf8-e131-4185-bdf6-2400036a38b8",
+							"id": "d2393e4f-6db4-4269-a113-9e0c6c3bf97d",
 							"name": "Create User Success w Student",
 							"originalRequest": {
 								"method": "POST",
@@ -2522,7 +2913,7 @@
 					},
 					"response": [
 						{
-							"id": "f15c0888-6f20-409b-8d67-4f8b58ae7051",
+							"id": "ea61a97a-bc08-4ac8-a48f-ba433f55ceb6",
 							"name": "Get Users",
 							"originalRequest": {
 								"method": "GET",
@@ -2620,7 +3011,7 @@
 					},
 					"response": [
 						{
-							"id": "2ac18f1e-2db8-4b2d-a0da-cd3001da1187",
+							"id": "7f1ed66c-359c-4e10-af4d-660dc9c00c47",
 							"name": "Get User by Id no student",
 							"originalRequest": {
 								"method": "GET",
@@ -2691,7 +3082,7 @@
 							"body": "{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
 						},
 						{
-							"id": "f9168e19-1f12-4dba-b2b2-c599258fb4a9",
+							"id": "6c020eed-1325-4722-a5ac-a5b01f2a8c62",
 							"name": "Get User by Id w student",
 							"originalRequest": {
 								"method": "GET",
@@ -2798,7 +3189,7 @@
 					},
 					"response": [
 						{
-							"id": "cd22e44c-4930-4291-a02d-7d790bb14beb",
+							"id": "fa43eec9-d23a-4a8b-808f-8815c1bb70aa",
 							"name": "Update User Success",
 							"originalRequest": {
 								"method": "PUT",
