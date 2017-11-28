@@ -4,12 +4,16 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.User
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
+  alias ClassnavapiWeb.AuthView
   alias Ecto.Changeset
+  alias Classnavapi.Auth
 
   defp insert_user(conn, changeset) do
     case Repo.insert(changeset) do
       {:ok, user} ->
-        render(conn, UserView, "show.json", user: user)
+        {:ok, token, _} = Auth.encode_and_sign(%{:id => user.id}, %{typ: "access"})
+        token = Map.new(%{token: token}) |> Map.merge(%{user: user})
+        render(conn, AuthView, "show.json", auth: token)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
