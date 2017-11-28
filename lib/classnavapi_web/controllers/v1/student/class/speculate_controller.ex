@@ -7,6 +7,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
   alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Class.SpeculationView
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  
+  plug :verify_role, %{role: @student_role}
+
   def speculate(conn, %{"grade" => grade, "class_id" => class_id, "student_id" => student_id}) do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
     

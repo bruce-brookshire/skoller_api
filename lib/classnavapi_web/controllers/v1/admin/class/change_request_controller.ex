@@ -7,9 +7,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
+  @admin_role 200
   @change_req_role 400
   
-  plug :verify_role, %{role: @change_req_role}
+  plug :verify_role, %{roles: [@change_req_role, @admin_role]}
 
   def complete(conn, %{"id" => id}) do
     change_request_old = Repo.get!(ChangeRequest, id)

@@ -6,6 +6,11 @@ defmodule ClassnavapiWeb.Api.V1.Student.FieldController do
   alias ClassnavapiWeb.School.StudentFieldView
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  
+  plug :verify_role, %{role: @student_role}
 
   def create(conn, %{} = params) do
     changeset = StudentField.changeset(%StudentField{}, params)

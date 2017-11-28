@@ -9,6 +9,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.ModHelper
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  
+  plug :verify_role, %{role: @student_role}
+
   def create(conn, %{"student_id" => student_id, "id" => id} = params) do
     mod = Mod
     |> Repo.get!(id)

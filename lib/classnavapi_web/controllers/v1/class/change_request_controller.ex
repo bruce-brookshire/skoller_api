@@ -8,6 +8,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+
+  @student_role 100
+
+  plug :verify_role, %{role: @student_role}
+
   def create(conn, %{"class_id" => class_id} = params) do
 
     class = Repo.get!(Class, class_id)

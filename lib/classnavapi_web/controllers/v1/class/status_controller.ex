@@ -8,6 +8,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     alias ClassnavapiWeb.ClassView
 
     import Ecto.Query
+    import ClassnavapiWeb.Helpers.AuthPlug
+    
+    @admin_role 200
+    
+    plug :verify_role, %{role: @admin_role}
 
     def index(conn, %{}) do
       statuses = Repo.all(Status)

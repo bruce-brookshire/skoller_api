@@ -42,7 +42,8 @@ defmodule ClassnavapiWeb.Router do
         resources "/periods", PeriodController, only: [:index, :create]
 
         # School Field of Study routes
-        resources "/fields-of-study", School.FieldController, only: [:index, :create]
+        resources "/fields-of-study", Admin.School.FieldController, only: [:create]
+        resources "/fields-of-study", School.FieldController, only: [:index]
       end
 
       # Class Period routes
@@ -103,13 +104,14 @@ defmodule ClassnavapiWeb.Router do
       end
 
       # Weight routes
-      resources "/weights", Class.WeightController, only: [:update]
+      resources "/weights", Admin.Class.WeightController, only: [:update]
 
       # Professor routes
       resources "/professors", ProfessorController, only: [:update, :show]
 
       # Field of Study routes
-      resources "/fields-of-study", School.FieldController, only: [:update, :show]
+      resources "/fields-of-study", Admin.School.FieldController, only: [:update]
+      resources "/fields-of-study", School.FieldController, only: [:show]
     end
   end
 

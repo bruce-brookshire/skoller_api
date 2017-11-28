@@ -12,6 +12,11 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   alias ClassnavapiWeb.Helpers.ModHelper
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  
+  plug :verify_role, %{role: @student_role}
 
   def create(conn, %{"class_id" => class_id} = params) do
 
