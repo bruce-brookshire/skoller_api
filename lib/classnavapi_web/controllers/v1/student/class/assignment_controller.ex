@@ -37,6 +37,16 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
+  def index(conn, %{"class_id" => class_id, "student_id" => student_id, "date" => date}) do
+    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
+    date = date |> Date.from_iso8601!()
+    student_assignments = student_class
+                          |> ClassCalcs.get_assignments_with_relative_weight()
+                          |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
+                          |> Enum.filter(&Date.compare(&1.due, date) == :gt and &1.is_completed == false)
+    render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
+  end
+
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
     student_assignments = student_class

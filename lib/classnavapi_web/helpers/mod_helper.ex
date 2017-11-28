@@ -180,6 +180,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       {:weight_id, weight_id} -> check_change(:weight, weight_id, student_assignment, params)
       {:due, due} -> check_change(:due, due, student_assignment, params)
       {:name, name} -> check_change(:name, name, student_assignment, params)
+      _ -> {:ok, :no_mod}
     end
   end
 
