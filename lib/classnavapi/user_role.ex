@@ -13,6 +13,8 @@ defmodule Classnavapi.UserRole do
   schema "user_roles" do
     field :user_id, :id
     field :role_id, :id
+    belongs_to :user, Classnavapi.User, define_field: false
+    belongs_to :role, Classnavapi.Role, define_field: false
 
     timestamps()
   end

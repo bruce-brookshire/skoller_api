@@ -20,7 +20,6 @@ defmodule ClassnavapiWeb.StudentView do
       name_first: student.name_first,
       name_last: student.name_last,
       phone: student.phone,
-      major: student.major,
       birthday: student.birthday,
       gender: student.gender,
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)

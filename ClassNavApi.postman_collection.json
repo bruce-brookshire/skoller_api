@@ -38,7 +38,151 @@
 						},
 						"description": "Logs a user in, gets a jwt token.\n\n## Body Params\n* email\n* password"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "f26e8082-cb7f-40f1-8488-95a8f6332bb8",
+							"name": "Failed Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": false
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test123123\"}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/login",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "plain",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "0",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 16:12:49 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "tfm5ugp3rrclikgfuggbvnqpn5ku9gul",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 899,
+							"body": ""
+						},
+						{
+							"id": "abb0a2a8-1172-4854-b08f-49ee8a647d3c",
+							"name": "Sucessful Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test\"}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/login",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "422",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 16:33:58 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "sed7jadashjvomhb7k09u45gnu8ar3e1",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 5255,
+							"body": "{\"user\":{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNjAzOCwiaWF0IjoxNTExODg2ODM4LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6ImNkZWE2ZDMwLTg5NjItNDRlZi05N2M0LTJiZDVkMTRhN2YwYSIsIm5iZiI6MTUxMTg4NjgzNywic3ViIjoiMSIsInR5cCI6ImFjY2VzcyJ9.egwT5UtnDVpobfAkYICc1cIubfVvgcfiboeVAzkCU-1p8KVtWBaFhNQk_jvYIKFJJDCasCgnRdnsRtUJcm6O6w\"}"
+						}
+					]
 				}
 			]
 		},
@@ -2130,7 +2274,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"dchappele@hku.edu\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
+							"raw": "{\"email\":\"dchappele@hku.edu\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users",
@@ -2143,7 +2287,7 @@
 								"users"
 							]
 						},
-						"description": ""
+						"description": "Adds a user.\n\n## Body Params\n* email\n* password\n* student obj (opt)\n  * name_first\n  * name_last\n  * school_id\n  * phone\n  * birthday\n  * gender"
 					},
 					"response": []
 				},
