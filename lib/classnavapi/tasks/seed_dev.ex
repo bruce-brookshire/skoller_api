@@ -48,7 +48,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                 student: %Student{name_first: "Tyler",
                                    name_last: "Witt",
                                    school_id: school.id,
-                                   major: "Computer Science",
                                    phone: "6158675309",
                                    birthday: date1,
                                    gender: "Male"}})

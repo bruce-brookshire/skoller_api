@@ -16,7 +16,6 @@ defmodule Classnavapi.Student do
     field :name_first, :string
     field :name_last, :string
     field :phone, :string
-    field :major, :string
     field :school_id, :id
     has_many :users, Classnavapi.User
     many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"
@@ -25,7 +24,7 @@ defmodule Classnavapi.Student do
     timestamps()
   end
 
-  @req_fields [:name_first, :name_last, :phone, :birthday, :gender, :major,
+  @req_fields [:name_first, :name_last, :phone, :birthday, :gender,
               :school_id]
   @all_fields @req_fields
 

@@ -22,6 +22,7 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
+      post "/users/token-login", AuthController, :token
 
       # User routes
       resources "/users", UserController, only: [:update, :show, :index] do
@@ -120,7 +121,7 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api
 
     scope "/v1", V1, as: :v1 do
-      post "/users/login", AuthController, :create
+      post "/users/login", AuthController, :login
       resources "/users", UserController, only: [:create]
     end
   end
