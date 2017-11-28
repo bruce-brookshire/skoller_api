@@ -36,6 +36,8 @@ defmodule ClassnavapiWeb.Endpoint do
     key: "_classnavapi_key",
     signing_salt: "EW+VIcw9"
 
+  plug CORSPlug
+
   plug ClassnavapiWeb.Router
 
   @doc """
