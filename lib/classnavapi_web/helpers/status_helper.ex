@@ -127,7 +127,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp syllabus_status_check(%{}), do: {:ok, nil}
 
   defp change_status_check(%{class_status: %{is_complete: false}}) do
-    {:error, "Class is incomplete, use Help Request."}
+    {:error, %{error: "Class is incomplete, use Help Request."}}
   end
   defp change_status_check(%{class_status: %{is_complete: true}} = params) do
     params
@@ -137,7 +137,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp change_status_check(%{}), do: {:ok, nil}
 
   defp help_status_check(%{class_status: %{is_complete: true}}) do
-    {:error, "Class is complete, use Change Request."}
+    {:error, %{error: "Class is complete, use Change Request."}}
   end
   defp help_status_check(%{class_status: %{is_complete: false}} = params) do
     params
