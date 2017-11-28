@@ -3,10 +3,11 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
 
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AuthView
+  alias ClassnavapiWeb.UserView
   alias Classnavapi.User
   alias Classnavapi.Auth
 
-  def create(conn, %{"email" => email, "password" => password}) do
+  def login(conn, %{"email" => email, "password" => password}) do
     user = Repo.get_by(User, email: email)
 
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
@@ -17,5 +18,9 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
         conn
            |> send_resp(401, "")
     end
+  end
+
+  def token(conn, _params) do
+    render(conn, AuthView, "show.json", auth: conn.assigns[:user])
   end
 end

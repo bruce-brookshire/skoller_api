@@ -40,77 +40,8 @@
 					},
 					"response": [
 						{
-							"id": "f26e8082-cb7f-40f1-8488-95a8f6332bb8",
-							"name": "Failed Login",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json",
-										"disabled": false
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test123123\"}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users/login",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"login"
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": "plain",
-							"_postman_previewtype": "text",
-							"header": [
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "0",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 16:12:49 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "tfm5ugp3rrclikgfuggbvnqpn5ku9gul",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
-							],
-							"cookie": [],
-							"responseTime": 899,
-							"body": ""
-						},
-						{
-							"id": "abb0a2a8-1172-4854-b08f-49ee8a647d3c",
-							"name": "Sucessful Login",
+							"id": "67de5a5a-b3de-4d2b-823c-77d587673d0d",
+							"name": "Successful with Student Obj Login",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
@@ -121,7 +52,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test\"}"
+									"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\":\"test\"}"
 								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/login",
@@ -149,7 +80,7 @@
 								},
 								{
 									"key": "content-length",
-									"value": "422",
+									"value": "544",
 									"name": "content-length",
 									"description": "The length of the response body in octets (8-bit bytes)"
 								},
@@ -161,7 +92,7 @@
 								},
 								{
 									"key": "date",
-									"value": "Tue, 28 Nov 2017 16:33:58 GMT",
+									"value": "Tue, 28 Nov 2017 16:47:37 GMT",
 									"name": "date",
 									"description": "The date and time that the message was sent"
 								},
@@ -173,14 +104,131 @@
 								},
 								{
 									"key": "x-request-id",
-									"value": "sed7jadashjvomhb7k09u45gnu8ar3e1",
+									"value": "9un4j0gf0c9drmp1tvsnq58b4hr7oi7f",
 									"name": "x-request-id",
 									"description": "Custom header"
 								}
 							],
 							"cookie": [],
-							"responseTime": 5255,
-							"body": "{\"user\":{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNjAzOCwiaWF0IjoxNTExODg2ODM4LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6ImNkZWE2ZDMwLTg5NjItNDRlZi05N2M0LTJiZDVkMTRhN2YwYSIsIm5iZiI6MTUxMTg4NjgzNywic3ViIjoiMSIsInR5cCI6ImFjY2VzcyJ9.egwT5UtnDVpobfAkYICc1cIubfVvgcfiboeVAzkCU-1p8KVtWBaFhNQk_jvYIKFJJDCasCgnRdnsRtUJcm6O6w\"}"
+							"responseTime": 890,
+							"body": "{\"user\":{\"student\":{\"phone\":\"6158675309\",\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[],\"id\":2,\"email\":\"tyler@hku.edu\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNjg1OCwiaWF0IjoxNTExODg3NjU4LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6IjAzNjI5YjZiLWIzOTYtNDk4Yi04ZTlhLTk2YmZhMjg0MTkzNiIsIm5iZiI6MTUxMTg4NzY1Nywic3ViIjoiMiIsInR5cCI6ImFjY2VzcyJ9.RZCZBUERrQF0YFZc3sVTRaEIsDv17PZXO-9n6bXD-mrUuBTOwdJPYDliQ7Priq20al8FtxaAm0Wj3kiwcp2Giw\"}"
+						}
+					]
+				},
+				{
+					"name": "Token Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test\"}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users/token-login",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"token-login"
+							]
+						},
+						"description": "Uses a token to get user info."
+					},
+					"response": [
+						{
+							"id": "b2ed7578-0d70-44e4-a72c-7b9e50120130",
+							"name": "Sucessful Token Login w Student Obj",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": false
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text",
+										"warning": "",
+										"disabled": false
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"email\":\"tyler@fortyau.com\",\n\"password\":\"test\"}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/token-login",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"token-login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "193",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 16:47:21 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "85bt30ph03s30kngg0df7ph25m204gjf",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 597,
+							"body": "{\"user\":{\"student\":{\"phone\":\"6158675309\",\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[],\"id\":2,\"email\":\"tyler@hku.edu\"}}"
 						}
 					]
 				}

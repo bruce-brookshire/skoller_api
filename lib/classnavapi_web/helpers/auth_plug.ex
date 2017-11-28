@@ -15,5 +15,4 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
         |> halt()
     end
   end
-
 end
