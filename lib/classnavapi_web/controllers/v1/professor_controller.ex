@@ -6,6 +6,12 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   alias ClassnavapiWeb.ProfessorView
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @admin_role 200
+
+  plug :verify_role, %{roles: [@admin_role, @student_role]}
 
   def create(conn, %{"period_id" => class_period_id} = params) do
     params = params |> Map.put("class_period_id", class_period_id)
@@ -30,19 +36,5 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   def show(conn, %{"id" => id}) do
     professor = Repo.get!(Professor, id)
     render(conn, ProfessorView, "show.json", professor: professor)
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    professor_old = Repo.get!(Professor, id)
-    changeset = Professor.changeset_update(professor_old, params)
-
-    case Repo.update(changeset) do
-      {:ok, professor} ->
-        render(conn, ProfessorView, "show.json", professor: professor)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
   end
 end

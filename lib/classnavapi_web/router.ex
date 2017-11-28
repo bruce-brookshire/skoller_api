@@ -107,7 +107,8 @@ defmodule ClassnavapiWeb.Router do
       resources "/weights", Admin.Class.WeightController, only: [:update]
 
       # Professor routes
-      resources "/professors", ProfessorController, only: [:update, :show]
+      resources "/professors", ProfessorController, only: [:show]
+      resources "/professors", Admin.ProfessorController, only: [:update]
 
       # Field of Study routes
       resources "/fields-of-study", Admin.School.FieldController, only: [:update]
