@@ -40,7 +40,7 @@
 					},
 					"response": [
 						{
-							"id": "33682f70-64de-4685-9549-1dfe372b6916",
+							"id": "e79f9ff8-1795-470c-9f78-0c577f4342ab",
 							"name": "Successful with Student Obj Login",
 							"originalRequest": {
 								"method": "POST",
@@ -149,7 +149,7 @@
 					},
 					"response": [
 						{
-							"id": "fb46e192-e7a3-4323-ac0e-ca72ecaef64a",
+							"id": "7933fae1-8519-48df-8a8a-86582111d55e",
 							"name": "Sucessful Token Login w Student Obj",
 							"originalRequest": {
 								"method": "POST",
@@ -2339,7 +2339,7 @@
 					},
 					"response": [
 						{
-							"id": "7ebeec65-351d-4852-aa02-386de6bc78fc",
+							"id": "0121d1f9-98fb-4982-838c-5df20ef0899e",
 							"name": "Create User Success w no student",
 							"originalRequest": {
 								"method": "POST",
@@ -2416,7 +2416,7 @@
 							"body": "{\"user\":{\"student\":null,\"roles\":[],\"id\":8,\"email\":\"dcha122345ppele@hku.edu\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNzI5NiwiaWF0IjoxNTExODg4MDk2LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6IjFmZmUxNTJkLTdhNTEtNDY2MS04YmU3LTM4ZjM1NjU4MmM0OSIsIm5iZiI6MTUxMTg4ODA5NSwic3ViIjoiOCIsInR5cCI6ImFjY2VzcyJ9.FlSZPBc-fi6DsAOv_tDSWKaDstgzo_LQXOoCXh6mGbJnqinC7_f0UE2PIaqbKrD6_w69fgBSAHFD-qmqvM1Ldw\"}"
 						},
 						{
-							"id": "aecf9737-a3a7-4185-a09e-3fe14908b404",
+							"id": "da05dbf8-e131-4185-bdf6-2400036a38b8",
 							"name": "Create User Success w Student",
 							"originalRequest": {
 								"method": "POST",
@@ -2522,7 +2522,7 @@
 					},
 					"response": [
 						{
-							"id": "bf510afe-ba08-44e3-b550-4595b5f92b08",
+							"id": "f15c0888-6f20-409b-8d67-4f8b58ae7051",
 							"name": "Get Users",
 							"originalRequest": {
 								"method": "GET",
@@ -2620,7 +2620,7 @@
 					},
 					"response": [
 						{
-							"id": "28d854b8-4da8-4d46-9778-ef17357cd77c",
+							"id": "2ac18f1e-2db8-4b2d-a0da-cd3001da1187",
 							"name": "Get User by Id no student",
 							"originalRequest": {
 								"method": "GET",
@@ -2691,7 +2691,7 @@
 							"body": "{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
 						},
 						{
-							"id": "95d1f57b-2308-48ae-9be3-810a79ba4235",
+							"id": "f9168e19-1f12-4dba-b2b2-c599258fb4a9",
 							"name": "Get User by Id w student",
 							"originalRequest": {
 								"method": "GET",
@@ -2794,9 +2794,88 @@
 								"1"
 							]
 						},
-						"description": ""
+						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* student obj (opt)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)"
 					},
-					"response": []
+					"response": [
+						{
+							"id": "cd22e44c-4930-4291-a02d-7d790bb14beb",
+							"name": "Update User Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\": \"test\",\n\"student\": {\n  \"name_first\": \"David\",\n  \"name_last\": \"Chapelletteville\",\n  \"school_id\": 1,\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\"\n  }\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "200",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 18:28:20 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "qigidffkqmmq7pl8amro5vrvnagnf7uj",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 865,
+							"body": "{\"student\":{\"phone\":\"6158675309\",\"name_last\":\"Chapelletteville\",\"name_first\":\"David\",\"id\":9,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
+						}
+					]
 				}
 			]
 		}
