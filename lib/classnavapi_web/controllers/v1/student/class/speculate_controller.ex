@@ -52,7 +52,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
 
   defp speculate_grade(%{} = student_class, grade) do
     complete = Decimal.new(1)
-    case Decimal.cmp(complete, student_class.completion) do
+    case Decimal.cmp(complete, Decimal.round(student_class.completion, 5)) do
       :eq -> {:error, "Class is already complete."}
       _ -> student_class
           |> get_grade_min(grade)
