@@ -17,6 +17,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
+  plug :verify_member, :class
+  plug :verify_member, :student
+  plug :verify_member, %{of: :student_assignment, using: :id}
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)

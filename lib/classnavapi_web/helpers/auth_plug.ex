@@ -30,17 +30,17 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
-  def verify_member(conn, :class) do
-    case conn |> get_classes() do
+  def verify_member(conn, %{of: type, using: id}) do
+    case conn |> get_items(type) do
       nil -> conn |> not_in_role(@student_role)
-      classes -> conn |> find_class(classes, conn.params)
+      items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
     end
   end
 
-  def verify_member(conn, :school) do
-    case conn |> get_school() do
+  def verify_member(conn, atom) do
+    case conn |> get_items(atom) do
       nil -> conn |> not_in_role(@student_role)
-      school_id -> conn |> find_school(school_id, conn.params)
+      items -> conn |> find_item(%{type: atom, items: items}, conn.params)
     end
   end
 
@@ -51,28 +51,43 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
-  defp get_classes(%{assigns: %{user: %{student: nil}}}), do: nil
-  defp get_classes(%{assigns: %{user: %{student: student}}}) do
+  defp get_items(%{assigns: %{user: %{student: nil}}}, _atom), do: nil
+  defp get_items(%{assigns: %{user: %{student: student}}}, :class) do
     student = student |> Repo.preload(:classes)
     student.classes
   end
+  defp get_items(%{assigns: %{user: %{student: student}}}, :school), do: student.school_id
+  defp get_items(%{assigns: %{user: %{student: student}}}, :student), do: student.id
+  defp get_items(%{assigns: %{user: %{student: student}}}, :student_assignment) do
+    student = student |> Repo.preload(:student_assignments)
+    student.student_assignments
+  end
 
-  defp get_school(%{assigns: %{user: %{student: nil}}}), do: nil
-  defp get_school(%{assigns: %{user: %{student: student}}}), do: student.school_id
-
-  defp find_class(conn, classes, %{"class_id" => class_id}) do
+  defp find_item(conn, %{type: :student_assignment, items: assignments, using: :id}, %{"id" => id}) do
+    case assignments |> Enum.any?(& &1.id == String.to_integer(id)) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+  defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
     case classes |> Enum.any?(& &1.id == String.to_integer(class_id)) do
       true -> conn
       false -> conn |> unauth
     end
   end
-
-  defp find_school(conn, id, %{"school_id" => school_id}) do
+  defp find_item(conn, %{type: :school, items: id}, %{"school_id" => school_id}) do
     case id == String.to_integer(school_id) do
       true -> conn
       false -> conn |> unauth
     end
   end
+  defp find_item(conn, %{type: :student, items: id}, %{"student_id" => student_id}) do
+    case id == String.to_integer(student_id) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+  defp find_item(conn, _items, _params), do: conn
 
   defp unauth(conn) do
     conn

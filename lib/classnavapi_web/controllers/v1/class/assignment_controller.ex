@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   @syllabus_worker_role 300
 
   plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def create(conn, %{} = params) do
     changeset = %Assignment{}

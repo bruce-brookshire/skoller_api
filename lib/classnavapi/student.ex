@@ -21,6 +21,8 @@ defmodule Classnavapi.Student do
     many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"
     belongs_to :school, Classnavapi.School, define_field: false
     many_to_many :classes, Classnavapi.Class, join_through: "student_classes"
+    has_many :student_classes, Classnavapi.Class.StudentClass
+    has_many :student_assignments, through: [:student_classes, :student_assignments]
 
     timestamps()
   end
