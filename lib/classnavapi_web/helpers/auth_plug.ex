@@ -85,11 +85,11 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       false -> conn |> unauth
     end
   end
+  defp find_item(conn, %{type: :class, items: classes, using: :id}, %{"id" => class_id}) do
+    conn |> compare_classes(classes, class_id)
+  end
   defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
-    case classes |> Enum.any?(& &1.id == String.to_integer(class_id)) do
-      true -> conn
-      false -> conn |> unauth
-    end
+    conn |> compare_classes(classes, class_id)
   end
   defp find_item(conn, %{type: :school, items: id}, %{"school_id" => school_id}) do
     case id == String.to_integer(school_id) do
@@ -104,6 +104,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
   defp find_item(conn, _items, _params), do: conn
+
+  defp compare_classes(conn, classes, id) do
+    case classes |> Enum.any?(& &1.id == String.to_integer(id)) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
 
   defp unauth(conn) do
     conn
