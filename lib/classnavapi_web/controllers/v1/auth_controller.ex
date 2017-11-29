@@ -12,6 +12,10 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
         {:ok, token} = TokenHelper.login(user)
         token = Map.new(%{token: token}) |> Map.merge(%{user: user})
+        ExTwilio.Message.create(%ExTwilio.Message{
+          to: "+12067189446",
+          body: "Test"
+        })
         render(conn, AuthView, "show.json", auth: token)
     else
         conn
