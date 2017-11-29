@@ -28,7 +28,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/users", Admin.UserController, only: [:update, :show, :index] do
 
         # User Role routes
-        post "/roles/:id", User.RoleController, :create
+        post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", User.RoleController, only: [:index, :delete]
       end
 

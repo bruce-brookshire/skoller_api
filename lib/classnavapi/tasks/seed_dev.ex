@@ -11,6 +11,7 @@ defmodule Mix.Tasks.Seed.Dev do
 
   alias Classnavapi.Repo
   alias Classnavapi.User
+  alias Classnavapi.UserRole
   alias Classnavapi.School
   alias Classnavapi.School.EmailDomain
   alias Classnavapi.ClassPeriod
@@ -29,7 +30,7 @@ defmodule Mix.Tasks.Seed.Dev do
     {:ok, date2} = Date.new(2018, 10, 12)
     pass = Comeonin.Bcrypt.add_hash("test")
 
-    Repo.insert!(%User{email: "tyler@fortyau.com", password_hash: pass.password_hash})
+    user = Repo.insert!(%User{email: "tyler@fortyau.com", password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     email_domains: [
@@ -51,6 +52,10 @@ defmodule Mix.Tasks.Seed.Dev do
                                    phone: "6158675309",
                                    birthday: date1,
                                    gender: "Male"}})
+
+    Repo.insert!(%UserRole{user_id: student.id, role_id: 200})
+    Repo.insert!(%UserRole{user_id: user.id, role_id: 200})
+    Repo.insert!(%UserRole{user_id: student.id, role_id: 100})
                             
     period = Repo.insert!(%ClassPeriod{
       name: "Q1",

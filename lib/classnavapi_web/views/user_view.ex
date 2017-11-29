@@ -24,7 +24,7 @@ defmodule ClassnavapiWeb.UserView do
     |> Map.merge(
       %{
         student: render_one(user.student, ClassnavapiWeb.StudentView, "student.json"),
-        roles: user.roles
+        roles: render_many(user.roles, ClassnavapiWeb.RoleView, "role.json")
       }
     )
   end
