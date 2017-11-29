@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
+  plug :verify_member, :student
 
   def create(conn, %{"student_id" => student_id, "id" => id} = params) do
     mod = Mod
