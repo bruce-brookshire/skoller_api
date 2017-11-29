@@ -11,6 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.FieldController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
+  plug :verify_member, :student
 
   def create(conn, %{} = params) do
     changeset = StudentField.changeset(%StudentField{}, params)
