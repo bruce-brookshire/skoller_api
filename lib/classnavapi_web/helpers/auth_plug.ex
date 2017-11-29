@@ -1,5 +1,11 @@
 defmodule ClassnavapiWeb.Helpers.AuthPlug do
 
+  @moduledoc """
+  
+  Handles auth plugs.
+
+  """
+
   alias Classnavapi.Repo
   alias Classnavapi.User
   alias Classnavapi.Class
