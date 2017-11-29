@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.Router do
 
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
-        resources "/roles/", User.RoleController, only: [:index, :delete]
+        resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
       end
 
       # Role routes

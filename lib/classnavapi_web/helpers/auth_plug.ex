@@ -52,6 +52,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
+  defp get_items(%{assigns: %{user: user}}, :user), do: user.id
   defp get_items(%{assigns: %{user: %{student: nil}}}, _atom), do: nil
   defp get_items(%{assigns: %{user: %{student: student}}}, :class) do
     student = student |> Repo.preload(:classes)
@@ -99,6 +100,12 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
   defp find_item(conn, %{type: :student, items: id}, %{"student_id" => student_id}) do
     case id == String.to_integer(student_id) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+  defp find_item(conn, %{type: :user, items: id}, %{"user_id" => user_id}) do
+    case id == String.to_integer(user_id) do
       true -> conn
       false -> conn |> unauth
     end
