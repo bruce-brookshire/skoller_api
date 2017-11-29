@@ -51,6 +51,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       items -> conn |> find_item(%{type: atom, items: items}, conn.params)
     end
   end
+  
+  def verify_user_exists(conn, _) do
+    case Repo.get_by(User, email: conn.params["email"]) do
+      nil -> conn |> unauth
+      _ -> conn
+    end
+  end
 
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
