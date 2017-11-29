@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   @admin_role 200
   
   plug :verify_role, %{roles: [@student_role, @admin_role]}
+  plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id}) do
     query = (from fs in FieldOfStudy)

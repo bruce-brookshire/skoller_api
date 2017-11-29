@@ -37,6 +37,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
+  def verify_member(conn, :school) do
+    case conn |> get_school() do
+      nil -> conn |> not_in_role(@student_role)
+      school_id -> conn |> find_school(school_id, conn.params)
+    end
+  end
+
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
       true -> conn |> unauth
@@ -50,8 +57,18 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     student.classes
   end
 
+  defp get_school(%{assigns: %{user: %{student: nil}}}), do: nil
+  defp get_school(%{assigns: %{user: %{student: student}}}), do: student.school_id
+
   defp find_class(conn, classes, %{"class_id" => class_id}) do
     case classes |> Enum.any?(& &1.id == String.to_integer(class_id)) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+
+  defp find_school(conn, id, %{"school_id" => school_id}) do
+    case id == String.to_integer(school_id) do
       true -> conn
       false -> conn |> unauth
     end

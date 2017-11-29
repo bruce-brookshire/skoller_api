@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
   @syllabus_worker_role 300
   
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
 

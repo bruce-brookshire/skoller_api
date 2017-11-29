@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.WeightController do
   @syllabus_worker_role 300
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def index(conn, %{"class_id" => class_id}) do
     weights = Repo.all(from a in Weight, where: a.class_id == ^class_id)
