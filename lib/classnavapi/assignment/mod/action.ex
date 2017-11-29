@@ -1,4 +1,11 @@
 defmodule Classnavapi.Assignment.Mod.Action do
+
+  @moduledoc """
+  
+  Schema and changeset for mod actions.
+  
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Assignment.Mod.Action

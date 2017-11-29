@@ -14,8 +14,18 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias ClassnavapiWeb.Helpers.StatusHelper
 
   import Ecto.Query
-
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @admin_role 200
+  @syllabus_worker_role 300
+  @change_req_role 400
   @default_grade_scale "A,90|B,80|C,70|D,60"
+  
+  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
+  plug :verify_member, :class
+  plug :verify_member, %{of: :school, using: :period_id}
+  plug :verify_member, %{of: :class, using: :id}
 
   @doc """
    Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 

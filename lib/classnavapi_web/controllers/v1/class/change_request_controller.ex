@@ -5,24 +5,15 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   alias Classnavapi.Class.ChangeRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
-  alias ClassnavapiWeb.Class.ChangeRequestView
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
-  def complete(conn, %{"id" => id}) do
-    change_request_old = Repo.get!(ChangeRequest, id)
+  import ClassnavapiWeb.Helpers.AuthPlug
 
-    changeset = ChangeRequest.changeset(change_request_old, %{is_completed: true})
+  @student_role 100
 
-    case Repo.update(changeset) do
-      {:ok, change_request} ->
-        render(conn, ChangeRequestView, "show.json", change_request: change_request)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
+  plug :verify_role, %{role: @student_role}
+  plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
 

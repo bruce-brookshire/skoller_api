@@ -5,24 +5,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
   alias Classnavapi.Class.HelpRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
-  alias ClassnavapiWeb.Class.HelpRequestView
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
-  def complete(conn, %{"id" => id}) do
-    help_request_old = Repo.get!(HelpRequest, id)
-
-    changeset = HelpRequest.changeset(help_request_old, %{is_completed: true})
-
-    case Repo.update(changeset) do
-      {:ok, help_request} ->
-        render(conn, HelpRequestView, "show.json", help_request: help_request)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @syllabus_worker_role 300
+  
+  plug :verify_role, %{roles: [@student_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
 

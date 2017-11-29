@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.User.RoleController do
+defmodule ClassnavapiWeb.Api.V1.Admin.User.RoleController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.UserRole
@@ -6,6 +6,11 @@ defmodule ClassnavapiWeb.Api.V1.User.RoleController do
   alias ClassnavapiWeb.UserRoleView
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @admin_role 200
+  
+  plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{"user_id" => user_id, "id" => role_id}) do
 
@@ -21,6 +26,11 @@ defmodule ClassnavapiWeb.Api.V1.User.RoleController do
     end
   end
 
+  def index(conn, %{"user_id" => user_id}) do
+    user_roles = Repo.all(from ur in UserRole, where: ur.user_id == ^user_id)
+    render(conn, UserRoleView, "index.json", user_roles: user_roles)
+  end
+
   def delete(conn, %{"user_id" => user_id, "id" => role_id}) do
     user_role = Repo.get_by!(UserRole, user_id: user_id, role_id: role_id)
     case Repo.delete(user_role) do
@@ -32,10 +42,5 @@ defmodule ClassnavapiWeb.Api.V1.User.RoleController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  def index(conn, %{"user_id" => user_id}) do
-    user_roles = Repo.all(from ur in UserRole, where: ur.user_id == ^user_id)
-    render(conn, UserRoleView, "index.json", user_roles: user_roles)
   end
 end

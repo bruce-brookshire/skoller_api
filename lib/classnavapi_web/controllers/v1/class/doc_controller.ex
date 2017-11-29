@@ -11,6 +11,14 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   alias ClassnavapiWeb.Helpers.StatusHelper
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @admin_role 200
+  @syllabus_worker_role 300
+  
+  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 

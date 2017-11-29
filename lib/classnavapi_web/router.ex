@@ -25,25 +25,27 @@ defmodule ClassnavapiWeb.Router do
       post "/users/token-login", AuthController, :token
 
       # User routes
-      resources "/users", UserController, only: [:update, :show, :index] do
+      resources "/users", Admin.UserController, only: [:update, :show, :index] do
 
         # User Role routes
-        post "/roles/:id", User.RoleController, :create
-        resources "/roles/", User.RoleController, only: [:index, :delete]
+        post "/roles/:id", Admin.User.RoleController, :create
+        resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
       end
 
       # Role routes
       resources "/roles", RoleController, only: [:show, :index]
 
       # School routes
-      get "/schools/hub", SchoolController, :hub
-      resources "/schools", SchoolController, except: [:new, :delete, :edit] do
+      get "/schools/hub", Admin.SchoolController, :hub
+      resources "/schools", Admin.SchoolController, only: [:create, :update]
+      resources "/schools", SchoolController, only: [:show, :index] do
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
 
         # School Field of Study routes
-        resources "/fields-of-study", School.FieldController, only: [:index, :create]
+        resources "/fields-of-study", Admin.School.FieldController, only: [:create]
+        resources "/fields-of-study", School.FieldController, only: [:index]
       end
 
       # Class Period routes
@@ -76,8 +78,8 @@ defmodule ClassnavapiWeb.Router do
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
-      post "/help/:id/complete", Class.HelpRequestController, :complete
-      post "/changes/:id/complete", Class.ChangeRequestController, :complete
+      post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
+      post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
 
@@ -104,13 +106,15 @@ defmodule ClassnavapiWeb.Router do
       end
 
       # Weight routes
-      resources "/weights", Class.WeightController, only: [:update]
+      resources "/weights", Admin.Class.WeightController, only: [:update]
 
       # Professor routes
-      resources "/professors", ProfessorController, only: [:update, :show]
+      resources "/professors", ProfessorController, only: [:show]
+      resources "/professors", Admin.ProfessorController, only: [:update]
 
       # Field of Study routes
-      resources "/fields-of-study", School.FieldController, only: [:update, :show]
+      resources "/fields-of-study", Admin.School.FieldController, only: [:update]
+      resources "/fields-of-study", School.FieldController, only: [:show]
     end
   end
 

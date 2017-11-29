@@ -7,20 +7,13 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   alias ClassnavapiWeb.School.FieldOfStudyView
 
   import Ecto.Query
-
-  def create(conn, %{} = params) do
-
-    changeset = FieldOfStudy.changeset(%FieldOfStudy{}, params)
-
-    case Repo.insert(changeset) do
-      {:ok, field} ->
-        render(conn, FieldOfStudyView, "show.json", field: field)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @admin_role 200
+  
+  plug :verify_role, %{roles: [@student_role, @admin_role]}
+  plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id}) do
     query = (from fs in FieldOfStudy)
@@ -36,19 +29,5 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
   def show(conn, %{"id" => id}) do
     field = Repo.get!(FieldOfStudy, id)
     render(conn, FieldOfStudyView, "show.json", field: field)
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    field_old = Repo.get!(FieldOfStudy, id)
-    changeset = FieldOfStudy.changeset(field_old, params)
-
-    case Repo.update(changeset) do
-      {:ok, field} ->
-        render(conn, FieldOfStudyView, "show.json", field: field)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
   end
 end

@@ -8,6 +8,14 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+
+  @admin_role 200
+  @syllabus_worker_role 300
+
+  plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
+  plug :verify_member, :class
+
   def create(conn, %{} = params) do
     changeset = %Assignment{}
                 |> Assignment.changeset(params)
