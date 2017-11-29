@@ -12,6 +12,7 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   @admin_role 200
 
   plug :verify_role, %{roles: [@admin_role, @student_role]}
+  plug :verify_member, %{of: :school, using: :period_id}
 
   def create(conn, %{"period_id" => class_period_id} = params) do
     params = params |> Map.put("class_period_id", class_period_id)
