@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   @student_role 100
 
   plug :verify_role, %{role: @student_role}
+  plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
 

@@ -17,7 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     changeset = User.changeset_insert(%User{}, params)
     changeset = changeset |> school_accepting_enrollment(school)
 
-    multi = changeset
+    changeset
     |> insert_user()
     |> Ecto.Multi.run(:role, &add_student_role(&1))
     |> user_transaction(conn)
@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   def create(conn, %{} = params) do
     changeset = User.changeset_insert(%User{}, params)
 
-    multi = changeset
+    changeset
     |> insert_user()
     |> user_transaction(conn)
   end

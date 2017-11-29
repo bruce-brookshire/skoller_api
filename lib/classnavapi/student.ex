@@ -20,6 +20,7 @@ defmodule Classnavapi.Student do
     has_many :users, Classnavapi.User
     many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"
     belongs_to :school, Classnavapi.School, define_field: false
+    many_to_many :classes, Classnavapi.Class, join_through: "student_classes"
 
     timestamps()
   end
