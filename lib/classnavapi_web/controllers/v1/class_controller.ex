@@ -23,6 +23,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   @default_grade_scale "A,90|B,80|C,70|D,60"
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
+  plug :verify_member, :class
+  plug :verify_member, %{of: :school, using: :period_id}
 
   @doc """
    Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 

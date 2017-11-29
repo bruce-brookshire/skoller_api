@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   alias Classnavapi.Repo
   alias Classnavapi.User
   alias Classnavapi.Class
+  alias Classnavapi.ClassPeriod
 
   import Plug.Conn
 
@@ -82,6 +83,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
             |> Repo.get!(class_id)
             |> Repo.preload(:school)
     case id == class.school.id do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+  defp find_item(conn, %{type: :school, items: id, using: :period_id}, %{"period_id" => period_id}) do
+    period = Repo.get!(ClassPeriod, period_id)
+    case id == period.school_id do
       true -> conn
       false -> conn |> unauth
     end
