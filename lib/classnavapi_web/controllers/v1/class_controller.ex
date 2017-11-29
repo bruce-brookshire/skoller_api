@@ -25,6 +25,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
   plug :verify_member, :class
   plug :verify_member, %{of: :school, using: :period_id}
+  plug :verify_member, %{of: :class, using: :id}
 
   @doc """
    Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 
