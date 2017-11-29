@@ -25,7 +25,7 @@ defmodule ClassnavapiWeb.Router do
       post "/users/token-login", AuthController, :token
 
       # User routes
-      resources "/users", UserController, only: [:update, :show, :index] do
+      resources "/users", Admin.UserController, only: [:update, :show, :index] do
 
         # User Role routes
         post "/roles/:id", User.RoleController, :create
@@ -36,8 +36,9 @@ defmodule ClassnavapiWeb.Router do
       resources "/roles", RoleController, only: [:show, :index]
 
       # School routes
-      get "/schools/hub", SchoolController, :hub
-      resources "/schools", SchoolController, except: [:new, :delete, :edit] do
+      get "/schools/hub", Admin.SchoolController, :hub
+      resources "/schools", Admin.SchoolController, only: [:create, :update]
+      resources "/schools", SchoolController, only: [:show, :index] do
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]

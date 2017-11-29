@@ -5,7 +5,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.ProfessorController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ProfessorView
 
-  import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
   
   @admin_role 200

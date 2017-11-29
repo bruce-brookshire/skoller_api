@@ -6,6 +6,11 @@ defmodule ClassnavapiWeb.Api.V1.PeriodController do
   alias ClassnavapiWeb.PeriodView
 
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.AuthPlug
+  
+  @admin_role 200
+  
+  plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
 
