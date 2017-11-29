@@ -2,6 +2,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
 
   alias Classnavapi.Repo
   alias Classnavapi.User
+  alias Classnavapi.Class
 
   import Plug.Conn
 
@@ -71,6 +72,15 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
   defp find_item(conn, %{type: :student_assignment, items: assignments, using: :assignment_id}, %{"assignment_id" => id}) do
     case assignments |> Enum.any?(& &1.id == String.to_integer(id)) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
+  defp find_item(conn, %{type: :school, items: id, using: :class_id}, %{"class_id" => class_id}) do
+    class = Class
+            |> Repo.get!(class_id)
+            |> Repo.preload(:school)
+    case id == class.school.id do
       true -> conn
       false -> conn |> unauth
     end

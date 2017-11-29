@@ -17,6 +17,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
+  plug :verify_member, :student
+  plug :verify_member, %{of: :school, using: :class_id}
 
   def create(conn, %{"class_id" => class_id} = params) do
 
