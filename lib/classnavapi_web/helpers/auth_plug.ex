@@ -69,6 +69,12 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       false -> conn |> unauth
     end
   end
+  defp find_item(conn, %{type: :student_assignment, items: assignments, using: :assignment_id}, %{"assignment_id" => id}) do
+    case assignments |> Enum.any?(& &1.id == String.to_integer(id)) do
+      true -> conn
+      false -> conn |> unauth
+    end
+  end
   defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
     case classes |> Enum.any?(& &1.id == String.to_integer(class_id)) do
       true -> conn
