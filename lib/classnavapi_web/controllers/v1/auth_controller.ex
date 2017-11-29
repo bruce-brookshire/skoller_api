@@ -4,13 +4,13 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AuthView
   alias Classnavapi.User
-  alias Classnavapi.Auth
+  alias ClassnavapiWeb.Helpers.TokenHelper
 
   def login(conn, %{"email" => email, "password" => password}) do
     user = Repo.get_by(User, email: email)
 
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
-        {:ok, token, _} = Auth.encode_and_sign(%{:id => user.id}, %{typ: "access"})
+        {:ok, token} = TokenHelper.login(user)
         token = Map.new(%{token: token}) |> Map.merge(%{user: user})
         render(conn, AuthView, "show.json", auth: token)
     else
