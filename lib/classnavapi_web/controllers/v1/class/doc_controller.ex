@@ -18,6 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   @syllabus_worker_role 300
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
+  plug :verify_member, :class
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 

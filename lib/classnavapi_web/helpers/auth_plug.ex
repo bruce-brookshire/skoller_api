@@ -5,6 +5,8 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
 
   import Plug.Conn
 
+  @student_role 100
+
   def authenticate(conn, _) do
     case Repo.get(User, Guardian.Plug.current_resource(conn)) do
       %User{} = user ->
@@ -29,9 +31,16 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
 
   def verify_member(conn, :class) do
-    case get_classes(conn) do
-      nil -> conn |> unauth
+    case conn |> get_classes() do
+      nil -> conn |> not_in_role(@student_role)
       classes -> conn |> find_class(classes, conn.params)
+    end
+  end
+
+  defp not_in_role(conn, role) do
+    case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
+      true -> conn |> unauth
+      false -> conn
     end
   end
 
