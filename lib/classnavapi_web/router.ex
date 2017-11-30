@@ -85,7 +85,7 @@ defmodule ClassnavapiWeb.Router do
 
       # Student routes
       resources "/students", StudentController, only: [] do
-        resources "/fields", Student.FieldController, only: [:create, :delete, :index]
+        resources "/fields", Student.FieldController, only: [:create, :delete]
 
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify
