@@ -8,6 +8,8 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Ecto.Changeset
   alias ClassnavapiWeb.Helpers.TokenHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.VerificationHelper
+  alias ClassnavapiWeb.Sms
 
   @student_role 100
 
@@ -15,29 +17,29 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     school = Repo.get(Classnavapi.School, student["school_id"])
 
     changeset = User.changeset_insert(%User{}, params)
-    changeset = changeset |> school_accepting_enrollment(school)
+    changeset = changeset 
+                |> school_accepting_enrollment(school)
+                |> verification_code()
 
-    changeset
+    multi = changeset
     |> insert_user()
     |> Ecto.Multi.run(:role, &add_student_role(&1))
-    |> user_transaction(conn)
+    
+    case Repo.transaction(multi) do
+      {:ok, %{user: user} = auth} ->
+        user.student.phone |> Sms.verify_phone(user.student.verification_code)
+        render(conn, AuthView, "show.json", auth: auth)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
   end
 
   def create(conn, %{} = params) do
     changeset = User.changeset_insert(%User{}, params)
 
-    changeset
-    |> insert_user()
-    |> user_transaction(conn)
-  end
-
-  defp insert_user(changeset) do
-    Ecto.Multi.new
-    |> Ecto.Multi.insert(:user, changeset)
-    |> Ecto.Multi.run(:token, &TokenHelper.login(&1))
-  end
-
-  defp user_transaction(multi, conn) do
+    multi = changeset |> insert_user()
+    
     case Repo.transaction(multi) do
       {:ok, %{} = auth} ->
         render(conn, AuthView, "show.json", auth: auth)
@@ -45,6 +47,12 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp insert_user(changeset) do
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:user, changeset)
+    |> Ecto.Multi.run(:token, &TokenHelper.login(&1))
   end
 
   defp add_student_role(%{user: user}) do
@@ -59,4 +67,9 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     changeset
     |> school_enrolling(school.is_active_enrollment)
   end
+
+  defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset) do
+    Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, VerificationHelper.generate_verify_code)})
+  end
+  defp verification_code(changeset), do: changeset
 end
