@@ -39,9 +39,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
 
   def verify_member(conn, %{of: type, using: id}) do
-    case conn |> get_items(type) do
-      nil -> conn |> not_in_role(@student_role)
-      items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
+    case conn.params |> Map.fetch(to_string(id)) do
+      :error -> conn
+      _ ->
+        case conn |> get_items(type) do
+          nil -> conn |> not_in_role(@student_role)
+          items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
+        end
     end
   end
 
