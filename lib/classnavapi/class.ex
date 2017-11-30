@@ -58,10 +58,11 @@ defmodule Classnavapi.Class do
     timestamps()
   end
 
-  @req_fields [:name, :number,  :meet_days, :meet_start_time, :meet_end_time,
-                :seat_count, :class_start, :class_end, :is_enrollable, :grade_scale,
+  @req_fields [:name, :number,  :meet_days, :seat_count, :class_start, :class_end, 
+                :is_enrollable, :grade_scale,
                 :is_editable, :class_period_id, :is_syllabus]
-  @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points]
+  @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
+                :meet_start_time, :meet_end_time]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
