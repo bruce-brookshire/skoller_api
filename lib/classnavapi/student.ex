@@ -17,6 +17,7 @@ defmodule Classnavapi.Student do
     field :name_last, :string
     field :phone, :string
     field :verification_code, :string
+    field :is_verified, :boolean
     field :school_id, :id
     has_many :users, Classnavapi.User
     many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"

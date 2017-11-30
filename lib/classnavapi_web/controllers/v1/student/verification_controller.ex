@@ -31,4 +31,22 @@ defmodule ClassnavapiWeb.Api.V1.Student.VerificationController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def verify(conn, %{"student_id" => student_id, "verification_code" => code}) do
+    student = Student |> Repo.get!(student_id)
+
+    case student.verification_code == code do
+      true -> student 
+              |> verified(conn)
+      false -> conn |> send_resp(401, "")
+    end
+  end
+
+  defp verified(student, conn) do
+    student 
+    |> Ecto.Changeset.change(%{is_verified: true})
+    |> Repo.update!
+
+    conn |> send_resp(204, "")
+  end
 end
