@@ -23,7 +23,7 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
       student_class_id: student_assignment.student_class_id,
       grade: get_grade(student_assignment),
       assignment_id: student_assignment.assignment_id,
-      is_completed: student_assignment.is_completed
+      is_completed: is_completed(student_assignment.is_completed)
     })
     |> Map.merge(get_pending_mods(student_assignment))
   end
@@ -38,5 +38,8 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
 
   defp get_grade(%{grade: nil}), do: nil
   defp get_grade(%{grade: grade}), do: Decimal.to_float(grade)
+
+  defp is_completed(nil), do: false
+  defp is_completed(val), do: val
 end
   
