@@ -79,3 +79,10 @@ pool_size: 10
 config :classnavapi, Classnavapi.Auth,
           issuer: System.get_env("API_TOKEN_ISSUER"),
           secret_key: System.get_env("API_TOKEN_KEY")
+  
+config :pigeon, :apns,
+  apns_default: %{
+    cert: System.get_env("APNS_CERT"),
+    key: System.get_env("APNS_KEY"),
+    mode: :prod
+  }

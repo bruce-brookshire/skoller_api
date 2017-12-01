@@ -34,6 +34,13 @@ config :ex_twilio,
   account_sid: {:system, "TWILIO_ACCT_SID"},
   auth_token: {:system, "TWILIO_AUTH"}
 
+config :pigeon, :apns,
+  apns_default: %{
+    cert: {:classnavapi, "apns/cert.pem"},
+    key: {:classnavapi, "apns/key_unencrypted.pem"},
+    mode: :dev
+  }
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"
