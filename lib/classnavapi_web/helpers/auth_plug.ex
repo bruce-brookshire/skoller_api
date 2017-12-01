@@ -39,9 +39,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
 
   def verify_member(conn, %{of: type, using: id}) do
-    case conn |> get_items(type) do
-      nil -> conn |> not_in_role(@student_role)
-      items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
+    case conn.params |> Map.fetch(to_string(id)) do
+      :error -> conn
+      _ ->
+        case conn |> get_items(type) do
+          nil -> conn |> not_in_role(@student_role)
+          items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
+        end
     end
   end
 
@@ -51,6 +55,14 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       items -> conn |> find_item(%{type: atom, items: items}, conn.params)
     end
   end
+  
+  def verify_user_exists(%{params: %{"email" => email}} = conn, _) do
+    case Repo.get_by(User, email: email) do
+      nil -> conn |> unauth
+      _ -> conn
+    end
+  end
+  def verify_user_exists(conn, _), do: conn
 
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do

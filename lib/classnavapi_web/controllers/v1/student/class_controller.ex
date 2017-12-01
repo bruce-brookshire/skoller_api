@@ -71,6 +71,21 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
 
+  def update(conn, %{"student_id" => student_id, "id" => class_id} = params) do
+    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+
+    changeset = StudentClass.update_changeset(student_class_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, student_class} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   defp get_new_class_assignments(%StudentClass{} = student_class) do
     student_class |> ModHelper.get_new_assignment_mods()
   end

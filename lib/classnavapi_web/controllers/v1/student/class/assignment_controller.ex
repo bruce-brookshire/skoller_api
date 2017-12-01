@@ -45,21 +45,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
-  def index(conn, %{"class_id" => class_id, "student_id" => student_id, "date" => date}) do
-    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
-    date = date |> Date.from_iso8601!()
-    student_assignments = student_class
-                          |> ClassCalcs.get_assignments_with_relative_weight()
+  def index(conn, %{"student_id" => student_id} = params) do
+    student_assignments = from(sc in StudentClass)
+                          |> where([sc], sc.student_id == ^student_id)
+                          |> where_filters(params)
+                          |> Repo.all()
+                          |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
                           |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
-                          |> Enum.filter(&Date.compare(&1.due, date) == :gt and &1.is_completed == false)
-    render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
-  end
-
-  def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
-    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
-    student_assignments = student_class
-                          |> ClassCalcs.get_assignments_with_relative_weight()
-                          |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
+                          |> filter(params)
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
@@ -108,6 +101,36 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
         |> RepoHelper.multi_error(failed_value)
     end
   end
+
+  defp where_filters(query, params) do
+    query
+    |> class_filter(params)
+  end
+
+  defp filter(enumerable, params) do
+    enumerable
+    |> date_filter(params)
+    |> completed_filter(params)
+  end
+
+  defp class_filter(query, %{"class" => id}) do
+    query
+    |> where([sc], sc.class_id == ^id)
+  end
+  defp class_filter(query, _params), do: query
+
+  defp date_filter(enumerable, %{"date" => date}) do
+    date = date |> Date.from_iso8601!()
+    enumerable
+    |> Enum.filter(&Date.compare(&1.due, date) == :gt and &1.is_completed == false)
+  end
+  defp date_filter(enumerable, _params), do: enumerable
+
+  defp completed_filter(enumerable, %{"is_complete" => is_complete}) do
+    enumerable
+    |> Enum.filter(& to_string(&1.is_completed) == is_complete)
+  end
+  defp completed_filter(enumerable, _params), do: enumerable
 
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do

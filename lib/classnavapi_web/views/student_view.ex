@@ -22,6 +22,8 @@ defmodule ClassnavapiWeb.StudentView do
       phone: student.phone,
       birthday: student.birthday,
       gender: student.gender,
+      is_verified: student.is_verified,
+      school_id: student.school_id,
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }
   end

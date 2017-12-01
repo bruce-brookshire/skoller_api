@@ -63,6 +63,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     params = params
             |> grade_scale()
             |> Map.put("class_period_id", period_id)
+            |> check_conn_for_student(conn)
 
     changeset = Class.changeset_insert(%Class{}, params)
     changeset = changeset
@@ -151,6 +152,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     conn |> update_class(changeset)
   end
+
+  defp check_conn_for_student(params, %{assigns: %{user: %{student: nil}}}), do: params
+  defp check_conn_for_student(params, %{assigns: %{user: %{student: _}}}) do
+    params |> Map.put("is_student", true)
+  end
+  defp check_conn_for_student(params, _conn), do: params
 
   defp grade_scale(%{"grade_scale" => _} = params), do: params
   defp grade_scale(%{} = params) do

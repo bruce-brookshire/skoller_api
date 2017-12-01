@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.ClassView do
 
     alias ClassnavapiWeb.ClassView
     alias ClassnavapiWeb.Class.StatusView
+    alias ClassnavapiWeb.ProfessorView
     alias ClassnavapiWeb.Helpers.ClassCalcs
     alias ClassnavapiWeb.Class.HelpRequestView
     alias ClassnavapiWeb.Class.ChangeRequestView
@@ -17,6 +18,7 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: class}) do
+        class = class |> Repo.preload(:professor)
         %{
             id: class.id,
             class_end: class.class_end,
@@ -35,7 +37,9 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             type: class.class_type,
-            length: ClassCalcs.get_class_length(class)
+            campus: class.campus,
+            length: ClassCalcs.get_class_length(class),
+            professor: render_one(class.professor, ProfessorView, "professor.json")
         }
     end
 

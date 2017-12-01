@@ -19,7 +19,8 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 name: class.name,
                 number: class.number,
                 enrolled: ClassCalcs.get_enrollment(class),
-                length: ClassCalcs.get_class_length(class)
+                length: ClassCalcs.get_class_length(class),
+                campus: class.campus
             },
             professor: %{
                 name: ClassCalcs.professor_name(class)

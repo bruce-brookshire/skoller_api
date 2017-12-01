@@ -3,9 +3,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.FieldController do
 
   alias Classnavapi.School.StudentField
   alias Classnavapi.Repo
-  alias ClassnavapiWeb.School.StudentFieldView
+  alias ClassnavapiWeb.StudentView
 
-  import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
   
   @student_role 100
@@ -18,7 +17,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.FieldController do
 
     case Repo.insert(changeset) do
       {:ok, student_field} ->
-        render(conn, StudentFieldView, "show.json", student_field: student_field)
+        student_field = student_field |> Repo.preload(:student)
+        render(conn, StudentView, "show.json", student: student_field.student)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -37,10 +37,5 @@ defmodule ClassnavapiWeb.Api.V1.Student.FieldController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  def index(conn, %{"student_id" => student_id}) do
-    student_fields = Repo.all(from fs in StudentField, where: fs.student_id == ^student_id)
-    render(conn, StudentFieldView, "index.json", student_fields: student_fields)
   end
 end

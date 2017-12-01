@@ -5,6 +5,10 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
   alias ClassnavapiWeb.AuthView
   alias Classnavapi.User
   alias ClassnavapiWeb.Helpers.TokenHelper
+  
+  import ClassnavapiWeb.Helpers.AuthPlug
+
+  plug :verify_user_exists
 
   def login(conn, %{"email" => email, "password" => password}) do
     user = Repo.get_by(User, email: email)
