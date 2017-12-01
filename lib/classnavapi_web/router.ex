@@ -37,8 +37,7 @@ defmodule ClassnavapiWeb.Router do
 
       # School routes
       get "/schools/hub", Admin.SchoolController, :hub
-      resources "/schools", Admin.SchoolController, only: [:create, :update]
-      resources "/schools", SchoolController, only: [:show, :index] do
+      resources "/schools", Admin.SchoolController, only: [:create, :update, :show, :index] do
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
@@ -130,6 +129,7 @@ defmodule ClassnavapiWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", UserController, only: [:create]
+      get "/school/list", SchoolController, :index
     end
   end
 end

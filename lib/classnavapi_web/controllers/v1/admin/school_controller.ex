@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   alias Classnavapi.Class.Status
   alias Classnavapi.Student
   alias Classnavapi.Repo
-  alias ClassnavapiWeb.SchoolView
+  alias ClassnavapiWeb.Admin.SchoolView
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -28,6 +28,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def index(conn, _params) do
+    schools = Repo.all(School)
+    render(conn, SchoolView, "index.json", schools: schools)
+  end
+
+  def show(conn, %{"id" => id}) do
+    school = Repo.get!(School, id)
+    render(conn, SchoolView, "show.json", school: school)
   end
 
   def hub(conn, _) do
