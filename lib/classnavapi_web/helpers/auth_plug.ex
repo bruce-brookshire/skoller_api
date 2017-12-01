@@ -55,6 +55,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       items -> conn |> find_item(%{type: atom, items: items}, conn.params)
     end
   end
+
+  def verify_user(conn, _params) do
+    case conn |> get_items(:user) do
+      nil -> conn |> unauth
+      items -> conn |> find_item(%{type: :user, items: items}, conn.params)
+    end
+  end
   
   def verify_user_exists(%{params: %{"email" => email}} = conn, _) do
     case Repo.get_by(User, email: email) do
