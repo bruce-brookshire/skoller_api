@@ -26,6 +26,10 @@ defmodule Classnavapi.Class.StudentClass do
   @opt_fields [:color]
   @all_fields @req_fields ++ @opt_fields
 
+  @upd_req_fields []
+  @upd_opt_fields [:color]
+  @upd_fields @req_fields ++ @opt_fields
+
   @doc false
   def changeset(%StudentClass{} = student_class, attrs) do
     student_class
@@ -34,5 +38,11 @@ defmodule Classnavapi.Class.StudentClass do
     |> foreign_key_constraint(:class_id)
     |> foreign_key_constraint(:student_id)
     |> unique_constraint(:student_class, name: :student_classes_student_id_class_id_index)
+  end
+
+  def update_changeset(%StudentClass{} = student_class, attrs) do
+    student_class
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@upd_req_fields)
   end
 end

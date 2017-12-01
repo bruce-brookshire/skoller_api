@@ -94,6 +94,7 @@ defmodule ClassnavapiWeb.Router do
         # Student Class routes
         post "/mods/:id", Student.ModController, :create
         post "/classes/:class_id", Student.ClassController, :create
+        put "/classes/:id", Student.ClassController, :update
         get "/classes/:class_id/speculate", Student.Class.SpeculateController, :speculate
         resources "/assignments", Student.Class.AssignmentController, only: [:index]
         resources "/classes", Student.ClassController, only: [:show, :index] do
