@@ -37,6 +37,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             type: class.class_type,
+            campus: class.campus,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(class.professor, ProfessorView, "professor.json")
         }
