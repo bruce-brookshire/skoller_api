@@ -28,7 +28,7 @@ defmodule Classnavapi.Class.StudentClass do
 
   @upd_req_fields []
   @upd_opt_fields [:color]
-  @upd_fields @req_fields ++ @opt_fields
+  @upd_fields @upd_req_fields ++ @upd_opt_fields
 
   @doc false
   def changeset(%StudentClass{} = student_class, attrs) do
