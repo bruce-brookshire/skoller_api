@@ -15,10 +15,7 @@ defmodule ClassnavapiWeb.UserView do
   def render("user.json", %{user: user}) do
     %{
       id: user.id,
-      email: user.email,
-      is_notifications: user.is_notifications,
-      notification_days_notice: user.notification_days_notice,
-      notification_time: user.notification_time
+      email: user.email
     }
   end
 

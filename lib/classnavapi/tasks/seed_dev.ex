@@ -32,8 +32,7 @@ defmodule Mix.Tasks.Seed.Dev do
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
-                              password_hash: pass.password_hash,
-                              notification_time: time1})
+                              password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     email_domains: [
@@ -49,13 +48,13 @@ defmodule Mix.Tasks.Seed.Dev do
 
     student = Repo.insert!(%User{email: "tyler@hku.edu", 
                                 password_hash: pass.password_hash,
-                                notification_time: time1,
                                 student: %Student{name_first: "Tyler",
                                    name_last: "Witt",
                                    school_id: school.id,
                                    phone: "6158675309",
                                    birthday: date1,
-                                   gender: "Male"}})
+                                   gender: "Male",
+                                   notification_time: time1}})
 
     Repo.insert!(%UserRole{user_id: user.id, role_id: 200})
     Repo.insert!(%UserRole{user_id: student.id, role_id: 100})

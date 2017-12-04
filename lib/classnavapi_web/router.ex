@@ -26,7 +26,8 @@ defmodule ClassnavapiWeb.Router do
       post "/users/token-login", AuthController, :token
 
       # User routes
-      resources "/users", Admin.UserController, only: [:update, :show, :index] do
+      put "/users/:user_id", UserController, :update
+      resources "/users", Admin.UserController, only: [:show, :index] do
         #Device routes
         post "/register", DeviceController, :register
 
@@ -131,7 +132,7 @@ defmodule ClassnavapiWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
-      resources "/users", UserController, only: [:create]
+      resources "/users", NewUserController, only: [:create]
       get "/school/list", SchoolController, :index
     end
   end

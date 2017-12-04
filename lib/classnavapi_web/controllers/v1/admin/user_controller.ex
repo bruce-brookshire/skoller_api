@@ -20,19 +20,4 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     user = Repo.get!(User, id)
       render(conn, UserView, "show.json", user: user)
   end
-
-  def update(conn, %{"id" => id} = params) do
-    user_old = Repo.get!(User, id)
-    user_old = Repo.preload user_old, :student
-    changeset = User.changeset_update(user_old, params)
-
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        render(conn, UserView, "show.json", user: user)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
 end
