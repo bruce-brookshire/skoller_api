@@ -1,11 +1,9 @@
 defmodule ClassnavapiWeb.Jobs do
   
+  alias ClassnavapiWeb.Jobs
+
   def run() do
     Time.utc_now()
-    |> send_notifications()
-  end
-
-  defp send_notifications(time) do
-    
+    |> Jobs.SendNotifications.run()
   end
 end

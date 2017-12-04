@@ -1,6 +1,8 @@
 defmodule ClassnavapiWeb.Scheduler do
   use GenServer
 
+  @interval_min 5
+
   def start_link(module) do
     GenServer.start_link(__MODULE__, %{jobs: module})
   end
@@ -24,13 +26,13 @@ defmodule ClassnavapiWeb.Scheduler do
   end
 
   defp schedule_work() do
-    Process.send_after(self(), :work, 1 * 5 * 60 * 1000) # 5 Min
+    Process.send_after(self(), :work, @interval_min * 60 * 1000)
   end
 
   defp get_time_diff(now) do
-    next_min = now.minute |> get_next_five_min()
+    next_min = now.minute |> get_next_interval()
     next_time = case now.minute == next_min do
-      true -> get_time(now.minute + 5, now)
+      true -> get_time(now.minute + @interval_min, now)
       _ -> next_min |> get_time(now)
     end
     case next_time do
@@ -40,16 +42,16 @@ defmodule ClassnavapiWeb.Scheduler do
   end
 
   defp get_time(min, now) do
-    case min > 55 do
+    case min > (60 - @interval_min) do
       true -> Time.new(now.hour + 1, 0, 0, 0)
       _ -> Time.new(now.hour, min, 0, 0)
     end
   end
 
-  defp get_next_five_min(min) do
-    case rem(min, 5) do
+  defp get_next_interval(min) do
+    case rem(min, @interval_min) do
       0 -> min
-      _ -> get_next_five_min(min + 1)
+      _ -> get_next_interval(min + 1)
     end
   end
 end
