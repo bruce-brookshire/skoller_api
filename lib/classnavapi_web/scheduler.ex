@@ -1,8 +1,8 @@
 defmodule ClassnavapiWeb.Scheduler do
   use GenServer
 
-  def start_link do
-    GenServer.start_link(__MODULE__, %{})
+  def start_link(module) do
+    GenServer.start_link(__MODULE__, %{jobs: module})
   end
 
   def init(state) do
@@ -13,7 +13,8 @@ defmodule ClassnavapiWeb.Scheduler do
   def handle_info(:work, state) do
     schedule_work()
     require Logger
-    Logger.info("Checking for Notifications")
+    Logger.info("Running Jobs")
+    state.jobs.run()
     {:noreply, state}
   end
 

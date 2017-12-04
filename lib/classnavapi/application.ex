@@ -22,7 +22,7 @@ defmodule Classnavapi.Application do
       # Start your own worker by calling:
       # Classnavapi.Worker.start_link(arg1, arg2, arg3)
       # worker(Classnavapi.Worker, [arg1, arg2, arg3]),
-      worker(ClassnavapiWeb.Scheduler, []),
+      worker(ClassnavapiWeb.Scheduler, [ClassnavapiWeb.Jobs]),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
