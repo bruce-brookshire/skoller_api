@@ -18,10 +18,39 @@ defmodule Classnavapi.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :notification_time, :time
+    field :notification_days_notice, :integer, default: 1
+    field :is_notifications, :boolean, default: true
     belongs_to :student, Classnavapi.Student
     many_to_many :roles, Classnavapi.Role, join_through: "user_roles"
 
     timestamps()
+  end
+
+  @req_fields [:email, :password, :notification_time]
+  @all_fields @req_fields
+  @upd_req [:notification_days_notice, :notification_time, :is_notifications]
+  @upd_opt [:password]
+  @upd_fields @upd_req ++ @upd_opt
+
+  @doc false
+  def changeset_insert(%User{} = user, attrs) do
+    user
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
+    |> unique_constraint(:email)
+    |> cast_assoc(:student)
+    |> validate_format(:email, ~r/@/)
+    |> validate_email(attrs["student"])
+    |> put_pass_hash()
+  end
+
+  def changeset_update(%User{} = user, attrs) do
+    user
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@upd_req)
+    |> cast_assoc(:student)
+    |> put_pass_hash()
   end
 
   defp extract_domain(changeset) do
@@ -66,30 +95,4 @@ defmodule Classnavapi.User do
     change(changeset, Comeonin.Bcrypt.add_hash(password))
   end
   defp put_pass_hash(changeset), do: changeset
-
-  @req_fields [:email, :password]
-  @all_fields @req_fields
-  @upd_req []
-  @upd_opt [:password]
-  @upd_fields @upd_req ++ @upd_opt
-
-  @doc false
-  def changeset_insert(%User{} = user, attrs) do
-    user
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-    |> unique_constraint(:email)
-    |> cast_assoc(:student)
-    |> validate_format(:email, ~r/@/)
-    |> validate_email(attrs["student"])
-    |> put_pass_hash()
-  end
-
-  def changeset_update(%User{} = user, attrs) do
-    user
-    |> cast(attrs, @upd_fields)
-    |> validate_required(@upd_req)
-    |> cast_assoc(:student)
-    |> put_pass_hash()
-  end
 end
