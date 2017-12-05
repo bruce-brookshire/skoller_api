@@ -35,7 +35,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp send_notifications(assignment) do
-    #Notification.create_notification(assignment.udid, format_msg(assignment))
+    Notification.create_notification(assignment.udid, format_msg(assignment))
   end
 
   defp format_msg(assignment) do
