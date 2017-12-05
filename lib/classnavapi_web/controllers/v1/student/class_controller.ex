@@ -21,23 +21,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   plug :verify_member, %{of: :school, using: :class_id}
   plug :verify_member, %{of: :class, using: :id}
 
-  def create(conn, %{"class_id" => class_id} = params) do
-
-    changeset = StudentClass.changeset(%StudentClass{}, params)
-
-    class = Repo.get(Class, class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:student_class, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
-    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
-
-    case Repo.transaction(multi) do
-      {:ok, %{student_class: student_class}} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
-      {:error, _, failed_value, _} ->
-        conn
-        |> RepoHelper.multi_error(failed_value)
+  def create(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
+    case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true) do
+      nil -> conn |> insert_student_class(class_id, params)
+      item -> conn |> update_student_class(item)
     end
   end
 
@@ -77,6 +64,51 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     changeset = StudentClass.update_changeset(student_class_old, params)
 
     case Repo.update(changeset) do
+      {:ok, student_class} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def delete(conn, %{"student_id" => student_id, "class_id" => class_id}) do
+    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+
+    changeset = StudentClass.update_changeset(student_class_old, %{"is_dropped" => true})
+
+    case Repo.update(changeset) do
+      {:ok, _student_class} ->
+        conn |> send_resp(204, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  defp insert_student_class(conn, class_id, params) do
+    changeset = StudentClass.changeset(%StudentClass{}, params)
+
+    class = Repo.get(Class, class_id)
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+
+    case Repo.transaction(multi) do
+      {:ok, %{student_class: student_class}} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
+  end
+
+  defp update_student_class(conn, item) do
+    case Repo.update(Ecto.Changeset.change(item, %{is_dropped: false})) do
       {:ok, student_class} ->
         render(conn, StudentClassView, "show.json", student_class: student_class)
       {:error, changeset} ->

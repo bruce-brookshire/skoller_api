@@ -29,8 +29,11 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
     end
   end
 
-  def index(conn, %{"period_id" => class_period_id}) do
-    professors = Repo.all(from p in Professor, where: p.class_period_id == ^class_period_id)
+  def index(conn, %{"period_id" => class_period_id} = params) do
+    professors = from(p in Professor)
+                |> where([p], p.class_period_id == ^class_period_id)
+                |> filters(params)
+                |> Repo.all()
     render(conn, ProfessorView, "index.json", professors: professors)
   end
 
@@ -38,4 +41,16 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
     professor = Repo.get!(Professor, id)
     render(conn, ProfessorView, "show.json", professor: professor)
   end
+
+  defp filters(query, params) do
+    query
+    |> name_filter(params)
+  end
+
+  defp name_filter(query, %{"professor.name" => professor_name}) do
+    prof_filter = "%" <> professor_name <> "%"
+    query
+    |> where([p], ilike(p.name_first, ^prof_filter) or ilike(p.name_last, ^prof_filter))
+  end
+  defp name_filter(query, _params), do: query
 end
