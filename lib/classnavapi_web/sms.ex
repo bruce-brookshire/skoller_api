@@ -11,14 +11,10 @@ defmodule ClassnavapiWeb.Sms do
   @verification_msg2 ". #SkollerAtMe"
 
   def verify_phone(phone, code) do
-    case Mix.env do
-      :prod -> Message.create(
-                to: "+1" <> phone,
-                from: @from_phone,
-                body: @verification_msg1 <> code <> @verification_msg2
-              )
-      _ -> {:ok, :disabled}
-    end
-    
+    Message.create(
+      to: "+1" <> phone,
+      from: @from_phone,
+      body: @verification_msg1 <> code <> @verification_msg2
+    )
   end
 end
