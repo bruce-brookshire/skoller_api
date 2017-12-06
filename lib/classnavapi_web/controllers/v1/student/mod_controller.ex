@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     |> Repo.get!(id)
     |> Repo.preload(:assignment)
 
-    student_class = Repo.get_by!(StudentClass, class_id: mod.assignment.class_id, student_id: student_id)
+    student_class = Repo.get_by!(StudentClass, class_id: mod.assignment.class_id, student_id: student_id, is_dropped: false)
 
     conn |> process_mod(mod, student_class, params)
   end

@@ -156,6 +156,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
+  # Checks to see if an incoming changeset is identical to another student's assignment in the same class.
   defp check_student_assignment(changeset) do
     assign = from(assign in StudentAssignment)
     |> join(:inner, [assign], sc in StudentClass, sc.id == assign.student_class_id)
