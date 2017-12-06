@@ -22,7 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   plug :verify_member, %{of: :student_assignment, using: :id}
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id)
+    student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id, is_dropped: false)
 
     params = params |> Map.put("student_class_id", student_class.id)
 
@@ -47,7 +47,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
   def index(conn, %{"student_id" => student_id} = params) do
     student_assignments = from(sc in StudentClass)
-                          |> where([sc], sc.student_id == ^student_id)
+                          |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
                           |> where_filters(params)
                           |> Repo.all()
                           |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
@@ -156,6 +156,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
+  # Checks to see if an incoming changeset is identical to another student's assignment in the same class.
   defp check_student_assignment(changeset) do
     assign = from(assign in StudentAssignment)
     |> join(:inner, [assign], sc in StudentClass, sc.id == assign.student_class_id)

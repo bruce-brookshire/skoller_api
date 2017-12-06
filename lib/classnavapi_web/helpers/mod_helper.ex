@@ -57,9 +57,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
   def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
     student_assignment = student_assignment |> Repo.preload(:student_class)
-    student_class = Repo.get_by(StudentClass, class_id: student_assignment.student_class.class_id, student_id: params["student_id"])
+    student_class = Repo.get_by(StudentClass, class_id: student_assignment.student_class.class_id, student_id: params["student_id"], is_dropped: false)
     student_assignment
     |> find_mods()
     |> Enum.map(&process_existing_mod(&1, student_class, params))

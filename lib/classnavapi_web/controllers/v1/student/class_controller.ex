@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   def index(conn, %{"student_id" => student_id}) do
     query = from(classes in StudentClass)
     student_classes = query
-                      |> where([classes], classes.student_id == ^student_id)
+                      |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
                       |> Repo.all()
                       |> Repo.preload(:class)
                       |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
@@ -44,7 +44,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   end
 
   def show(conn, %{"student_id" => student_id, "id" => class_id}) do
-    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     student_class = student_class |> Repo.preload(:class)
 
@@ -59,7 +59,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   end
 
   def update(conn, %{"student_id" => student_id, "id" => class_id} = params) do
-    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     changeset = StudentClass.update_changeset(student_class_old, params)
 
@@ -74,7 +74,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   end
 
   def delete(conn, %{"student_id" => student_id, "class_id" => class_id}) do
-    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+    student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     changeset = StudentClass.update_changeset(student_class_old, %{"is_dropped" => true})
 
