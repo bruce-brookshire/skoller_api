@@ -72,6 +72,7 @@ defmodule ClassnavapiWeb.Router do
 
         # Class Weight routes
         resources "/weights", Class.WeightController, only: [:index]
+        resources "/weights", Admin.Class.WeightController, only: [:create]
 
         # Class Request routes
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
@@ -112,7 +113,7 @@ defmodule ClassnavapiWeb.Router do
       end
 
       # Weight routes
-      resources "/weights", Admin.Class.WeightController, only: [:update]
+      resources "/weights", Admin.Class.WeightController, only: [:update, :delete]
 
       # Professor routes
       resources "/professors", ProfessorController, only: [:show]

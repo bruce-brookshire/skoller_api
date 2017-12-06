@@ -40,7 +40,7 @@
 					},
 					"response": [
 						{
-							"id": "9eae7554-dbc1-43bd-b529-83c654583a60",
+							"id": "63488c9b-1925-40dc-aa81-5851f9d73d9e",
 							"name": "Successful with Student Obj Login",
 							"originalRequest": {
 								"method": "POST",
@@ -217,7 +217,7 @@
 					},
 					"response": [
 						{
-							"id": "a5169581-52ad-465e-b77c-080ebccb9c1b",
+							"id": "5505d831-c04a-4f76-9247-7f87aa570e6f",
 							"name": "Logout",
 							"originalRequest": {
 								"method": "POST",
@@ -348,7 +348,7 @@
 					},
 					"response": [
 						{
-							"id": "ad8a2e07-58fb-4160-92a4-ae69546cc5db",
+							"id": "a5a7612f-2376-4ecb-9591-60d80bc2b0b7",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "POST",
@@ -463,7 +463,7 @@
 					},
 					"response": [
 						{
-							"id": "891873ad-db9a-4b62-a7a4-578c981abf9a",
+							"id": "cd611cb1-bd2f-48fa-933c-913a7df9f99b",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "PUT",
@@ -577,7 +577,7 @@
 					},
 					"response": [
 						{
-							"id": "4d66b2e0-f07e-404f-b885-4a5cf7521f58",
+							"id": "4eb6f8b0-bc7d-48fb-bd23-34026a09f918",
 							"name": "Delete Student Assignments",
 							"originalRequest": {
 								"method": "DELETE",
@@ -684,7 +684,7 @@
 					},
 					"response": [
 						{
-							"id": "e86b31e2-d200-426d-b477-0d2f9465e08a",
+							"id": "b4afc01b-17e2-4b4b-a3f7-8b524661e73e",
 							"name": "Update Student Assignments Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -797,7 +797,7 @@
 					},
 					"response": [
 						{
-							"id": "518738d5-4462-467c-a32f-456dd0351039",
+							"id": "72ee3596-6ae6-4e31-8553-8bcda439ec56",
 							"name": "Get Student Assignment by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -924,7 +924,7 @@
 							},
 							"response": [
 								{
-									"id": "a3140bd2-6284-4931-8879-800ec64dafdd",
+									"id": "268caea1-032e-4751-a946-e66eee4dbb9d",
 									"name": "Get Class Files",
 									"originalRequest": {
 										"method": "GET",
@@ -1041,11 +1041,11 @@
 										"docs"
 									]
 								},
-								"description": "Uploads a file for a class to AWS.\n\n## Path Params\n* class id\n\n## Body Params\n* file\n* is_syllabus (boolean)\n\n## Behavior\nUploading a syllabus will cause class status to progress.\n\n## Notes\nFile type must be in: .pdf .txt .rtf .jpg .png .jpeg"
+								"description": "Uploads a file for a class to AWS.\n\n## Path Params\n* class id\n\n## Body Params\n* file\n* is_syllabus (boolean)\n\n## Behavior\nUploading a syllabus will cause class status to progress.\n\n## Notes\nFile type must be in: .pdf .txt .rtf .jpg .png .jpeg .doc .docx .pages"
 							},
 							"response": [
 								{
-									"id": "6438f797-99e3-433b-8aeb-2c9596c5e2c0",
+									"id": "7af1ee3f-4df0-492e-9aeb-e51129d43d0c",
 									"name": "Upload Class File",
 									"originalRequest": {
 										"method": "POST",
@@ -1172,7 +1172,7 @@
 							},
 							"response": [
 								{
-									"id": "2735e245-570e-487e-ac39-2f42166ec9a9",
+									"id": "ccea5639-db8c-4644-937e-eafd791bb902",
 									"name": "Create Class Assignment",
 									"originalRequest": {
 										"method": "POST",
@@ -1287,7 +1287,7 @@
 							},
 							"response": [
 								{
-									"id": "1f4c91b0-759b-43b8-9c66-a391f590537a",
+									"id": "4221fb0a-2de4-4cb3-844f-958701e600da",
 									"name": "Get Class Assignments",
 									"originalRequest": {
 										"method": "GET",
@@ -1400,7 +1400,7 @@
 							},
 							"response": [
 								{
-									"id": "cb6a9e8f-5ce7-4058-a21d-326c5eba5c17",
+									"id": "99e5b5cc-33ff-4f7f-812e-3ced621f4f4d",
 									"name": "Get Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -1498,7 +1498,7 @@
 							},
 							"response": [
 								{
-									"id": "b8f6ba9b-e4c3-459e-af4b-d865024bcab2",
+									"id": "c472f264-68f0-400f-8d42-18cfe519b5d7",
 									"name": "Get Hub Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -1596,7 +1596,7 @@
 							},
 							"response": [
 								{
-									"id": "fb6909cf-4a4f-44b3-a80c-1863a8a79e1b",
+									"id": "ded30812-236f-489c-b805-11e73b2aac2a",
 									"name": "Get Class Help Types",
 									"originalRequest": {
 										"method": "GET",
@@ -1693,7 +1693,7 @@
 							},
 							"response": [
 								{
-									"id": "61614e7c-9172-45b5-a999-b120e3cfabfc",
+									"id": "cfb58ae0-4052-4a01-b667-e26a9e554300",
 									"name": "Get Class Change Types",
 									"originalRequest": {
 										"method": "GET",
@@ -1799,7 +1799,7 @@
 							},
 							"response": [
 								{
-									"id": "e7023a7b-a3e2-412d-9125-ba94afe81226",
+									"id": "86e9092b-fac4-4fb9-bbf9-f7adb03d7f60",
 									"name": "Update Class Status",
 									"originalRequest": {
 										"method": "PUT",
@@ -1902,7 +1902,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"Tests\",\n  \"weight\": 87.5\n}"
+									"raw": ""
 								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1/weights",
@@ -1919,87 +1919,7 @@
 								},
 								"description": "Lists weights for a class.\n\n## Path Params\n* class id"
 							},
-							"response": [
-								{
-									"id": "aae8e899-28f4-4b76-a869-ab401637705e",
-									"name": "Get Class Weights",
-									"originalRequest": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Tests\",\n  \"weight\": 87.5\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/classes/1/weights",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"classes",
-												"1",
-												"weights"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "120",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:15:05 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "0bkkk82bplu4e3lfbf3fqd64k0cka25d",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 580,
-									"body": "[{\"weight\":35.0,\"name\":\"Labs\",\"id\":3},{\"weight\":50.0,\"name\":\"Tests\",\"id\":2},{\"weight\":15.0,\"name\":\"Assignments\",\"id\":1}]"
-								}
-							]
+							"response": []
 						},
 						{
 							"name": "Update Class Weights",
@@ -2035,7 +1955,7 @@
 							},
 							"response": [
 								{
-									"id": "78e008fc-b491-49ad-8c86-806bcb463cb2",
+									"id": "c79d187e-82ea-40bf-b89a-5534a95a78b4",
 									"name": "Update Class Weights",
 									"originalRequest": {
 										"method": "PUT",
@@ -2113,6 +2033,264 @@
 									"body": "{\"weight\":87.5,\"name\":\"Tests\",\"id\":1}"
 								}
 							]
+						},
+						{
+							"name": "Create Class Weights",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Tests\",\n  \"weight\": 87.5\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/classes/1/weights",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"classes",
+										"1",
+										"weights"
+									]
+								},
+								"description": "Lists weights for a class.\n\n## Path Params\n* class id\n\n## Body Params\n* name\n* weight\n"
+							},
+							"response": [
+								{
+									"id": "8eda6134-6e5e-4487-ac26-88fcc9e5339d",
+									"name": "Create Class Weights",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Tests 12\",\n  \"weight\": 87.5\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/classes/1/weights",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"classes",
+												"1",
+												"weights"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "40",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Wed, 06 Dec 2017 17:27:43 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "gt3v44rvhga41k2vjopbio74arvd00ra",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 568,
+									"body": "{\"weight\":87.5,\"name\":\"Tests 12\",\"id\":9}"
+								}
+							]
+						},
+						{
+							"name": "Delete Class Weights",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/weights/9",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"weights",
+										"9"
+									]
+								},
+								"description": "Deletes a weight for a class\n\n## Path Params\n* weight id"
+							},
+							"response": [
+								{
+									"id": "4dc9cfbf-2c85-4827-ab01-8863c3a03cd9",
+									"name": "Delete Class Weights",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": ""
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/weights/9",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"weights",
+												"9"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "plain",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "0",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "date",
+											"value": "Wed, 06 Dec 2017 17:28:28 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "cgmdaso400qegof2r0vaioj5b1o0m4bp",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 562,
+									"body": ""
+								}
+							]
 						}
 					],
 					"_postman_isSubFolder": true
@@ -2157,7 +2335,7 @@
 							},
 							"response": [
 								{
-									"id": "7a43b634-f78e-4b8e-9d86-f8f7cf9631bf",
+									"id": "e45a24b4-d384-4efb-8d24-32f84da4317a",
 									"name": "Add Help Request Error",
 									"originalRequest": {
 										"method": "POST",
@@ -2237,7 +2415,7 @@
 									"body": "{\"error\":{\"error\":\"Class is complete, use Change Request.\"}}"
 								},
 								{
-									"id": "2b5929d1-d332-4c86-87f3-ee57659fabf9",
+									"id": "d387b843-9efb-4a47-bf26-8e70f174f476",
 									"name": "Add Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2348,7 +2526,7 @@
 							},
 							"response": [
 								{
-									"id": "21aae415-8d79-4932-900f-8a2a5a719772",
+									"id": "cf12eb76-9358-456a-9cd9-766e57d62878",
 									"name": "Resolve Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2457,7 +2635,7 @@
 							},
 							"response": [
 								{
-									"id": "23ebc893-bbd3-4fa6-bdc6-eeedfee9c516",
+									"id": "6626570c-0e46-48f3-99a3-5ad72f054a7f",
 									"name": "Add Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2559,7 +2737,7 @@
 							},
 							"response": [
 								{
-									"id": "73efb000-3571-47a2-bc52-48ff5c5ba9b8",
+									"id": "e2a97992-25ec-4a97-b1ab-cf8afadb6a58",
 									"name": "Resolve Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2661,7 +2839,7 @@
 					},
 					"response": [
 						{
-							"id": "cbbae623-e912-4f7b-817f-50d0e5f7940f",
+							"id": "c81899fe-0e7f-41b0-8d0f-67c75f2fb9d4",
 							"name": "Get Classes",
 							"originalRequest": {
 								"method": "GET",
@@ -2784,7 +2962,7 @@
 					},
 					"response": [
 						{
-							"id": "571ed439-60b0-4f47-b349-61b6ddcf71b6",
+							"id": "4ceb49d1-9518-4b4c-a5bc-34242f2a1c27",
 							"name": "Update Class",
 							"originalRequest": {
 								"method": "PUT",
@@ -2880,7 +3058,7 @@
 							"body": "{\"type\":null,\"status\":{\"name\":\"Help\",\"id\":600},\"seat_count\":200,\"number\":\"8002-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Custom\",\"is_syllabus\":true,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"help_requests\":[{\"note\":\"It broke.\",\"is_completed\":true,\"id\":3,\"help_type\":{\"name\":\"Incorrect\",\"id\":100}}],\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-08-30\",\"class_end\":\"2017-11-11\",\"change_requests\":[]}"
 						},
 						{
-							"id": "eb3e5d09-8779-47be-b263-261346468e0f",
+							"id": "61558c0c-dfd6-4432-aa0a-a9acc61870b0",
 							"name": "Update Class No Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -3006,7 +3184,7 @@
 					},
 					"response": [
 						{
-							"id": "9cb89475-4e64-4f54-9ab5-b2a5a362f607",
+							"id": "fd9218ee-6467-4b56-a7bd-3cf1e29e12f3",
 							"name": "Get School Classes by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -3131,7 +3309,7 @@
 					},
 					"response": [
 						{
-							"id": "6003fb99-b174-4af0-b569-ae1476da7d8f",
+							"id": "f86b660e-c9eb-4244-98d4-dc716aab868c",
 							"name": "Confirm Class",
 							"originalRequest": {
 								"method": "POST",
@@ -3265,7 +3443,7 @@
 					},
 					"response": [
 						{
-							"id": "7ecd474b-586e-468d-9451-a140c639b526",
+							"id": "0adb8406-8473-4e2d-a3a5-7c870deeae40",
 							"name": "Create School Class",
 							"originalRequest": {
 								"method": "POST",
@@ -3391,7 +3569,7 @@
 							},
 							"response": [
 								{
-									"id": "f3adca10-ff7e-4483-bfd9-a66c388496f7",
+									"id": "839be8cb-8dc8-41ce-807e-55545a6cfbb2",
 									"name": "Create Professor",
 									"originalRequest": {
 										"method": "POST",
@@ -3525,7 +3703,7 @@
 							},
 							"response": [
 								{
-									"id": "3ff7dff0-ae3b-484f-a6b4-16b581ee169a",
+									"id": "de86c3b0-7a15-403a-afcd-9939bf9e46ab",
 									"name": "Get Professors",
 									"originalRequest": {
 										"method": "GET",
@@ -3623,7 +3801,7 @@
 									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}]"
 								},
 								{
-									"id": "f77c9219-b0e1-4fab-b9f2-584c31e13682",
+									"id": "f31507ad-6601-4a77-93f5-b61c07a147b4",
 									"name": "Get Professors filter",
 									"originalRequest": {
 										"method": "GET",
@@ -3762,7 +3940,7 @@
 							},
 							"response": [
 								{
-									"id": "df319955-49a2-447a-ac80-b9fc08cacd75",
+									"id": "d447ebd0-065d-4a56-927f-a6f679b5a368",
 									"name": "Get Professors by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -3893,7 +4071,7 @@
 							},
 							"response": [
 								{
-									"id": "495ab460-d0e6-46fb-95ac-190b43543a65",
+									"id": "c4c052d6-9d16-477a-9de4-4fb3a53320cb",
 									"name": "Update Professor",
 									"originalRequest": {
 										"method": "PUT",
@@ -4027,7 +4205,7 @@
 					},
 					"response": [
 						{
-							"id": "5160c7e9-3451-4228-afcb-e443e3bb8bef",
+							"id": "1a4e9f34-ac71-403a-993a-2ea2201d8d4c",
 							"name": "Get Class Period by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -4158,7 +4336,7 @@
 					},
 					"response": [
 						{
-							"id": "91a4ca39-cd07-4e06-9deb-353a11b13488",
+							"id": "5673ddac-6bef-40d3-950a-5a1ee067b50c",
 							"name": "Update Class Period",
 							"originalRequest": {
 								"method": "PUT",
@@ -4293,7 +4471,7 @@
 					},
 					"response": [
 						{
-							"id": "5e6adeb1-d665-4b47-a999-4d8490948c79",
+							"id": "06470d1b-0c4a-42c7-8a93-06959380527c",
 							"name": "Get Roles",
 							"originalRequest": {
 								"method": "GET",
@@ -4420,7 +4598,7 @@
 					},
 					"response": [
 						{
-							"id": "e9f80cca-7e1a-47f2-aa39-ac3f9f83f6b4",
+							"id": "612b17f3-afd4-48e5-b146-22585db60b22",
 							"name": "Get Role by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -4560,7 +4738,7 @@
 							},
 							"response": [
 								{
-									"id": "4f9ed0b2-e326-403d-984d-c996c4052a9a",
+									"id": "f84d58cf-5daa-4d64-ae5c-ad7fceba7ac9",
 									"name": "Create School Class Period",
 									"originalRequest": {
 										"method": "POST",
@@ -4694,7 +4872,7 @@
 							},
 							"response": [
 								{
-									"id": "2c9bd10d-80b3-4179-a82a-c8f8e07434c4",
+									"id": "b0fb59fc-e757-48fd-96b7-5d0efb60d90e",
 									"name": "Get School Class Periods",
 									"originalRequest": {
 										"method": "GET",
@@ -4835,7 +5013,7 @@
 							},
 							"response": [
 								{
-									"id": "ee3c6374-44c2-4f65-a58f-82a3361aea42",
+									"id": "04c800b2-69be-4772-b500-64c3ace94065",
 									"name": "Add Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -4967,7 +5145,7 @@
 							},
 							"response": [
 								{
-									"id": "e6ce68c9-325c-4cd6-a3c0-c63060f13e0c",
+									"id": "e8002a32-a0a7-4abe-8c77-3b17e7683d71",
 									"name": "Get Field of Study by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -5099,7 +5277,7 @@
 							},
 							"response": [
 								{
-									"id": "95f1057f-32c2-47b7-aa3f-9f52b5af295a",
+									"id": "a8b36d68-559f-4730-b4da-46efbde2bf1e",
 									"name": "Get Fields of Study",
 									"originalRequest": {
 										"method": "GET",
@@ -5231,7 +5409,7 @@
 							},
 							"response": [
 								{
-									"id": "26c373b4-2fe2-428a-a32a-7849d3ed9c3d",
+									"id": "553219f7-c75d-4bf1-a9ea-dfa32fb55d30",
 									"name": "Update Field of Study",
 									"originalRequest": {
 										"method": "PUT",
@@ -5364,7 +5542,7 @@
 					},
 					"response": [
 						{
-							"id": "900c767f-6ab6-479a-be39-ccb78efc3c1f",
+							"id": "17051b75-c00a-447b-9861-76db0d8795a4",
 							"name": "Create School",
 							"originalRequest": {
 								"method": "POST",
@@ -5487,7 +5665,7 @@
 					},
 					"response": [
 						{
-							"id": "d298d4b1-0684-4c84-a96a-8757ec1cc885",
+							"id": "eefaa85c-9660-4f21-a3b4-943432e201bf",
 							"name": "Get Schools",
 							"originalRequest": {
 								"method": "GET",
@@ -5604,7 +5782,7 @@
 					},
 					"response": [
 						{
-							"id": "84568842-9f7f-4de2-8130-bef0ab0053fd",
+							"id": "fb2d567b-891d-4c9c-8f77-9804a1b060b3",
 							"name": "Get School by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -5728,7 +5906,7 @@
 					},
 					"response": [
 						{
-							"id": "8ac522fc-99af-4919-afa5-cf673daa097a",
+							"id": "b264f4c9-7645-4e05-9638-9eb1b07f6029",
 							"name": "Update School",
 							"originalRequest": {
 								"method": "PUT",
@@ -5852,7 +6030,7 @@
 					},
 					"response": [
 						{
-							"id": "daf67eb1-5067-4d65-855d-70ce47e0811a",
+							"id": "b606f567-9a16-40f8-b11f-7d4d68275d1e",
 							"name": "Get Schools Hub",
 							"originalRequest": {
 								"method": "GET",
@@ -5964,7 +6142,7 @@
 					},
 					"response": [
 						{
-							"id": "5f62c058-3d5c-4581-a467-10ace1243ffe",
+							"id": "2e95e79d-4dc1-46e9-8fc1-e010a084fd94",
 							"name": "Get Schools No Auth",
 							"originalRequest": {
 								"method": "GET",
@@ -6109,7 +6287,7 @@
 							},
 							"response": [
 								{
-									"id": "c59ac8e7-a543-4d7c-9e71-5e6f09cfc0e5",
+									"id": "60ba20f7-bf12-4032-8fb0-92263c80bf84",
 									"name": "Speculate Grades Complete Class",
 									"originalRequest": {
 										"method": "GET",
@@ -6215,7 +6393,7 @@
 									"body": "{\"error\":\"Class is already complete.\"}"
 								},
 								{
-									"id": "7a2447da-4454-4d16-b898-ad55dd9e49fd",
+									"id": "a3715d65-81c4-4ecb-93cf-1b5d00c5a51f",
 									"name": "Speculate Grades by Grade",
 									"originalRequest": {
 										"method": "GET",
@@ -6323,7 +6501,7 @@
 									"body": "{\"speculation\":93.33333333333333,\"grade\":\"A\"}"
 								},
 								{
-									"id": "118654cb-22c2-42d8-b94a-449a6a0932f1",
+									"id": "7b75e318-ee60-4590-b2ff-61e31a281abd",
 									"name": "Speculate Grades",
 									"originalRequest": {
 										"method": "GET",
@@ -6460,7 +6638,7 @@
 							},
 							"response": [
 								{
-									"id": "2af44f5f-5e77-4a5f-9e24-d907d26119c5",
+									"id": "653f9fc5-bd6e-4d15-bc08-06ac74773af8",
 									"name": "Get Student Assignments Date",
 									"originalRequest": {
 										"method": "GET",
@@ -6564,7 +6742,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "b26c64d5-2cd2-47ef-b1f6-9b1baa996e7a",
+									"id": "2a9ad825-88b8-476d-ac9c-2ec028400283",
 									"name": "Get Student Assignments Complete",
 									"originalRequest": {
 										"method": "GET",
@@ -6670,7 +6848,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4},{\"weight_id\":4,\"weight\":0.49455984174085066,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":11,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":5},{\"weight_id\":5,\"weight\":0.20276953511374876,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":10,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":6},{\"weight_id\":6,\"weight\":0.3026706231454006,\"student_class_id\":4,\"name\":\"assign 2343\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":9,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":7}]"
 								},
 								{
-									"id": "e7cc6997-73ed-4146-b3b5-aad5420803f7",
+									"id": "c6549a7d-59f2-4a8c-97f3-e3541283c3e1",
 									"name": "Get Student Assignments Class",
 									"originalRequest": {
 										"method": "GET",
@@ -6776,7 +6954,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "1e772888-26c9-48e0-ad2e-047d98a19be5",
+									"id": "f6122c9c-ccdb-4e65-a83c-b2277dc703ba",
 									"name": "Get Student Assignments",
 									"originalRequest": {
 										"method": "GET",
@@ -6911,7 +7089,7 @@
 							},
 							"response": [
 								{
-									"id": "12c6aeb3-e3d2-4e31-9396-015007bf94d5",
+									"id": "3bbfa77a-3580-4fbd-ad80-e2419dd2285d",
 									"name": "Create Student Assignments",
 									"originalRequest": {
 										"method": "POST",
@@ -7059,7 +7237,7 @@
 									},
 									"response": [
 										{
-											"id": "eec3bd64-356b-4d03-9b14-8520bde5a68a",
+											"id": "c7ebfd9b-ff9b-468b-aace-060c1293be93",
 											"name": "Get Pending New Assignments None",
 											"originalRequest": {
 												"method": "GET",
@@ -7158,7 +7336,7 @@
 											"body": "[]"
 										},
 										{
-											"id": "7ed233a9-c1a1-47ff-8151-b1c4b56fc7d7",
+											"id": "f22e7865-640c-433b-951c-f175eba5c916",
 											"name": "Get Pending New Assignments",
 											"originalRequest": {
 												"method": "GET",
@@ -7335,7 +7513,7 @@
 							},
 							"response": [
 								{
-									"id": "918748f0-f717-4b3c-9fc1-db278261fba8",
+									"id": "650704ec-ecfe-4ec6-badc-f6065045c102",
 									"name": "Get Student Class by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -7506,7 +7684,7 @@
 							},
 							"response": [
 								{
-									"id": "86137d73-a6dc-41c3-bd36-b995f3ca3ab0",
+									"id": "e71aef79-975e-4e18-a393-4de479772057",
 									"name": "Update Student Class",
 									"originalRequest": {
 										"method": "PUT",
@@ -7641,7 +7819,7 @@
 							},
 							"response": [
 								{
-									"id": "6de9c84d-22ba-45cf-b50a-0399a42ce3b1",
+									"id": "63fa9f2e-d59c-4d48-9a33-7d46682bce94",
 									"name": "UnEnroll In Class",
 									"originalRequest": {
 										"method": "DELETE",
@@ -7776,7 +7954,7 @@
 							},
 							"response": [
 								{
-									"id": "ea807484-e15d-4411-b566-c3d953cccea2",
+									"id": "629a47e9-51f3-4372-b3f9-eaf1f717cab6",
 									"name": "Add Student Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -7903,7 +8081,7 @@
 							},
 							"response": [
 								{
-									"id": "3f5af7b2-eb88-4554-91e0-2c2e276468e1",
+									"id": "d48f8849-a289-40ab-a9ce-bafd143b0dec",
 									"name": "Delete Student Field of Study",
 									"originalRequest": {
 										"method": "DELETE",
@@ -8032,7 +8210,7 @@
 							},
 							"response": [
 								{
-									"id": "e5148cb1-e235-4fc5-b724-c31ecb4a2cd0",
+									"id": "5c9cd23d-57ba-4c90-888d-5b0153b2a359",
 									"name": "Respond to Mod",
 									"originalRequest": {
 										"method": "POST",
@@ -8170,7 +8348,7 @@
 					},
 					"response": [
 						{
-							"id": "c07e9435-2a4e-4af1-828e-ce18d12ce22b",
+							"id": "bd1ba80e-8a1a-432e-9ee9-8eb7beb27ac4",
 							"name": "Resend Verification",
 							"originalRequest": {
 								"method": "POST",
@@ -8299,7 +8477,7 @@
 					},
 					"response": [
 						{
-							"id": "fe2d0c35-0f05-4561-821e-c5015b0be779",
+							"id": "52db4c9c-061e-45ad-be6b-0e1b0908199c",
 							"name": "Verify Phone",
 							"originalRequest": {
 								"method": "POST",
@@ -8436,7 +8614,7 @@
 							},
 							"response": [
 								{
-									"id": "181af573-4984-4392-9a8c-6af30ac77b55",
+									"id": "01d74a32-7e81-4312-b272-e2e166f5b6bc",
 									"name": "Add Role To User",
 									"originalRequest": {
 										"method": "POST",
@@ -8567,7 +8745,7 @@
 							},
 							"response": [
 								{
-									"id": "9deb5260-3be2-4810-ab9f-b5622f8c8b29",
+									"id": "4f571229-3052-476e-aa66-a72ef542b8fe",
 									"name": "Get Roles by User",
 									"originalRequest": {
 										"method": "GET",
@@ -8698,7 +8876,7 @@
 							},
 							"response": [
 								{
-									"id": "b87fec59-794b-4d4d-aef8-6377a70cb31f",
+									"id": "bd52bb89-a7cd-49c9-8a31-a5970c08a08b",
 									"name": "Remove Role From User",
 									"originalRequest": {
 										"method": "DELETE",
@@ -8825,7 +9003,7 @@
 					},
 					"response": [
 						{
-							"id": "55002590-50d5-415a-9da5-6810aaaafd60",
+							"id": "e6277384-9267-47de-bf5c-e64024617ac1",
 							"name": "Create User Success w no student",
 							"originalRequest": {
 								"method": "POST",
@@ -8902,7 +9080,7 @@
 							"body": "{\"user\":{\"student\":null,\"roles\":[],\"id\":8,\"email\":\"dcha122345ppele@hku.edu\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNzI5NiwiaWF0IjoxNTExODg4MDk2LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6IjFmZmUxNTJkLTdhNTEtNDY2MS04YmU3LTM4ZjM1NjU4MmM0OSIsIm5iZiI6MTUxMTg4ODA5NSwic3ViIjoiOCIsInR5cCI6ImFjY2VzcyJ9.FlSZPBc-fi6DsAOv_tDSWKaDstgzo_LQXOoCXh6mGbJnqinC7_f0UE2PIaqbKrD6_w69fgBSAHFD-qmqvM1Ldw\"}"
 						},
 						{
-							"id": "507dcd70-20df-4e81-aa15-cafa2d4c60ed",
+							"id": "cf781248-783a-45db-b56c-c799e98fba6f",
 							"name": "Create User Success w Student",
 							"originalRequest": {
 								"method": "POST",
@@ -9008,7 +9186,7 @@
 					},
 					"response": [
 						{
-							"id": "23e5af39-7e88-4315-a18a-a2dd40c588cd",
+							"id": "cf98e6e3-79b1-4c19-89f0-4b7453898a3b",
 							"name": "Get Users",
 							"originalRequest": {
 								"method": "GET",
@@ -9106,7 +9284,7 @@
 					},
 					"response": [
 						{
-							"id": "69c4135e-3c46-42e4-b3a4-e2dfb47d5e0b",
+							"id": "e94c1950-5f75-4ef7-80d0-1f4125331eff",
 							"name": "Get User by Id no student",
 							"originalRequest": {
 								"method": "GET",
@@ -9177,7 +9355,7 @@
 							"body": "{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
 						},
 						{
-							"id": "3d11814f-4234-4b41-bd40-cd13bd3e1fed",
+							"id": "03126e87-aa64-45d1-b2bf-35ba2def96bd",
 							"name": "Get User by Id w student",
 							"originalRequest": {
 								"method": "GET",
@@ -9280,11 +9458,11 @@
 								"1"
 							]
 						},
-						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)"
+						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * is_mod_notifications (opt)\n  * is_reminder_notifications (opt)\n  * is_chat_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)"
 					},
 					"response": [
 						{
-							"id": "59ec711f-8872-4db1-87d6-e5db6d1c90d9",
+							"id": "1343628e-5170-4fe3-89dc-3411be331491",
 							"name": "Update User Success",
 							"originalRequest": {
 								"method": "PUT",
@@ -9360,6 +9538,102 @@
 							"cookie": [],
 							"responseTime": 865,
 							"body": "{\"student\":{\"phone\":\"6158675309\",\"name_last\":\"Chapelletteville\",\"name_first\":\"David\",\"id\":9,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
+						},
+						{
+							"id": "e91fc4c3-39cc-4943-aa6b-609945d629d8",
+							"name": "Update Student Notifications",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"student\": {\n  \"id\": 1,\n  \"is_mod_notifications\": false\n  }\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/2",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "access-control-allow-credentials",
+									"value": "true",
+									"name": "access-control-allow-credentials",
+									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-expose-headers",
+									"value": "",
+									"name": "access-control-expose-headers",
+									"description": "Lets a server whitelist headers that browsers are allowed to access."
+								},
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "618",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Wed, 06 Dec 2017 14:54:29 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "7tmif288sstmp7bnfd51856v2rpehgp4",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 606,
+							"body": "{\"student\":{\"school\":{\"periods\":[{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"id\":1,\"end_date\":\"2018-10-12\"}],\"name\":\"Hard Knocks University\",\"id\":1,\"email_domains\":[{\"is_professor_only\":false,\"email_domain\":\"@hku.edu\"}]},\"phone\":\"6158675309\",\"notification_time\":\"21:20:00.000000\",\"notification_days_notice\":4,\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"is_verified\":false,\"is_reminder_notifications\":true,\"is_notifications\":true,\"is_mod_notifications\":false,\"is_chat_notifications\":true,\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[{\"name\":\"Student\",\"id\":100}],\"id\":2,\"email\":\"tyler@hku.edu\"}"
 						}
 					]
 				}
