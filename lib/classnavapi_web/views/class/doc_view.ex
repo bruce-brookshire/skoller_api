@@ -15,7 +15,8 @@ defmodule ClassnavapiWeb.Class.DocView do
     %{
       path: doc.path,
       class_id: doc.class_id,
-      is_syllabus: doc.is_syllabus
+      is_syllabus: doc.is_syllabus,
+      name: doc.name
     }
   end
 end

@@ -31,7 +31,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
           nil
       end
 
-    changeset = Doc.changeset(%Doc{}, Map.put(params, "path", location))
+      
+    params = params 
+    |> Map.put("path", location)
+    |> Map.put("name", file.filename)
+
+    changeset = Doc.changeset(%Doc{}, params)
 
     class = Repo.get!(Class, class_id)
 
