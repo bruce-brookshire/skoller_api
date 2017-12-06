@@ -192,6 +192,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     dynamic
     |> school_filter(params)
     |> prof_filter(params)
+    |> prof_id_filter(params)
     |> status_filter(params)
     |> name_filter(params)
     |> number_filter(params)
@@ -216,6 +217,14 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) and ^dynamic)
   end
   defp prof_filter(dynamic, _), do: dynamic
+
+  defp prof_id_filter(dynamic, %{"professor.id" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], prof.id == ^filter or ^dynamic)
+  end
+  defp prof_id_filter(dynamic, %{"professor.id" => filter}) do
+    dynamic([class, period, prof], prof.id == ^filter and ^dynamic)
+  end
+  defp prof_id_filter(dynamic, _), do: dynamic
 
   defp status_filter(dynamic, %{"class.status" => "0", "or" => "true"}) do
     dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
