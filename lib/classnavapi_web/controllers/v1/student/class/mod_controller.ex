@@ -15,7 +15,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.ModController do
   plug :verify_member, :student
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
-    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     assignments = student_class |> ModHelper.get_new_assignment_mods()
 
