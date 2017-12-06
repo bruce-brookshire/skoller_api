@@ -15,12 +15,13 @@ defmodule Classnavapi.Class.Doc do
     field :is_syllabus, :boolean, default: false
     field :path, :string
     field :class_id, :id
+    field :name, :string
     belongs_to :class, Class, define_field: false
 
     timestamps()
   end
 
-  @req_fields [:path, :is_syllabus, :class_id]
+  @req_fields [:path, :is_syllabus, :class_id, :name]
   @all_fields @req_fields
 
   @doc false
