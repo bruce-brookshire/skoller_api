@@ -9,12 +9,17 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import ClassnavapiWeb.Helpers.LockPlug
 
+  @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
 
-  plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
+  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
   plug :verify_member, :class
+  plug :verify_member, %{of: :class, using: :id}
+  plug :check_lock, %{type: :assignment, using: :id}
+  plug :check_lock, %{type: :assignment, using: :class_id}
 
   def create(conn, %{} = params) do
     changeset = %Assignment{}
@@ -37,6 +42,20 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   def index(conn, %{"class_id" => class_id}) do
     assignments = AssignmentHelper.get_assignments(%{class_id: class_id})
     render(conn, AssignmentView, "index.json", assignments: assignments)
+  end
+
+  def delete(conn, %{"id" => id}) do
+    class = Repo.get!(Assignment, id)
+
+    case Repo.delete(class) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset

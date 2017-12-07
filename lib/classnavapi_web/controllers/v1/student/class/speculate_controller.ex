@@ -16,7 +16,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
   plug :verify_member, :student
 
   def speculate(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id)
+    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
     
     student_class = student_class |> Repo.preload(:class)
 

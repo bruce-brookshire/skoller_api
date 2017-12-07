@@ -110,7 +110,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
-    |> filter(params)
+    |> where([class, period, prof], ^filter(params))
     |> Repo.all()
 
     render(conn, SearchView, "index.json", classes: classes)
@@ -186,10 +186,13 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  defp filter(query, %{} = params) do
-    query
+  defp filter(%{} = params) do
+    dynamic = params["or"] != "true"
+
+    dynamic
     |> school_filter(params)
     |> prof_filter(params)
+    |> prof_id_filter(params)
     |> status_filter(params)
     |> name_filter(params)
     |> number_filter(params)
@@ -197,53 +200,97 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> length_filter(params)
   end
 
-  defp school_filter(query, %{"school" => filter}) do
-    query |> where([class, period, prof], period.school_id == ^filter)
+  defp school_filter(dynamic, %{"school" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], period.school_id == ^filter or ^dynamic)
   end
-  defp school_filter(query, _), do: query
+  defp school_filter(dynamic, %{"school" => filter}) do
+    dynamic([class, period, prof], period.school_id == ^filter and ^dynamic)
+  end
+  defp school_filter(dynamic, _), do: dynamic
 
-  defp prof_filter(query, %{"professor.name" => filter}) do
+  defp prof_filter(dynamic, %{"professor.name" => filter, "or" => "true"}) do
     prof_filter = "%" <> filter <> "%"
-    query |> where([class, period, prof], ilike(prof.name_last, ^prof_filter))
+    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ^dynamic)
   end
-  defp prof_filter(query, _), do: query
+  defp prof_filter(dynamic, %{"professor.name" => filter}) do
+    prof_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) and ^dynamic)
+  end
+  defp prof_filter(dynamic, _), do: dynamic
 
-  defp status_filter(query, %{"class.status" => "0"}) do
-    query |> where([class, period, prof], class.is_ghost == true)
+  defp prof_id_filter(dynamic, %{"professor.id" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], prof.id == ^filter or ^dynamic)
   end
-  defp status_filter(query, %{"class.status" => filter}) do
-    query |> where([class, period, prof], class.class_status_id == ^filter and class.is_ghost == false)
+  defp prof_id_filter(dynamic, %{"professor.id" => filter}) do
+    dynamic([class, period, prof], prof.id == ^filter and ^dynamic)
   end
-  defp status_filter(query, _), do: query
+  defp prof_id_filter(dynamic, _), do: dynamic
 
-  defp name_filter(query, %{"class.name" => filter}) do
+  defp status_filter(dynamic, %{"class.status" => "0", "or" => "true"}) do
+    dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
+  end
+  defp status_filter(dynamic, %{"class.status" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], (class.class_status_id == ^filter and class.is_ghost == false) or ^dynamic)
+  end
+  defp status_filter(dynamic, %{"class.status" => "0"}) do
+    dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+  end
+  defp status_filter(dynamic, %{"class.status" => filter}) do
+    dynamic([class, period, prof], (class.class_status_id == ^filter and class.is_ghost == false) and ^dynamic)
+  end
+  defp status_filter(dynamic, _), do: dynamic
+
+  defp name_filter(dynamic, %{"class.name" => filter, "or" => "true"}) do
     name_filter = "%" <> filter <> "%"
-    query |> where([class, period, prof], ilike(class.name, ^name_filter))
+    dynamic([class, period, prof], ilike(class.name, ^name_filter) or ^dynamic)
   end
-  defp name_filter(query, _), do: query
+  defp name_filter(dynamic, %{"class.name" => filter}) do
+    name_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.name, ^name_filter) and ^dynamic)
+  end
+  defp name_filter(dynamic, _), do: dynamic
 
-  defp number_filter(query, %{"class.number" => filter}) do
+  defp number_filter(dynamic, %{"class.number" => filter, "or" => "true"}) do
     number_filter = "%" <> filter <> "%"
-    query |> where([class, period, prof], ilike(class.number, ^number_filter))
+    dynamic([class, period, prof], ilike(class.number, ^number_filter) or ^dynamic)
   end
-  defp number_filter(query, _), do: query
+  defp number_filter(dynamic, %{"class.number" => filter}) do
+    number_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.number, ^number_filter) and ^dynamic)
+  end
+  defp number_filter(dynamic, _), do: dynamic
 
-  defp day_filter(query, %{"class.meet_days" => filter}) do
-    query |> where([class, period, prof], class.meet_days == ^filter)
+  defp day_filter(dynamic, %{"class.meet_days" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], class.meet_days == ^filter or ^dynamic)
   end
-  defp day_filter(query, _), do: query
+  defp day_filter(dynamic, %{"class.meet_days" => filter}) do
+    dynamic([class, period, prof], class.meet_days == ^filter and ^dynamic)
+  end
+  defp day_filter(dynamic, _), do: dynamic
 
-  defp length_filter(query, %{"class.length" => "1st Half"}) do
-    query |> where([class, period, prof], period.start_date == class.class_start and period.end_date != class.class_end)
+  defp length_filter(dynamic, %{"class.length" => "1st Half", "or" => "true"}) do
+    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date != class.class_end) or ^dynamic)
   end
-  defp length_filter(query, %{"class.length" => "2nd Half"}) do
-    query |> where([class, period, prof], period.end_date == class.class_end and period.start_date != class.class_start)
+  defp length_filter(dynamic, %{"class.length" => "2nd Half", "or" => "true"}) do
+    dynamic([class, period, prof], (period.end_date == class.class_end and period.start_date != class.class_start) or ^dynamic)
   end
-  defp length_filter(query, %{"class.length" => "Full Term"}) do
-    query |> where([class, period, prof], period.start_date == class.class_start and period.end_date == class.class_end)
+  defp length_filter(dynamic, %{"class.length" => "Full Term", "or" => "true"}) do
+    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date == class.class_end) or ^dynamic)
   end
-  defp length_filter(query, %{"class.length" => "Custom"}) do
-    query |> where([class, period, prof], period.start_date != class.class_start and period.end_date != class.class_end)
+  defp length_filter(dynamic, %{"class.length" => "Custom", "or" => "true"}) do
+    dynamic([class, period, prof], (period.start_date != class.class_start and period.end_date != class.class_end) or ^dynamic)
   end
-  defp length_filter(query, _), do: query
+  defp length_filter(dynamic, %{"class.length" => "1st Half"}) do
+    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date != class.class_end) and ^dynamic)
+  end
+  defp length_filter(dynamic, %{"class.length" => "2nd Half"}) do
+    dynamic([class, period, prof], (period.end_date == class.class_end and period.start_date != class.class_start) and ^dynamic)
+  end
+  defp length_filter(dynamic, %{"class.length" => "Full Term"}) do
+    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date == class.class_end) and ^dynamic)
+  end
+  defp length_filter(dynamic, %{"class.length" => "Custom"}) do
+    dynamic([class, period, prof], (period.start_date != class.class_start and period.end_date != class.class_end) and ^dynamic)
+  end
+  defp length_filter(dynamic, _), do: dynamic
 end

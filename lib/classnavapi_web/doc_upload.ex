@@ -9,7 +9,7 @@ defmodule Classnavapi.DocUpload do
   use Arc.Ecto.Definition
 
   @versions [:original]
-  @extensions ~w(.pdf .txt .rtf .jpg .png .jpeg)
+  @extensions ~w(.pdf .txt .rtf .jpg .png .jpeg .doc .docx .pages)
   @acl :public_read
 
   # Whitelist file extensions:
