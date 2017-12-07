@@ -44,11 +44,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     end
   end
 
-  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "is_class" => true}) do
+  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "is_class" => true} = params) do
     status = from(l in Lock)
-                |> where([l], l.class_id == ^class_id and l.user_id == ^user.id)
+                |> where([l], l.class_id == ^class_id and l.user_id == ^user.id and l.is_completed == false)
                 |> Repo.all()
-                |> Enum.map(&unlock_class(&1))
+                |> Enum.map(&unlock_class(&1, params))
                 |> Enum.find({:ok, nil}, &errors(&1))
 
     case status do
@@ -60,10 +60,10 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     end
   end
 
-  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id}) do
-    lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id)
+  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id} = params) do
+    lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id, is_completed: false)
 
-    case unlock_class(lock_old) do
+    case unlock_class(lock_old, params) do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, changeset} ->
         conn
@@ -77,9 +77,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     Repo.insert(changeset)
   end
 
-  defp unlock_class(lock_old) do
+  defp unlock_class(lock_old, %{"is_completed" => true}) do
     changeset = Lock.changeset(lock_old, %{is_completed: true})
     Repo.update(changeset)
+  end
+
+  defp unlock_class(lock_old, %{}) do
+    Repo.delete(lock_old)
   end
 
   defp errors(tuple) do
