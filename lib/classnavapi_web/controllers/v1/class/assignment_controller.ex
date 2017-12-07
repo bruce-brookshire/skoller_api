@@ -9,13 +9,17 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import ClassnavapiWeb.Helpers.LockPlug
 
+  @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
 
-  plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
+  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
   plug :verify_member, :class
   plug :verify_member, %{of: :class, using: :id}
+  plug :check_lock, %{type: :assignment, using: :id}
+  plug :check_lock, %{type: :assignment, using: :class_id}
 
   def create(conn, %{} = params) do
     changeset = %Assignment{}
