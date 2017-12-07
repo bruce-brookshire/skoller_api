@@ -24,7 +24,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   end
 
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :weight, using: :id}) do
-    case conn.params |> check_using(:weight) do
+    case conn.params |> check_using(:weight, :id) do
       true ->
         weight = Repo.get!(Weight, conn.params["id"])
         case Repo.get_by(Lock, class_id: weight.class_id, class_lock_section_id: @weight_lock, user_id: user.id, is_completed: false) do
@@ -35,8 +35,20 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     end
   end
 
-  defp check_using(%{"id" => _}, :weight), do: true
-  defp check_using(_params, _), do: false
+  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :weight, using: :class_id}) do
+    case conn.params |> check_using(:weight, :class_id) do
+      true ->
+        case Repo.get_by(Lock, class_id: conn.params["class_id"], class_lock_section_id: @weight_lock, user_id: user.id, is_completed: false) do
+          nil -> conn |> unauth
+          _ -> conn
+        end
+      false -> conn
+    end
+  end
+
+  defp check_using(%{"id" => _}, :weight, :id), do: true
+  defp check_using(%{"class_id" => _}, :weight, :class_id), do: true
+  defp check_using(_params, _, _), do: false
 
   defp is_admin(conn) do
     Enum.any?(conn.assigns[:user].roles, & &1.id == @admin_role)

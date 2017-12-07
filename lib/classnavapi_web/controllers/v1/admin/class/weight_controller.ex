@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.WeightController do
   
   plug :verify_role, %{roles: [@admin_role, @change_req_role, @student_role]}
   plug :check_lock, %{type: :weight, using: :id}
+  plug :check_lock, %{type: :weight, using: :class_id}
 
   def create(conn, params) do
     changeset = Weight.changeset_admin(%Weight{}, params)
