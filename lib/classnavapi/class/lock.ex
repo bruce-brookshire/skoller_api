@@ -21,5 +21,9 @@ defmodule Classnavapi.Class.Lock do
     lock
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:class_id)
+    |> foreign_key_constraint(:class_lock_section_id)
+    |> foreign_key_constraint(:user_id)
+    |> unique_constraint(:class_lock, name: :class_locks_class_id_class_lock_section_id_index)
   end
 end

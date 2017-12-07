@@ -64,6 +64,10 @@ defmodule ClassnavapiWeb.Router do
         put "/statuses", Class.StatusController, :update
         post "/confirm", ClassController, :confirm
 
+        # Class Lock routes
+        post "/lock", Class.LockController, :lock
+        post "/unlock", Class.LockController, :unlock
+
         # Class Doc routes
         resources "/docs", Class.DocController, only: [:create, :index]
 
