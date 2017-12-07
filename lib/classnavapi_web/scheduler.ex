@@ -8,25 +8,21 @@ defmodule ClassnavapiWeb.Scheduler do
   end
 
   def init(state) do
-    schedule_init()
+    schedule_work()
     {:ok, state}
   end
 
   def handle_info(:work, state) do
     schedule_work()
     require Logger
-    Logger.info("Running Jobs")
+    Logger.info("Running Jobs: " <> to_string(Time.utc_now))
     state.jobs.run()
     {:noreply, state}
   end
 
-  defp schedule_init() do
-    now = Time.utc_now()
-    Process.send_after(self(), :work, get_time_diff(now) * 1000)
-  end
-
   defp schedule_work() do
-    Process.send_after(self(), :work, @interval_min * 60 * 1000)
+    now = Time.utc_now()
+    Process.send_after(self(), :work, get_time_diff(now))
   end
 
   defp get_time_diff(now) do
@@ -36,7 +32,7 @@ defmodule ClassnavapiWeb.Scheduler do
       _ -> next_min |> get_time(now)
     end
     case next_time do
-      {:ok, next} -> Time.diff(next, Time.utc_now)
+      {:ok, next} -> Time.diff(next, Time.utc_now, :milliseconds)
       {:error, _} -> raise("converting time from " <> now <> " failed.")
     end
   end
