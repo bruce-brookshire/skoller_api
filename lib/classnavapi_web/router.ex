@@ -47,8 +47,7 @@ defmodule ClassnavapiWeb.Router do
         resources "/periods", PeriodController, only: [:index, :create]
 
         # School Field of Study routes
-        resources "/fields-of-study", Admin.School.FieldController, only: [:create]
-        resources "/fields-of-study", School.FieldController, only: [:index]
+        resources "/fields-of-study", Admin.School.FieldController, only: [:create, :index]
       end
 
       # Class Period routes
@@ -141,6 +140,7 @@ defmodule ClassnavapiWeb.Router do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
       get "/school/list", SchoolController, :index
+      resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
     end
   end
 end
