@@ -24,6 +24,12 @@ defmodule ClassnavapiWeb.StudentView do
       birthday: student.birthday,
       gender: student.gender,
       is_verified: student.is_verified,
+      is_notifications: student.is_notifications,
+      is_mod_notifications: student.is_mod_notifications,
+      is_reminder_notifications: student.is_reminder_notifications,
+      is_chat_notifications: student.is_chat_notifications,
+      notification_days_notice: student.notification_days_notice,
+      notification_time: student.notification_time,
       school: render_one(student.school, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }

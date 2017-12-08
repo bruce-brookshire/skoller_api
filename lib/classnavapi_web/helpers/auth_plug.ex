@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   import Plug.Conn
 
   @student_role 100
+  @admin_role 200
 
   def authenticate(conn, _) do
     case Repo.get(User, Guardian.Plug.current_resource(conn)) do
@@ -53,6 +54,24 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     case conn |> get_items(atom) do
       nil -> conn |> not_in_role(@student_role)
       items -> conn |> find_item(%{type: atom, items: items}, conn.params)
+    end
+  end
+
+  def verify_user(conn, :allow_admin) do
+    case Enum.any?(conn.assigns[:user].roles, & &1.id == @admin_role) do
+      true -> conn
+      _ ->
+        case conn |> get_items(:user) do
+          nil -> conn |> unauth
+          items -> conn |> find_item(%{type: :user, items: items}, conn.params)
+        end
+    end
+  end
+
+  def verify_user(conn, _params) do
+    case conn |> get_items(:user) do
+      nil -> conn |> unauth
+      items -> conn |> find_item(%{type: :user, items: items}, conn.params)
     end
   end
   

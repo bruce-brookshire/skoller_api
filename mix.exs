@@ -51,6 +51,8 @@ defmodule Classnavapi.Mixfile do
       {:comeonin, "~> 4.0"},
       {:bcrypt_elixir, "~> 1.0"},
       {:cors_plug, "~> 1.2"},
+      {:pigeon, "~> 1.1.1"},
+      {:kadabra, "~> 0.3.4"},
       {:ex_twilio, "~> 0.5.0"}
     ]
   end

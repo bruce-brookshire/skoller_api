@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AuthView
   alias Classnavapi.User
+  alias Classnavapi.User.Device
   alias ClassnavapiWeb.Helpers.TokenHelper
   
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -23,7 +24,22 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
     end
   end
 
+  def logout(conn, params) do
+    conn
+    |> deregister_devices(params)
+    |> send_resp(204, "")
+  end
+
   def token(conn, _params) do
     render(conn, AuthView, "show.json", auth: conn.assigns[:user])
   end
+
+  def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid}) do
+    Device
+    |> Repo.get_by!(udid: udid, user_id: user.id)
+    |> Repo.delete!()
+
+    conn
+  end
+  def deregister_devices(conn, _params), do: conn
 end

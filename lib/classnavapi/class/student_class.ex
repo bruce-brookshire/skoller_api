@@ -15,6 +15,7 @@ defmodule Classnavapi.Class.StudentClass do
     field :student_id, :id
     field :class_id, :id
     field :color, :string
+    field :is_notifications, :boolean, default: true
     field :is_dropped, :boolean, default: false
     belongs_to :class, Classnavapi.Class, define_field: false
     belongs_to :student, Classnavapi.Student, define_field: false
@@ -27,7 +28,7 @@ defmodule Classnavapi.Class.StudentClass do
   @opt_fields [:color, :is_dropped]
   @all_fields @req_fields ++ @opt_fields
 
-  @upd_req_fields [:is_dropped]
+  @upd_req_fields [:is_dropped, :is_notifications]
   @upd_opt_fields [:color]
   @upd_fields @upd_req_fields ++ @upd_opt_fields
 

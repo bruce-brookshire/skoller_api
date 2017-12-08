@@ -35,13 +35,11 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
     student_class = student_class |> Repo.preload([:class, :student_assignments])
     %{
       student_id: student_class.student_id,
-      color: student_class.color
+      color: student_class.color,
+      is_notifications: student_class.is_notifications,
+      assignments: render_many(student_class.student_assignments, StudentAssignmentView, "student_assignment.json")
     } 
     |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
-    |> Map.merge(
-        %{
-          assignments: render_many(student_class.student_assignments, StudentAssignmentView, "student_assignment.json")
-        })
   end
 end
   
