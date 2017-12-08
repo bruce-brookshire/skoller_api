@@ -84,5 +84,6 @@ config :pigeon, :apns,
   apns_default: %{
     cert: System.get_env("APNS_CERT"),
     key: System.get_env("APNS_KEY"),
-    mode: :prod
+    mode: :prod,
+    use_2197: true
   }
