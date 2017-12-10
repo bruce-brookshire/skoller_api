@@ -62,8 +62,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         student_class = Repo.get_by(StudentClass, class_id: assign.class_id, student_id: params["student_id"])
 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(&1.mod, student_class))
-        |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
+        |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
     end
   end
 
@@ -102,8 +102,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
   end
@@ -264,8 +264,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
   end
@@ -291,8 +291,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
   end
@@ -318,8 +318,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
   end
@@ -378,6 +378,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  defp process_self_action(%Mod{} = mod, student_class_id, _) do
+    process_self_action(mod, student_class_id)
+  end
+
   defp process_self_action(%Mod{id: mod_id}, student_class_id) do
     case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
       nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true})
@@ -385,6 +389,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
               |> Ecto.Changeset.change(%{is_accepted: true})
               |> Repo.update()
     end
+  end
+
+  defp dismiss_prior_mods(%Mod{} = mod, student_class_id, _) do
+    dismiss_prior_mods(mod, student_class_id)
   end
 
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do
@@ -433,6 +441,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
     |> Enum.map(&Repo.insert!(&1))
     |> Enum.find({:ok, nil}, &errors(&1))
+  end
+
+  defp insert_backlogged_mods(mod, %StudentClass{} = sc, _) do
+    insert_backlogged_mods(mod, sc)
   end
 
   defp insert_backlogged_mods(mod, %StudentClass{id: id}) do
