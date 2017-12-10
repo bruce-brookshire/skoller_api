@@ -413,7 +413,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp dismiss_from_results(query) do
     case query do
       [] -> {:ok, nil}
-      items -> items |> Enum.each(&Repo.update!(Ecto.Changeset.change(&1, %{is_accepted: false})))
+      items -> 
+        items = items |> Enum.map(&Repo.update!(Ecto.Changeset.change(&1, %{is_accepted: false})))
+        {:ok, items}
     end
   end
 
