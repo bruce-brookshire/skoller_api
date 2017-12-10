@@ -351,11 +351,12 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all()
   end
 
-  defp insert_public_mod_action_query(%Mod{} = mod, _student_class) do
+  defp insert_public_mod_action_query(%Mod{} = mod, student_class) do
     from(sc in StudentClass)
     |> join(:inner, [sc], assign in StudentAssignment, assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
     |> join(:left, [sc, assign], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
     |> where([sc, assign, act], is_nil(act.id))
+    |> where([sc], sc.id != ^student_class.id)
     |> Repo.all()
   end
 
