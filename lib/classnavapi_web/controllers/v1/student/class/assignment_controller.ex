@@ -79,7 +79,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
 
     case Repo.transaction(multi) do
-      {:ok, %{student_assignment: student_assignment}} ->
+      {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
         conn

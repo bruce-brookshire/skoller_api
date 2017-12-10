@@ -8,6 +8,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.User
   alias Classnavapi.User.Device
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Assignment
+  alias Classnavapi.Class.Weight
 
   import Ecto.Query
 
@@ -35,20 +38,32 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     end
   end
 
+  def send_mod_update_notifications({:ok, %{actions: _} = mod}) do
+    send_mod_update_notifications(mod)
+  end
+
+  def send_mod_update_notifications(mod) when is_list(mod) do
+    mod |> Enum.each(&send_mod_update_notifications(&1))
+  end
+
   def send_mod_update_notifications(mod) do
     mod.actions |> Enum.each(&send_mod_update_notifications(&1))
   end
 
   def get_user_devices(%User{} = user) do
     from(user in User)
-    |> join(:inner, [user], dev in Device, user.id = dev.user_id)
+    |> join(:inner, [user], dev in Device, user.id == dev.user_id)
     |> where([usr], usr.id == ^user.id)
     |> Repo.all
   end
 
   defp one_pending_mod_notification(user, action) do
-    mod = get_mod_from_action(action)
-    @one_mod_pending_update <> mod_type(mod) <> @of
+    mod = get_mod_from_action(action) |> Repo.preload(:assignment)
+    class = mod |> get_class_from_mod()
+    t = @one_mod_pending_update <> mod_type(mod) <> @of <> class.name <> " " 
+        <> mod.assignment.name <> @to <> mod_change(mod)
+    require IEx
+    IEx.pry
   end
 
   defp mod_type(%Mod{assignment_mod_type_id: type}) do
@@ -56,6 +71,16 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       @name_assignment_mod -> "name"
       @weight_assignment_mod -> "weight"
       @due_assignment_mod -> "due date"
+      @new_assignment_mod -> ""
+      @delete_assignment_mod -> ""
+    end
+  end
+
+  defp mod_change(%Mod{assignment_mod_type_id: type, data: data}) do
+    case type do
+      @name_assignment_mod -> data["name"]
+      @weight_assignment_mod -> get_weight_from_id(data["weight_id"])
+      @due_assignment_mod -> data["due"]
       @new_assignment_mod -> ""
       @delete_assignment_mod -> ""
     end
@@ -85,7 +110,22 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   defp get_mod_from_action(%Action{} = action) do
     from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_mod_type_id)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id)
+    |> where([mod, act], act.id == ^action.id)
     |> Repo.all
+    |> List.first()
+  end
+
+  defp get_class_from_mod(%Mod{} = mod) do
+    from(class in Class)
+    |> join(:inner, [class], assign in Assignment, class.id == assign.class_id)
+    |> where([class, assign], assign.id == ^mod.assignment_id)
+    |> Repo.all
+    |> List.first()
+  end
+
+  defp get_weight_from_id(id) do
+    weight = Repo.get!(Weight, id)
+    weight.name
   end
 end
