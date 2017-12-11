@@ -130,6 +130,10 @@ defmodule ClassnavapiWeb.Router do
       # Field of Study routes
       resources "/fields-of-study", Admin.School.FieldController, only: [:update]
       resources "/fields-of-study", School.FieldController, only: [:show]
+
+      #Syllabus Worker routes
+      post "/syllabus-workers/weights", SyllabusWorkerController, :weights
+      # post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
     end
   end
 

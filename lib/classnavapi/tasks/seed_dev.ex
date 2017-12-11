@@ -46,6 +46,19 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
 
+    school2 = Repo.insert!(%School{name: "Skoller University",
+                                    timezone: "CST",
+                                    email_domains: [
+                                      %EmailDomain{
+                                        email_domain: "@skoller.edu",
+                                        is_professor_only: false
+                                      }
+                                    ],
+                                    adr_zip: "37201",
+                                    adr_state: "TN",
+                                    adr_line_1: "530 Church St",
+                                    adr_city: "Nashville"})
+
     student = Repo.insert!(%User{email: "tyler@hku.edu", 
                                 password_hash: pass.password_hash,
                                 student: %Student{name_first: "Tyler",
@@ -66,6 +79,13 @@ defmodule Mix.Tasks.Seed.Dev do
       end_date: date2
     })
 
+    period2 = Repo.insert!(%ClassPeriod{
+      name: "Q1",
+      school_id: school2.id,
+      start_date: date1,
+      end_date: date2
+    })
+
     class = Repo.insert!(%Class{name: "Big Money",
                   number: "8001-01",
                   meet_days: "MWF",
@@ -81,6 +101,40 @@ defmodule Mix.Tasks.Seed.Dev do
                   class_period_id: period.id,
                   class_status_id: 700,
                   is_ghost: false
+    })
+
+    Repo.insert!(%Class{name: "Big Money 2",
+        number: "8001-01",
+        meet_days: "MWF",
+        meet_start_time: "8:30",
+        meet_end_time: "12",
+        seat_count: 2,
+        class_start: date1,
+        class_end: date2,
+        is_enrollable: true,
+        is_editable: true,
+        is_syllabus: false,
+        grade_scale: "A,90|B,80|C,70|D,60",
+        class_period_id: period.id,
+        class_status_id: 300,
+        is_ghost: false
+    })
+
+    Repo.insert!(%Class{name: "Skoller 101",
+      number: "8001-01",
+      meet_days: "MWF",
+      meet_start_time: "8:30",
+      meet_end_time: "12",
+      seat_count: 200,
+      class_start: date1,
+      class_end: date2,
+      is_enrollable: true,
+      is_editable: true,
+      is_syllabus: false,
+      grade_scale: "A,90|B,80|C,70|D,60",
+      class_period_id: period2.id,
+      class_status_id: 300,
+      is_ghost: false
     })
 
     assign_weight = Repo.insert!(%Weight{
