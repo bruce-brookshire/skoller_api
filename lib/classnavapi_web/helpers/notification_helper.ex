@@ -27,10 +27,14 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @delete_assignment_mod 500
 
   @a_classmate_has "A classmate has "
+  @you_have "You have "
+  @updates_pending " updates pending"
   @of_s " of "
   @to_s " to "
   @the_s " the "
   @in_s " in "
+  @and_s " and "
+  @c_and_s ", and "
   @updated "updated"
   @added "added "
   @removed "removed "
@@ -69,7 +73,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     count = get_pending_mods_for_student(student.id)
     msg = case count do
       1 -> action |> one_pending_mod_notification()
-      num -> multiple_pending_mod_notification()
+      num -> student |> multiple_pending_mod_notification(num)
     end
     devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
   end
@@ -83,6 +87,35 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       @delete_assignment_mod -> @a_classmate_has <> @removed <> mod.assignment.name <> @in_s <> class.name <> @notification_end
       _ -> @a_classmate_has <> @updated <> @the_s <> mod_type(mod) <> @of_s <> class.name <> " " 
         <> mod.assignment.name <> @to_s <> mod_change(mod) <> @notification_end
+    end
+  end
+
+  defp multiple_pending_mod_notification(student, num) do
+    @you_have <> to_string(num) <> @updates_pending <> @in_s <> class_list(student) <> @notification_end
+  end
+
+  defp class_list(%Student{} = student) do
+    from(class in Class)
+    |> join(:inner, [class], sc in StudentClass, sc.class_id == class.id)
+    |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
+    |> where([class, sc, act], is_nil(act.is_accepted))
+    |> where([class, sc, act], sc.student_id == ^student.id)
+    |> select([class, sc, act], class)
+    |> Repo.all
+    |> Enum.uniq
+    |> format_list
+  end
+
+  defp format_list(list) do
+    head = list |> List.first()
+    tail = list |> List.last()
+    case list |> Enum.count() do
+      1 -> head.name
+      2 -> head.name <> @and_s <> tail.name
+      _ -> str = list |> List.delete_at(-1)
+                      |> List.delete_at(0)
+                      |> List.foldl(@c_and_s <> tail.name, & ", " <> &1.name <> &2)
+        head.name <> str
     end
   end
 
