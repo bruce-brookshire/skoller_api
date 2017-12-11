@@ -39,9 +39,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
-    count = get_pending_mods_for_student(user.student.id)
-    case count do
-      1 -> user |> one_pending_mod_notification(action)
+    devices = user.user |> get_user_devices()
+    case devices do
+      [] -> :ok
+      _ -> action |> build_notifications(user, devices)
     end
   end
 
@@ -58,16 +59,24 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   def get_user_devices(%User{} = user) do
-    from(user in User)
-    |> join(:inner, [user], dev in Device, user.id == dev.user_id)
-    |> where([usr], usr.id == ^user.id)
+    from(dev in Device)
+    |> join(:inner, [dev], user in User, user.id == dev.user_id)
+    |> where([dev, user], user.id == ^user.id)
     |> Repo.all
   end
 
-  defp one_pending_mod_notification(user, action) do
+  defp build_notifications(%Action{} = action, %{student: student}, devices) do
+    count = get_pending_mods_for_student(student.id)
+    msg = case count do
+      1 -> action |> one_pending_mod_notification()
+    end
+    devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
+  end
+
+  defp one_pending_mod_notification(action) do
     mod = get_mod_from_action(action) |> Repo.preload(:assignment)
     class = mod |> get_class_from_mod()
-    t = case mod.assignment_mod_type_id do
+    case mod.assignment_mod_type_id do
       @new_assignment_mod -> @a_classmate_has <> @added <> mod.assignment.name <> @in_s <> class.name
         <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
       @delete_assignment_mod -> @a_classmate_has <> @removed <> mod.assignment.name <> @in_s <> class.name <> @notification_end
@@ -97,7 +106,6 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> join(:inner, [act], sc in StudentClass, sc.id == act.student_class_id)
     |> join(:inner, [act, sc], stu in Student, stu.id == sc.student_id)
     |> where([act], is_nil(act.is_accepted))
-    |> where([act, sc, stu], stu.is_notifications == true and stu.is_mod_notifications == true)
     |> where([act, sc, stu], stu.id == ^student_id)
     |> select([act, sc, stu], count(act.id))
     |> Repo.all
@@ -109,6 +117,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
     |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
     |> where([sc, stu, usr], sc.id == ^student_class_id)
+    |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
     |> select([sc, stu, usr], %{user: usr, student: stu})
     |> Repo.all
     |> List.first()
