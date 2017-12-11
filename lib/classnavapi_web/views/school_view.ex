@@ -20,6 +20,9 @@ defmodule ClassnavapiWeb.SchoolView do
       id: school.id,
       name: school.name,
       periods: active_periods(school.class_periods),
+      is_diy_enabled: school.is_diy_enabled,
+      is_diy_preferred: school.is_diy_preferred,
+      is_auto_syllabus: school.is_auto_syllabus,
       email_domains: render_many(school.email_domains, EmailDomainView, "email_domain.json")
     }
   end
