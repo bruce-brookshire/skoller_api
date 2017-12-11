@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.ModHelper
   alias Classnavapi.Class.Weight
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -37,7 +38,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> Ecto.Multi.run(:mod, &ModHelper.insert_new_mod(&1, params))
 
     case Repo.transaction(multi) do
-      {:ok, %{student_assignment: student_assignment}} ->
+      {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
         conn
@@ -77,7 +79,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
 
     case Repo.transaction(multi) do
-      {:ok, %{student_assignment: student_assignment}} ->
+      {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
         conn
@@ -93,7 +96,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> Ecto.Multi.run(:mod, &ModHelper.insert_delete_mod(&1, params))
 
     case Repo.transaction(multi) do
-      {:ok, _map} ->
+      {:ok, %{mod: mod}} ->
+        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         conn
         |> send_resp(200, "")
       {:error, _, failed_value, _} ->
