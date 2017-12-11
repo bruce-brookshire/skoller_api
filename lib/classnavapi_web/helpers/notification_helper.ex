@@ -69,6 +69,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     count = get_pending_mods_for_student(student.id)
     msg = case count do
       1 -> action |> one_pending_mod_notification()
+      num -> multiple_pending_mod_notification()
     end
     devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
   end
