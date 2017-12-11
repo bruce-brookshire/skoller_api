@@ -26,9 +26,16 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @new_assignment_mod 400
   @delete_assignment_mod 500
 
-  @one_mod_pending_update "A classmate has updated the "
-  @of " of "
-  @to " to "
+  @a_classmate_has "A classmate has "
+  @of_s " of "
+  @to_s " to "
+  @the_s " the "
+  @in_s " in "
+  @updated "updated"
+  @added "added "
+  @removed "removed "
+  @due "due "
+  @notification_end "."
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
@@ -60,10 +67,13 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp one_pending_mod_notification(user, action) do
     mod = get_mod_from_action(action) |> Repo.preload(:assignment)
     class = mod |> get_class_from_mod()
-    t = @one_mod_pending_update <> mod_type(mod) <> @of <> class.name <> " " 
-        <> mod.assignment.name <> @to <> mod_change(mod)
-    require IEx
-    IEx.pry
+    t = case mod.assignment_mod_type_id do
+      @new_assignment_mod -> @a_classmate_has <> @added <> mod.assignment.name <> @in_s <> class.name
+        <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
+      @delete_assignment_mod -> @a_classmate_has <> @removed <> mod.assignment.name <> @in_s <> class.name <> @notification_end
+      _ -> @a_classmate_has <> @updated <> @the_s <> mod_type(mod) <> @of_s <> class.name <> " " 
+        <> mod.assignment.name <> @to_s <> mod_change(mod) <> @notification_end
+    end
   end
 
   defp mod_type(%Mod{assignment_mod_type_id: type}) do
@@ -71,8 +81,6 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       @name_assignment_mod -> "name"
       @weight_assignment_mod -> "weight"
       @due_assignment_mod -> "due date"
-      @new_assignment_mod -> ""
-      @delete_assignment_mod -> ""
     end
   end
 
@@ -80,9 +88,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     case type do
       @name_assignment_mod -> data["name"]
       @weight_assignment_mod -> get_weight_from_id(data["weight_id"])
-      @due_assignment_mod -> format_date(data["due"])
-      @new_assignment_mod -> ""
-      @delete_assignment_mod -> ""
+      @due_assignment_mod -> format_date_from_iso(data["due"])
     end
   end
 
@@ -130,11 +136,16 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   defp format_date(date) do
-    date = Date.from_iso8601!(date)
     day_of_week = get_day_of_week(Date.day_of_week(date))
     month = get_month(date.month)
     day = get_day(date.day)
     day_of_week <> ", " <> month <> " " <> day
+  end
+
+  defp format_date_from_iso(date) do
+    date
+    |> Date.from_iso8601()
+    |> format_date()
   end
 
   defp get_month(1), do: "January"
