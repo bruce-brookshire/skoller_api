@@ -11,6 +11,7 @@ defmodule Mix.Tasks.Seed.Dev do
 
   alias Classnavapi.Repo
   alias Classnavapi.User
+  alias Classnavapi.Class.Doc
   alias Classnavapi.UserRole
   alias Classnavapi.School
   alias Classnavapi.School.EmailDomain
@@ -32,6 +33,14 @@ defmodule Mix.Tasks.Seed.Dev do
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
+                              password_hash: pass.password_hash})
+    sw1 = Repo.insert!(%User{email: "sw1@skoller.co", 
+                              password_hash: pass.password_hash})
+    sw2 = Repo.insert!(%User{email: "sw2@skoller.co", 
+                              password_hash: pass.password_hash})
+    sw3 = Repo.insert!(%User{email: "sw3@skoller.co", 
+                              password_hash: pass.password_hash})
+    sw4 = Repo.insert!(%User{email: "sw4@skoller.co", 
                               password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
@@ -58,6 +67,19 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
+    
+    school3 = Repo.insert!(%School{name: "Classo University",
+                                    timezone: "CST",
+                                    email_domains: [
+                                      %EmailDomain{
+                                        email_domain: "@classo.edu",
+                                        is_professor_only: false
+                                      }
+                                    ],
+                                    adr_zip: "37201",
+                                    adr_state: "TN",
+                                    adr_line_1: "530 Church St",
+                                    adr_city: "Nashville"})
 
     student = Repo.insert!(%User{email: "tyler@hku.edu", 
                                 password_hash: pass.password_hash,
@@ -70,6 +92,10 @@ defmodule Mix.Tasks.Seed.Dev do
                                    notification_time: time1}})
 
     Repo.insert!(%UserRole{user_id: user.id, role_id: 200})
+    Repo.insert!(%UserRole{user_id: sw1.id, role_id: 300})
+    Repo.insert!(%UserRole{user_id: sw2.id, role_id: 300})
+    Repo.insert!(%UserRole{user_id: sw3.id, role_id: 300})
+    Repo.insert!(%UserRole{user_id: sw4.id, role_id: 300})
     Repo.insert!(%UserRole{user_id: student.id, role_id: 100})
                             
     period = Repo.insert!(%ClassPeriod{
@@ -82,6 +108,13 @@ defmodule Mix.Tasks.Seed.Dev do
     period2 = Repo.insert!(%ClassPeriod{
       name: "Q1",
       school_id: school2.id,
+      start_date: date1,
+      end_date: date2
+    })
+
+    period3 = Repo.insert!(%ClassPeriod{
+      name: "Q1",
+      school_id: school3.id,
       start_date: date1,
       end_date: date2
     })
@@ -103,7 +136,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   is_ghost: false
     })
 
-    Repo.insert!(%Class{name: "Big Money 2",
+    c1 = Repo.insert!(%Class{name: "Big Money 2",
         number: "8001-01",
         meet_days: "MWF",
         meet_start_time: "8:30",
@@ -120,7 +153,7 @@ defmodule Mix.Tasks.Seed.Dev do
         is_ghost: false
     })
 
-    Repo.insert!(%Class{name: "Skoller 101",
+    c2 = Repo.insert!(%Class{name: "Skoller 101",
       number: "8001-01",
       meet_days: "MWF",
       meet_start_time: "8:30",
@@ -136,6 +169,140 @@ defmodule Mix.Tasks.Seed.Dev do
       class_status_id: 300,
       is_ghost: false
     })
+
+  c3 = Repo.insert!(%Class{name: "Skoller 201",
+    number: "8001-01",
+    meet_days: "MWF",
+    meet_start_time: "8:30",
+    meet_end_time: "12",
+    seat_count: 200,
+    class_start: date1,
+    class_end: date2,
+    is_enrollable: true,
+    is_editable: true,
+    is_syllabus: false,
+    grade_scale: "A,90|B,80|C,70|D,60",
+    class_period_id: period2.id,
+    class_status_id: 300,
+    is_ghost: false
+  })
+
+  c4 = Repo.insert!(%Class{name: "Skoller 301",
+    number: "8001-01",
+    meet_days: "MWF",
+    meet_start_time: "8:30",
+    meet_end_time: "12",
+    seat_count: 200,
+    class_start: date1,
+    class_end: date2,
+    is_enrollable: true,
+    is_editable: true,
+    is_syllabus: false,
+    grade_scale: "A,90|B,80|C,70|D,60",
+    class_period_id: period2.id,
+    class_status_id: 400,
+    is_ghost: false
+  })
+
+  c5 = Repo.insert!(%Class{name: "Classo 101",
+    number: "8001-01",
+    meet_days: "MWF",
+    meet_start_time: "8:30",
+    meet_end_time: "12",
+    seat_count: 200,
+    class_start: date1,
+    class_end: date2,
+    is_enrollable: true,
+    is_editable: true,
+    is_syllabus: false,
+    grade_scale: "A,90|B,80|C,70|D,60",
+    class_period_id: period3.id,
+    class_status_id: 400,
+    is_ghost: false
+  })
+
+  c6 = Repo.insert!(%Class{name: "Classo 201",
+    number: "8001-01",
+    meet_days: "MWF",
+    meet_start_time: "8:30",
+    meet_end_time: "12",
+    seat_count: 200,
+    class_start: date1,
+    class_end: date2,
+    is_enrollable: true,
+    is_editable: true,
+    is_syllabus: false,
+    grade_scale: "A,90|B,80|C,70|D,60",
+    class_period_id: period3.id,
+    class_status_id: 300,
+    is_ghost: false
+  })
+
+  c7 = Repo.insert!(%Class{name: "Classo 301",
+    number: "8001-01",
+    meet_days: "MWF",
+    meet_start_time: "8:30",
+    meet_end_time: "12",
+    seat_count: 200,
+    class_start: date1,
+    class_end: date2,
+    is_enrollable: true,
+    is_editable: true,
+    is_syllabus: false,
+    grade_scale: "A,90|B,80|C,70|D,60",
+    class_period_id: period3.id,
+    class_status_id: 400,
+    is_ghost: false
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c1.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c2.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c3.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c4.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c5.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c6.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
+
+  Repo.insert!(%Doc{
+    class_id: c7.id,
+    is_syllabus: true,
+    name: "Test",
+    path: "Name"
+  })
 
     assign_weight = Repo.insert!(%Weight{
       name: "Assignments",

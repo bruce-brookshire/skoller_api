@@ -21,22 +21,22 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   plug :verify_role, %{role: @syllabus_worker_role}
 
   def weights(conn, _params) do
-    class = serve_weight(conn)
+    class = conn |> serve_class(@weight_lock, @weight_status)
     conn |> render(ClassView, "show.json", class: class)
   end
 
-  # def assignments(conn, _params) do
-  #   class = serve_assign(conn)
-  #   conn |> render(ClassView, "show.json", class: class)
-  # end
+  def assignments(conn, _params) do
+    class = conn |> serve_class(@assignment_lock, @assignment_status)
+    conn |> render(ClassView, "show.json", class: class)
+  end
 
-  defp serve_weight(conn) do
-    case find_existing_lock(conn, @weight_lock) do
-      [] -> ratios = get_ratios(@weight_status)
-        workers = get_workers(@weight_lock)
+  defp serve_class(conn, lock_type, status_type) do
+    case find_existing_lock(conn, lock_type) do
+      [] -> ratios = get_ratios(status_type)
+        workers = get_workers(lock_type)
         class = biggest_difference(ratios, workers) 
-                |> get_oldest(@weight_status)
-        class |> lock_class(conn, @weight_lock)
+                |> get_oldest(status_type)
+        class |> lock_class(conn, lock_type)
         class
       list -> Repo.get!(Class, List.first(list).class_id)
     end
@@ -62,8 +62,8 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   defp biggest_difference(needed, workers) do
     needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
-    max = needed |> Enum.reduce(0, &
-      case &1.need > &2 do
+    max = needed |> Enum.reduce(%{need: 0}, &
+      case &1.need > &2.need do
         true -> &1
         false -> &2
       end)
