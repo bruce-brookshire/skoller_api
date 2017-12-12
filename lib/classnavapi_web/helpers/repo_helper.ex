@@ -18,4 +18,11 @@ defmodule ClassnavapiWeb.Helpers.RepoHelper do
     |> put_status(:unprocessable_entity)
     |> render(ClassnavapiWeb.ErrorView, "error.json", error: failed_value)
   end
+
+  def errors(tuple) do
+    case tuple do
+      {:error, _val} -> true
+      _ -> false
+    end
+  end
 end

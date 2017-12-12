@@ -4,6 +4,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias Classnavapi.Class.Lock
   alias Classnavapi.Class.Lock.Section
   alias Classnavapi.Repo
+  alias ClassnavapiWeb.Helpers.StatusHelper
+  alias Classnavapi.Class
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -20,7 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
 
     status = Repo.all(Section)
     |> Enum.map(&lock_class(Map.put(params, "class_lock_section_id", &1.id)))
-    |> Enum.find({:ok, nil}, &errors(&1))
+    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
 
     case status do
       {:ok, _lock} -> conn |> send_resp(204, "")
@@ -44,32 +47,60 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     end
   end
 
-  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "is_class" => true} = params) do
-    status = from(l in Lock)
-                |> where([l], l.class_id == ^class_id and l.user_id == ^user.id and l.is_completed == false)
-                |> Repo.all()
-                |> Enum.map(&unlock_class(&1, params))
-                |> Enum.find({:ok, nil}, &errors(&1))
+  def unlock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
 
-    case status do
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.run(:unlock, &unlock_full_class(user, params, &1))
+    |> Ecto.Multi.run(:status, &process_unlocks(&1, params))
+
+    case Repo.transaction(multi) do
       {:ok, _lock} -> conn |> send_resp(204, "")
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
   def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id} = params) do
     lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id, is_completed: false)
 
-    case unlock_class(lock_old, params) do
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.run(:unlock, &unlock_class(lock_old, params, &1))
+    |> Ecto.Multi.run(:status, &process_unlocks(&1, params))
+
+    case Repo.transaction(multi) do
       {:ok, _lock} -> conn |> send_resp(204, "")
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp process_unlocks(%{unlock: []}, _map), do: {:ok, nil}
+  defp process_unlocks(%{unlock: %Lock{} = unlock}, params) do
+    check_class_status(unlock, params)
+  end
+  defp process_unlocks(%{unlock: unlock}, params) do
+    status = unlock |> Enum.map(&check_class_status(&1, params))
+  end
+
+  defp check_class_status({:ok, lock}, params), do: check_class_status(lock, params)
+  defp check_class_status(%Lock{is_completed: true} = lock, params) do
+    Repo.get!(Class, lock.class_id)
+    |> Ecto.Changeset.change()
+    |> StatusHelper.unlock_class(params)
+    |> Repo.update()
+  end
+  defp check_class_status(_tuple, _map), do: {:ok, nil}
+
+  defp unlock_full_class(user, %{"class_id" => class_id} = params, _) do
+    status = from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user.id and l.is_completed == false)
+    |> Repo.all()
+    |> Enum.map(&unlock_class(&1, params))
+
+    status
+    |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   defp lock_class(params) do
@@ -77,19 +108,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     Repo.insert(changeset)
   end
 
-  defp unlock_class(lock_old, %{"is_completed" => true}) do
+  defp unlock_class(lock_old, map, _) do
+    unlock_class(lock_old, map)
+  end
+
+  defp unlock_class(lock_old, %{"is_completed" => true} = params) do
     changeset = Lock.changeset(lock_old, %{is_completed: true})
     Repo.update(changeset)
   end
 
   defp unlock_class(lock_old, %{}) do
     Repo.delete(lock_old)
-  end
-
-  defp errors(tuple) do
-    case tuple do
-      {:error, _val} -> true
-      _ -> false
-    end
   end
 end
