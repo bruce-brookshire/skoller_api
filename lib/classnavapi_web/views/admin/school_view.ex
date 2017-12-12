@@ -2,6 +2,7 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
   use ClassnavapiWeb, :view
 
   alias ClassnavapiWeb.Admin.SchoolView
+  alias ClassnavapiWeb.PeriodView
   alias ClassnavapiWeb.School.EmailDomainView
   alias Classnavapi.Repo
 
@@ -38,6 +39,7 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
   end
 
   defp base_school_view(school) do
+    school = school |> Repo.preload(:class_periods)
     %{
       id: school.id,
       name: school.name,
@@ -51,7 +53,8 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
       is_readonly: school.is_readonly,
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
-      is_auto_syllabus: school.is_auto_syllabus
+      is_auto_syllabus: school.is_auto_syllabus,
+      class_periods: render_many(school.class_periods, PeriodView, "period.json")
     }
   end
 
