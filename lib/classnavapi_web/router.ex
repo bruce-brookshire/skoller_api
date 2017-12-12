@@ -28,6 +28,7 @@ defmodule ClassnavapiWeb.Router do
       # User routes
       put "/users/:user_id", UserController, :update
       post "/users/create", Admin.UserController, :create
+      put "/users/:user_id/update", Admin.UserController, :update
       resources "/users", Admin.UserController, only: [:show, :index] do
         #Device routes
         post "/register", DeviceController, :register
