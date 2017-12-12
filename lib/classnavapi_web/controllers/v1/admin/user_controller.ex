@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   alias ClassnavapiWeb.UserView
   alias ClassnavapiWeb.Helpers.RepoHelper
 
+  import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
   
   @admin_role 200
@@ -40,8 +41,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
       render(conn, UserView, "show.json", user: user)
   end
 
-  def update(conn, params) do
-    user_old = Repo.get!(User, id)
+  def update(conn, %{"user_id" => user_id} = params) do
+    user_old = Repo.get!(User, user_id)
     user_old = user_old |> Repo.preload(:student)
     changeset = User.changeset_update(user_old, params)
     
@@ -51,9 +52,30 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     |> Ecto.Multi.run(:roles, &add_roles(&1, params))
     |> Ecto.Multi.run(:delete_fields_of_study, &delete_fields_of_study(&1, params))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+
+    case Repo.transaction(multi) do
+      {:ok, %{user: user}} ->
+        render(conn, UserView, "show.json", user: user)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
   end
 
-  defp delete_roles(%{user: user}, _params)
+  defp delete_roles(%{user: user}, _params) do
+    from(role in UserRole)
+    |> where([role], role.user_id == ^user.id)
+    |> Repo.delete_all()
+    {:ok, nil}
+  end
+
+  defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
+  defp delete_fields_of_study(%{user: %{student: student}}, _params) do
+    from(sf in StudentField)
+    |> where([sf], sf.student_id == ^student.id)
+    |> Repo.delete_all()
+    {:ok, nil}
+  end
 
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
     status = fields |> Enum.map(&add_field_of_study(user, &1))
