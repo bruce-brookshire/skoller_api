@@ -40,6 +40,21 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
       render(conn, UserView, "show.json", user: user)
   end
 
+  def update(conn, params) do
+    user_old = Repo.get!(User, id)
+    user_old = user_old |> Repo.preload(:student)
+    changeset = User.changeset_update(user_old, params)
+    
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.run(:delete_roles, &delete_roles(&1, params))
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:delete_fields_of_study, &delete_fields_of_study(&1, params))
+    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+  end
+
+  defp delete_roles(%{user: user}, _params)
+
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
     status = fields |> Enum.map(&add_field_of_study(user, &1))
 
