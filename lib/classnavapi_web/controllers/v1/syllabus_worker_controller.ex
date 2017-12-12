@@ -24,17 +24,26 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   def weights(conn, _params) do
     class = conn |> serve_class(@weight_lock, @weight_status)
-    conn |> render(ClassView, "show.json", class: class)
+    case class do
+      nil ->  conn |> send_resp(204, "")
+      class -> conn |> render(ClassView, "show.json", class: class)
+    end
   end
 
   def assignments(conn, _params) do
     class = conn |> serve_class(@assignment_lock, @assignment_status)
-    conn |> render(ClassView, "show.json", class: class)
+    case class do
+      nil ->  conn |> send_resp(204, "")
+      class -> conn |> render(ClassView, "show.json", class: class)
+    end
   end
 
   def reviews(conn, _params) do
     class = conn |> serve_class(@review_lock, @review_status)
-    conn |> render(ClassView, "show.json", class: class)
+    case class do
+      nil ->  conn |> send_resp(204, "")
+      class -> conn |> render(ClassView, "show.json", class: class)
+    end
   end
 
   defp serve_class(conn, lock_type, status_type) do
@@ -49,9 +58,10 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     end
   end
 
-  defp lock_class(class, %{assigns: %{user: user}}, type) do
-    Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: class.id, is_completed: false})
+  defp lock_class(%{id: id}, %{assigns: %{user: user}}, type) do
+    Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: id, is_completed: false})
   end
+  defp lock_class(class, _conn, _type), do: class
 
   defp get_oldest(school_id, %{assigns: %{user: user}}, @review_status, @review_lock) do
     from(class in Class)
@@ -83,7 +93,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   defp biggest_difference(needed, workers) do
     needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
-    max = needed |> Enum.reduce(%{need: 0}, &
+    max = needed |> Enum.reduce(%{need: 0, school: 0}, &
       case &1.need > &2.need do
         true -> &1
         false -> &2
