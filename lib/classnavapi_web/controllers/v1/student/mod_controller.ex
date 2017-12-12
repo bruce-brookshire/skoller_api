@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias ClassnavapiWeb.Helpers.ModHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
   
   @student_role 100
   
@@ -24,6 +25,11 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     student_class = Repo.get_by!(StudentClass, class_id: mod.assignment.class_id, student_id: student_id, is_dropped: false)
 
     conn |> process_mod(mod, student_class, params)
+  end
+
+  def index(conn, %{"student_id" => student_id}) do
+    from(mod in Mod)
+    |> where([mod], mod.student_id == ^student_id)
   end
 
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do
