@@ -6,11 +6,12 @@ defmodule Classnavapi.Class.Lock.Section do
   @primary_key {:id, :id, []}
   schema "class_lock_sections" do
     field :name, :string
+    field :is_diy, :boolean, default: true
 
     timestamps()
   end
 
-  @req_fields [:id, :name]
+  @req_fields [:id, :name, :is_diy]
   @all_fields @req_fields
 
   @doc false

@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Helpers.AssignmentHelper
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
 
@@ -74,13 +75,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     student_assignment
     |> find_mods()
     |> Enum.map(&process_existing_mod(&1, student_class, params))
-    |> Enum.find({:ok, nil}, &errors(&1))
+    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&get_changes(&1, student_assignment, params))
-    status |> Enum.find({:ok, status}, &errors(&1))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   def insert_delete_mod(%{student_assignment: student_assignment}, params) do
@@ -202,13 +203,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
       @due_assignment_mod -> %{due: mod.data |> Map.get("due")}
       @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
-    end
-  end
-
-  defp errors(tuple) do
-    case tuple do
-      {:error, _val} -> true
-      _ -> false
     end
   end
 
@@ -364,7 +358,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     status = mod
             |> insert_public_mod_action_query(student_class)
             |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
-    case status |> Enum.find({:ok, nil}, &errors(&1)) do
+    case status |> Enum.find({:ok, nil}, &RepoHelper.errors(&1)) do
       {:ok, nil} -> {:ok, status}
       {:error, val} -> {:error, val}
     end
@@ -441,7 +435,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     enumerable
     |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
     |> Enum.map(&Repo.insert!(&1))
-    |> Enum.find({:ok, nil}, &errors(&1))
+    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
   defp insert_backlogged_mods(mod, %StudentClass{} = sc, _) do

@@ -18,10 +18,13 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   @syllabus_status 200
   @weight_status 300
   @assignment_status 400
-  # @review_status 500
+  @review_status 500
   @help_status 600
   @complete_status 700
   @change_status 800
+
+  @weight_lock 100
+  @assignment_lock 200
 
   def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
     case class_id == id do
@@ -68,11 +71,23 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_syllabus(changeset.data)
     |> check_needs_weight(changeset.data)
   end
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{}) do
-    changeset
-    |> check_needs_complete(changeset.data)
-  end
   def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
+
+  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
+    changeset
+    |> check_needs_assignments(params)
+    |> check_needs_complete(params)
+  end
+  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{} = params) do
+    changeset
+    |> check_needs_review(params)
+    |> check_needs_complete(params)
+  end
+  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @review_status}} = changeset, %{} = params) do
+    changeset
+    |> check_needs_complete(params)
+  end
+  def unlock_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   defp check_new_class(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
   defp check_new_class(changeset, %{"is_student" => true}) do
@@ -102,12 +117,25 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp check_needs_assignments(%Ecto.Changeset{changes: %{weights: _}} = changeset, %{"weights" => _}) do
     changeset |> change_changeset_status(@assignment_status)
   end
+  defp check_needs_assignments(changeset, %{"class_lock_section_id" => @weight_lock, "is_completed" => true}) do
+    case changeset.changes |> Map.equal?(%{}) do
+      true -> changeset |> change_changeset_status(@assignment_status)
+      false -> changeset
+    end
+  end
   defp check_needs_assignments(changeset, %{}), do: changeset
 
+  defp check_needs_review(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
+  defp check_needs_review(changeset, %{"class_lock_section_id" => @assignment_lock, "is_completed" => true}) do
+    changeset |> change_changeset_status(@review_status)
+  end
+  defp check_needs_review(changeset, %{}), do: changeset
+
   defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_complete(changeset, %{}) do
+  defp check_needs_complete(changeset, %{"is_completed" => true}) do
     changeset |> change_changeset_status(@complete_status)
   end
+  defp check_needs_complete(changeset, %{}), do: changeset
 
   defp change_changeset_status(changeset, new_status) do
     changeset |> Ecto.Changeset.change(%{class_status_id: new_status})

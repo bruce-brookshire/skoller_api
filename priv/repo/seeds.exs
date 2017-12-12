@@ -39,5 +39,6 @@ Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 300, name: "Due Da
 Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 400, name: "New Assignment"})
 Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 500, name: "Delete Assignment"})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 100, name: "Weights"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 200, name: "Assignments"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 100, name: "Weights", is_diy: true})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 200, name: "Assignments", is_diy: true})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 300, name: "Review", is_diy: false})
