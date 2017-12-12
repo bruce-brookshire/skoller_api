@@ -21,7 +21,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   def lock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
     params = params |> Map.put("user_id", user.id)
 
-    status = Repo.all(Section)
+    status = from(sect in Section)
+    |> where([sect], sect.is_diy == true)
+    |> Repo.all()
     |> Enum.map(&lock_class(Map.put(params, "class_lock_section_id", &1.id)))
     |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
 
@@ -82,6 +84,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   end
   defp process_unlocks(%{unlock: unlock}, params) do
     status = unlock |> Enum.map(&check_class_status(&1, params))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   defp check_class_status({:ok, lock}, params), do: check_class_status(lock, params)
@@ -112,7 +115,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     unlock_class(lock_old, map)
   end
 
-  defp unlock_class(lock_old, %{"is_completed" => true} = params) do
+  defp unlock_class(lock_old, %{"is_completed" => true}) do
     changeset = Lock.changeset(lock_old, %{is_completed: true})
     Repo.update(changeset)
   end

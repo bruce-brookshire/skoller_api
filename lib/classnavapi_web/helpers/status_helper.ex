@@ -80,6 +80,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
     changeset
     |> check_needs_assignments(params)
+    |> check_needs_complete(params)
   end
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{} = params) do
     changeset
