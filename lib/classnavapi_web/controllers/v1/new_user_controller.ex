@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
   alias Classnavapi.User
   alias Classnavapi.UserRole
   alias Classnavapi.Repo
+  alias Classnavapi.School.StudentField
   alias ClassnavapiWeb.AuthView
   alias Ecto.Changeset
   alias ClassnavapiWeb.Helpers.TokenHelper
@@ -23,6 +24,7 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
 
     multi = changeset
     |> insert_user()
+    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
     |> Ecto.Multi.run(:role, &add_student_role(&1))
     
     case Repo.transaction(multi) do
@@ -47,6 +49,17 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
+    status = fields |> Enum.map(&add_field_of_study(user, &1))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp add_fields_of_study(_map, _params), do: {:ok, nil}
+
+  defp add_field_of_study(user, field) do
+    Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
   end
 
   defp insert_user(changeset) do

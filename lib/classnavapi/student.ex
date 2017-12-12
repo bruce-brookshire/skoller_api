@@ -35,10 +35,11 @@ defmodule Classnavapi.Student do
     timestamps()
   end
 
-  @req_fields [:name_first, :name_last, :phone, :birthday, :gender,
+  @req_fields [:name_first, :name_last, :phone,
               :school_id, :notification_time, :notification_days_notice, :is_notifications,
               :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications]
-  @all_fields @req_fields
+  @opt_fields [:birthday, :gender]
+  @all_fields @req_fields ++ @opt_fields
 
   @doc false
   def changeset(%Student{} = student, attrs) do
