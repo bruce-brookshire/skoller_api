@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   alias Classnavapi.Class
   alias Classnavapi.Class.Doc
   alias Classnavapi.ClassPeriod
+  alias Classnavapi.Class.StudentClass
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -48,14 +49,34 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   defp serve_class(conn, lock_type, status_type) do
     case find_existing_lock(conn, lock_type) do
-      [] -> ratios = conn |> get_ratios(status_type)
+      [] -> 
         workers = get_workers(lock_type)
-        class = biggest_difference(ratios, workers) 
-                |> get_oldest(conn, status_type, lock_type)
+        class = workers |> get_class(conn, lock_type, status_type)
         class |> lock_class(conn, lock_type)
         class
       list -> Repo.get!(Class, List.first(list).class_id)
     end
+  end
+
+  defp get_class(workers, conn, lock_type, status_type) do
+    case workers |> get_enrolled_class(conn, lock_type, status_type) do
+      nil -> workers |> get_unenrolled_class(conn, lock_type, status_type)
+      class -> class
+    end
+  end
+
+  defp get_enrolled_class(workers, conn, lock_type, status_type) do
+    ratios = conn |> get_enrolled_ratios(status_type)
+
+    class = biggest_difference(ratios, workers) 
+            |> get_oldest(conn, status_type, lock_type)
+  end
+
+  defp get_unenrolled_class(workers, conn, lock_type, status_type) do
+    ratios = conn |> get_ratios(status_type)
+    
+    class = biggest_difference(ratios, workers) 
+            |> get_oldest(conn, status_type, lock_type)
   end
 
   defp lock_class(%{id: id}, %{assigns: %{user: user}}, type) do
@@ -124,6 +145,30 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> where([class], class.class_status_id == ^status)
     |> group_by([class, period], period.school_id)
     |> select([class, period], %{count: count(period.school_id), school: period.school_id})
+    |> Repo.all()
+    |> get_enum_ratio()
+  end
+
+  defp get_enrolled_ratios(%{assigns: %{user: user}}, @review_status) do
+    from(class in Class)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:left, [class, period], lock in Lock, lock.class_id == class.id and lock.user_id == ^user.id)
+    |> join(:inner, [class, period, lock], sc in StudentClass, class.id == sc.class_id)
+    |> where([class], class.class_status_id == @review_status)
+    |> where([class, period, lock, sc], is_nil(lock.id))
+    |> group_by([class, period, lock, sc], period.school_id)
+    |> select([class, period, lock, sc], %{count: count(period.school_id), school: period.school_id})
+    |> Repo.all()
+    |> get_enum_ratio()
+  end
+
+  defp get_enrolled_ratios(_conn, status) do
+    from(class in Class)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class, period], sc in StudentClass, class.id == sc.class_id)
+    |> where([class], class.class_status_id == ^status)
+    |> group_by([class, period, sc], period.school_id)
+    |> select([class, period, sc], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
   end
