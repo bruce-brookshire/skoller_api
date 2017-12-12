@@ -71,10 +71,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_syllabus(changeset.data)
     |> check_needs_weight(changeset.data)
   end
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @review_status}} = changeset, %{}) do
-    changeset
-    |> check_needs_complete(%{confirming: true})
-  end
   def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
@@ -85,6 +81,10 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{} = params) do
     changeset
     |> check_needs_review(params)
+    |> check_needs_complete(params)
+  end
+  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @review_status}} = changeset, %{} = params) do
+    changeset
     |> check_needs_complete(params)
   end
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
@@ -132,10 +132,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp check_needs_review(changeset, %{}), do: changeset
 
   defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_complete(changeset, %{"is_class" => true, "is_completed" => true}) do
-    changeset |> change_changeset_status(@complete_status)
-  end
-  defp check_needs_complete(changeset, %{confirming: true}) do
+  defp check_needs_complete(changeset, %{"is_completed" => true}) do
     changeset |> change_changeset_status(@complete_status)
   end
   defp check_needs_complete(changeset, %{}), do: changeset
