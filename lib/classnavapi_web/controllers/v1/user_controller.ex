@@ -4,6 +4,8 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.User
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
+  alias ClassnavapiWeb.Helpers.RepoHelper
+  alias Classnavapi.UserRole
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -18,13 +20,21 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     user_old = Repo.preload user_old, :student
     changeset = User.changeset_update(user_old, params)
 
-    case Repo.update(changeset) do
-      {:ok, user} ->
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.run(:roles, &check_student_role(changeset, &1))
+
+    case Repo.transaction(multi) do
+      {:ok, %{user: user}} ->
         render(conn, UserView, "show.json", user: user)
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
+
+  defp check_student_role(%Ecto.Changeset{changes: %{student: %Ecto.Changeset{action: :insert}}}, %{user: user}) do
+    Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+  end
+  defp check_student_role(_changeset, _user), do: {:ok, nil}
 end
