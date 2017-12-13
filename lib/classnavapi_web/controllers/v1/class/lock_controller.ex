@@ -2,6 +2,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Class.Lock
+  alias Classnavapi.Class.AbandonedLock
   alias Classnavapi.Class.Lock.Section
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Helpers.StatusHelper
@@ -132,6 +133,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   end
 
   defp unlock_class(lock_old, %{}) do
+    Repo.insert!(%AbandonedLock{
+      class_lock_section_id: lock_old.class_lock_section_id,
+      class_id: lock_old.class_id,
+      user_id: lock_old.user_id
+    })
     Repo.delete(lock_old)
   end
 end
