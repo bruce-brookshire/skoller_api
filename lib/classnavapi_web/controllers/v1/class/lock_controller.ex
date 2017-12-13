@@ -22,21 +22,15 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, %{of: :school, using: :class_id}
 
-  def lock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
+  def lock(%{assigns: %{user: user}} = conn, %{"is_class" => true, "class_id" => class_id} = params) do
     params = params |> Map.put("user_id", user.id)
 
-    status = from(sect in Section)
-    |> where([sect], sect.is_diy == true)
-    |> Repo.all()
-    |> Enum.map(&lock_class(Map.put(params, "class_lock_section_id", &1.id)))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
+    class = Repo.get!(Class, class_id)
+            |> Repo.preload(:school)
 
-    case status do
-      {:ok, _lock} -> conn |> send_resp(204, "")
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    case class.school.is_diy_enabled do
+      true -> conn |> lock_full_class(params)
+      false -> conn |> send_resp(401, "")
     end
   end
 
@@ -87,6 +81,22 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
       {:error, _, failed_value, _} ->
         conn
         |> RepoHelper.multi_error(failed_value)
+    end
+  end
+
+  defp lock_full_class(conn, params) do
+    status = from(sect in Section)
+    |> where([sect], sect.is_diy == true)
+    |> Repo.all()
+    |> Enum.map(&lock_class(Map.put(params, "class_lock_section_id", &1.id)))
+    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
+
+    case status do
+      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
