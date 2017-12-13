@@ -22,6 +22,10 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
+      # CSV Upload routes
+      post "/csv/professors", CSVController, :professors
+
+      # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
 
