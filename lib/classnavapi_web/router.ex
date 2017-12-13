@@ -102,6 +102,7 @@ defmodule ClassnavapiWeb.Router do
 
         # Student Class routes
         post "/mods/:id", Student.ModController, :create
+        get "/mods", Student.ModController, :index
         post "/classes/:class_id", Student.ClassController, :create
         delete "/classes/:class_id", Student.ClassController, :delete
         put "/classes/:id", Student.ClassController, :update
