@@ -30,6 +30,19 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   def index(conn, %{"student_id" => student_id}) do
     from(mod in Mod)
     |> where([mod], mod.student_id == ^student_id)
+    |> Repo.all()
+    |> add_message()
+  end
+
+  defp add_messages(nil), do: nil
+  defp add_messages(list) do
+    list |> Enum.map(&add_message(&1))
+  end
+
+  defp add_message(%Mod{} = mod) do
+    mod = mod |> Repo.preload(:assignment)
+    assignment = mod.assignment |> Repo.preload(:class)
+
   end
 
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do
