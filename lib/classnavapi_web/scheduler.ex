@@ -39,8 +39,15 @@ defmodule ClassnavapiWeb.Scheduler do
 
   defp get_time(min, now) do
     case min > (60 - @interval_min) do
-      true -> Time.new(now.hour + 1, 0, 0, 0)
+      true -> now |> add_hour
       _ -> Time.new(now.hour, min, 0, 0)
+    end
+  end
+
+  defp add_hour(now) do
+    case now.hour + 1 do
+      24 -> Time.new(0, 0, 0, 0)
+      _ -> Time.new(now.hour + 1, 0, 0, 0)
     end
   end
 
