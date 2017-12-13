@@ -41,6 +41,12 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @due "due "
   @notification_end "."
 
+  @class_complete "We didn't find any assignments on the syllabus. Be sure to add assignments on the app throughout the semester so you and your classmates can keep up. 💯"
+  @we_created "We created"
+  @from_syllabus "from the class syllabus. Any new assignments or schedule changes are up to you and your classmates. 💯"
+  @one_assign_class_complete "assignment " <> @from_syllabus
+  @multiple_assign_class_complete "assignments " <> @from_syllabus
+
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
     devices = user.user |> get_user_devices()
@@ -66,6 +72,32 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     from(dev in Device)
     |> join(:inner, [dev], user in User, user.id == dev.user_id)
     |> where([dev, user], user.id == ^user.id)
+    |> Repo.all
+  end
+
+  def send_class_complete_notification(%Class{} = class) do
+    users = class 
+            |> get_users_from_class()
+    devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+    class = class |> Repo.preload([:assignments])
+    msg = class.assignments |> class_complete_msg()
+    
+    devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
+  end
+
+  defp class_complete_msg(assignments) do
+    case Enum.count(assignments) do
+      0 -> @class_complete
+      1 -> @we_created <> " 1 " <> @one_assign_class_complete
+      num -> @we_created <> " " <> num <> " " <> @multiple_assign_class_complete
+    end
+  end
+
+  defp get_users_from_class(%Class{} = class) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> where([sc, user], sc.class_id == ^class.id)
+    |> select([sc, user], user)
     |> Repo.all
   end
 
