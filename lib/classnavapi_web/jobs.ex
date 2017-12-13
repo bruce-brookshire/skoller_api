@@ -8,7 +8,6 @@ defmodule ClassnavapiWeb.Jobs do
     now
     |> Jobs.SendNotifications.run()
 
-    now
-    |> Jobs.ClearLocks.run()
+    Jobs.ClearLocks.run()
   end
 end

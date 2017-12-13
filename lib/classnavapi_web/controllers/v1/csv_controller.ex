@@ -9,7 +9,10 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   
   plug :verify_role, %{role: @admin_role}
 
-  def professor(conn, %{} = params) do
-    
+  def professors(conn, %{"file" => file} = params) do
+    t = file.path 
+        |> File.stream!()
+        |> CSV.decode()
+        |> Enum.take_every(1)
   end
 end
