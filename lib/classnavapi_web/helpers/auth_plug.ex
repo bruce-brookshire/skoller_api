@@ -40,12 +40,12 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
 
   def verify_member(conn, %{of: type, using: id}) do
-    case conn.params |> Map.fetch(to_string(id)) do
+    case conn.path_params |> Map.fetch(to_string(id)) do
       :error -> conn
       _ ->
         case conn |> get_items(type) do
           nil -> conn |> not_in_role(@student_role)
-          items -> conn |> find_item(%{type: type, items: items, using: id}, conn.params)
+          items -> conn |> find_item(%{type: type, items: items, using: id}, conn.path_params)
         end
     end
   end
@@ -53,7 +53,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   def verify_member(conn, atom) do
     case conn |> get_items(atom) do
       nil -> conn |> not_in_role(@student_role)
-      items -> conn |> find_item(%{type: atom, items: items}, conn.params)
+      items -> conn |> find_item(%{type: atom, items: items}, conn.path_params)
     end
   end
 
@@ -63,7 +63,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       _ ->
         case conn |> get_items(:user) do
           nil -> conn |> unauth
-          items -> conn |> find_item(%{type: :user, items: items}, conn.params)
+          items -> conn |> find_item(%{type: :user, items: items}, conn.path_params)
         end
     end
   end
@@ -71,7 +71,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   def verify_user(conn, _params) do
     case conn |> get_items(:user) do
       nil -> conn |> unauth
-      items -> conn |> find_item(%{type: :user, items: items}, conn.params)
+      items -> conn |> find_item(%{type: :user, items: items}, conn.path_params)
     end
   end
   
