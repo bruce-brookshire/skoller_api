@@ -17,7 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
 
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
   plug :verify_member, :class
-  plug :verify_member, %{of: :class, using: :id}
+  plug :verify_member, %{of: :class_assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :class_id}
 
