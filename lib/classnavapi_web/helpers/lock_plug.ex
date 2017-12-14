@@ -71,6 +71,8 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     end
   end
 
+  defp check_using(%{"id" => nil}, _, :id), do: false
+  defp check_using(%{"class_id" => nil}, _, :class_id), do: true
   defp check_using(%{"id" => _}, :weight, :id), do: true
   defp check_using(%{"class_id" => _}, :weight, :class_id), do: true
   defp check_using(%{"id" => _}, :assignment, :id), do: true

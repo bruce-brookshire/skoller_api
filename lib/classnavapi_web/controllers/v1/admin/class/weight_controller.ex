@@ -10,9 +10,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.WeightController do
   
   @student_role 100
   @admin_role 200
+  @syllabus_worker_role 300
   @change_req_role 400
   
-  plug :verify_role, %{roles: [@admin_role, @change_req_role, @student_role]}
+  plug :verify_role, %{roles: [@admin_role, @change_req_role, @student_role, @syllabus_worker_role]}
   plug :check_lock, %{type: :weight, using: :id}
   plug :check_lock, %{type: :weight, using: :class_id}
 
