@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias ClassnavapiWeb.CSVView
   alias Classnavapi.Professor
   alias Classnavapi.Class
+  alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -15,25 +16,41 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   plug :verify_role, %{role: @admin_role}
 
   def fos(conn, %{"file" => file, "school_id" => school_id}) do
-    school_id = school_id |> String.to_integer
-    uploads = file.path 
-    |> File.stream!()
-    |> CSV.decode(headers: [:field])
-    |> Enum.map(&process_fos_row(&1, school_id))
+    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
+    case Repo.insert(changeset) do
+      {:ok, _} ->
+        school_id = school_id |> String.to_integer
+        uploads = file.path 
+        |> File.stream!()
+        |> CSV.decode(headers: [:field])
+        |> Enum.map(&process_fos_row(&1, school_id))
 
-    conn |> render(CSVView, "index.json", csv: uploads)
+        conn |> render(CSVView, "index.json", csv: uploads)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 
   def class(conn, %{"file" => file, "period_id" => period_id}) do
-    period_id = period_id |> String.to_integer
-    uploads = file.path 
-    |> File.stream!()
-    |> CSV.decode(headers: [:campus, :number, :crn, :meet_days,
-                            :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
-                            :location, :name, :class_type, :class_start, :meet_start_time])
-    |> Enum.map(&process_class_row(&1, period_id))
+    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
+    case Repo.insert(changeset) do
+      {:ok, _} ->
+        period_id = period_id |> String.to_integer
+        uploads = file.path 
+        |> File.stream!()
+        |> CSV.decode(headers: [:campus, :number, :crn, :meet_days,
+                                :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
+                                :location, :name, :class_type, :class_start, :meet_start_time])
+        |> Enum.map(&process_class_row(&1, period_id))
 
-    conn |> render(CSVView, "index.json", csv: uploads)
+        conn |> render(CSVView, "index.json", csv: uploads)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 
   defp process_class_row(class, period_id) do
