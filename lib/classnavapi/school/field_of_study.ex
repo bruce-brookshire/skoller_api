@@ -26,5 +26,6 @@ defmodule Classnavapi.School.FieldOfStudy do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
+    |> unique_constraint(:school_field, name: :fields_of_study_field_school_id_index)
   end
 end

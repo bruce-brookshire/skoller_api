@@ -8,7 +8,7 @@ defmodule ClassnavapiWeb.Jobs.ClearLocks do
 
   @open_lock_mins 60
 
-    def run(time) do
+    def run() do
       locks = get_incomplete_locks()
       locks |> insert_into_abandoned()
       locks |> delete()

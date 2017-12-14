@@ -22,6 +22,7 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
+      # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
 
@@ -50,16 +51,18 @@ defmodule ClassnavapiWeb.Router do
 
         # School Field of Study routes
         resources "/fields-of-study", Admin.School.FieldController, only: [:create, :index]
+        post "/fields-of-study/csv", CSVController, :fos
       end
 
       # Class Period routes
       resources "/periods", PeriodController, only: [:update, :show] do
-
+        
         # Class Period Professor routes
         resources "/professors", ProfessorController, only: [:create, :index]
 
         # Class Period Class routes
         resources "/classes", ClassController, only: [:create]
+        post "/classes/csv", CSVController, :class
       end
 
       # Class routes
