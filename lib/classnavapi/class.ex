@@ -23,6 +23,8 @@ defmodule Classnavapi.Class do
   alias Classnavapi.Repo
   alias Ecto.Changeset
 
+  @needs_syllabus_status 200
+
   schema "classes" do
     field :class_end, :date
     field :class_start, :date
@@ -34,18 +36,18 @@ defmodule Classnavapi.Class do
     field :is_syllabus, :boolean, default: true
     field :is_points, :boolean
     field :location, :string
-    field :meet_days, :string
-    field :meet_end_time, :string
-    field :meet_start_time, :string
+    field :meet_days, :string, default: ""
+    field :meet_end_time, :string, default: ""
+    field :meet_start_time, :string, default: ""
     field :name, :string
     field :number, :string
     field :seat_count, :integer
     field :professor_id, :id
     field :class_period_id, :id
-    field :class_status_id, :id
+    field :class_status_id, :id, default: @needs_syllabus_status
     field :grade_scale, :string
     field :class_type, :string
-    field :campus, :string
+    field :campus, :string, default: ""
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
@@ -75,6 +77,7 @@ defmodule Classnavapi.Class do
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
+    |> unique_constraint(:class, name: :unique_class_index)
   end
 
   def changeset_update(%Class{} = class, attrs) do
@@ -87,6 +90,7 @@ defmodule Classnavapi.Class do
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> cast_assoc(:weights)
     |> validate_weight_totals()
+    |> unique_constraint(:class, name: :unique_class_index)
   end
 
   defp sum_weight(list) do

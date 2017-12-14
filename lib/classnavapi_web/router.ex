@@ -62,6 +62,7 @@ defmodule ClassnavapiWeb.Router do
 
         # Class Period Class routes
         resources "/classes", ClassController, only: [:create]
+        post "/classes/csv", CSVController, :class
       end
 
       # Class routes
