@@ -4,13 +4,14 @@ defmodule ClassnavapiWeb.Class.SearchView do
     alias ClassnavapiWeb.Class.SearchView
     alias ClassnavapiWeb.Helpers.ClassCalcs
     alias Classnavapi.Repo
+    alias ClassnavapiWeb.ProfessorView
   
     def render("index.json", %{classes: classes}) do
         render_many(classes, SearchView, "class.json", as: :class)
     end
   
     def render("class.json", %{class: class}) do
-        class = class |> Repo.preload([:school, :class_status])
+        class = class |> Repo.preload([:school, :class_status, :professor])
         %{
                 id: class.id,
                 meet_days: class.meet_days,
@@ -20,10 +21,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 enrolled: ClassCalcs.get_enrollment(class),
                 length: ClassCalcs.get_class_length(class),
                 campus: class.campus,
-                professor: %{
-                    id: class.professor_id,
-                    name: ClassCalcs.professor_name(class)
-                },
+                professor: render_one(class.professor, ProfessorView, "professor-short.json"),
                 school: %{
                     id: class.school.id,
                     name: class.school.name

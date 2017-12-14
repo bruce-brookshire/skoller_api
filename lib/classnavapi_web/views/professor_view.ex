@@ -22,4 +22,12 @@ defmodule ClassnavapiWeb.ProfessorView do
         phone: professor.phone
     }
   end
+
+  def render("professor-short.json", %{professor: professor}) do
+    %{
+        id: professor.id,
+        name_first: professor.name_first,
+        name_last: professor.name_last
+    }
+  end
 end
