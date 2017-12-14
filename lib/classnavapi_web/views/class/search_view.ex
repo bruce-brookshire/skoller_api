@@ -10,9 +10,8 @@ defmodule ClassnavapiWeb.Class.SearchView do
     end
   
     def render("class.json", %{class: class}) do
-        class = class |> Repo.preload(:school)
+        class = class |> Repo.preload([:school, :class_status])
         %{
-            class: %{
                 id: class.id,
                 meet_days: class.meet_days,
                 meet_start_time: class.meet_start_time,
@@ -20,17 +19,16 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 number: class.number,
                 enrolled: ClassCalcs.get_enrollment(class),
                 length: ClassCalcs.get_class_length(class),
-                campus: class.campus
-            },
-            professor: %{
-                name: ClassCalcs.professor_name(class)
-            },
-            school: %{
-                name: class.school.name
-            },
-            status: %{
-                name: ClassCalcs.get_class_status(class)
-            }
+                campus: class.campus,
+                professor: %{
+                    id: class.professor_id,
+                    name: ClassCalcs.professor_name(class)
+                },
+                school: %{
+                    id: class.school.id,
+                    name: class.school.name
+                },
+                status: ClassCalcs.get_class_status(class)
         }
     end
   end
