@@ -17,6 +17,10 @@ defmodule ClassnavapiWeb.Router do
     plug :authenticate
   end
 
+  if Mix.env == :dev do
+    forward "/sent_emails", Bamboo.EmailPreviewPlug
+  end
+
   # Other scopes may use custom stacks.
   scope "/api", ClassnavapiWeb.Api do
     pipe_through :api_auth
@@ -25,6 +29,7 @@ defmodule ClassnavapiWeb.Router do
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
+      post "/reset", ForgotEmailController, :reset
 
       # User routes
       put "/users/:user_id", UserController, :update
@@ -152,6 +157,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/users", NewUserController, only: [:create]
       get "/school/list", SchoolController, :index
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
+      post "/forgot", ForgotEmailController, :forgot
     end
   end
 end

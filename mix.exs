@@ -54,7 +54,9 @@ defmodule Classnavapi.Mixfile do
       {:pigeon, "~> 1.1.1"},
       {:kadabra, "~> 0.3.4"},
       {:ex_twilio, "~> 0.5.0"},
-      {:csv, "~> 2.0.0"}
+      {:csv, "~> 2.0.0"},
+      {:bamboo, "~> 0.8"},
+      {:bamboo_smtp, "~> 1.4.0"}
     ]
   end
 
