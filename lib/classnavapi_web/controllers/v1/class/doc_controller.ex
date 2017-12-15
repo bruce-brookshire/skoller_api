@@ -22,6 +22,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
+    sammi = get_sammi_data(params)
+
     scope = %{"id" => UUID.generate()}
     location = 
       case DocUpload.store({file, scope}) do
@@ -31,7 +33,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
           nil
       end
 
-      
     params = params 
     |> Map.put("path", location)
     |> Map.put("name", file.filename)
@@ -58,4 +59,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     docs = Repo.all(from docs in Doc, where: docs.class_id == ^class_id)
     render(conn, DocView, "index.json", docs: docs)
   end
+
+  defp get_sammi_data(%{"file" => file, "is_syllabus" => "true"}) do
+    System.cmd("python3", ["./classifiers/sammi/main.py", "extract", file.path], cd: "./priv/sammi")
+  end
+  defp get_sammi_data(_params), do: nil
 end
