@@ -29,6 +29,7 @@ defmodule ClassnavapiWeb.Router do
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
+      post "/reset", ForgotEmailController, :reset
 
       # User routes
       put "/users/:user_id", UserController, :update
@@ -157,7 +158,6 @@ defmodule ClassnavapiWeb.Router do
       get "/school/list", SchoolController, :index
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
-      post "/reset", ForgotEmailController, :reset
     end
   end
 end

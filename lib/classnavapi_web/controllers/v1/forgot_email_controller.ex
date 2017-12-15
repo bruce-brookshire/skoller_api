@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
   alias Classnavapi.Mailer
   alias ClassnavapiWeb.Helpers.TokenHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.AuthView
 
   import Bamboo.Email
 
@@ -20,7 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
   end
 
   def reset(conn, %{"password" => password}) do
-    changeset = User.changeset_update(conn.assigns[:user], password)
+    changeset = User.changeset_update(conn.assigns[:user], %{"password" => password})
     multi = changeset |> update_user()
 
     case Repo.transaction(multi) do
