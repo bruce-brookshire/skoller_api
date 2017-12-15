@@ -26,12 +26,14 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
-  def is_phone_verified(%{request_path: "/api/v1/students/1/resend/"} = conn, _), do: conn
-  def is_phone_verified(%{request_path: "/api/v1/students/1/verify/"} = conn, _), do: conn
   def is_phone_verified(%{assigns: %{user: %{student: student}}} = conn, _) do
-    case student.is_verified do
+    case List.last(conn.path_info) in ["verify", "resend"] do
       true -> conn
-      _ -> conn |> unauth
+      false -> 
+        case student.is_verified do
+          true -> conn
+          _ -> conn |> unauth
+        end
     end
   end
   def is_phone_verified(conn, _), do: conn

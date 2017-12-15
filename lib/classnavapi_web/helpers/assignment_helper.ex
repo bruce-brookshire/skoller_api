@@ -29,6 +29,14 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     end
   end
 
+  def update_student_assignments(%{assignment: %Assignment{} = assignment}) do
+    students = get_students(%{class_id: assignment.class_id})
+    case students do
+      [] -> {:ok, nil}
+      _ -> convert_and_update(assignment, students)
+    end
+  end
+
   def get_assignments(%StudentClass{id: id}) do
     query = (from assign in StudentAssignment)
     query
@@ -78,6 +86,19 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     end
   end
 
+  defp convert_and_update(assignment, student_class) do
+    assignment
+    |> convert_assignments(student_class)
+    |> update_assignments()
+
+    updated = get_inserted(student_class, assignment)
+
+    case updated do
+      [] -> {:error, %{student_class: "Student Assignments not updated"}}
+      _ -> {:ok, updated}
+    end
+  end
+
   defp get_inserted(%StudentClass{} = student_class, _enumerable) do
     student_class
     |> get_assignments
@@ -91,6 +112,11 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
   defp insert_assignments(enumerable) do
     enumerable
     |> Enum.each(&Repo.insert!(&1))
+  end
+
+  defp update_assignments(enumerable) do
+    enumerable
+    |> Enum.each(&Repo.update!(&1))
   end
 
   defp convert_assignments(enumerable, %StudentClass{} = student_class) do

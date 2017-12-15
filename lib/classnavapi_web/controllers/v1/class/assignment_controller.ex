@@ -58,6 +58,24 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     end
   end
 
+  def update(conn, %{} = params) do
+    changeset = %Assignment{}
+                |> Assignment.changeset(params)
+                |> validate_class_weight()
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.update(:assignment, changeset)
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.update_student_assignments(&1))
+
+    case Repo.transaction(multi) do
+      {:ok, %{assignment: assignment}} ->
+        render(conn, AssignmentView, "show.json", assignment: assignment)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
+  end
+
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset) do
     case Repo.get_by(Weight, class_id: class_id, id: weight_id) do

@@ -89,6 +89,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                    phone: "6158675309",
                                    birthday: date1,
                                    gender: "Male",
+                                   is_verified: true,
                                    notification_time: time1}})
 
     Repo.insert!(%UserRole{user_id: user.id, role_id: 200})
