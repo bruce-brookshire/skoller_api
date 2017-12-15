@@ -58,8 +58,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     end
   end
 
-  def update(conn, %{} = params) do
-    changeset = %Assignment{}
+  def update(conn, %{"id" => id} = params) do
+    assign_old = Repo.get!(Assignment, id)
+    changeset = assign_old
                 |> Assignment.changeset(params)
                 |> validate_class_weight()
 

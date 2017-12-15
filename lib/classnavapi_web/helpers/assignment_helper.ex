@@ -89,7 +89,7 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
   defp convert_and_update(assignment, student_class) do
     assignment
     |> convert_assignments(student_class)
-    |> update_assignments()
+    |> Enum.each(&update_assignment(&1))
 
     updated = get_inserted(student_class, assignment)
 
@@ -114,9 +114,14 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
     |> Enum.each(&Repo.insert!(&1))
   end
 
-  defp update_assignments(enumerable) do
-    enumerable
-    |> Enum.each(&Repo.update!(&1))
+  defp update_assignment(student_assignment) do
+    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
+      nil -> :ok
+      assign_old -> StudentAssignment.changeset_update(assign_old, %{name: student_assignment.name,
+                                                                      weight_id: student_assignment.weight_id,
+                                                                      due: student_assignment.due}) 
+                    |> Repo.update
+    end
   end
 
   defp convert_assignments(enumerable, %StudentClass{} = student_class) do
