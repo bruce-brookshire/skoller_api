@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Router do
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource
     plug :authenticate
+    plug :is_phone_verified
   end
 
   if Mix.env == :dev do

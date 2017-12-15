@@ -40,12 +40,12 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
 
   defp send_forgot_pass_email(%User{} = user) do
     {:ok, token} = user |> TokenHelper.short_token()
-    email = user 
+    user 
     |> forgot_pass_email(token)
     |> Mailer.deliver_later
   end
 
-  defp forgot_pass_email(user, token) do
+  defp forgot_pass_email(_user, token) do
     new_email()
     |> to("tyler@fortyau.com") #to(user.email)
     |> from(@from_email)
