@@ -183,8 +183,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> AssignmentHelper.convert_assignment(student_class)
 
     Ecto.Multi.new
-    |> Ecto.Multi.insert(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
     |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp insert_student_assignment(student_assignment, _) do
+    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
+      nil -> Repo.insert(student_assignment)
+      assign -> {:ok, assign}
+    end
   end
 
   defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}) do
