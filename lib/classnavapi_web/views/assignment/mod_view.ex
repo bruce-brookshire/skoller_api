@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.Assignment.ModView do
     render_one(mod, ModView, "mod.json")
   end
 
-  def render("mod.json", %{mod: %{mod: mod, action: action}}) do
+  def render("mod.json", %{mod: %{mod: mod, action: action, student_assignment: student_assignment}}) do
     mod = mod |> Repo.preload([:assignment_mod_type, :assignment])
     assignment = mod.assignment |> Repo.preload(:class)
     %{
@@ -28,7 +28,8 @@ defmodule ClassnavapiWeb.Assignment.ModView do
       mod_type: mod.assignment_mod_type.name,
       short_msg: assignment.name <> " " <> mod_type(mod) <> ".",
       class: render_one(assignment.class, ClassView, "class.json"),
-      is_accepted: action.is_accepted
+      is_accepted: action.is_accepted,
+      student_assignment_id: get_student_assignment_id(student_assignment)
     }
   end
 
@@ -40,6 +41,9 @@ defmodule ClassnavapiWeb.Assignment.ModView do
       mod_type: mod.assignment_mod_type.name
     }
   end
+
+  defp get_student_assignment_id(nil), do: nil
+  defp get_student_assignment_id(student_assignment), do: student_assignment.id
 
   defp mod_type(mod) do
     case mod.assignment_mod_type_id do

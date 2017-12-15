@@ -2,8 +2,11 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Class
+  alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Repo
+  alias Classnavapi.Assignment.Mod
+  alias Classnavapi.Assignment.Mod.Action
   alias ClassnavapiWeb.Class.StudentClassView
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias ClassnavapiWeb.Helpers.ClassCalcs
@@ -97,6 +100,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     |> Ecto.Multi.insert(:student_class, changeset)
     |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
     |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_class: student_class}} ->
@@ -105,6 +109,23 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp add_public_mods(%{student_class: student_class}) do
+    mods = from(mod in Mod)
+    |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
+    |> join(:inner, [mod, assign], class in Class, class.id == assign.class_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod, assign, class], class.id == ^student_class.class_id)
+    |> Repo.all()
+    
+    status = mods |> Enum.map(&insert_mod_action(student_class, &1))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp insert_mod_action(student_class, %Mod{} = mod) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
   end
 
   defp update_student_class(conn, item) do

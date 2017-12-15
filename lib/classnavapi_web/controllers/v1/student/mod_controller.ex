@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentAssignmentView
   alias ClassnavapiWeb.Helpers.RepoHelper
@@ -32,8 +33,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     mod_actions = from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
     |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
-    |> where([mod, action, sc], sc.student_id == ^student_id)
-    |> select([mod, action, sc], %{mod: mod, action: action})
+    |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
+    |> where([mod, action, sc, sa], sc.student_id == ^student_id)
+    |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
     |> Repo.all()
 
     conn |> render(ModView, "index.json", mods: mod_actions)
