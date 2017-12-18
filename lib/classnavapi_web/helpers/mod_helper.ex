@@ -65,6 +65,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         Ecto.Multi.new
         |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:auto_update, &Task.start(process_auto_update(existing_mod, &1)))
+        |> Repo.transaction()
     end
   end
 
@@ -133,6 +135,31 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> where([mod, act], is_nil(act.is_accepted))
     |> select([mod, act, assign], assign)
     |> Repo.all()
+  end
+
+  defp process_auto_update(mod, _) do
+    actions = mod |> get_actions_from_mod()
+    count = actions |> Enum.count()
+    case count < 5 do
+      false -> {:ok, :not_enough_enrolled}
+      true -> 
+        acted = actions |> get_acted_ratio(count)
+        case acted >= 0.35 do
+          true -> copied = actions |> get_copied_ratio(count)
+          false -> {:ok, :not_enough_responses}
+        end
+    end
+  end
+  
+  defp get_acted_ratio(actions, count) do
+    action_count = actions
+    |> Enum.filter(& not(is_nil(&1.is_accepted)))
+    |> Enum.count()
+    action_count / count
+  end
+
+  defp get_actions_from_mod(mod) do
+    Repo.all(Action, assignment_modification_id: mod.id)
   end
 
   defp insert_mod(mod, %StudentClass{} = student_class) do
