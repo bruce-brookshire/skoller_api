@@ -52,6 +52,8 @@ defmodule ClassnavapiWeb.Router do
       get "/schools/hub", Admin.SchoolController, :hub
       resources "/schools", Admin.SchoolController, only: [:create, :update, :show, :index] do
 
+        get "/classes", School.ClassController, :index
+
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
 
