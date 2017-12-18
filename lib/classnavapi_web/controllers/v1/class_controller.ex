@@ -111,6 +111,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period, prof], ^filter(params))
+    |> select([class, period, prof], %{class: class, professor: prof})
     |> Repo.all()
 
     render(conn, SearchView, "index.json", classes: classes)
