@@ -27,7 +27,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     params = params |> Map.put("student_class_id", student_class.id)
 
-    changeset = Assignment.changeset(%Assignment{}, params)
+    changeset = Assignment.student_changeset(%Assignment{}, params)
     changeset = changeset
                 |> Ecto.Changeset.change(%{from_mod: true})
                 |> validate_class_weight()
@@ -166,7 +166,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> join(:inner, [assign], sc in StudentClass, sc.id == assign.student_class_id)
     |> where([assign, sc], sc.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
-    |> where([assign], ^Ecto.Changeset.get_field(changeset, :weight_id) == assign.weight_id)
+    |> compare_weights(changeset)
     |> where([assign], ^Ecto.Changeset.get_field(changeset, :due) == assign.due)
     |> Repo.all()
 
@@ -184,13 +184,22 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     assign = from(assign in Assignment)
     |> where([assign], assign.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
-    |> where([assign], ^Ecto.Changeset.get_field(changeset, :weight_id) == assign.weight_id)
+    |> compare_weights(changeset)
     |> where([assign], ^Ecto.Changeset.get_field(changeset, :due) == assign.due)
     |> Repo.all()
 
     case assign do
       [] -> changeset |> check_student_assignment()
       assign -> {:ok, assign |> List.first}
+    end
+  end
+
+  defp compare_weights(query, changeset) do
+    case Ecto.Changeset.get_field(changeset, :weight_id) do
+      nil ->
+        query |> where([assign], is_nil(assign.weight_id))
+      weight_id -> 
+        query |> where([assign], ^weight_id == assign.weight_id)
     end
   end
 

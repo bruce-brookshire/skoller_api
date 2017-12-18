@@ -29,10 +29,20 @@ defmodule Classnavapi.Class.Assignment do
   @req_fields [:due, :name, :class_id, :weight_id]
   @all_fields @req_fields
 
+  @stu_req_fields [:due, :name, :class_id]
+  @stu_opt_fields [:weight_id]
+  @stu_fields @stu_req_fields ++ @stu_opt_fields
+
   @doc false
   def changeset(%Assignment{} = assignment, attrs) do
     assignment
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+  end
+
+  def student_changeset(%Assignment{} = assignment, attrs) do
+    assignment
+    |> cast(attrs, @stu_fields)
+    |> validate_required(@stu_req_fields)
   end
 end
