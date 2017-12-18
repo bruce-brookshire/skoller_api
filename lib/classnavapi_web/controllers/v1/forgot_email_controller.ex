@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
 
   import Bamboo.Email
 
-  @from_email "support@skoller.co"
+  @from_email "noreply@skoller.co"
   @base_url "https://www.skoller.co"
   @reset_password_route "/api/v1/reset"
   @forgot_email_text1 "You forgot your password? It's okay. None of us are perfect. Click " 
@@ -45,9 +45,9 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
     |> Mailer.deliver_later
   end
 
-  defp forgot_pass_email(_user, token) do
+  defp forgot_pass_email(user, token) do
     new_email()
-    |> to("tyler@fortyau.com") #to(user.email)
+    |> to(user.email)
     |> from(@from_email)
     |> subject("Forgot Password")
     |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> @base_url <> @reset_password_route <> "?token=" <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>")
