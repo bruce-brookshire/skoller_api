@@ -26,6 +26,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
+  def is_phone_verified(%{assigns: %{user: %{student: nil}}} = conn, _), do: conn
   def is_phone_verified(%{assigns: %{user: %{student: student}}} = conn, _) do
     case List.last(conn.path_info) in ["verify", "resend"] do
       true -> conn
