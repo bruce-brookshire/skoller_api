@@ -37,6 +37,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_syllabus: class.is_syllabus,
             type: class.class_type,
             campus: class.campus,
+            class_period_id: class.class_period_id,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(professor, ProfessorView, "professor.json")
         }
@@ -63,6 +64,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_syllabus: class.is_syllabus,
             type: class.class_type,
             campus: class.campus,
+            class_period_id: class.class_period_id,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(class.professor, ProfessorView, "professor.json")
         }
