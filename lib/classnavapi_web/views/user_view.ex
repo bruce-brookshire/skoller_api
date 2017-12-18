@@ -15,7 +15,8 @@ defmodule ClassnavapiWeb.UserView do
   def render("user.json", %{user: user}) do
     %{
       id: user.id,
-      email: user.email
+      email: user.email,
+      avatar: user.pic_path
     }
   end
 

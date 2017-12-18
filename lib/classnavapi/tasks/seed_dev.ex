@@ -46,10 +46,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                     timezone: "CST",
                                     email_domains: [
                                       %EmailDomain{
-                                        email_domain: "@skoller.co",
-                                        is_professor_only: false
-                                      },
-                                      %EmailDomain{
                                         email_domain: "@fortyau.com",
                                         is_professor_only: false
                                       }
@@ -65,10 +61,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                       %EmailDomain{
                                         email_domain: "@skoller.co",
                                         is_professor_only: false
-                                      },
-                                      %EmailDomain{
-                                        email_domain: "@fortyau.com",
-                                        is_professor_only: false
                                       }
                                     ],
                                     adr_zip: "37201",
@@ -80,11 +72,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     timezone: "CST",
                                     email_domains: [
                                       %EmailDomain{
-                                        email_domain: "@skoller.co",
-                                        is_professor_only: false
-                                      },
-                                      %EmailDomain{
-                                        email_domain: "@fortyau.com",
+                                        email_domain: "@test.com",
                                         is_professor_only: false
                                       }
                                     ],
