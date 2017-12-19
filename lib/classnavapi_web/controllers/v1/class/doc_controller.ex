@@ -22,7 +22,17 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    sammi = get_sammi_data(params)
+    {sammi, _code} = get_sammi_data(params)
+    
+    require IEx
+    IEx.pry
+
+    t = sammi
+    |> String.replace("'", ~s("))
+    |> Poison.decode!
+
+    require IEx
+    IEx.pry
 
     scope = %{"id" => UUID.generate()}
     location = 
