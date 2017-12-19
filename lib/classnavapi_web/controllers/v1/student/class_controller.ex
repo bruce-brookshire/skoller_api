@@ -101,6 +101,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
     |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
+    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_class: student_class}} ->
@@ -110,6 +111,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
         |> RepoHelper.multi_error(failed_value)
     end
   end
+
+  defp auto_approve_mods(%{mods: mods}) do
+    status = mods
+    |> Enum.map(&ModHelper.process_auto_update(&1))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp auto_approve_mods(_params), do: {:ok, nil}
 
   defp add_public_mods(%{student_class: student_class}) do
     mods = from(mod in Mod)
@@ -121,7 +130,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     
     status = mods |> Enum.map(&insert_mod_action(student_class, &1))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
   end
 
   defp insert_mod_action(student_class, %Mod{} = mod) do
