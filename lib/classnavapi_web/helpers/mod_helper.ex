@@ -201,11 +201,12 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  defp get_actions_from_mod(mod) do
+  defp get_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
-    |> where([act], act.assignment_modification_id == ^mod.id)
+    |> where([act], act.assignment_modification_id == ^id)
     |> Repo.all()
   end
+  defp get_actions_from_mod(_mod), do: []
 
   defp insert_mod(mod, %StudentClass{} = student_class) do
     changeset = Mod.changeset(%Mod{}, mod)
