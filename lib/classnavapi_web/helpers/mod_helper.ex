@@ -15,7 +15,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
-  alias ClassnavapiWeb.Helpers.ModHelper
 
   import Ecto.Query
 
@@ -70,7 +69,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         Ecto.Multi.new
         |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [existing_mod, &1]))
         |> Repo.transaction()
     end
   end
@@ -111,7 +109,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       true -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [existing_mod, &1]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -143,8 +140,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all()
   end
 
-  def process_auto_update(mod, _) do
+  def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
+
     actions 
     |> Enum.count()
     |> auto_update_count_needed()
@@ -216,7 +214,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
     |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
-    |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [&1.mod, &1]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
@@ -228,7 +225,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.update(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
     |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
-    |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [&1.mod, &1]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
@@ -240,7 +236,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       false -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [mod, &1]))
         |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
         |> Repo.transaction()
     end
@@ -252,7 +247,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.delete(:student_assignment, student_assignment)
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
-    |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [mod, &1]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
@@ -264,7 +258,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
-    |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [mod, &1]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
@@ -284,7 +277,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
-    |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [mod, &1]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
@@ -349,7 +341,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       true -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [existing_mod, &1]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -377,7 +368,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       true -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [existing_mod, &1]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -405,7 +395,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       true -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:auto_update, &Task.start(ModHelper, :process_auto_update, [existing_mod, &1]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
