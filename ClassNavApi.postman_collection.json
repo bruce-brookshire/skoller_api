@@ -38,82 +38,7 @@
 						},
 						"description": "Logs a user in, gets a jwt token.\n\n## Body Params\n* email\n* password"
 					},
-					"response": [
-						{
-							"id": "6da436c0-1f3e-4563-8a65-b04b41e78458",
-							"name": "Successful with Student Obj Login",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\":\"test\"}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users/login",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users",
-										"login"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"_postman_previewtype": "text",
-							"header": [
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "544",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "content-type",
-									"value": "application/json; charset=utf-8",
-									"name": "content-type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 16:47:37 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "9un4j0gf0c9drmp1tvsnq58b4hr7oi7f",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
-							],
-							"cookie": [],
-							"responseTime": 890,
-							"body": "{\"user\":{\"student\":{\"phone\":\"6158675309\",\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[],\"id\":2,\"email\":\"tyler@hku.edu\"},\"token\":\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJDbGFzc25hdmFwaSIsImV4cCI6MTUxNDMwNjg1OCwiaWF0IjoxNTExODg3NjU4LCJpc3MiOiJDbGFzc25hdmFwaSIsImp0aSI6IjAzNjI5YjZiLWIzOTYtNDk4Yi04ZTlhLTk2YmZhMjg0MTkzNiIsIm5iZiI6MTUxMTg4NzY1Nywic3ViIjoiMiIsInR5cCI6ImFjY2VzcyJ9.RZCZBUERrQF0YFZc3sVTRaEIsDv17PZXO-9n6bXD-mrUuBTOwdJPYDliQ7Priq20al8FtxaAm0Wj3kiwcp2Giw\"}"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Token Login",
@@ -217,7 +142,7 @@
 					},
 					"response": [
 						{
-							"id": "05e78691-5016-48b6-9d42-eef915d1d231",
+							"id": "579f7515-a3e9-4085-b9bf-feddb8b463d7",
 							"name": "Logout",
 							"originalRequest": {
 								"method": "POST",
@@ -306,6 +231,68 @@
 							"body": ""
 						}
 					]
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"dev@skoller.co\"}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/forgot",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"forgot"
+							]
+						},
+						"description": "Sends a forgot password email to user.\n\n## Body Params\n* email"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\":\"lolol\"}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/reset",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reset"
+							]
+						},
+						"description": "Resets a password based on token user.\n\n## Body Params\n* password"
+					},
+					"response": []
 				}
 			]
 		},
@@ -348,7 +335,7 @@
 					},
 					"response": [
 						{
-							"id": "d97ac7c3-e780-4c9d-a715-b10b8a827223",
+							"id": "4eb583f7-c9f6-447c-b795-132e1ec3460a",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "POST",
@@ -463,7 +450,7 @@
 					},
 					"response": [
 						{
-							"id": "dddd78ee-2f26-4f97-9d0f-6949dab8d3e6",
+							"id": "0514fbf8-5a87-4c20-b148-b3345f706af8",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "PUT",
@@ -559,10 +546,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"is_private\": true\n}"
+							"raw": "{\n\t\"is_private\": false\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/assignments/4",
+							"raw": "{{BaseUrl}}/api/v1/assignments/1",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -570,14 +557,14 @@
 								"api",
 								"v1",
 								"assignments",
-								"4"
+								"1"
 							]
 						},
 						"description": "Deletes a student assignment.\n\n## Path Params\n* Student Assignment id\n\n## Body Params\n* is_private (boolean)\n\n## Behavior\nThis action will create a mod."
 					},
 					"response": [
 						{
-							"id": "42a59685-7859-489a-b207-335c7252b689",
+							"id": "0c1ea42a-15bb-4cc6-ac21-bfa3017a0938",
 							"name": "Delete Student Assignments",
 							"originalRequest": {
 								"method": "DELETE",
@@ -684,7 +671,7 @@
 					},
 					"response": [
 						{
-							"id": "046bf1ba-476f-4bcb-a8c8-09cf456da927",
+							"id": "a5be0a73-bd0f-426f-b99c-789d90bbdf7e",
 							"name": "Update Student Assignments Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -797,7 +784,7 @@
 					},
 					"response": [
 						{
-							"id": "2d0360a1-6292-4a4a-90d2-30a1150b761c",
+							"id": "c1a40c65-e2e8-441a-9387-0c7947884653",
 							"name": "Get Student Assignment by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -924,7 +911,7 @@
 							},
 							"response": [
 								{
-									"id": "591e36af-1267-42e4-b5a9-d7d41f46a8d4",
+									"id": "3eb1b840-5510-4bce-a1e9-0f7b3e44b626",
 									"name": "Get Class Files",
 									"originalRequest": {
 										"method": "GET",
@@ -1045,7 +1032,7 @@
 							},
 							"response": [
 								{
-									"id": "5c4a6039-1397-4d2f-a6c8-33c803676e4a",
+									"id": "5f40da16-63f8-47c4-bd19-09af4ae1b419",
 									"name": "Upload Class File",
 									"originalRequest": {
 										"method": "POST",
@@ -1172,7 +1159,7 @@
 							},
 							"response": [
 								{
-									"id": "0180dbc0-28ac-4215-8336-d60dabd7263b",
+									"id": "7f6722bb-d047-4685-82c6-aadd138fe3ca",
 									"name": "Create Class Assignment",
 									"originalRequest": {
 										"method": "POST",
@@ -1322,7 +1309,7 @@
 							},
 							"response": [
 								{
-									"id": "9843181f-392a-4779-81fb-979bc96d1997",
+									"id": "aa09ce7b-1c2b-46c1-8026-83d62c047fd1",
 									"name": "Delete Class Assignments",
 									"originalRequest": {
 										"method": "DELETE",
@@ -1413,6 +1400,41 @@
 									"body": ""
 								}
 							]
+						},
+						{
+							"name": "Update Class Assignments",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Apple\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/class/assignments/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"class",
+										"assignments",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
@@ -1447,7 +1469,7 @@
 							},
 							"response": [
 								{
-									"id": "8976de6e-3e4e-452c-aefd-edf5afb24e15",
+									"id": "cff99af1-a44c-4891-a9c3-d8e3b6895c39",
 									"name": "Get Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -1545,7 +1567,7 @@
 							},
 							"response": [
 								{
-									"id": "7de31492-f14f-4b26-b19c-c31e9a0e0156",
+									"id": "45dd33df-a6ce-4b20-b753-abb9f5158e4a",
 									"name": "Get Hub Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -1643,7 +1665,7 @@
 							},
 							"response": [
 								{
-									"id": "9cd2e14e-fcbb-4b64-bcc6-82a470bda17b",
+									"id": "7f8fb6fd-e3a0-4b17-bc05-6ffdfa4c7dfc",
 									"name": "Get Class Help Types",
 									"originalRequest": {
 										"method": "GET",
@@ -1740,7 +1762,7 @@
 							},
 							"response": [
 								{
-									"id": "b2b608b8-dc18-4e7b-a2ac-1ffc2659a34a",
+									"id": "22171428-f9c3-4cf5-aa1c-9c390acf1d93",
 									"name": "Get Class Change Types",
 									"originalRequest": {
 										"method": "GET",
@@ -1846,7 +1868,7 @@
 							},
 							"response": [
 								{
-									"id": "988dc12e-ada4-4a58-a4b5-08d035d38327",
+									"id": "ad34072d-8532-4708-bb07-1b65dc57ee26",
 									"name": "Update Class Status",
 									"originalRequest": {
 										"method": "PUT",
@@ -2002,7 +2024,7 @@
 							},
 							"response": [
 								{
-									"id": "104efb88-eb51-40b8-af95-1197598b523d",
+									"id": "46fb5806-b273-49a8-a7cf-12f9e0b13986",
 									"name": "Update Class Weights",
 									"originalRequest": {
 										"method": "PUT",
@@ -2116,7 +2138,7 @@
 							},
 							"response": [
 								{
-									"id": "9c10d1a7-06ad-43e2-83ea-3040b817548c",
+									"id": "722e6c09-b510-482a-93e1-690ceef336b4",
 									"name": "Create Class Weights",
 									"originalRequest": {
 										"method": "POST",
@@ -2248,7 +2270,7 @@
 							},
 							"response": [
 								{
-									"id": "7b20dbe9-3826-4dc6-81bd-69e12a2b008b",
+									"id": "3b552699-0ead-47cc-934e-363d5209436f",
 									"name": "Delete Class Weights",
 									"originalRequest": {
 										"method": "DELETE",
@@ -2382,7 +2404,7 @@
 							},
 							"response": [
 								{
-									"id": "b7a4d1a1-4ee1-4af8-ac94-38510da0f0b2",
+									"id": "bfeef40b-87fc-4ea4-894d-daca77293dc4",
 									"name": "Add Help Request Error",
 									"originalRequest": {
 										"method": "POST",
@@ -2462,7 +2484,7 @@
 									"body": "{\"error\":{\"error\":\"Class is complete, use Change Request.\"}}"
 								},
 								{
-									"id": "a805d358-6375-4280-ab4e-e36df6941efa",
+									"id": "3e64ed4d-c473-4636-b260-e19ae72fd767",
 									"name": "Add Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2573,7 +2595,7 @@
 							},
 							"response": [
 								{
-									"id": "1240fcc1-85fe-4c74-a514-b6071942e912",
+									"id": "f6592334-7a78-4e56-849d-eef928ac85b9",
 									"name": "Resolve Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2682,7 +2704,7 @@
 							},
 							"response": [
 								{
-									"id": "cb22a78c-6b03-4403-ae6e-750de5b19c58",
+									"id": "6951132c-1c4e-42c7-83a0-a7bb93e7db32",
 									"name": "Add Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2784,7 +2806,7 @@
 							},
 							"response": [
 								{
-									"id": "cb11277b-96f6-4e64-89a5-6c19b981e1fb",
+									"id": "c6aaaa00-0665-4a36-b4f0-9445d5a147b2",
 									"name": "Resolve Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2938,6 +2960,56 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "CSV",
+					"description": "",
+					"item": [
+						{
+							"name": "Class Upload",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"value": "",
+											"description": "",
+											"type": "file"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/periods/1/classes/csv",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"periods",
+										"1",
+										"classes",
+										"csv"
+									]
+								},
+								"description": "Uploads a class from CSV.\n\nColumn order:\n:campus, \n:class_number, \n:crn, \n:meet_days,\n:class_end, \n:meet_end_time, \n:prof_name_first, \n:prof_name_last,\n:location, \n:name, \n:class_type, \n:class_start, \n:meet_start_time"
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Get Classes",
 					"request": {
 						"method": "GET",
@@ -2961,96 +3033,7 @@
 						},
 						"description": "Shows all classes. Can be used as a search with multiple filters.\n\n## Behavior:\n   Only searches the current period\n   Passing or=true as a filter makes the filter list become inclusive\n\n## Filters:\n  * school\n    * school id\n  * professor.name\n    * professor name\n  * professor.id\n\t* professor id\n  * class.status\n    * status id\n    * For ghost classes, use 0.\n  * class.name\n    * class name\n  * class.number\n    * class number\n  * class.meet_days\n    * class meet_days\n  * class.length\n    * 1st Half\n    * 2nd Half\n    * Full Term\n    * Custom"
 					},
-					"response": [
-						{
-							"id": "31aaed40-4ab7-4840-8852-7a485bd7152d",
-							"name": "Get Classes",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/classes",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"classes"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"_postman_previewtype": "text",
-							"header": [
-								{
-									"key": "access-control-allow-credentials",
-									"value": "true",
-									"name": "access-control-allow-credentials",
-									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-								},
-								{
-									"key": "access-control-allow-origin",
-									"value": "*",
-									"name": "access-control-allow-origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "access-control-expose-headers",
-									"value": "",
-									"name": "access-control-expose-headers",
-									"description": "Lets a server whitelist headers that browsers are allowed to access."
-								},
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "472",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "content-type",
-									"value": "application/json; charset=utf-8",
-									"name": "content-type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 20:50:52 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "fi3tamqcrir9du3ic9ss8h7frsspl4k6",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
-							],
-							"cookie": [],
-							"responseTime": 656,
-							"body": "[{\"status\":{\"name\":\"Ghost\"},\"school\":{\"name\":\"Hard Knocks University\"},\"professor\":{\"name\":\"None\"},\"class\":{\"number\":\"8001-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_days\":\"MWF\",\"length\":\"Custom\",\"id\":2,\"enrolled\":0}},{\"status\":{\"name\":\"Change\"},\"school\":{\"name\":\"Hard Knocks University\"},\"professor\":{\"name\":\"None\"},\"class\":{\"number\":\"8001-01\",\"name\":\"Big Money\",\"meet_start_time\":\"8:30\",\"meet_days\":\"MWF\",\"length\":\"Full Term\",\"id\":1,\"enrolled\":1}}]"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Update Class",
@@ -3086,7 +3069,7 @@
 					},
 					"response": [
 						{
-							"id": "b5a49e25-b58b-49a3-bad7-59720770c059",
+							"id": "35c819bc-f432-4f5b-83e9-476b0c73bcae",
 							"name": "Update Class",
 							"originalRequest": {
 								"method": "PUT",
@@ -3182,7 +3165,7 @@
 							"body": "{\"type\":null,\"status\":{\"name\":\"Help\",\"id\":600},\"seat_count\":200,\"number\":\"8002-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Custom\",\"is_syllabus\":true,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"help_requests\":[{\"note\":\"It broke.\",\"is_completed\":true,\"id\":3,\"help_type\":{\"name\":\"Incorrect\",\"id\":100}}],\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-08-30\",\"class_end\":\"2017-11-11\",\"change_requests\":[]}"
 						},
 						{
-							"id": "b2cecb1d-39da-40c5-93c0-557de728bd9a",
+							"id": "be43276a-ad1d-4972-ace7-56bbb1e982cf",
 							"name": "Update Class No Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -3308,7 +3291,7 @@
 					},
 					"response": [
 						{
-							"id": "6ef32554-96b5-42ff-86c5-500684ba5c13",
+							"id": "256f0435-16f7-4d26-91eb-f9570df734d2",
 							"name": "Get School Classes by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -3433,7 +3416,7 @@
 					},
 					"response": [
 						{
-							"id": "6de37c09-6b3a-4e64-aea8-f9c5a195202d",
+							"id": "f2421c75-53e4-413a-9d26-86fbf631fd38",
 							"name": "Confirm Class",
 							"originalRequest": {
 								"method": "POST",
@@ -3565,11 +3548,21 @@
 						},
 						"description": "Creates a class in the given class period.\n\n## Defaults\n\ngrade_scale: A,90|B,80|C,70|D,60\n\n## Required fields\n\nname, \nnumber, \nmeet_days, \nmeet_start_time, \nmeet_end_time,\nseat_count, \nclass_start, \nclass_end, \nis_enrollable, \nis_editable, \nclass_period_id, \nis_syllabus\n\n## Optional fields\n\ncrn, \ncredits, \nlocation, \nprofessor_id, \nclass_type,\ngrade_scale, \nis_points"
 					},
-					"response": [
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Period",
+			"description": "",
+			"item": [
+				{
+					"name": "Professors",
+					"description": "",
+					"item": [
 						{
-							"id": "dd2750ae-a057-4b75-a076-1cfcf88df7dd",
-							"name": "Create School Class",
-							"originalRequest": {
+							"name": "Create Professor",
+							"request": {
 								"method": "POST",
 								"header": [
 									{
@@ -3583,10 +3576,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\"name\":\"Cryptocurrencies 101\",\n\"number\": \"8001-01\",\n\"meet_days\": \"MWF\",\n\"meet_start_time\": \"8:30\",\n\"meet_end_time\": \"12\",\n\"seat_count\": 200,\n\"class_start\":\"2017-08-30T00:00:00Z\",\n\"class_end\": \"2017-12-11T00:00:00Z\",\n\"is_enrollable\":true,\n\"is_editable\":true,\n\"is_syllabus\":true,\n\"grade_scale\": \"A,90|B,80|C,70|D,60\",\n\"is_student\": false\n}"
+									"raw": "{\n  \"name_last\": \"Jimbo\"\n}"
 								},
 								"url": {
-									"raw": "{{BaseUrl}}/api/v1/periods/1/classes/",
+									"raw": "{{BaseUrl}}/api/v1/periods/1/professors",
 									"host": [
 										"{{BaseUrl}}"
 									],
@@ -3595,8 +3588,677 @@
 										"v1",
 										"periods",
 										"1",
-										"classes",
+										"professors"
+									]
+								},
+								"description": ""
+							},
+							"response": [
+								{
+									"id": "c045aaea-1841-45cc-8723-225eb72f0074",
+									"name": "Create Professor",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name_last\": \"Jimbo\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/periods/1/professors",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"periods",
+												"1",
+												"professors"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "122",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 28 Nov 2017 20:53:03 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "g7hbtvd54vjppfbfcmqqaq00md6kquv3",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 564,
+									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}"
+								}
+							]
+						},
+						{
+							"name": "Get Professors",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"periods",
+										"1",
+										"professors",
 										""
+									]
+								},
+								"description": "Gets all or searches professors for the class period.\n\n# Header Params\n* peroid id\n\n# Filters\n* professor.name\n  * string"
+							},
+							"response": [
+								{
+									"id": "b03d0161-5259-498d-ba95-f3011ef2b721",
+									"name": "Get Professors",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"periods",
+												"1",
+												"professors",
+												""
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "124",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 28 Nov 2017 20:53:15 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "1kdtohjqfn58fmhceic5ndkmeb3ltmcv",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 560,
+									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}]"
+								},
+								{
+									"id": "07920438-8563-4163-9df4-367f1e1759e7",
+									"name": "Get Professors filter",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/periods/1/professors?professor.name=mm",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"periods",
+												"1",
+												"professors"
+											],
+											"query": [
+												{
+													"key": "professor.name",
+													"value": "mm",
+													"equals": true
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "139",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 05 Dec 2017 17:39:29 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "kl9p9kc7tjen7ua0uq7q1v153gd3217b",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 51,
+									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":\"Jimmy\",\"id\":1,\"email\":\"jimjim@jim.edu\"}]"
+								}
+							]
+						},
+						{
+							"name": "Get Professors by Id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/professors/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"professors",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": [
+								{
+									"id": "f6ff52aa-4776-4271-912f-5a63c8a028be",
+									"name": "Get Professors by Id",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/professors/1",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"professors",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "122",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 28 Nov 2017 20:53:21 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "u9dcveplj4ec6brmt2ertonr0efht8kl",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 546,
+									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}"
+								}
+							]
+						},
+						{
+							"name": "Update Professor",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/professors/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"professors",
+										"1"
+									]
+								},
+								"description": ""
+							},
+							"response": [
+								{
+									"id": "64a74248-088a-4bf2-bcb6-3938745f8572",
+									"name": "Update Professor",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/professors/1",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"professors",
+												"1"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"_postman_previewtype": "text",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "137",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 28 Nov 2017 20:53:29 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "sk5386nnhdpubfuekv20ecbaok2tqof4",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"responseTime": 546,
+									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":\"Jimmy\",\"id\":1,\"email\":\"jimjim@jim.edu\"}"
+								}
+							]
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Get Class Period by Id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/periods/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"periods",
+								"1"
+							]
+						},
+						"description": ""
+					},
+					"response": [
+						{
+							"id": "3a798519-8d19-4304-9179-4fb71c4ef964",
+							"name": "Get Class Period by Id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/periods/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"periods",
+										"1"
 									]
 								}
 							},
@@ -3606,6 +4268,24 @@
 							"_postman_previewtype": "text",
 							"header": [
 								{
+									"key": "access-control-allow-credentials",
+									"value": "true",
+									"name": "access-control-allow-credentials",
+									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-expose-headers",
+									"value": "",
+									"name": "access-control-expose-headers",
+									"description": "Lets a server whitelist headers that browsers are allowed to access."
+								},
+								{
 									"key": "cache-control",
 									"value": "max-age=0, private, must-revalidate",
 									"name": "cache-control",
@@ -3613,7 +4293,7 @@
 								},
 								{
 									"key": "content-length",
-									"value": "441",
+									"value": "70",
 									"name": "content-length",
 									"description": "The length of the response body in octets (8-bit bytes)"
 								},
@@ -3625,7 +4305,7 @@
 								},
 								{
 									"key": "date",
-									"value": "Tue, 28 Nov 2017 20:21:49 GMT",
+									"value": "Tue, 28 Nov 2017 20:53:48 GMT",
 									"name": "date",
 									"description": "The date and time that the message was sent"
 								},
@@ -3637,14 +4317,145 @@
 								},
 								{
 									"key": "x-request-id",
-									"value": "00usq1q1fohlg64tf918ri5dpf380329",
+									"value": "56u8thtnmlghq6q2m1707jsnmk60pls9",
 									"name": "x-request-id",
 									"description": "Custom header"
 								}
 							],
 							"cookie": [],
-							"responseTime": 566,
-							"body": "{\"type\":null,\"status\":{\"name\":\"Needs Syllabus\",\"id\":200},\"seat_count\":200,\"number\":\"8001-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Custom\",\"is_syllabus\":true,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"help_requests\":[],\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-08-30\",\"class_end\":\"2017-12-11\",\"change_requests\":[]}"
+							"responseTime": 556,
+							"body": "{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"id\":1,\"end_date\":\"2018-10-12\"}"
+						}
+					]
+				},
+				{
+					"name": "Update Class Period",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Quarter 21\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/periods/2",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"periods",
+								"2"
+							]
+						},
+						"description": ""
+					},
+					"response": [
+						{
+							"id": "e6251913-5e8f-4cce-8ab2-f5c96c524bd3",
+							"name": "Update Class Period",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Quarter 21\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/periods/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"periods",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "access-control-allow-credentials",
+									"value": "true",
+									"name": "access-control-allow-credentials",
+									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-expose-headers",
+									"value": "",
+									"name": "access-control-expose-headers",
+									"description": "Lets a server whitelist headers that browsers are allowed to access."
+								},
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "78",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Tue, 28 Nov 2017 20:54:01 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "1oup275h9polvastgb4bpfq2modmhg3a",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 557,
+							"body": "{\"start_date\":\"2017-10-12\",\"name\":\"Quarter 21\",\"id\":1,\"end_date\":\"2018-10-12\"}"
 						}
 					]
 				}
@@ -3686,7 +4497,7 @@
 					},
 					"response": [
 						{
-							"id": "df5c4847-7d9b-4532-8f8a-88dab3d2596d",
+							"id": "3054a8bd-8738-4246-8d99-92f4eb63b357",
 							"name": "Get Roles",
 							"originalRequest": {
 								"method": "GET",
@@ -3813,7 +4624,7 @@
 					},
 					"response": [
 						{
-							"id": "30582fe2-d91b-495c-8fcb-01620781415c",
+							"id": "ca8d70e4-361a-4a9c-ab3d-ff6b78095c42",
 							"name": "Get Role by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -3953,7 +4764,7 @@
 							},
 							"response": [
 								{
-									"id": "604707b3-bc6f-47e8-8c3f-deccb7d90ade",
+									"id": "dd639182-12ad-4b74-80af-2d330bce42ef",
 									"name": "Create School Class Period",
 									"originalRequest": {
 										"method": "POST",
@@ -4087,7 +4898,7 @@
 							},
 							"response": [
 								{
-									"id": "c20e5c4a-5382-4e04-91ea-db7476b9a4d0",
+									"id": "056f7341-0fcd-4514-86be-f59cc7323c6f",
 									"name": "Get School Class Periods",
 									"originalRequest": {
 										"method": "GET",
@@ -4194,6 +5005,52 @@
 					"description": "",
 					"item": [
 						{
+							"name": "CSV",
+							"description": "",
+							"item": [
+								{
+									"name": "Upload Fields of Study",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "file",
+													"description": "",
+													"type": "file",
+													"src": "TEST SCHOOL FOS.csv"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study/csv",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"schools",
+												"1",
+												"fields-of-study",
+												"csv"
+											]
+										},
+										"description": "Uploads a CSV of fields of study for given school\n\nFile format is a single column, no headers, with text for the field of study."
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Add Field of Study",
 							"request": {
 								"method": "POST",
@@ -4228,7 +5085,7 @@
 							},
 							"response": [
 								{
-									"id": "77e3b119-30b7-45d1-b0b7-39f0a0206732",
+									"id": "74144e1b-46e5-4831-a5ff-c711b73cca60",
 									"name": "Add Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -4360,7 +5217,7 @@
 							},
 							"response": [
 								{
-									"id": "a945a1e5-b414-470c-a0a7-ec1d87309588",
+									"id": "7dd896d5-9423-4c0b-8b4e-37a0e46aac00",
 									"name": "Get Field of Study by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -4492,7 +5349,7 @@
 							},
 							"response": [
 								{
-									"id": "f392581f-8b34-4529-9f83-335b61e907e0",
+									"id": "f43df112-9e19-4506-a99a-97be70ff8aa2",
 									"name": "Get Fields of Study",
 									"originalRequest": {
 										"method": "GET",
@@ -4624,7 +5481,7 @@
 							},
 							"response": [
 								{
-									"id": "4d369db1-4a6a-4c26-af74-bae92d174cd2",
+									"id": "2551b689-b94b-413d-ac65-556f492d182e",
 									"name": "Update Field of Study",
 									"originalRequest": {
 										"method": "PUT",
@@ -4789,7 +5646,7 @@
 					},
 					"response": [
 						{
-							"id": "ea10599c-32c5-4755-80af-e63cfd26f561",
+							"id": "f278e9ed-7f63-4429-bde1-65f8d53d0215",
 							"name": "Create School",
 							"originalRequest": {
 								"method": "POST",
@@ -4912,7 +5769,7 @@
 					},
 					"response": [
 						{
-							"id": "5582341a-5e24-4eb2-87b3-5653c6dbee1c",
+							"id": "bfc1315e-51df-4684-9952-95fd7af64e6d",
 							"name": "Get Schools",
 							"originalRequest": {
 								"method": "GET",
@@ -5029,7 +5886,7 @@
 					},
 					"response": [
 						{
-							"id": "0e137f77-cf07-446d-97e5-bafe088567c1",
+							"id": "d292d794-ad90-4a4b-afc8-14abacc59a70",
 							"name": "Get School by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -5153,7 +6010,7 @@
 					},
 					"response": [
 						{
-							"id": "01415d57-e598-4e0a-b267-3588a3bc84fc",
+							"id": "ea2dd7a5-8eaa-4768-838a-4bc1435654e7",
 							"name": "Update School",
 							"originalRequest": {
 								"method": "PUT",
@@ -5277,7 +6134,7 @@
 					},
 					"response": [
 						{
-							"id": "fb1bbf1c-a684-4e52-9590-575f6029127e",
+							"id": "5f506a2e-19c2-46e2-b6f5-bf35b14a5eeb",
 							"name": "Get Schools Hub",
 							"originalRequest": {
 								"method": "GET",
@@ -5389,7 +6246,7 @@
 					},
 					"response": [
 						{
-							"id": "5743e180-2c23-4f72-adef-54c6c7dc3722",
+							"id": "22a6e1d1-b7d1-4255-812e-99ce2d21fffc",
 							"name": "Get Schools No Auth",
 							"originalRequest": {
 								"method": "GET",
@@ -5479,6 +6336,126 @@
 							"body": "[{\"name\":\"Hard Knocks University\",\"id\":1,\"email_domains\":[{\"is_professor_only\":false,\"email_domain\":\"@hku.edu\"}]}]"
 						}
 					]
+				},
+				{
+					"name": "Get School Classes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/schools/1/classes",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"schools",
+								"1",
+								"classes"
+							]
+						},
+						"description": "Shows all classes for a school. Lighter weight than get classes, mainly used for enrollment in a class. Can be used as a search with multiple filters.\n\n## Behavior:\n   Only searches the current period\n   Passing or=true as a filter makes the filter list become inclusive\n\n## Filters:\n  * professor.name\n    * professor name\n  * professor.id\n\t* professor id\n  * class.name\n    * class name\n  * class.number\n    * class number"
+					},
+					"response": [
+						{
+							"id": "083ac581-63d7-4b81-a079-bbd35ba07260",
+							"name": "Get School Classes",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"disabled": false
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/classes",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"classes"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "access-control-allow-credentials",
+									"value": "true",
+									"name": "access-control-allow-credentials",
+									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-expose-headers",
+									"value": "",
+									"name": "access-control-expose-headers",
+									"description": "Lets a server whitelist headers that browsers are allowed to access."
+								},
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "761",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Mon, 18 Dec 2017 17:09:17 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "vknqstrq62fees0tkv6vq0guub254op9",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 147,
+							"body": "[{\"type\":null,\"seat_count\":200,\"professor\":null,\"number\":\"8001-01\",\"name\":\"Big Money\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Full Term\",\"is_syllabus\":false,\"is_enrollable\":true,\"is_editable\":true,\"id\":1,\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-10-12\",\"class_end\":\"2018-10-12\",\"campus\":\"\"},{\"type\":null,\"seat_count\":2,\"professor\":null,\"number\":\"8001-01\",\"name\":\"Big Money 2\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Full Term\",\"is_syllabus\":false,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-10-12\",\"class_end\":\"2018-10-12\",\"campus\":\"\"}]"
+						}
+					]
 				}
 			]
 		},
@@ -5534,7 +6511,7 @@
 							},
 							"response": [
 								{
-									"id": "39e133d2-ffca-421c-ac5d-70af1d895b32",
+									"id": "fbbe0755-d582-4a6e-ac38-f4f84819b22d",
 									"name": "Speculate Grades Complete Class",
 									"originalRequest": {
 										"method": "GET",
@@ -5640,7 +6617,7 @@
 									"body": "{\"error\":\"Class is already complete.\"}"
 								},
 								{
-									"id": "aabfd80a-3170-4046-9a0f-90ef80f35fd4",
+									"id": "300e5556-50b3-40fd-b372-297998df074e",
 									"name": "Speculate Grades by Grade",
 									"originalRequest": {
 										"method": "GET",
@@ -5748,7 +6725,7 @@
 									"body": "{\"speculation\":93.33333333333333,\"grade\":\"A\"}"
 								},
 								{
-									"id": "8f4b5a5e-48c6-481f-ac5c-e4e29abd6231",
+									"id": "900e7764-cd7a-4272-b8de-ffefcdab608e",
 									"name": "Speculate Grades",
 									"originalRequest": {
 										"method": "GET",
@@ -5885,7 +6862,7 @@
 							},
 							"response": [
 								{
-									"id": "8d8c7fe2-e26b-49cc-a54a-8bf06ae592f4",
+									"id": "0d1b3bc2-b4c6-462f-b85a-b6b0586ed40e",
 									"name": "Get Student Assignments Date",
 									"originalRequest": {
 										"method": "GET",
@@ -5989,7 +6966,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "ea837b0e-f605-4319-a89a-724d20edd752",
+									"id": "c9ec836d-4acc-4a6b-854f-1e2a55606134",
 									"name": "Get Student Assignments Complete",
 									"originalRequest": {
 										"method": "GET",
@@ -6095,7 +7072,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4},{\"weight_id\":4,\"weight\":0.49455984174085066,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":11,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":5},{\"weight_id\":5,\"weight\":0.20276953511374876,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":10,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":6},{\"weight_id\":6,\"weight\":0.3026706231454006,\"student_class_id\":4,\"name\":\"assign 2343\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":9,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":7}]"
 								},
 								{
-									"id": "3fc9f28e-8f21-478e-a615-c1856a3c3cba",
+									"id": "9cf73a18-740a-4628-bb86-7a82dca17792",
 									"name": "Get Student Assignments Class",
 									"originalRequest": {
 										"method": "GET",
@@ -6201,7 +7178,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "eefb51bc-c8e5-466e-b158-2d66f80909ca",
+									"id": "4e606a46-a03e-43e1-9d77-ae020b15f370",
 									"name": "Get Student Assignments",
 									"originalRequest": {
 										"method": "GET",
@@ -6332,11 +7309,11 @@
 										"assignments"
 									]
 								},
-								"description": ""
+								"description": "Adds an assignment to a student's class.\n\n## Path Params\n* student id\n* class id\n\n## Body Params\n* due (YYYY-MM-dd)\n* weight (id)\n* name\n* is_completed (opt)\n* is_private (opt)\n\n## Behavior\nIf is_private is false, mods will be created for all students in class.\nis_completed defaults to false"
 							},
 							"response": [
 								{
-									"id": "31308394-6cfe-4cd5-8a80-e9267018b7d7",
+									"id": "98e5acaf-bbe4-435e-be72-bdfb9e14f635",
 									"name": "Create Student Assignments",
 									"originalRequest": {
 										"method": "POST",
@@ -6484,7 +7461,7 @@
 									},
 									"response": [
 										{
-											"id": "f3f298b6-d462-4bbd-8f55-212b0b14093c",
+											"id": "092193ac-120f-4ce3-a298-b3bffcf5baa5",
 											"name": "Get Pending New Assignments None",
 											"originalRequest": {
 												"method": "GET",
@@ -6583,7 +7560,7 @@
 											"body": "[]"
 										},
 										{
-											"id": "f042f9e1-4d39-40c1-9f41-db86914d9ef5",
+											"id": "7be13ce0-1cf8-4a1e-8cd4-29baf548ee3a",
 											"name": "Get Pending New Assignments",
 											"originalRequest": {
 												"method": "GET",
@@ -6760,7 +7737,7 @@
 							},
 							"response": [
 								{
-									"id": "163857d8-73a1-40b9-af8d-f377475d83a4",
+									"id": "20c63ec8-3186-4a80-8c18-8656ee1d8888",
 									"name": "Get Student Class by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -6931,7 +7908,7 @@
 							},
 							"response": [
 								{
-									"id": "c70352bc-a359-4305-8c01-ea611b863072",
+									"id": "653d4a9a-debf-4060-a995-3baadc2604d8",
 									"name": "Update Student Class",
 									"originalRequest": {
 										"method": "PUT",
@@ -7066,7 +8043,7 @@
 							},
 							"response": [
 								{
-									"id": "eb1dd318-b453-4066-a115-f3912de76af5",
+									"id": "698c79f0-e94e-4c29-8a16-c9745faf42ac",
 									"name": "UnEnroll In Class",
 									"originalRequest": {
 										"method": "DELETE",
@@ -7201,7 +8178,7 @@
 							},
 							"response": [
 								{
-									"id": "a439229e-080a-4d53-b59f-6636bb0852f0",
+									"id": "181e398f-27aa-4d61-bc55-24d153319562",
 									"name": "Add Student Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -7328,7 +8305,7 @@
 							},
 							"response": [
 								{
-									"id": "9ebae8fa-d880-42fa-b9ae-3ea7421f8e14",
+									"id": "094b722f-b5c5-43c5-8047-dbf3126f7170",
 									"name": "Delete Student Field of Study",
 									"originalRequest": {
 										"method": "DELETE",
@@ -7457,7 +8434,7 @@
 							},
 							"response": [
 								{
-									"id": "142ee109-35c9-413e-ad5e-b23cd8d70263",
+									"id": "a5bc214c-deae-4771-b8d3-bf897cc95dde",
 									"name": "Respond to Mod",
 									"originalRequest": {
 										"method": "POST",
@@ -7631,7 +8608,7 @@
 					},
 					"response": [
 						{
-							"id": "f896ec19-41ca-4c01-b9a5-8b20b749f909",
+							"id": "4176dc5b-4e49-41f6-a164-c43294a2ac9a",
 							"name": "Resend Verification",
 							"originalRequest": {
 								"method": "POST",
@@ -7760,7 +8737,7 @@
 					},
 					"response": [
 						{
-							"id": "51aab25b-150d-473f-928e-630b010dbf8e",
+							"id": "13821e2e-7282-479f-aa1a-4be1087788bd",
 							"name": "Verify Phone",
 							"originalRequest": {
 								"method": "POST",
@@ -7856,654 +8833,13 @@
 			]
 		},
 		{
-			"name": "Period",
+			"name": "SW",
 			"description": "",
 			"item": [
 				{
-					"name": "Professors",
-					"description": "",
-					"item": [
-						{
-							"name": "Create Professor",
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name_last\": \"Jimbo\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/periods/1/professors",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"periods",
-										"1",
-										"professors"
-									]
-								},
-								"description": ""
-							},
-							"response": [
-								{
-									"id": "9d9cedaf-674f-4ca9-b290-ba6104bfe3ac",
-									"name": "Create Professor",
-									"originalRequest": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name_last\": \"Jimbo\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/periods/1/professors",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"periods",
-												"1",
-												"professors"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "122",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:53:03 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "g7hbtvd54vjppfbfcmqqaq00md6kquv3",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 564,
-									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}"
-								}
-							]
-						},
-						{
-							"name": "Get Professors",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"periods",
-										"1",
-										"professors",
-										""
-									]
-								},
-								"description": "Gets all or searches professors for the class period.\n\n# Header Params\n* peroid id\n\n# Filters\n* professor.name\n  * string"
-							},
-							"response": [
-								{
-									"id": "19ca4c3e-408d-4766-b972-26dbc97e7f8c",
-									"name": "Get Professors",
-									"originalRequest": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"periods",
-												"1",
-												"professors",
-												""
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "124",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:53:15 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "1kdtohjqfn58fmhceic5ndkmeb3ltmcv",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 560,
-									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}]"
-								},
-								{
-									"id": "71b531ff-0905-41cc-b747-fc147a1653d3",
-									"name": "Get Professors filter",
-									"originalRequest": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/periods/1/professors?professor.name=mm",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"periods",
-												"1",
-												"professors"
-											],
-											"query": [
-												{
-													"key": "professor.name",
-													"value": "mm",
-													"equals": true
-												}
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "139",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 05 Dec 2017 17:39:29 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "kl9p9kc7tjen7ua0uq7q1v153gd3217b",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 51,
-									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":\"Jimmy\",\"id\":1,\"email\":\"jimjim@jim.edu\"}]"
-								}
-							]
-						},
-						{
-							"name": "Get Professors by Id",
-							"request": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/professors/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"professors",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": [
-								{
-									"id": "618ddc1a-17a6-44a0-ac0d-ba0b4eb2921e",
-									"name": "Get Professors by Id",
-									"originalRequest": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/professors/1",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"professors",
-												"1"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "122",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:53:21 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "u9dcveplj4ec6brmt2ertonr0efht8kl",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 546,
-									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}"
-								}
-							]
-						},
-						{
-							"name": "Update Professor",
-							"request": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/professors/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"professors",
-										"1"
-									]
-								},
-								"description": ""
-							},
-							"response": [
-								{
-									"id": "47af4814-c342-4cc9-a008-555b2aa44f20",
-									"name": "Update Professor",
-									"originalRequest": {
-										"method": "PUT",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name_last\": \"Jimbo\",\n  \"name_first\": \"Jimmy\",\n  \"email\": \"jimjim@jim.edu\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/professors/1",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"professors",
-												"1"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"_postman_previewtype": "text",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "137",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:53:29 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "sk5386nnhdpubfuekv20ecbaok2tqof4",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"responseTime": 546,
-									"body": "{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":\"Jimmy\",\"id\":1,\"email\":\"jimjim@jim.edu\"}"
-								}
-							]
-						}
-					],
-					"_postman_isSubFolder": true
-				},
-				{
-					"name": "Get Class Period by Id",
+					"name": "Syllabus Worker Weights",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
@@ -8516,125 +8852,28 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/periods/1",
+							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/weights",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"periods",
-								"1"
+								"syllabus-workers",
+								"weights"
 							]
 						},
-						"description": ""
+						"description": "Fetches and locks a class for weights for a syllabus worker."
 					},
-					"response": [
-						{
-							"id": "209d6838-850d-4f2e-bca5-2acaace0985e",
-							"name": "Get Class Period by Id",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/periods/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"periods",
-										"1"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"_postman_previewtype": "text",
-							"header": [
-								{
-									"key": "access-control-allow-credentials",
-									"value": "true",
-									"name": "access-control-allow-credentials",
-									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-								},
-								{
-									"key": "access-control-allow-origin",
-									"value": "*",
-									"name": "access-control-allow-origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "access-control-expose-headers",
-									"value": "",
-									"name": "access-control-expose-headers",
-									"description": "Lets a server whitelist headers that browsers are allowed to access."
-								},
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "70",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "content-type",
-									"value": "application/json; charset=utf-8",
-									"name": "content-type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 20:53:48 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "56u8thtnmlghq6q2m1707jsnmk60pls9",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
-							],
-							"cookie": [],
-							"responseTime": 556,
-							"body": "{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"id\":1,\"end_date\":\"2018-10-12\"}"
-						}
-					]
+					"response": []
 				},
 				{
-					"name": "Update Class Period",
+					"name": "Syllabus Worker Assignments",
 					"request": {
-						"method": "PUT",
+						"method": "POST",
 						"header": [
 							{
 								"key": "Authorization",
@@ -8647,120 +8886,57 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Quarter 21\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
+							"raw": ""
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/periods/2",
+							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/assignments",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"periods",
-								"2"
+								"syllabus-workers",
+								"assignments"
 							]
 						},
-						"description": ""
+						"description": "Fetches and locks a class for assignments for a syllabus worker."
 					},
-					"response": [
-						{
-							"id": "558533c8-8a18-4c63-9a3d-b983b68b7d82",
-							"name": "Update Class Period",
-							"originalRequest": {
-								"method": "PUT",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									},
-									{
-										"key": "Content-Type",
-										"value": "application/json"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 21\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/periods/1",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"periods",
-										"1"
-									]
-								}
+					"response": []
+				},
+				{
+					"name": "Syllabus Worker Reviews",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"_postman_previewtype": "text",
-							"header": [
-								{
-									"key": "access-control-allow-credentials",
-									"value": "true",
-									"name": "access-control-allow-credentials",
-									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-								},
-								{
-									"key": "access-control-allow-origin",
-									"value": "*",
-									"name": "access-control-allow-origin",
-									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-								},
-								{
-									"key": "access-control-expose-headers",
-									"value": "",
-									"name": "access-control-expose-headers",
-									"description": "Lets a server whitelist headers that browsers are allowed to access."
-								},
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "78",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "content-type",
-									"value": "application/json; charset=utf-8",
-									"name": "content-type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 20:54:01 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "1oup275h9polvastgb4bpfq2modmhg3a",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/reviews",
+							"host": [
+								"{{BaseUrl}}"
 							],
-							"cookie": [],
-							"responseTime": 557,
-							"body": "{\"start_date\":\"2017-10-12\",\"name\":\"Quarter 21\",\"id\":1,\"end_date\":\"2018-10-12\"}"
-						}
-					]
+							"path": [
+								"api",
+								"v1",
+								"syllabus-workers",
+								"reviews"
+							]
+						},
+						"description": "Fetches and locks a class for review for a syllabus worker."
+					},
+					"response": []
 				}
 			]
 		},
@@ -8806,7 +8982,7 @@
 							},
 							"response": [
 								{
-									"id": "7e6fa48f-22b6-4daf-a092-9019172edd2a",
+									"id": "60939fb8-f142-4d38-aeef-696cefc86ca6",
 									"name": "Add Role To User",
 									"originalRequest": {
 										"method": "POST",
@@ -8937,7 +9113,7 @@
 							},
 							"response": [
 								{
-									"id": "ca74b4ee-5080-4c71-b3b7-d634cd2b7bff",
+									"id": "9f44647d-51a5-4bc4-ae31-660d490cdab1",
 									"name": "Get Roles by User",
 									"originalRequest": {
 										"method": "GET",
@@ -9068,7 +9244,7 @@
 							},
 							"response": [
 								{
-									"id": "395df422-3ead-4a3f-8547-d30d7e365f28",
+									"id": "e7226a6d-9fde-404f-9e67-2c882deb9723",
 									"name": "Remove Role From User",
 									"originalRequest": {
 										"method": "DELETE",
@@ -9178,7 +9354,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"dc1happe1le@hku.edu\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"fields_of_study\": [1, 2],\n  \"phone\": \"2067189446\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\",\n  \"notification_time\": \"18:00:00\"\n  }\n}"
+							"raw": "{\"email\":\"dchappele@skoller.co\",\n\"password\": \"bigmoney\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"school_id\": 1,\n  \"fields_of_study\": [1],\n  \"phone\": \"2067189446\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\",\n  \"notification_time\": \"18:00:00\"\n  }\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users",
@@ -9221,7 +9397,7 @@
 					},
 					"response": [
 						{
-							"id": "6656d1ab-2f0c-401a-98c8-63de861d0f4c",
+							"id": "832d656c-bacf-49c2-8213-5cce8cc4da37",
 							"name": "Get Users",
 							"originalRequest": {
 								"method": "GET",
@@ -9319,7 +9495,7 @@
 					},
 					"response": [
 						{
-							"id": "987a6c76-e384-4d22-bc21-e521bc3ab7b0",
+							"id": "627c28c2-b81d-4e7d-97ca-af89d9f78a95",
 							"name": "Get User by Id no student",
 							"originalRequest": {
 								"method": "GET",
@@ -9390,7 +9566,7 @@
 							"body": "{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
 						},
 						{
-							"id": "62501645-118d-4fb3-b3f1-1151762fbb2a",
+							"id": "e903aec8-24e4-456f-8999-c98b0a576c8c",
 							"name": "Get User by Id w student",
 							"originalRequest": {
 								"method": "GET",
@@ -9493,11 +9669,11 @@
 								"6"
 							]
 						},
-						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * is_mod_notifications (opt)\n  * is_reminder_notifications (opt)\n  * is_chat_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)"
+						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* file (opt)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * is_mod_notifications (opt)\n  * is_reminder_notifications (opt)\n  * is_chat_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)\n  * bio (opt)\n  * organization (opt)"
 					},
 					"response": [
 						{
-							"id": "73013108-9671-47db-b946-f8fb5d54f6b5",
+							"id": "b94932b6-0710-461f-b8c0-ddcb9404f151",
 							"name": "Update Student Notifications",
 							"originalRequest": {
 								"method": "PUT",
@@ -9591,6 +9767,111 @@
 							"cookie": [],
 							"responseTime": 606,
 							"body": "{\"student\":{\"school\":{\"periods\":[{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"id\":1,\"end_date\":\"2018-10-12\"}],\"name\":\"Hard Knocks University\",\"id\":1,\"email_domains\":[{\"is_professor_only\":false,\"email_domain\":\"@hku.edu\"}]},\"phone\":\"6158675309\",\"notification_time\":\"21:20:00.000000\",\"notification_days_notice\":4,\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"is_verified\":false,\"is_reminder_notifications\":true,\"is_notifications\":true,\"is_mod_notifications\":false,\"is_chat_notifications\":true,\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[{\"name\":\"Student\",\"id\":100}],\"id\":2,\"email\":\"tyler@hku.edu\"}"
+						},
+						{
+							"id": "e1a5b1be-7ba2-4ac7-896f-62acafd01684",
+							"name": "Update User Avatar",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"description": "",
+											"type": "file",
+											"src": {
+												"0": {}
+											}
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/6",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"6"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"_postman_previewtype": "text",
+							"header": [
+								{
+									"key": "access-control-allow-credentials",
+									"value": "true",
+									"name": "access-control-allow-credentials",
+									"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+								},
+								{
+									"key": "access-control-allow-origin",
+									"value": "*",
+									"name": "access-control-allow-origin",
+									"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+								},
+								{
+									"key": "access-control-expose-headers",
+									"value": "",
+									"name": "access-control-expose-headers",
+									"description": "Lets a server whitelist headers that browsers are allowed to access."
+								},
+								{
+									"key": "cache-control",
+									"value": "max-age=0, private, must-revalidate",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-length",
+									"value": "879",
+									"name": "content-length",
+									"description": "The length of the response body in octets (8-bit bytes)"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "date",
+									"value": "Mon, 18 Dec 2017 20:11:18 GMT",
+									"name": "date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "server",
+									"value": "Cowboy",
+									"name": "server",
+									"description": "A name for the server"
+								},
+								{
+									"key": "x-request-id",
+									"value": "lucbakeq9ne66rt1k640fjesbnlklh4e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								}
+							],
+							"cookie": [],
+							"responseTime": 3939,
+							"body": "{\"student\":{\"school\":{\"periods\":[{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"is_active\":true,\"id\":1,\"end_date\":\"2018-10-12\"}],\"name\":\"Hard Knocks University\",\"is_diy_preferred\":false,\"is_diy_enabled\":true,\"is_auto_syllabus\":true,\"id\":1,\"email_domains\":[{\"is_professor_only\":false,\"email_domain\":\"@fortyau.com\"},{\"is_professor_only\":false,\"email_domain\":\"@skoller.co\"}]},\"phone\":\"2067189446\",\"notification_time\":\"13:00:00.000000\",\"notification_days_notice\":1,\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"is_verified\":true,\"is_reminder_notifications\":true,\"is_notifications\":true,\"is_mod_notifications\":true,\"is_chat_notifications\":true,\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[{\"name\":\"Student\",\"id\":100}],\"id\":6,\"email\":\"tyler@fortyau.com\",\"avatar\":\"https://s3.amazonaws.com/classnav-api-docs/uploads/thumbs/8932da3b-b1f3-41a0-a67c-85ab8d5b23e0.png\"}"
 						}
 					]
 				},
@@ -9660,114 +9941,6 @@
 							]
 						},
 						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* roles (list of ids)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * is_mod_notifications (opt)\n  * is_reminder_notifications (opt)\n  * is_chat_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)\n  * fields_of_study (list of ids)"
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "SW",
-			"description": "",
-			"item": [
-				{
-					"name": "Syllabus Worker Weights",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/weights",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"syllabus-workers",
-								"weights"
-							]
-						},
-						"description": "Fetches and locks a class for weights for a syllabus worker."
-					},
-					"response": []
-				},
-				{
-					"name": "Syllabus Worker Assignments",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/assignments",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"syllabus-workers",
-								"assignments"
-							]
-						},
-						"description": "Fetches and locks a class for assignments for a syllabus worker."
-					},
-					"response": []
-				},
-				{
-					"name": "Syllabus Worker Reviews",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/syllabus-workers/reviews",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"syllabus-workers",
-								"reviews"
-							]
-						},
-						"description": "Fetches and locks a class for review for a syllabus worker."
 					},
 					"response": []
 				}

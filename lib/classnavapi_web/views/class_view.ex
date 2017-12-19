@@ -17,6 +17,32 @@ defmodule ClassnavapiWeb.ClassView do
         render_one(class, ClassView, "class_detail.json")
     end
 
+    def render("class.json", %{class: %{class: class, professor: professor}}) do
+        %{
+            id: class.id,
+            class_end: class.class_end,
+            class_start: class.class_start,
+            credits: class.credits,
+            crn: class.crn,
+            grade_scale: class.grade_scale,
+            location: class.location,
+            meet_days: class.meet_days,
+            meet_end_time: class.meet_end_time,
+            meet_start_time: class.meet_start_time,
+            name: class.name,
+            number: class.number,
+            seat_count: class.seat_count,
+            is_enrollable: class.is_enrollable,
+            is_editable: class.is_editable,
+            is_syllabus: class.is_syllabus,
+            type: class.class_type,
+            campus: class.campus,
+            class_period_id: class.class_period_id,
+            length: ClassCalcs.get_class_length(class),
+            professor: render_one(professor, ProfessorView, "professor.json")
+        }
+    end
+
     def render("class.json", %{class: class}) do
         class = class |> Repo.preload(:professor)
         %{
@@ -38,6 +64,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_syllabus: class.is_syllabus,
             type: class.class_type,
             campus: class.campus,
+            class_period_id: class.class_period_id,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(class.professor, ProfessorView, "professor.json")
         }

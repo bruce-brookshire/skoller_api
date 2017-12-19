@@ -174,7 +174,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     Ecto.Multi.new
     |> Ecto.Multi.delete(:student_assignment, student_assignment)
-    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class) do
@@ -183,8 +184,16 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> AssignmentHelper.convert_assignment(student_class)
 
     Ecto.Multi.new
-    |> Ecto.Multi.insert(:student_assignment, student_assignment)
-    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
+    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp insert_student_assignment(student_assignment, _) do
+    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
+      nil -> Repo.insert(student_assignment)
+      assign -> {:ok, assign}
+    end
   end
 
   defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}) do
@@ -195,7 +204,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
-    |> Ecto.Multi.run(:mod_action, &insert_or_update_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
   defp get_data(mod) do
@@ -365,13 +375,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp insert_public_mod_action(%Mod{is_private: true}, %StudentClass{}), do: {:ok, nil}
-
-  defp insert_or_update_self_action(%Mod{} = mod, student_class_id) do
-    case process_self_action(mod, student_class_id) do
-      {:ok, _new_action} -> dismiss_prior_mods(mod, student_class_id)
-      {:error, error} -> {:error, error}
-    end
-  end
 
   defp process_self_action(%Mod{} = mod, student_class_id, _) do
     process_self_action(mod, student_class_id)

@@ -46,7 +46,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     timezone: "CST",
                                     email_domains: [
                                       %EmailDomain{
-                                        email_domain: "@hku.edu",
+                                        email_domain: "@fortyau.com",
                                         is_professor_only: false
                                       }
                                     ],
@@ -59,7 +59,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     timezone: "CST",
                                     email_domains: [
                                       %EmailDomain{
-                                        email_domain: "@skoller.edu",
+                                        email_domain: "@skoller.co",
                                         is_professor_only: false
                                       }
                                     ],
@@ -72,7 +72,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     timezone: "CST",
                                     email_domains: [
                                       %EmailDomain{
-                                        email_domain: "@classo.edu",
+                                        email_domain: "@test.com",
                                         is_professor_only: false
                                       }
                                     ],
@@ -81,14 +81,15 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
 
-    student = Repo.insert!(%User{email: "tyler@hku.edu", 
+    student = Repo.insert!(%User{email: "tyler@fortyau.com", 
                                 password_hash: pass.password_hash,
                                 student: %Student{name_first: "Tyler",
                                    name_last: "Witt",
                                    school_id: school.id,
-                                   phone: "6158675309",
+                                   phone: "2067189446",
                                    birthday: date1,
                                    gender: "Male",
+                                   is_verified: true,
                                    notification_time: time1}})
 
     Repo.insert!(%UserRole{user_id: user.id, role_id: 200})

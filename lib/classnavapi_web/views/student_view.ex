@@ -30,6 +30,8 @@ defmodule ClassnavapiWeb.StudentView do
       is_chat_notifications: student.is_chat_notifications,
       notification_days_notice: student.notification_days_notice,
       notification_time: student.notification_time,
+      organization: student.organization,
+      bio: student.bio,
       school: render_one(student.school, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }

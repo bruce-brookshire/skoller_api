@@ -15,6 +15,11 @@ defmodule ClassnavapiWeb.Router do
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource
     plug :authenticate
+    plug :is_phone_verified
+  end
+
+  if Mix.env == :dev do
+    forward "/sent_emails", Bamboo.EmailPreviewPlug
   end
 
   # Other scopes may use custom stacks.
@@ -25,6 +30,7 @@ defmodule ClassnavapiWeb.Router do
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
+      post "/reset", ForgotEmailController, :reset
 
       # User routes
       put "/users/:user_id", UserController, :update
@@ -45,6 +51,8 @@ defmodule ClassnavapiWeb.Router do
       # School routes
       get "/schools/hub", Admin.SchoolController, :hub
       resources "/schools", Admin.SchoolController, only: [:create, :update, :show, :index] do
+
+        get "/classes", School.ClassController, :index
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
@@ -118,7 +126,7 @@ defmodule ClassnavapiWeb.Router do
       end
 
       # Assignment routes
-      resources "/class/assignments", Class.AssignmentController, only: [:delete]
+      resources "/class/assignments", Class.AssignmentController, only: [:delete, :update]
       resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
 
         # Assignment Grade routes
@@ -152,6 +160,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/users", NewUserController, only: [:create]
       get "/school/list", SchoolController, :index
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
+      post "/forgot", ForgotEmailController, :forgot
     end
   end
 end

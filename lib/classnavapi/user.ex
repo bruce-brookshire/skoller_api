@@ -18,15 +18,17 @@ defmodule Classnavapi.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :pic_path, :string
     belongs_to :student, Classnavapi.Student
     many_to_many :roles, Classnavapi.Role, join_through: "user_roles"
     timestamps()
   end
 
   @req_fields [:email, :password]
-  @all_fields @req_fields
+  @opt_fields [:pic_path]
+  @all_fields @req_fields ++ @opt_fields
   @upd_req []
-  @upd_opt [:password]
+  @upd_opt [:password, :pic_path]
   @upd_fields @upd_req ++ @upd_opt
 
   @doc false
