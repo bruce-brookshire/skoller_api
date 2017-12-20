@@ -1,0 +1,9 @@
+certifi==2017.11.5
+docx2txt==0.7
+nltk==3.2.5
+olefile==0.44
+Pillow==4.3.0
+pyenchant==2.0.0
+pyocr==0.5
+six==1.11.0
+Wand==0.4.4
