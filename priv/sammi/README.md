@@ -23,12 +23,11 @@
   * To retrain Sammi (i.e. loop through all 'corpora' files and train based off of their given classification) ``python3 ./classifiers/sammi/main.py train``
   * To get the current stats for Sammi (i.e. the labels it knows about and the confidence it has in classifying those) ``python3 ./classifiers/sammi/main.py stats``
 
-# Testing
+# Tested
 
-  * S48
-  * S50
-  * S51
-  * S54
+  * S33 (missed email)
+  * S34 (missed phone (its an extension), returned office hours but there were none)
+  * S58 (missed office location)
 
 # Part Of Speech Tag List:
 

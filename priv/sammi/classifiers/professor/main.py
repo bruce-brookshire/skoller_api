@@ -2,6 +2,8 @@
 import os
 import re
 import sys
+
+import nltk
 # CUSTOM
 scriptpath = "./classifiers"
 sys.path.append(os.path.abspath(scriptpath))
@@ -26,6 +28,20 @@ class ProfessorClassifier:
 
     def __init__(self):
         self.PostProcessor = ProfessorPostProcessor()
+
+    # CHUNK GRAMMER
+    def grammer(self):
+        return (
+            "NAME: {<ProfessorNameKey>?<:>?<ProfessorName>{2,}}"
+            "\n"
+            "EMAIL: {<ProfessorEmailKey>?<:>?<ProfessorEmail>+}"
+            "\n"
+            "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<OfficeHours.*>{2,}}"
+            "\n"
+            "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
+            "\n"
+            "PHONE: {<OfficeKey>?<ProfessorPhoneKey>?<:>?<None>{0,1}<ProfessorPhone>?<None>{0,1}<ProfessorPhone>+}"
+        )
 
     # TESTS
 
@@ -79,6 +95,11 @@ class ProfessorClassifier:
         features["only-phone-keys"] = sum(key in word.lower() for key in self.professor_phone_key) == len(word)
         features["phone-extension-format"] = sum(key.isdigit() for key in word) == len(word)-1 and "x" in word.lower()
         return features
+
+    def chunk(self,text):
+        cp = nltk.RegexpParser(self.grammer())
+        res = cp.parse(text)
+        return res
 
     def extract(self,output):
         return self.PostProcessor.objectify(output)

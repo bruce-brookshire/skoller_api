@@ -1,6 +1,8 @@
 # GENERAL
 import os
 import sys
+
+import nltk
 # CUSTOM
 scriptpath = "./classifiers"
 sys.path.append(os.path.abspath(scriptpath))
@@ -31,6 +33,12 @@ class GradeScaleClassifier:
         else:
             return False
 
+    # CHUNK GRAMMER
+    def grammer(self):
+        return (
+            "GRADESCALE: {<GradeScaleKey>?<:>?<GradeScale.*>{3,}}"
+        )
+
     # FEATURES (adds grade scale features to given features objectd)
     def grade_scale_features(self,features,word,prev_word,words,i,history):
         features["after-dash"] = prev_word == "-"
@@ -45,6 +53,11 @@ class GradeScaleClassifier:
         features["sentence-has-grade-scale-key"] = any(word.lower() in self.grade_scale_key for word in words)
         features["sentence-has-multiple-grade-scale-keys"] = sum(word.lower() in self.grade_scale_key for word in words) > 1
         return features
+
+    def chunk(self,text):
+        cp = nltk.RegexpParser(self.grammer())
+        res = cp.parse(text)
+        return res
 
     def extract(self,output):
         return self.PostProcessor.objectify(output)
