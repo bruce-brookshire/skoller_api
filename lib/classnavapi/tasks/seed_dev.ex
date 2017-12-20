@@ -416,27 +416,27 @@ defmodule Mix.Tasks.Seed.Dev do
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc1 = Repo.insert!(%StudentClass{
       student_id: student1.student.id,
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc2 = Repo.insert!(%StudentClass{
       student_id: student2.student.id,
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc3 = Repo.insert!(%StudentClass{
       student_id: student3.student.id,
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc4 = Repo.insert!(%StudentClass{
       student_id: student4.student.id,
       class_id: class.id
     })
 
-    Repo.insert!(%StudentClass{
+    sc5 = Repo.insert!(%StudentClass{
       student_id: student5.student.id,
       class_id: class.id
     })
@@ -470,6 +470,186 @@ defmodule Mix.Tasks.Seed.Dev do
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: 100
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: 100
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: 100
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: 100
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: 100
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: a1.id,
+      name: a1.name,
+      due: a1.due,
+      weight_id: a1.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: a2.id,
+      name: a2.name,
+      due: a2.due,
+      weight_id: a2.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: a3.id,
+      name: a3.name,
+      due: a3.due,
+      weight_id: a3.weight_id,
+      grade: 80
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
       assignment_id: t1.id,
       name: t1.name,
       due: t1.due,
