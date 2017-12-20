@@ -4,108 +4,141 @@ class ProfessorPostProcessor:
     professor_name_key = ['prof','professor','instructor','dr','ms','mrs','mr','phd','prof.','dr.','ms.','mrs.','mr.']
     email_key = ['.edu','.com','.org']
 
-    def get_professor_email(self,parsed_output):
-        prof_email = ""
-        prof_prob = 0
-        prof_prob_count = 0
-        for i,result in enumerate(parsed_output):
-            value, tag, prob = result[0], result[1], result[2]*100
-            if tag != "None" and prob > 80:
-                if tag == "ProfessorEmail" and value == "@" and not prof_email:
-                    prof_email += parsed_output[i-1][0]
-                if tag == "ProfessorEmail" and (any(suffix in value for suffix in self.email_key)) and not prof_email:
-                    prof_email += parsed_output[i-2][0]
-                    prof_email += parsed_output[i-1][0]
-                if tag == "ProfessorEmail":
-                    prof_email += value
-                    prof_prob += prob
-                    prof_prob_count += 1
-                    # Only get the first email, since its probably the professors
-                    if len(value) > 2 and value[-4:] in self.email_key:
-                        break
-        return {"value": prof_email, "probability": prof_prob/prof_prob_count if prof_prob_count > 0 else 0}
+    def get_professor_email(self,results):
+        greatest_length = 0
+        best_guess = None
+        res = ''
+        for result in results:
+            length = len(result)
+            if length > greatest_length:
+                greatest_length = length
+                best_guess = result
+        if best_guess:
+            for val in best_guess:
+                if val[1] == 'ProfessorEmail':
+                    res += val[0]
+        return {'value':res.strip()}
 
-    def get_professor_name(self,parsed_output):
-        prof_name = ""
-        prof_prob = 0
-        prof_prob_count = 0
-        for i,result in enumerate(parsed_output):
-            value, tag, prob = result[0], result[1], result[2]*100
-            if tag != "None" and prob > 80:
-                if tag == "ProfessorName":
-                    prof_name += (value+" ")
-                    prof_prob += prob
-                    prof_prob_count += 1
-                if len(prof_name.split(" ")) > 3:
+    def get_professor_name(self,results):
+        greatest_length = 0
+        best_guess = None
+        found_name_key = False
+        res = ''
+        for result in results:
+            for val in result:
+                # If the result has one of the professor name keys
+                # its almost certainly the professor name
+                if val[0].lower() in self.professor_name_key:
+                    found_name_key = True
+                    best_guess = result
+            length = len(result)
+            if length > greatest_length and not found_name_key:
+                greatest_length = length
+                best_guess = result
+        if best_guess:
+            for val in best_guess:
+                if val[1] == 'ProfessorName' and val[0][0].isupper():
+                    res += (val[0]+" ")
+                if len(res.split(" ")) > 3 and sum("." == l for l in res) < 2:
                     break
-        return {"value": prof_name, "probability": prof_prob/prof_prob_count if prof_prob_count > 0 else 0}
+                # if it has two periods, its probably includes professor prefix and middle name
+                elif len(res.split(" ")) > 4 and sum("." == l for l in res) == 2:
+                    break
+        return {'value':res.strip()}
 
-    def get_professor_phone(self,parsed_output):
-        prof_phone = ""
-        prof_prob = 0
-        prof_prob_count = 0
-        for i,result in enumerate(parsed_output):
-            value, tag, prob = result[0], result[1], result[2]*100
-            if tag != "None" and prob > 80:
-                if tag == "ProfessorPhone":
-                    prof_phone += (value.replace('-',''))
-                    prof_prob += prob
-                    prof_prob_count += 1
-                    if len(prof_phone) >= 7:
-                        break
-        return {"value": prof_phone, "probability": prof_prob/prof_prob_count if prof_prob_count > 0 else 0}
+    def get_professor_phone(self,results):
+        most_phone_values = 0
+        best_guess = None
+        res = ''
+        for result in results:
+            num_of_phone_values = sum(val[1] == 'ProfessorPhone' for val in result)
+            if num_of_phone_values > most_phone_values:
+                most_phone_values = num_of_phone_values
+                best_guess = result
+        if best_guess:
+            for val in best_guess:
+                if val[1] == 'ProfessorPhone' or val[0] == "(" or val[0] == ")":
+                    res += val[0]
+                if val[1] == 'None' and (val[0] != "(" or val[0] != ")"):
+                    break
+        return {'value':res.strip()}
 
-    def get_office_hours(self,parsed_output):
-        office_hours = ''
-        prob_val = 0
-        prob_count = 0
-        day_i = None
-        for i,result in enumerate(parsed_output):
-            value, tag, prob = result[0], result[1], result[2]*100
-            if tag == "OfficeHoursDay":
-                if day_i is None and prob > 99:
-                    day_i = i
-                if day_i and (i - day_i) < 20:
-                    office_hours += (value+" ")
-                    prob_val += prob
-                    prob_count += 1
-            elif tag == "OfficeHoursTime" or tag == "OfficeHoursSeparator":
-                if office_hours and day_i and (i - day_i) < 20:
-                    office_hours += (value+" ")
-                    prob_val += prob
-                    prob_count += 1
-        return {"value": office_hours, "probability": prob_val/prob_count if prob_count > 0 else 0}
+    def get_office_hours(self,results):
+        greatest_length = 0
+        best_guess = None
+        res = ''
+        for result in results:
+            # we dont just care about length of results as in others
+            # here, we also care how many were labeled as OfficeHoursDay and OfficeHoursTime (need at least 2)
+            length = len(result)
+            num_of_office_values = sum((val[1] == 'OfficeHoursDay' or val[1] == 'OfficeHoursTime') for val in result)
+            if length > greatest_length and num_of_office_values > 1:
+                greatest_length = length
+                best_guess = result
+        if best_guess:
+            for val in best_guess:
+                if val[1] == 'OfficeHoursDay' and res and res.strip()[-1].isalpha():
+                    res = res.strip()
+                elif val[1] == 'OfficeHoursTime' and res and res.strip()[-1].isdigit():
+                    res = res.strip()
+                if val[1] == 'OfficeHoursDay' or val[1] == 'OfficeHoursTime':
+                    res += (val[0]+" ")
+        return {'value':res.strip()}
 
-    def get_office_location(self,parsed_output):
-        office_location = ""
-        prof_prob = 0
-        prof_prob_count = 0
-        for i,result in enumerate(parsed_output):
-            value, tag, prob = result[0], result[1], result[2]*100
-            if tag != "None" and prob > 90:
-                if tag == "OfficeLocation":
-                    office_location += value
-                    prof_prob += prob
-                    prof_prob_count += 1
-                    if any(char.isdigit() for char in office_location) and any(char.isalpha() for char in office_location):
-                        break
-        return {"value": office_location, "probability": prof_prob/prof_prob_count if prof_prob_count > 0 else 0}
+    def get_office_location(self,results):
+        greatest_length = 0
+        greatest_location_building_keys = 0
+        greatest_location_room_keys = 0
+        best_guess = None
+        res = ''
+        for result in results:
+            # we dont just care about length of results as in others
+            # here, we also care how many were labeled as OfficeLocation
+            length = len(result)
+            num_of_location_building_values = sum(val[1] == 'OfficeLocationBuilding'for val in result)
+            num_of_location_room_values = sum(val[1] == 'OfficeLocationRoom'for val in result)
+            if length > greatest_length:
+                greatest_length = length
+                best_guess = result
+            elif length == greatest_length:
+                if num_of_location_building_values > greatest_location_building_keys and num_of_location_room_values > greatest_location_room_keys:
+                    greatest_length = length
+                    greatest_location_building_keys = num_of_location_building_values
+                    greatest_location_room_keys = num_of_location_room_values
+                    best_guess = result
+        if best_guess:
+            for val in best_guess:
+                if val[1] == 'OfficeLocationBuilding' or val[1] == 'OfficeLocationRoom':
+                    res += (val[0]+" ")
+        return {'value':res.strip()}
 
     def objectify(self,parsed_output):
         obj = {}
-        # NAME
-        prof_name_obj = self.get_professor_name(parsed_output)
-        obj["name"] = {"value": prof_name_obj["value"], "probability": prof_name_obj["probability"]}
-        # EMAIL
-        prof_email_obj = self.get_professor_email(parsed_output)
-        obj["email"] = {"value": prof_email_obj["value"], "probability": prof_email_obj["probability"]}
-        # PHONE
-        prof_phone_obj = self.get_professor_phone(parsed_output)
-        obj["phone"] = {"value": prof_phone_obj["value"], "probability": prof_phone_obj["probability"]}
-        # OFFICE HOURS
-        office_hours_obj = self.get_office_hours(parsed_output)
-        obj["office_hours"] = {"value": office_hours_obj["value"], "probability": office_hours_obj["probability"]}
-        # OFFICE LOCATION
-        office_location_obj = self.get_office_location(parsed_output)
-        obj["office_location"] = {"value": office_location_obj["value"], "probability": office_location_obj["probability"]}
+        potential_prof_names = []
+        potential_prof_emails = []
+        potential_prof_phones = []
+        potential_office_hours = []
+        potential_office_locations = []
+        for subtree in parsed_output.subtrees():
+            label = subtree.label()
+            if label == 'NAME':
+                potential_prof_names.append(subtree)
+            elif label == 'EMAIL':
+                potential_prof_emails.append(subtree)
+            elif label == 'PHONE':
+                potential_prof_phones.append(subtree)
+            elif label == 'OFFICEHOURS':
+                potential_office_hours.append(subtree)
+            elif label == 'OFFICELOCATION':
+                potential_office_locations.append(subtree)
+        prof_name_obj = self.get_professor_name(potential_prof_names)
+        obj["name"] = {"value": prof_name_obj["value"]}
+        prof_email_obj = self.get_professor_email(potential_prof_emails)
+        obj["email"] = {"value": prof_email_obj["value"]}
+        prof_phone_obj = self.get_professor_phone(potential_prof_phones)
+        obj["phone"] = {"value": prof_phone_obj["value"]}
+        office_hours_obj = self.get_office_hours(potential_office_hours)
+        obj["office_hours"] = {"value": office_hours_obj["value"]}
+        office_location_obj = self.get_office_location(potential_office_locations)
+        obj["office_location"] = {"value": office_location_obj["value"]}
         return obj

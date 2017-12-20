@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
+  require Logger
   
   @student_role 100
   @admin_role 200
@@ -23,14 +24,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    {sammi, _code} = get_sammi_data(params)
-
-    decoded_sammi = sammi
-    |> String.replace("'", ~s("))
-    |> Poison.decode!
-
-    decoded_sammi |> add_grade_scale(class_id)
-    decoded_sammi |> add_professor_info(class_id)
+    sammi(params)
 
     scope = %{"id" => UUID.generate()}
     location = 
@@ -68,12 +62,26 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     render(conn, DocView, "index.json", docs: docs)
   end
 
-  defp add_grade_scale(%{"grade_scale" => %{"grade_scale" => %{"value" => ""}}}, _class_id), do: nil
-  defp add_grade_scale(%{"grade_scale" => %{"grade_scale" => %{"value" => val}}}, class_id) do
+  defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
+  defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
     class = Repo.get!(Class, class_id)
     Class.changeset_update(class, %{"grade_scale" => val})
     |> Repo.update()
   end
+
+  defp sammi(%{"is_syllabus" => "true", "class_id" => class_id} = params) do
+    {sammi, _code} = get_sammi_data(params)
+
+    Logger.info(sammi)
+    
+    decoded_sammi = sammi
+    |> String.replace("'", ~s("))
+    |> Poison.decode!
+
+    decoded_sammi |> add_grade_scale(class_id)
+    decoded_sammi |> add_professor_info(class_id)
+  end
+  defp sammi(_params), do: nil
 
   defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
     class = Repo.get!(Class, class_id)

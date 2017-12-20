@@ -132,13 +132,16 @@ class Sammi:
 
     def extract(self,filepath):
         output = self.parse(filepath)
-        professor_info_obj = self.ProfessorClassifier.extract(output)
-        grade_scale_obj = self.GradeScaleClassifier.extract(output)
+        prof_chunked_output = self.ProfessorClassifier.chunk(output)
+        chunked_output = self.GradeScaleClassifier.chunk(prof_chunked_output)
+        professor_info_obj = self.ProfessorClassifier.extract(chunked_output)
+        grade_scale_obj = self.GradeScaleClassifier.extract(chunked_output)
         print({'professor_info': professor_info_obj,'grade_scale':grade_scale_obj})
 
     def grade_scale(self,filepath):
         output = self.parse(filepath)
-        grade_scale_obj = self.GradeScaleClassifier.extract(output)
+        chunked_output = self.GradeScaleClassifier.chunk(output)
+        grade_scale_obj = self.GradeScaleClassifier.extract(chunked_output)
         print(grade_scale_obj)
 
     def parse(self,filepath):
@@ -154,16 +157,17 @@ class Sammi:
                 # Find Tag
                 res = self.classifier.classify(feats)
                 # Get Probability of Tag
-                prob = self.classifier.prob_classify(feats).prob(res)
+                # prob = self.classifier.prob_classify(feats).prob(res)
                 # Append to Output
-                output.append((word,res,prob))
+                output.append((word,res))
                 # Update History
                 history.append(res)
         return output
 
     def professor_info(self,filepath):
         output = self.parse(filepath)
-        professor_info_obj = self.ProfessorClassifier.extract(output)
+        chunked_output = self.ProfessorClassifier.chunk(output)
+        professor_info_obj = self.ProfessorClassifier.extract(chunked_output)
         print(professor_info_obj)
 
     def tag_sentence(self,sentence):
