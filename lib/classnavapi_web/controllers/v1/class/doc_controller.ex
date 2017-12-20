@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   alias Classnavapi.Class
   alias Classnavapi.Class.Doc
+  alias Classnavapi.Professor
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.DocView
   alias Classnavapi.DocUpload
@@ -29,9 +30,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     |> Poison.decode!
 
     decoded_sammi |> add_grade_scale(class_id)
-
-    require IEx
-    IEx.pry
+    decoded_sammi |> add_professor_info(class_id)
 
     scope = %{"id" => UUID.generate()}
     location = 
@@ -74,6 +73,72 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     class = Repo.get!(Class, class_id)
     Class.changeset_update(class, %{"grade_scale" => val})
     |> Repo.update()
+  end
+
+  defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
+    class = Repo.get!(Class, class_id)
+            |> Repo.preload(:professor)
+    professor_params = professor_info |> extract_professor_details()
+    case class.professor do
+      nil -> nil
+        # professor_params 
+        # |> find_professor(class)
+        # |> process_professor()
+      professor -> 
+        professor_params 
+        |> update_professor(professor)
+    end
+  end
+
+  defp update_professor(params, professor) do
+    params = params |> Map.delete("name_first")
+    |> Map.delete("name_last")
+    Professor.changeset_update(professor, params)
+    |> Repo.update()
+  end
+
+  defp extract_professor_details(professor_info) do
+    Map.new()
+    |> get_name(professor_info)
+    |> get_office_hours(professor_info)
+    |> get_office_location(professor_info)
+    |> get_phone(professor_info)
+  end
+
+  defp get_name(map, %{"name" => %{"value" => ""}}), do: map |> Map.put("name", nil)
+  defp get_name(map, %{"name" => %{"value" => val}}) do 
+    name = val 
+    |> String.trim()
+    |> String.split()
+
+    name_last = name
+    |> List.last()
+
+    name_first = name
+    |> List.delete_at(-1)
+    |> Enum.reduce("", & &2 <> " " <> &1)
+    |> String.trim()
+
+    map |> Map.put("name_first", name_first)
+    |> Map.put("name_last", name_last)
+  end
+
+  defp get_office_hours(map, %{"office_hours" => %{"value" => ""}}), do: map |> Map.put("office_availability", nil)
+  defp get_office_hours(map, %{"office_hours" => %{"value" => val}}) do 
+    val = val |> String.trim()
+    map |> Map.put("office_availability", val)
+  end
+
+  defp get_office_location(map, %{"office_location" => %{"value" => ""}}), do: map |> Map.put("office_location", nil)
+  defp get_office_location(map, %{"office_location" => %{"value" => val}}) do 
+    val = val |> String.trim()
+    map |> Map.put("office_location", val)
+  end
+
+  defp get_phone(map, %{"phone" => %{"value" => ""}}), do: map |> Map.put("phone", nil)
+  defp get_phone(map, %{"phone" => %{"value" => val}}) do
+    val = val |> String.trim()
+    map |> Map.put("phone", val)
   end
 
   defp get_sammi_data(%{"file" => file, "is_syllabus" => "true"}) do
