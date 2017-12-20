@@ -23,13 +23,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
     {sammi, _code} = get_sammi_data(params)
-    
-    require IEx
-    IEx.pry
 
-    t = sammi
+    decoded_sammi = sammi
     |> String.replace("'", ~s("))
     |> Poison.decode!
+
+    decoded_sammi |> add_grade_scale(class_id)
 
     require IEx
     IEx.pry
@@ -68,6 +67,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   def index(conn, %{"class_id" => class_id}) do
     docs = Repo.all(from docs in Doc, where: docs.class_id == ^class_id)
     render(conn, DocView, "index.json", docs: docs)
+  end
+
+  defp add_grade_scale(%{"grade_scale" => %{"grade_scale" => %{"value" => ""}}}, _class_id), do: nil
+  defp add_grade_scale(%{"grade_scale" => %{"grade_scale" => %{"value" => val}}}, class_id) do
+    class = Repo.get!(Class, class_id)
+    Class.changeset_update(class, %{"grade_scale" => val})
+    |> Repo.update()
   end
 
   defp get_sammi_data(%{"file" => file, "is_syllabus" => "true"}) do
