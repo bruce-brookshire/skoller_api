@@ -36,7 +36,7 @@ class ProfessorClassifier:
             "\n"
             "EMAIL: {<ProfessorEmailKey>?<:>?<ProfessorEmail>+}"
             "\n"
-            "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<OfficeHours.*>{2,}}"
+            "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<ProfessorPhone>?<OfficeHours.*>{2,}<GradeScaleLetter>?}"
             "\n"
             "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
             "\n"
