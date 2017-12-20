@@ -32,8 +32,13 @@ defmodule ClassnavapiWeb.Scheduler do
       _ -> next_min |> get_time(now)
     end
     case next_time do
-      {:ok, ~T[11:59:59]} -> Time.diff(next_time, Time.utc_now, :milliseconds) + 1000
-      {:ok, next_time} -> Time.diff(next_time, Time.utc_now, :milliseconds)
+      {:ok, next_time} ->
+         case next_time == ~T[23:59:59.000000] do
+            true -> 
+              Time.diff(next_time, Time.utc_now, :milliseconds) + 1000
+            false -> 
+              Time.diff(next_time, Time.utc_now, :milliseconds)
+         end
       {:error, _} -> raise("converting time from " <> now <> " failed.")
     end
   end
@@ -47,7 +52,7 @@ defmodule ClassnavapiWeb.Scheduler do
 
   defp add_hour(now) do
     case now.hour + 1 do
-      24 -> Time.new(11, 59, 59, 0)
+      24 -> Time.new(23, 59, 59, 0)
       _ -> Time.new(now.hour + 1, 0, 0, 0)
     end
   end
