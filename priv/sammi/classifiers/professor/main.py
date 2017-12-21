@@ -13,6 +13,7 @@ class ProfessorClassifier:
 
     # Put Most Specific (i.e. most meaningful) day keys at beginning of array as they are matched first in regex
     day_keys = ['Monday','monday','Tuesday','tuesday','Wednesday','wednesday','Thursday','thursday','Friday','friday',
+                'Mondays','mondays','Tuesdays','tuesdays','Wednesdays','wednesdays','Thursdays','thursdays','Fridays','fridays',
                 'Tues./Thurs.','Mon./Wed./Fri.','Tues/Thurs','Mon/Wed/Fri',
                 'M/W','M/W/F','M/F','W/F','T/Th',
                 'MTWR','MWF','MW','MF','TU/TH','TR','TU','TH',
@@ -23,7 +24,7 @@ class ProfessorClassifier:
     office_hours_key = ['am','pm','office','hours']
     office_location_key = ['office','location','room','building','rm','rm.']
     professor_email_key = ['@','edu','org','.']
-    professor_name_key = ['prof','professor','instructor','dr','ms','mrs','mr','phd','prof.','dr.','ms.','mrs.','mr.']
+    professor_name_key = ['prof','professor','instructor','dr','ms','mrs','mr','phd','prof.','dr.','ms.','mrs.','mr.','ph.d.','ph.d']
     professor_phone_key = ['-','(',')','0','1','2','3','4','5','6','7','8','9','x','X']
 
     def __init__(self):
@@ -38,7 +39,7 @@ class ProfessorClassifier:
             "\n"
             "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<ProfessorPhone>?<OfficeHours.*>{2,}<GradeScaleLetter>?}"
             "\n"
-            "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
+            "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey|OfficeHoursKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
             "\n"
             "PHONE: {<OfficeKey>?<ProfessorPhoneKey>?<:>?<None>{0,1}<ProfessorPhone>?<None>{0,1}<ProfessorPhone>+}"
         )

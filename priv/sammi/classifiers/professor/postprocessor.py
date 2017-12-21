@@ -63,7 +63,7 @@ class ProfessorPostProcessor:
             for val in best_guess:
                 if val[1] == 'ProfessorPhone' or val[0] == "(" or val[0] == ")":
                     res += val[0]
-                if val[1] == 'None' and (val[0] != "(" or val[0] != ")"):
+                if val[1] == 'None' and val[0] != "(" and val[0] != ")" and val != ":":
                     break
         return {'value':res.strip()}
 
@@ -91,22 +91,28 @@ class ProfessorPostProcessor:
                 # these will both eventually go away as Sammi gets smarter (i.e. as the 'corpora' folder gets larger)
                 if val[1] == 'OfficeHoursDay' or val[1] == 'OfficeHoursTime' or val[1] == 'ProfessorPhone' or val[1] == 'GradeScaleLetter':
                     res += (val[0]+" ")
-        return {'value':res.strip()}
+                elif val[1] == 'OfficeHoursSeparator':
+                    res = res.strip()
+                    res += (val[0]+" ")
+        res = res.strip()
+        if res[-1] == ",":
+            res = res[:-1]
+        return {'value':res}
 
     def get_office_location(self,results):
-        greatest_length = 0
+        most_location_keys = 0
         best_guess = None
         res = ''
         for result in results:
-            # we dont just care about length of results as in others
-            # here, we also care how many were labeled as OfficeLocation
             length = len(result)
-            num_of_location_keys = sum((val[1] == 'OfficeLocationKey' or val[1] == 'OfficeKey' or val[1] == ':') for val in result)
+            # sometimes 'location' gets tagged as OfficeHoursKey
+            # this will go away as Sammi gets smarter, but account for it here for now
+            num_of_location_keys = sum((val[1] == 'OfficeLocationKey' or val[1] == 'OfficeKey' or val[1] == ':' or val[0].lower() == 'location') for val in result)
             num_of_location_building_values = sum(val[1] == 'OfficeLocationBuilding'for val in result)
             num_of_location_room_values = sum(val[1] == 'OfficeLocationRoom'for val in result)
-            overwrites = num_of_location_building_values > 0 and num_of_location_room_values > 0 and num_of_location_keys > 0
-            if length >= greatest_length and overwrites:
-                greatest_length = length
+            overwrites = num_of_location_building_values == 1 and num_of_location_room_values == 1
+            if num_of_location_keys >= most_location_keys and overwrites:
+                most_location_keys = num_of_location_keys
                 best_guess = result
         if best_guess:
             for val in best_guess:

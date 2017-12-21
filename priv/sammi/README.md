@@ -26,9 +26,12 @@
 
 # Tested
 
+  * ERR_S1 (missed professor name and grade scale (uses points system))
   * S33 (perfect)
   * S34 (missed phone (its an extension), returned office hours but there were none)
   * S35 (missed grade scale (using max instead of min))
+  * S36 (missed prof name (has dr. value at end) missed grade scale (uses point system))
+  * S43 (office hours incomplete and grade scale incomplete)
   * S58 (missed office location)
 
 # Part Of Speech Tag List:
