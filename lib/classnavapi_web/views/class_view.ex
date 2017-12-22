@@ -63,6 +63,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
+            is_points: class.is_points,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
