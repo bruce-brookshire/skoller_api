@@ -22,7 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id} = params) do
-    date = Date.utc_today()
+    date = DateTime.utc_now()
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)

@@ -221,7 +221,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   defp format_date_from_iso(date) do
     date
-    |> Date.from_iso8601()
+    |> DateTime.from_iso8601()
     |> format_date()
   end
 

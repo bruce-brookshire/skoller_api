@@ -104,7 +104,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   * 200 `ClassnavapiWeb.Class.SearchView`
   """
   def index(conn, %{} = params) do
-    date = Date.utc_today()
+    date = DateTime.utc_now
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)

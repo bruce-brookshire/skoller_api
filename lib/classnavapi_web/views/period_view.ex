@@ -12,8 +12,8 @@ defmodule ClassnavapiWeb.PeriodView do
   end
 
   def render("period.json", %{period: period}) do
-    today = Date.utc_today()
-    period = case Date.compare(period.start_date, today) in [:lt, :eq] and Date.compare(period.end_date, today) in [:gt, :eq] do
+    today = DateTime.utc_now()
+    period = case DateTime.compare(period.start_date, today) in [:lt, :eq] and DateTime.compare(period.end_date, today) in [:gt, :eq] do
       true -> period |> Map.put(:is_active, true)
       false -> period |> Map.put(:is_active, false)
     end

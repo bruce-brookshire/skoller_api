@@ -11,7 +11,7 @@ defmodule Classnavapi.Helpers.ChangesetValidation do
   defp compare_dates(changeset, nil, _, _), do: changeset
   defp compare_dates(changeset, _, nil, _), do: changeset
   defp compare_dates(changeset, start_val, end_val, start_date) do
-    changeset |> compare_dates(Date.compare(start_val, end_val), start_date)
+    changeset |> compare_dates(DateTime.compare(start_val, end_val), start_date)
   end
   defp compare_dates(changeset, :lt, _), do: changeset
   defp compare_dates(changeset, _, start_date) do
