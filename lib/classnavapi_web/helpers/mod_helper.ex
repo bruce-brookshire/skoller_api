@@ -148,15 +148,21 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> auto_update_count_needed()
     |> auto_update_acted_ratio_needed(actions)
     |> auto_update_copied_ratio_needed()
-    |> apply_mods(mod, actions)
+    |> apply_mods(actions)
     |> update_actions(actions)
   end
 
-  defp apply_mods({:error, msg}, _mod, _actions), do: {:error, msg}
-  defp apply_mods({:ok, _}, mod, actions) do
-    student_class = Repo.get!(StudentClass, actions.student_class_id)
-    
-    status = student_class |> Enum.map(&apply_mod(mod, &1))
+  defp apply_action_mods(action) do
+    student_class = Repo.get!(StudentClass, action.student_class_id)
+    mod = Repo.get!(Mod, action.assignment_modification_id)
+    Repo.transaction(apply_mod(mod, student_class))
+  end
+
+  defp apply_mods({:error, msg}, _actions), do: {:error, msg}
+  defp apply_mods({:ok, _}, actions) do
+    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
+
+    status = nil_actions |> Enum.map(&apply_action_mods(&1))
     
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
