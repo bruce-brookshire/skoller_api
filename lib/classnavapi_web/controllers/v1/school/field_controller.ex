@@ -7,11 +7,11 @@ defmodule ClassnavapiWeb.Api.V1.School.FieldController do
 
   import Ecto.Query
 
-  def index(conn, %{"school_id" => school_id}) do
+  def index(conn, %{"school_id" => school_id} = params) do
     query = (from fs in FieldOfStudy)
     fields = query
             |> where([fs], fs.school_id == ^school_id)
-            |> where([fs], ^filter(params))
+            |> filter(params)
             |> Repo.all()
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end

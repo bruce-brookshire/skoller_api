@@ -85,7 +85,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
 
   defp unauth(conn) do
     conn
-    |> send_resp(401, "")
+    |> send_resp(403, "")
     |> halt()
   end
 end
