@@ -220,9 +220,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   defp format_date_from_iso(date) do
-    date
-    |> DateTime.from_iso8601()
-    |> format_date()
+    {:ok, date} = date |> DateTime.from_iso8601()
+    
+    date |> format_date()
   end
 
   defp get_month(1), do: "January"
