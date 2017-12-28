@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
 
   defp assignment_query(time) do
     {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
-    now = Date.utc_today()
+    now = DateTime.utc_now()
 
     from(student in Student)
     |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
@@ -43,11 +43,12 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp due_days_away(due) do
-    today = Date.utc_today()
-    case Date.diff(due, today) do
-      0 -> "today."
-      1 -> "tomorrow."
-      days -> "in " <> to_string(days) <> " days."
+    # TODO: Need to double check these.
+    today = DateTime.utc_now()
+    case DateTime.diff(due, today) do
+      less when less < 86400 -> "today."
+      one when one < 86400*2 -> "tomorrow."
+      seconds -> "in " <> to_string(abs(seconds/86400)) <> " days."
     end
   end
 end

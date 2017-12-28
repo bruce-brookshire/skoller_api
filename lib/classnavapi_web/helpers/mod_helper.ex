@@ -307,7 +307,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
-    case Date.compare(old_due, due) do
+    case DateTime.compare(old_due, due) do
       :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
       _ -> due |> insert_due_mod(student_assignment, params)
     end

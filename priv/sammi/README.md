@@ -7,6 +7,7 @@
     - ``ln -s /usr/local/Cellar/imagemagick@6/6.9.9-26/lib/libMagickWand-6.Q16.dylib /usr/local/lib/libMagickWand.dylib``
   * Wand (pip3 install wand)
   * Pillow (pip3 install Pillow)
+  * Tesseract (``brew install tesseract`` for mac or ``sudo apt install tesseract-ocr`` for ubuntu)
   * pyocr (pip3 install pyocr)
   * pip3 install docx2text
   * pip3 install pyenchant
@@ -25,8 +26,12 @@
 
 # Tested
 
-  * S33 (missed email)
+  * ERR_S1 (missed professor name and grade scale (uses points system))
+  * S33 (perfect)
   * S34 (missed phone (its an extension), returned office hours but there were none)
+  * S35 (missed grade scale (using max instead of min))
+  * S36 (missed prof name (has dr. value at end) missed grade scale (uses point system))
+  * S43 (office hours incomplete and grade scale incomplete)
   * S58 (missed office location)
 
 # Part Of Speech Tag List:

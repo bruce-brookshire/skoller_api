@@ -26,8 +26,8 @@ defmodule Classnavapi.Class do
   @needs_syllabus_status 200
 
   schema "classes" do
-    field :class_end, :date
-    field :class_start, :date
+    field :class_end, :utc_datetime
+    field :class_start, :utc_datetime
     field :credits, :string
     field :crn, :string
     field :is_editable, :boolean, default: true

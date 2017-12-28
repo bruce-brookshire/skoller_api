@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :api_auth do
+  pipeline :api_auth_verified do
     plug :accepts, ["json"]
     plug Guardian.Plug.Pipeline, module: Classnavapi.Auth,
                                   error_handler: Classnavapi.AuthErrorHandler
@@ -18,13 +18,23 @@ defmodule ClassnavapiWeb.Router do
     plug :is_phone_verified
   end
 
+  pipeline :api_auth do
+    plug :accepts, ["json"]
+    plug Guardian.Plug.Pipeline, module: Classnavapi.Auth,
+                                  error_handler: Classnavapi.AuthErrorHandler
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+    plug :authenticate
+  end
+
   if Mix.env == :dev do
     forward "/sent_emails", Bamboo.EmailPreviewPlug
   end
 
   # Other scopes may use custom stacks.
   scope "/api", ClassnavapiWeb.Api do
-    pipe_through :api_auth
+    pipe_through :api_auth_verified
 
     scope "/v1", V1, as: :v1 do
       # Login/out routes
@@ -33,13 +43,9 @@ defmodule ClassnavapiWeb.Router do
       post "/reset", ForgotEmailController, :reset
 
       # User routes
-      put "/users/:user_id", UserController, :update
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
       resources "/users", Admin.UserController, only: [:show, :index] do
-        #Device routes
-        post "/register", DeviceController, :register
-
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
@@ -150,6 +156,16 @@ defmodule ClassnavapiWeb.Router do
       post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
       post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
     end
+  end
+
+  scope "/api", ClassnavapiWeb.Api do
+    pipe_through :api_auth
+
+    scope "/v1", V1, as: :v1 do
+      put "/users/:user_id", UserController, :update
+      post "/users/:user_id/register", DeviceController, :register
+    end
+    
   end
 
   scope "/api", ClassnavapiWeb.Api do

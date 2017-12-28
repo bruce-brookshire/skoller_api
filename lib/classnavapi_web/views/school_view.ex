@@ -28,9 +28,9 @@ defmodule ClassnavapiWeb.SchoolView do
   end
 
   defp active_periods(class_periods) do
-    today = Date.utc_today()
+    today = DateTime.utc_now()
     class_periods 
-    |> Enum.filter(&Date.compare(&1.start_date, today) in [:lt, :eq] and Date.compare(&1.end_date, today) in [:gt, :eq])
+    |> Enum.filter(&DateTime.compare(&1.start_date, today) in [:lt, :eq] and DateTime.compare(&1.end_date, today) in [:gt, :eq])
     |> render_many(PeriodView, "period.json")
   end
 end

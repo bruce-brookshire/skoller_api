@@ -14,7 +14,7 @@ defmodule Classnavapi.Class.Assignment do
   alias Classnavapi.Class.Weight
 
   schema "assignments" do
-    field :due, :date
+    field :due, :utc_datetime
     field :name, :string
     field :weight_id, :id
     field :class_id, :id

@@ -2,9 +2,16 @@ defmodule ClassnavapiWeb.Class.StatusView do
   use ClassnavapiWeb, :view
 
   alias ClassnavapiWeb.Class.StatusView
+  alias Classnavapi.School
+  alias Classnavapi.Repo
 
   def render("index.json", %{statuses: statuses}) do
-    render_many(statuses, StatusView, "status.json")
+    count = Repo.all(School)
+    |> Enum.count()
+    %{
+      schools: count,
+      statuses: render_many(statuses, StatusView, "status.json")
+    }
   end
 
   def render("show.json", %{status: status}) do

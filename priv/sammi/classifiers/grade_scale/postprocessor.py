@@ -25,6 +25,7 @@ class GradeScalePostProcessor:
             current_letter = None
             letters_come_first = None
             grade_maxes = []
+            num_of_mins = sum(val[1] == 'GradeScaleMin' for val in best_guess)
             for val in best_guess:
                 # we need to see if letters come before or after grade scales
                 if val[1] == 'GradeScaleLetter' and letters_come_first == None:
@@ -32,13 +33,20 @@ class GradeScalePostProcessor:
                 elif (val[1] == 'GradeScaleRange' or val[1] == 'GradeScaleMin' or val[1] == 'GradeScaleMax') and letters_come_first == None:
                     letters_come_first = False
                 # then we need to actually segment the grades in the proper format
-                if val[1] == 'GradeScaleLetter' and val[0] in self.letter_key:
-                    # If letter come first, just append the value
-                    if letters_come_first:
+                if val[1] == 'GradeScaleLetter':
+                    # If letters come first and the curr_res is either blank or doesnt end in a comma, just append the value
+                    if letters_come_first and (curr_res == "" or curr_res[-1] != ",") and val[0] in self.letter_key:
                         curr_res += (val[0]+",")
                         current_letter = val[0]
+                    # If the curr res ends in a comma, we must have missed a number.  Use the last max value.
+                    elif letters_come_first and curr_res[-1] == ",":
+                        curr_res += grade_maxes[-1]
+                        res[current_letter] = curr_res
+                        if val[0] in self.letter_key:
+                            curr_res = (val[0]+",")
+                            current_letter = val[0]
                     # If numbers come first append the value with the saved number
-                    else:
+                    elif val[0] in self.letter_key:
                         res[val[0]] = val[0]+","+current_number if current_number else val[0]+","+grade_maxes[-1]
                 elif val[1] == 'GradeScaleRange':
                     # If letters come first and the curr_res is expecting its next number, put it there
@@ -58,9 +66,13 @@ class GradeScalePostProcessor:
                     # If numbers come first and the curr_res is blank
                     elif not letters_come_first and curr_res == "":
                         current_number = val[0]
-                # saving all references to grade scale max as sometimes the min is missing and we must use it
                 elif val[1] == 'GradeScaleMax':
-                    grade_maxes.append(val[0])
+                    # If there aren't any min values, have to use max
+                    if num_of_mins == 0:
+                        current_number = val[0]
+                    # saving all references to grade scale max as sometimes the min is missing and we must use it
+                    else:
+                        grade_maxes.append(val[0])
         final_val = ''
         for key,val in res.items():
             if val:

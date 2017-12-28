@@ -104,7 +104,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   * 200 `ClassnavapiWeb.Class.SearchView`
   """
   def index(conn, %{} = params) do
-    date = Date.utc_today()
+    date = DateTime.utc_now
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
@@ -211,11 +211,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   defp prof_filter(dynamic, %{"professor_name" => filter, "or" => "true"}) do
     prof_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ^dynamic)
+    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter) or ^dynamic)
   end
   defp prof_filter(dynamic, %{"professor_name" => filter}) do
     prof_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) and ^dynamic)
+    dynamic([class, period, prof], (ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter)) and ^dynamic)
   end
   defp prof_filter(dynamic, _), do: dynamic
 

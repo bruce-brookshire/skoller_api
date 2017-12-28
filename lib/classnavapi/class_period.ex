@@ -14,9 +14,9 @@ defmodule Classnavapi.ClassPeriod do
   alias Classnavapi.Helpers.ChangesetValidation
 
   schema "class_periods" do
-    field :end_date, :date
+    field :end_date, :utc_datetime
     field :name, :string
-    field :start_date, :date
+    field :start_date, :utc_datetime
     field :school_id, :id
     belongs_to :school, Classnavapi.School, define_field: false
     has_many :classes, Classnavapi.Class

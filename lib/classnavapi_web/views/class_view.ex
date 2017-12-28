@@ -35,6 +35,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
+            is_points: class.is_points,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
@@ -44,7 +45,7 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: class}) do
-        class = class |> Repo.preload(:professor)
+        class = class |> Repo.preload([:professor, :class_status])
         %{
             id: class.id,
             class_end: class.class_end,
@@ -62,11 +63,13 @@ defmodule ClassnavapiWeb.ClassView do
             is_enrollable: class.is_enrollable,
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
+            is_points: class.is_points,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
             length: ClassCalcs.get_class_length(class),
-            professor: render_one(class.professor, ProfessorView, "professor.json")
+            professor: render_one(class.professor, ProfessorView, "professor.json"),
+            status: render_one(class.class_status, StatusView, "status.json")
         }
     end
 
