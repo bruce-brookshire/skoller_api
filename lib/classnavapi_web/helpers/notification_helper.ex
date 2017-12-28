@@ -65,7 +65,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   def send_mod_update_notifications(%{actions: nil}), do: nil
-  def send_mod_update_notifications({:ok, :no_mod}), do: nil
+  def send_mod_update_notifications({:ok, _}), do: nil
   def send_mod_update_notifications(mod) do
     mod.actions |> Enum.each(&send_mod_update_notifications(&1))
   end

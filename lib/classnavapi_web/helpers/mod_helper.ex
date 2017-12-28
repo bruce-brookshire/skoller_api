@@ -24,6 +24,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   @new_assignment_mod 400
   @delete_assignment_mod 500
 
+  @auto_upd_enrollment_threshold 5
+  @auto_upd_response_threshold 0.35
+  @auto_upd_approval_threshold 0.75
+
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
       data: %{
@@ -65,6 +69,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
         Ecto.Multi.new
         |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
+        |> Repo.transaction()
     end
   end
 
@@ -134,6 +139,92 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> select([mod, act, assign], assign)
     |> Repo.all()
   end
+
+  def process_auto_update(mod) do
+    actions = mod |> get_actions_from_mod()
+
+    actions 
+    |> Enum.count()
+    |> auto_update_count_needed()
+    |> auto_update_acted_ratio_needed(actions)
+    |> auto_update_copied_ratio_needed()
+    |> apply_mods(actions)
+    |> update_actions(actions)
+
+    {:ok, nil}
+  end
+
+  defp apply_action_mods(action) do
+    student_class = Repo.get!(StudentClass, action.student_class_id)
+    mod = Repo.get!(Mod, action.assignment_modification_id)
+    Repo.transaction(apply_mod(mod, student_class))
+  end
+
+  defp apply_mods({:error, msg}, _actions), do: {:error, msg}
+  defp apply_mods({:ok, _}, actions) do
+    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
+
+    status = nil_actions |> Enum.map(&apply_action_mods(&1))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp update_actions({:error, msg}, _actions), do: {:error, msg}
+  defp update_actions({:ok, _}, actions) do
+    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
+    
+    status = nil_actions |> Enum.map(&update_action(&1))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp update_action(%Action{} = action) do
+    action
+    |> Ecto.Changeset.change(%{is_accepted: true})
+    |> Repo.update()
+  end
+
+  defp auto_update_count_needed(count) do
+    case count < @auto_upd_enrollment_threshold do
+      true -> {:error, :not_enough_enrolled}
+      false -> {:ok, count}
+    end
+  end
+  
+  defp auto_update_copied_ratio_needed({:error, msg}), do: {:error, msg}
+  defp auto_update_copied_ratio_needed({:ok, acted}) do
+    count = acted |> Enum.count()
+
+    action_count = acted
+    |> Enum.filter(& &1.is_accepted == true)
+    |> Enum.count()
+
+    case action_count / count < @auto_upd_approval_threshold do
+      true -> {:error, :not_enough_copied}
+      false -> {:ok, nil}
+    end
+  end
+
+  defp auto_update_acted_ratio_needed({:error, msg}, _count), do: {:error, msg}
+  defp auto_update_acted_ratio_needed({:ok, count}, actions) do
+    acted = actions
+    |> Enum.filter(& not(is_nil(&1.is_accepted)))
+
+    action_count = acted
+    |> Enum.count()
+
+    case action_count / count < @auto_upd_response_threshold do
+      true -> {:error, :not_enough_responses}
+      false -> {:ok, acted}
+    end
+  end
+
+  defp get_actions_from_mod(%Mod{id: id}) do
+    from(act in Action)
+    |> where([act], act.assignment_modification_id == ^id)
+    |> Repo.all()
+  end
+  defp get_actions_from_mod(_mod), do: []
 
   defp insert_mod(mod, %StudentClass{} = student_class) do
     changeset = Mod.changeset(%Mod{}, mod)
