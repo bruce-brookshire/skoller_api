@@ -163,7 +163,7 @@ defmodule ClassnavapiWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
-      post "users/:user_id/register", DeviceController, :register
+      post "/users/:user_id/register", DeviceController, :register
     end
     
   end
