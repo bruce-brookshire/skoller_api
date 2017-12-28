@@ -17,6 +17,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
 
   @weight_lock 100
   @assignment_lock 200
+  @review_lock 300
 
   def check_lock(conn, params) do
     case conn |> is_admin() do
