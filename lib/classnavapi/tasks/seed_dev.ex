@@ -98,7 +98,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                       name_last: "Witt",
                                       school_id: school.id,
                                       phone: "2067189446",
-                                      birthday: date1,
+                                      birthday: bday,
                                       gender: "Male",
                                       is_verified: true,
                                       notification_time: time1}})
@@ -109,7 +109,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                          name_last: "Witt",
                                          school_id: school.id,
                                          phone: "2067189446",
-                                         birthday: date1,
+                                         birthday: bday,
                                          gender: "Male",
                                          is_verified: true,
                                          notification_time: time1}})
@@ -120,7 +120,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                             name_last: "Witt",
                                             school_id: school.id,
                                             phone: "2067189446",
-                                            birthday: date1,
+                                            birthday: bday,
                                             gender: "Male",
                                             is_verified: true,
                                             notification_time: time1}})
@@ -131,7 +131,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     name_last: "Witt",
                                     school_id: school.id,
                                     phone: "2067189446",
-                                    birthday: date1,
+                                    birthday: bday,
                                     gender: "Male",
                                     is_verified: true,
                                     notification_time: time1}})
@@ -142,7 +142,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                       name_last: "Witt",
                                       school_id: school.id,
                                       phone: "2067189446",
-                                      birthday: date1,
+                                      birthday: bday,
                                       gender: "Male",
                                       is_verified: true,
                                       notification_time: time1}})
