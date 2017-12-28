@@ -150,6 +150,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> auto_update_copied_ratio_needed()
     |> apply_mods(actions)
     |> update_actions(actions)
+
+    {:ok, nil}
   end
 
   defp apply_action_mods(action) do
