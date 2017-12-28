@@ -37,8 +37,8 @@ defmodule Classnavapi.Class do
     field :is_points, :boolean
     field :location, :string
     field :meet_days, :string, default: ""
-    field :meet_end_time, :string, default: ""
-    field :meet_start_time, :string, default: ""
+    field :meet_end_time, :time
+    field :meet_start_time, :time
     field :name, :string
     field :number, :string
     field :seat_count, :integer
