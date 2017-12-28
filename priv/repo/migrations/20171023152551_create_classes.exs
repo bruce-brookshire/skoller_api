@@ -10,8 +10,8 @@ defmodule Classnavapi.Repo.Migrations.CreateClasses do
       add :location, :string
       add :meet_days, :string
       add :grade_scale, :string
-      add :meet_start_time, :string
-      add :meet_end_time, :string
+      add :meet_start_time, :time
+      add :meet_end_time, :time
       add :seat_count, :integer
       add :class_start, :date
       add :class_end, :date
