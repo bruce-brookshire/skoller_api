@@ -72,12 +72,48 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     end
   end
 
+  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review_assignment, using: :id}) do
+    case conn.params |> check_using(:review, :id) do
+      true ->
+        assign = Repo.get!(Assignment, conn.params["id"])
+        case Repo.get_by(Lock, class_id: assign.class_id, class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do  nil -> conn |> unauth
+          _ -> conn
+        end
+      false -> conn
+    end
+  end
+
+  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review_weight, using: :id}) do
+    case conn.params |> check_using(:review, :id) do
+      true ->
+        weight = Repo.get!(Weight, conn.params["id"])
+        case Repo.get_by(Lock, class_id: weight.class_id, class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do
+          nil -> conn |> unauth
+          _ -> conn
+        end
+      false -> conn
+    end
+  end
+
+  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review, using: :class_id}) do
+    case conn.params |> check_using(:review, :class_id) do
+      true ->
+        case Repo.get_by(Lock, class_id: conn.params["class_id"], class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do
+          nil -> conn |> unauth
+          _ -> conn
+        end
+      false -> conn
+    end
+  end
+
   defp check_using(%{"id" => nil}, _, :id), do: false
   defp check_using(%{"class_id" => nil}, _, :class_id), do: true
   defp check_using(%{"id" => _}, :weight, :id), do: true
   defp check_using(%{"class_id" => _}, :weight, :class_id), do: true
   defp check_using(%{"id" => _}, :assignment, :id), do: true
   defp check_using(%{"class_id" => _}, :assignment, :class_id), do: true
+  defp check_using(%{"id" => _}, :review, :id), do: true
+  defp check_using(%{"class_id" => _}, :review, :class_id), do: true
   defp check_using(_params, _, _), do: false
 
   defp is_admin(conn) do
