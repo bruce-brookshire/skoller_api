@@ -12,6 +12,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
   
+  @admin_role 200
   @syllabus_worker_role 300
   
   @weight_lock 100
@@ -21,7 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   @review_lock 300
   @review_status 500
 
-  plug :verify_role, %{role: @syllabus_worker_role}
+  plug :verify_role, %{roles: [@syllabus_worker_role, @admin_role]}
 
   def weights(conn, _params) do
     class = conn |> serve_class(@weight_lock, @weight_status)
