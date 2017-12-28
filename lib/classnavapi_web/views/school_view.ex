@@ -23,6 +23,7 @@ defmodule ClassnavapiWeb.SchoolView do
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
       is_auto_syllabus: school.is_auto_syllabus,
+      timezone: school.timezone,
       email_domains: render_many(school.email_domains, EmailDomainView, "email_domain.json")
     }
   end
