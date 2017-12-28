@@ -220,7 +220,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   defp format_date_from_iso(date) do
-    {:ok, date} = date |> DateTime.from_iso8601()
+    {:ok, date, _offset} = date |> DateTime.from_iso8601()
     
     date |> format_date()
   end
