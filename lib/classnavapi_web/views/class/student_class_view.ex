@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
   alias ClassnavapiWeb.Class.StudentAssignmentView
   alias ClassnavapiWeb.AssignmentView
   alias ClassnavapiWeb.Helpers.ClassCalcs
+  alias ClassnavapiWeb.Class.StatusView
 
   def render("index.json", %{student_classes: student_classes}) do
     render_many(student_classes, StudentClassView, "student_class.json")
@@ -24,7 +25,6 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
       grade: Decimal.to_float(grade),
       completion: Decimal.to_float(completion),
       enrollment: enrollment,
-      status: status,
       new_assignments: render_many(new_assignments, AssignmentView, "assignment.json")
     })
   end
@@ -41,7 +41,7 @@ defmodule ClassnavapiWeb.Class.StudentClassView do
       color: student_class.color,
       is_notifications: student_class.is_notifications,
       assignments: render_many(ClassCalcs.get_assignments_with_relative_weight(student_class), StudentAssignmentView, "student_assignment.json"),
-      weights: render_many(class.weights, WeightView, "weight.json")
+      weights: render_many(class.weights, WeightView, "weight.json"),
     } 
     |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
   end
