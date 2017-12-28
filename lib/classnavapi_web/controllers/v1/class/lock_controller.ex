@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, changeset} ->
         conn
-        |> put_status(:unprocessable_entity)
+        |> put_status(:conflict)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
@@ -153,8 +153,15 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   end
 
   defp lock_class(params) do
-    changeset = Lock.changeset(%Lock{}, params) 
-    Repo.insert(changeset)
+    case Repo.get_by(Lock, class_id: params["class_id"], 
+                            class_lock_section_id: params["class_lock_section_id"], 
+                            user_id: params["user_id"],
+                            is_completed: false) do
+      nil ->           
+        changeset = Lock.changeset(%Lock{}, params) 
+        Repo.insert(changeset)
+      lock -> {:ok, lock} 
+    end
   end
 
   defp unlock_class(lock_old, map, _) do
