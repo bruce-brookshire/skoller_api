@@ -46,9 +46,6 @@ defmodule ClassnavapiWeb.Router do
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
       resources "/users", Admin.UserController, only: [:show, :index] do
-        #Device routes
-        post "/register", DeviceController, :register
-
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
@@ -166,7 +163,9 @@ defmodule ClassnavapiWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
+      post "users/:user_id/register", DeviceController, :register
     end
+    
   end
 
   scope "/api", ClassnavapiWeb.Api do
