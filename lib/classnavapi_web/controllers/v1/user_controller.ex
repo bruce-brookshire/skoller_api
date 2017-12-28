@@ -7,9 +7,11 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias Classnavapi.UserRole
   alias Classnavapi.PicUpload
+  alias Classnavapi.School.StudentField
   alias Ecto.UUID
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
   
   @student_role 100
   @admin_role 200
