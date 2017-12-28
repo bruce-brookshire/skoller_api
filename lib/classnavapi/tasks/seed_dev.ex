@@ -27,8 +27,8 @@ defmodule Mix.Tasks.Seed.Dev do
   def run(_) do
     ensure_started(Repo, [])
  
-    {:ok, date1, offset1} = DateTime.from_iso8601("2017-10-12T00:00:00Z")
-    {:ok, date2, offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
+    {:ok, date1, _offset1} = DateTime.from_iso8601("2017-10-12T00:00:00Z")
+    {:ok, date2, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
     pass = Comeonin.Bcrypt.add_hash("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
@@ -80,7 +80,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",
                                     adr_city: "Nashville"})
-    {:ok, bday} = Date.new(2017,10,12)
+    {:ok, bday} = Date.new(2017, 10, 12)
     student = Repo.insert!(%User{email: "tyler@fortyau.com", 
                                 password_hash: pass.password_hash,
                                 student: %Student{name_first: "Tyler",
