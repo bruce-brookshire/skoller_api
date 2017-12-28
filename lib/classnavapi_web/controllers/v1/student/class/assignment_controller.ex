@@ -127,7 +127,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   defp class_filter(query, _params), do: query
 
   defp date_filter(enumerable, %{"date" => date}) do
-    date = date |> DateTime.from_iso8601()
+    {:ok, date, _offset} = date |> DateTime.from_iso8601()
     enumerable
     |> Enum.filter(&DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
   end
