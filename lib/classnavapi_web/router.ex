@@ -82,6 +82,7 @@ defmodule ClassnavapiWeb.Router do
       # Class routes
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
+      post "/classes/:class_hash/pydocs", Admin.Class.DocController, :create
       resources "/classes", ClassController, only: [:update, :show, :index] do
         put "/statuses", Class.StatusController, :update
         post "/confirm", ClassController, :confirm
