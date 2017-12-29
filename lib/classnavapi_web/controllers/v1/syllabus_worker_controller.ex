@@ -85,19 +85,19 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   end
   defp lock_class(class, _conn, _type), do: class
 
-  defp get_oldest(school_id, %{assigns: %{user: user}}, @review_status, @review_lock) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
-    |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and (lock.class_lock_section_id == @review_lock or lock.user_id == ^user.id))
-    |> where([class], class.class_status_id == @review_status)
-    |> where([class, period, doc, lock], doc.is_syllabus == true)
-    |> where([class, period, doc, lock], period.school_id == ^school_id)
-    |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-    |> order_by([class, period, doc, lock], asc: doc.inserted_at)
-    |> Repo.all()
-    |> List.first()
-  end
+  # defp get_oldest(school_id, %{assigns: %{user: user}}, @review_status, @review_lock) do
+  #   from(class in Class)
+  #   |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+  #   |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
+  #   |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and (lock.class_lock_section_id == @review_lock or lock.user_id == ^user.id))
+  #   |> where([class], class.class_status_id == @review_status)
+  #   |> where([class, period, doc, lock], doc.is_syllabus == true)
+  #   |> where([class, period, doc, lock], period.school_id == ^school_id)
+  #   |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
+  #   |> order_by([class, period, doc, lock], asc: doc.inserted_at)
+  #   |> Repo.all()
+  #   |> List.first()
+  # end
 
   defp get_oldest(school_id, _conn, status, type) do
     from(class in Class)
