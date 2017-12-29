@@ -142,14 +142,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   def process_auto_update(mod, :notification) do
-    require IEx
-    IEx.pry
     case mod |> process_auto_update() do
-      _ -> 
-        require IEx
-        IEx.pry
       {:ok, nil} -> {:ok, nil}
-      {:ok, data} -> NotificationHelper.send_auto_update_notification(data)
+      {:ok, %{actions: actions}} -> NotificationHelper.send_auto_update_notification(actions)
     end
   end
 
