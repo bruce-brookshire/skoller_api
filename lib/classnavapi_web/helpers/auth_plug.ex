@@ -19,6 +19,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
 
   def authenticate(conn, _) do
     case Repo.get(User, Guardian.Plug.current_resource(conn)) do
+      %User{is_active: false} -> conn |> unauth
       %User{} = user ->
         user = user |> Repo.preload([:roles, :student])
         assign(conn, :user, user)

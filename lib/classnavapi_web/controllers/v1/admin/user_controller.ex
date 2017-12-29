@@ -44,7 +44,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Repo.get!(User, user_id)
     user_old = user_old |> Repo.preload(:student)
-    changeset = User.changeset_update(user_old, params)
+    changeset = User.changeset_update_admin(user_old, params)
     
     multi = Ecto.Multi.new
     |> Ecto.Multi.update(:user, changeset)

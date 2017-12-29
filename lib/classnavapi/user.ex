@@ -19,6 +19,7 @@ defmodule Classnavapi.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     field :pic_path, :string
+    field :is_active, :boolean, default: true
     belongs_to :student, Classnavapi.Student
     many_to_many :roles, Classnavapi.Role, join_through: "user_roles"
     timestamps()
@@ -30,6 +31,9 @@ defmodule Classnavapi.User do
   @upd_req []
   @upd_opt [:password, :pic_path]
   @upd_fields @upd_req ++ @upd_opt
+  @adm_upd_req [:is_active]
+  @adm_upd_opt [:password, :pic_path]
+  @adm_upd_fields @adm_upd_req ++ @adm_upd_opt
 
   @doc false
   def changeset_insert(%User{} = user, attrs) do
@@ -47,6 +51,14 @@ defmodule Classnavapi.User do
     user
     |> cast(attrs, @upd_fields)
     |> validate_required(@upd_req)
+    |> cast_assoc(:student)
+    |> put_pass_hash()
+  end
+
+  def changeset_update_admin(%User{} = user, attrs) do
+    user
+    |> cast(attrs, @adm_upd_fields)
+    |> validate_required(@adm_upd_req)
     |> cast_assoc(:student)
     |> put_pass_hash()
   end

@@ -16,7 +16,8 @@ defmodule ClassnavapiWeb.UserView do
     %{
       id: user.id,
       email: user.email,
-      avatar: user.pic_path
+      avatar: user.pic_path,
+      is_active: user.is_active
     }
   end
 
