@@ -30,8 +30,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
     end
   end
 
-  def index(conn, _params) do
-    schools = Repo.all(School)
+  def index(conn, params) do
+    schools = from(school in School)
+    |> filter(params)
+    |> Repo.all()
     render(conn, SchoolView, "index.json", schools: schools)
   end
 
@@ -71,6 +73,17 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  defp filter(query, params) do
+    query
+    |> short_name_filter(params)
+  end
+
+  defp short_name_filter(query, %{"short_name" => short_name}) do
+    query
+    |> where([school], school.short_name == ^short_name)
+  end
+  defp short_name_filter(query, _params), do: query
 
   defp put_class_statuses(%{school: %School{} = school} = params) do
     params
