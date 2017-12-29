@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import Ecto.Query
 
@@ -140,18 +141,30 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all()
   end
 
+  def process_auto_update(mod, :notification) do
+    case mod |> process_auto_update() do
+      {:ok, nil} -> {:ok, nil}
+      {:ok, %{actions: actions}} -> NotificationHelper.send_auto_update_notification(actions)
+    end
+  end
+
   def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
 
-    actions 
+    update = actions 
     |> Enum.count()
     |> auto_update_count_needed()
     |> auto_update_acted_ratio_needed(actions)
     |> auto_update_copied_ratio_needed()
-    |> apply_mods(actions)
-    |> update_actions(actions)
 
-    {:ok, nil}
+    case update do
+      {:ok, _} ->
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
+        |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
+        |> Repo.transaction()
+      {:error, _msg} -> {:ok, nil}
+    end
   end
 
   defp apply_action_mods(action) do
@@ -160,8 +173,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Repo.transaction(apply_mod(mod, student_class))
   end
 
-  defp apply_mods({:error, msg}, _actions), do: {:error, msg}
-  defp apply_mods({:ok, _}, actions) do
+  defp apply_mods(actions, _) do
     nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
 
     status = nil_actions |> Enum.map(&apply_action_mods(&1))
@@ -170,7 +182,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   defp update_actions({:error, msg}, _actions), do: {:error, msg}
-  defp update_actions({:ok, _}, actions) do
+  defp update_actions(actions, _) do
     nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
     
     status = nil_actions |> Enum.map(&update_action(&1))

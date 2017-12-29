@@ -39,7 +39,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     case Repo.transaction(multi) do
       {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod])
+        Task.start(ModHelper, :process_auto_update, [mod, :notification])
         Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
@@ -81,7 +81,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     case Repo.transaction(multi) do
       {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod])
+        Task.start(ModHelper, :process_auto_update, [mod, :notification])
         Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
@@ -99,7 +99,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     case Repo.transaction(multi) do
       {:ok, %{mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod])
+        Task.start(ModHelper, :process_auto_update, [mod, :notification])
         Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         conn
         |> send_resp(200, "")
