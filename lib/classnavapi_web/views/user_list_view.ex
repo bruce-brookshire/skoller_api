@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.UserListView do
   alias Classnavapi.Repo
 
   def render("index.json", %{users: users}) do
-    render_many(users, UserListView, "user-detail.json", as: :user)
+    render_many(users, UserListView, "user_detail.json", as: :user)
   end
 
   def render("user.json", %{user: user}) do
@@ -17,13 +17,13 @@ defmodule ClassnavapiWeb.UserListView do
     }
   end
 
-  def render("user_detail.json", %{user: user}) do
-    user = user |> Repo.preload([:student, :roles])
+  def render("user_detail.json", %{user: %{user: user, student: student}}) do
+    user = user |> Repo.preload([:roles])
     user
     |> render_one(UserListView, "user.json", as: :user)
     |> Map.merge(
       %{
-        student: render_one(user.student, ClassnavapiWeb.StudentView, "student.json"),
+        student: render_one(student, ClassnavapiWeb.StudentView, "student.json"),
         roles: render_many(user.roles, ClassnavapiWeb.RoleView, "role.json")
       }
     )
