@@ -12,7 +12,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
 
   @from_email "noreply@skoller.co"
   @base_url "https://www.skoller.co"
-  @reset_password_route "/api/v1/reset"
+  @reset_password_route "/reset_password/"
   @forgot_email_text1 "You forgot your password? It's okay. None of us are perfect. Click " 
   @forgot_email_text2 " to reset it."
   @this_link "this link"
@@ -50,7 +50,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
     |> to(user.email)
     |> from(@from_email)
     |> subject("Forgot Password")
-    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> @base_url <> @reset_password_route <> "?token=" <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>")
+    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> @base_url <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>")
     |> text_body(@forgot_email_text1 <> @base_url <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2)
   end
 
