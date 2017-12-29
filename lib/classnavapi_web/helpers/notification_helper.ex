@@ -40,6 +40,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @removed "removed "
   @due "due "
   @notification_end "."
+  @no_weight "no weight"
 
   @class_complete "We didn't find any assignments on the syllabus. Be sure to add assignments on the app throughout the semester so you and your classmates can keep up. 💯"
   @we_created "We created"
@@ -109,11 +110,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     body = case mod.assignment_mod_type_id do
       @new_assignment_mod -> mod_add_notification_text(mod, class)
       @delete_assignment_mod -> mod_delete_notification_text(mod, class)
-      _ -> String.capitalize(mod_change_notification_text(mod, class))
+      _ -> text = mod_change_notification_text(mod, class)
+      len = text |> String.length
+      msg = text |> String.slice(0..0) |> String.upcase()
+      msg <> (text |> String.slice(1..len))
     end
-    body = body <> " " <> Kernel.to_string(add_acceptance_percentage(mod)) <> @of_class_accepted
-    require IEx
-    IEx.pry
   end
   def build_auto_update_notification(_), do: nil
 
@@ -259,6 +260,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Repo.all
     |> List.first()
   end
+
+  defp get_weight_from_id(nil), do: @no_weight
 
   defp get_weight_from_id(id) do
     weight = Repo.get!(Weight, id)
