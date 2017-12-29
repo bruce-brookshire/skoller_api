@@ -108,7 +108,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     end
     body = case mod.assignment_mod_type_id do
       @new_assignment_mod -> mod_add_notification_text(mod, class)
-      @delete_assignment_mod -> String.capitalize(mod_delete_notification_text(mod, class))
+      @delete_assignment_mod -> mod_delete_notification_text(mod, class)
       _ -> String.capitalize(mod_change_notification_text(mod, class))
     end
     body = body <> " " <> Kernel.to_string(add_acceptance_percentage(mod)) <> @of_class_accepted
