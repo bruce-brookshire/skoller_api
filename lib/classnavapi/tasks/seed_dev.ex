@@ -23,6 +23,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Student
   alias Classnavapi.School.FieldOfStudy
+  alias Classnavapi.User.Device
 
   def run(_) do
     ensure_started(Repo, [])
@@ -146,6 +147,9 @@ defmodule Mix.Tasks.Seed.Dev do
                                       gender: "Male",
                                       is_verified: true,
                                       notification_time: time1}})
+
+    Repo.insert!(%Device{type: "ios", udid: "Test", user_id: student5.id})
+    Repo.insert!(%Device{type: "ios", udid: "Test1", user_id: student4.id})
 
     Repo.insert!(%UserRole{user_id: user.id, role_id: 200})
     Repo.insert!(%UserRole{user_id: sw1.id, role_id: 300})

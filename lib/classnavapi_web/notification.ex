@@ -10,8 +10,6 @@ defmodule ClassnavapiWeb.Notification do
   @push_topic "co.skoller.skoller"
 
   def create_notification(device, %{title: title, body: body}) do
-    require IEx
-    IEx.pry
     ""
     |> APNS.Notification.new(device, @push_topic)
     |> put_mutable_content
@@ -23,8 +21,6 @@ defmodule ClassnavapiWeb.Notification do
   end
 
   def create_notification(device, msg) do
-    require IEx
-    IEx.pry
     msg
     |> APNS.Notification.new(device, @push_topic)
     |> put_mutable_content
