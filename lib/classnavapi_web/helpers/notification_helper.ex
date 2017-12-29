@@ -20,6 +20,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   """
 
+  @class_complete_category "Class.Complete"
+  @auto_update_category "Update.Auto"
+  @pending_update_category "Update.Pending"
+
   @name_assignment_mod 100
   @weight_assignment_mod 200
   @due_assignment_mod 300
@@ -90,7 +94,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     class = class |> Repo.preload([:assignments])
     msg = class.assignments |> class_complete_msg()
     
-    devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, msg, @class_complete_category))
   end
 
   def send_auto_update_notification(actions) do
@@ -116,7 +120,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     end
     users = get_users_from_student_class(action.student_class_id)
     devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
-    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
   end
   def build_auto_update_notification(_), do: nil
 
@@ -163,7 +167,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       1 -> action |> one_pending_mod_notification()
       num -> student |> multiple_pending_mod_notification(num)
     end
-    devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, msg, @pending_update_category))
   end
 
   defp one_pending_mod_notification(action) do

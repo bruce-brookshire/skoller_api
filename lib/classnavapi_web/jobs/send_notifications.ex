@@ -11,6 +11,8 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
 
   import Ecto.Query
 
+  @assignment_reminder_category "Assignment.Reminder"
+
   def run(time) do
     time 
     |> assignment_query() 
@@ -35,7 +37,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp send_notifications(assignment) do
-    Notification.create_notification(assignment.udid, format_msg(assignment))
+    Notification.create_notification(assignment.udid, format_msg(assignment), @assignment_reminder_category)
   end
 
   defp format_msg(assignment) do

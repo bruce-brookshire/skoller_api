@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Notification do
 
   @push_topic "co.skoller.skoller"
 
-  def create_notification(device, %{title: title, body: body}) do
+  def create_notification(device, %{title: title, body: body}, category) do
     ""
     |> APNS.Notification.new(device, @push_topic)
     |> put_mutable_content
@@ -17,13 +17,15 @@ defmodule ClassnavapiWeb.Notification do
           "title" => title,
           "body" => body
       })
+    |> put_category(category)
     |> APNS.push()
   end
 
-  def create_notification(device, msg) do
+  def create_notification(device, msg, category) do
     msg
     |> APNS.Notification.new(device, @push_topic)
     |> put_mutable_content
+    |> put_category(category)
     |> APNS.push()
   end
 end
