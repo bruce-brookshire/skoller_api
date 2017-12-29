@@ -7,6 +7,8 @@ defmodule ClassnavapiWeb.Notification do
 
   import Pigeon.APNS.Notification
 
+  require Logger
+
   @push_topic "co.skoller.skoller"
 
   def create_notification(device, %{title: title, body: body}, category) do
@@ -19,6 +21,7 @@ defmodule ClassnavapiWeb.Notification do
       })
     |> put_category(category)
     |> APNS.push()
+    |> Logger.info()
   end
 
   def create_notification(device, msg, category) do
@@ -27,5 +30,6 @@ defmodule ClassnavapiWeb.Notification do
     |> put_mutable_content
     |> put_category(category)
     |> APNS.push()
+    |> Logger.info()
   end
 end
