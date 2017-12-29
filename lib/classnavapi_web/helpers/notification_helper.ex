@@ -87,6 +87,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     devices |> Enum.each(&Notification.create_notification(&1.udid, msg))
   end
 
+  def send_auto_update_notification(params) do
+    require IEx
+    IEx.pry
+  end
+
   defp class_complete_msg(assignments) do
     case Enum.count(assignments) do
       0 -> @class_complete

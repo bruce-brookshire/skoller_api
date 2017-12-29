@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import Ecto.Query
 
@@ -138,6 +139,18 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> where([mod, act], is_nil(act.is_accepted))
     |> select([mod, act, assign], assign)
     |> Repo.all()
+  end
+
+  def process_auto_update(mod, :notification) do
+    require IEx
+    IEx.pry
+    case mod |> process_auto_update() do
+      _ -> 
+        require IEx
+        IEx.pry
+      {:ok, nil} -> {:ok, nil}
+      {:ok, data} -> NotificationHelper.send_auto_update_notification(data)
+    end
   end
 
   def process_auto_update(mod) do

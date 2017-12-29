@@ -44,7 +44,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do
     case Repo.transaction(ModHelper.apply_mod(mod, student_class)) do
       {:ok, %{student_assignment: student_assignment}} ->
-        Task.start(ModHelper, :process_auto_update, [mod])
+        Task.start(ModHelper, :process_auto_update, [mod, :notification])
         conn
         |> render(StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
