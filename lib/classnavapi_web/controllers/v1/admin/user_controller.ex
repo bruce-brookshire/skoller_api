@@ -6,11 +6,15 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   alias Classnavapi.School.StudentField
   alias Classnavapi.UserRole
   alias ClassnavapiWeb.UserView
+  alias ClassnavapiWeb.UserListView
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias Classnavapi.Student
+  alias Classnavapi.School
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
   
+  @student_role "100"
   @admin_role 200
   
   plug :verify_role, %{role: @admin_role}
@@ -31,9 +35,15 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     end
   end
 
-  def index(conn, _) do
-    users = Repo.all(User)
-    render(conn, UserView, "index.json", users: users)
+  def index(conn, params) do
+    users = from(user in User)
+    |> join(:inner, [user], role in UserRole, role.user_id == user.id)
+    |> join(:left, [user, role], student in Student, student.id == user.student_id)
+    |> join(:left, [user, role, student], school in School, school.id == student.school_id)
+    |> filters(params)
+    |> select([user, role, student, school], %{user: user, student: student})
+    |> Repo.all()
+    render(conn, UserListView, "index.json", users: users)
   end
 
   def show(conn, %{"id" => id}) do
@@ -61,6 +71,51 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
         |> RepoHelper.multi_error(failed_value)
     end
   end
+
+  defp filters(query, params) do
+    query
+    |> account_type_filter(params)
+    |> school_filter(params)
+    |> name_filter(params)
+    |> email_filter(params)
+    |> suspended_filter(params)
+  end
+
+  defp account_type_filter(query, %{"account_type" => filter}) do
+    query
+    |> where([user, role, student, school], role.role_id == ^filter)
+  end
+  defp account_type_filter(query, _params), do: query
+
+  defp school_filter(query, %{"account_type" => @student_role, "school_id" => filter}) do
+    query
+    |> where([user, role, student, school], school.id == ^filter)
+  end
+  defp school_filter(query, _params), do: query
+
+  defp name_filter(query, %{"account_type" => @student_role, "user_name" => filter}) do
+    filter = "%" <> filter <> "%"
+    query
+    |> where([user, role, student, school], ilike(student.name_first, ^filter) or ilike(student.name_last, ^filter))
+  end
+  defp name_filter(query, _params), do: query
+
+  defp email_filter(query, %{"email" => filter}) do
+    filter = "%" <> filter <> "%"
+    query
+    |> where([user, role, student, school], ilike(user.email, ^filter))
+  end
+  defp email_filter(query, _params), do: query
+
+  defp suspended_filter(query, %{"is_suspended" => "true"}) do
+    query
+    |> where([user, role, student, school], user.is_active == false)
+  end
+  defp suspended_filter(query, %{"is_suspended" => "false"}) do
+    query
+    |> where([user, role, student, school], user.is_active == true)
+  end
+  defp suspended_filter(query, _params), do: query
 
   defp delete_roles(%{user: user}, _params) do
     from(role in UserRole)
