@@ -54,6 +54,7 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
       is_auto_syllabus: school.is_auto_syllabus,
+      short_name: school.short_name,
       class_periods: render_many(school.class_periods, PeriodView, "period.json")
     }
   end

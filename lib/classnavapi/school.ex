@@ -24,6 +24,7 @@ defmodule Classnavapi.School do
     field :is_auto_syllabus, :boolean
     field :name, :string
     field :timezone, :string
+    field :short_name, :string
     has_many :students, Classnavapi.Student
     has_many :email_domains, School.EmailDomain, on_replace: :delete
     has_many :class_periods, Classnavapi.ClassPeriod
@@ -34,7 +35,7 @@ defmodule Classnavapi.School do
 
   @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone]
   @opt_fields [:adr_line_2, :is_active_enrollment, :is_readonly,
-              :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus]
+              :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus, :short_name]
   @all_fields @req_fields ++ @opt_fields
   @upd_fields @all_fields
 
