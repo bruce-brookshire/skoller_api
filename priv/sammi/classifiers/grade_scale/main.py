@@ -11,7 +11,7 @@ from grade_scale.postprocessor import GradeScalePostProcessor
 class GradeScaleClassifier:
 
     grade_key = ["A+","A","A-","B+","B","B-","C+","C","C-","D+","D","D-"]
-    grade_scale_key = ["grade","grades","evaluation","scale"]
+    grade_scale_key = ["grade","grades","evaluation","scale","grading"]
 
     def __init__(self):
         self.PostProcessor = GradeScalePostProcessor()
@@ -36,7 +36,7 @@ class GradeScaleClassifier:
     # CHUNK GRAMMER
     def grammer(self):
         return (
-            "GRADESCALE: {<GradeScaleKey>?<:>?<GradeScale.*>{3,}}"
+            "GRADESCALE: {<GradeScaleKey>?<:>?<GradeScale.*|Separator|PointsKey>{3,}}"
         )
 
     # FEATURES (adds grade scale features to given features objectd)
@@ -46,6 +46,7 @@ class GradeScaleClassifier:
         features["in-grade-range"] = self.in_grade_range(word)
         features["is-dash"] = word == "-"
         features["is-grade-key"] = word in self.grade_key
+        features["is-points-key"] = word.lower() == 'points' or word.lower() == 'point'
         features["has-grade-scale-precusor"] = self.grade_scale_precursor(prev_word)
         features["has-grade-scale-symbol"] = any(char in ["+","-"] for char in word)
         features["numbers-surround-dash"] = word[0].isdigit() and word[-1].isdigit() and any(char == "-" for char in word) and sum(char.isalpha() for char in word) == 0

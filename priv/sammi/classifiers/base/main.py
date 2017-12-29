@@ -67,6 +67,7 @@ class BaseClassifier:
         features["has-dash"] = any(l == '-' for l in word)
         features["has-number"] = any(l.isdigit() for l in word)
         features["is-english-word"] = english_dictionary.check(word)
+        features["is-separator"] = word == ';' or word == ','
         features["pos"] = self.tag(words,i)
         features["prev-pos"] = prev_pos
         features["prev-tag"] = prev_tag

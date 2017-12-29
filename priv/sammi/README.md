@@ -24,16 +24,6 @@
   * To retrain Sammi (i.e. loop through all 'corpora' files and train based off of their given classification) ``python3 ./classifiers/sammi/main.py train``
   * To get the current stats for Sammi (i.e. the labels it knows about and the confidence it has in classifying those) ``python3 ./classifiers/sammi/main.py stats``
 
-# Tested
-
-  * ERR_S1 (missed professor name and grade scale (uses points system))
-  * S33 (perfect)
-  * S34 (missed phone (its an extension), returned office hours but there were none)
-  * S35 (missed grade scale (using max instead of min))
-  * S36 (missed prof name (has dr. value at end) missed grade scale (uses point system))
-  * S43 (office hours incomplete and grade scale incomplete)
-  * S58 (missed office location)
-
 # Part Of Speech Tag List:
 
   * CC	coordinating conjunction

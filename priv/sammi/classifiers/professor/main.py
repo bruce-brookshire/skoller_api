@@ -12,16 +12,16 @@ from professor.postprocessor import ProfessorPostProcessor
 class ProfessorClassifier:
 
     # Put Most Specific (i.e. most meaningful) day keys at beginning of array as they are matched first in regex
-    day_keys = ['Monday','monday','Tuesday','tuesday','Wednesday','wednesday','Thursday','thursday','Friday','friday',
-                'Mondays','mondays','Tuesdays','tuesdays','Wednesdays','wednesdays','Thursdays','thursdays','Fridays','fridays',
-                'Tues./Thurs.','Mon./Wed./Fri.','Tues/Thurs','Mon/Wed/Fri',
+    day_keys = ['Mondays','mondays','Tuesdays','tuesdays','Wednesdays','wednesdays','Thursdays','thursdays','Fridays','fridays',
+                'Monday','monday','Tuesday','tuesday','Wednesday','wednesday','Thursday','thursday','Friday','friday',
+                'Tues./Thurs.','Mon./Wed./Fri.','Tues/Thurs','Mon/Wed/Fri','Mon/Weds',
                 'M/W','M/W/F','M/F','W/F','T/Th',
-                'MTWR','MWF','MW','MF','TU/TH','TR','TU','TH',
+                'MTWR','MWF','MW','MF','WR','TU/TH','TTH','TR','TU','TH',
                 'Mon.','Tu.','Wed.','Th.','Fri.',
                 'Mon','Tu','Wed','Th','Fri',
                 'mon','tu','wed','th','fri',
                 'M','W','F','T','R']
-    office_hours_key = ['am','pm','office','hours']
+    office_hours_key = ['am','pm','office','hours','a.m','p.m','a.m.','p.m.']
     office_location_key = ['office','location','room','building','rm','rm.']
     professor_email_key = ['@','edu','org','.']
     professor_name_key = ['prof','professor','instructor','dr','ms','mrs','mr','phd','prof.','dr.','ms.','mrs.','mr.','ph.d.','ph.d']
@@ -37,11 +37,11 @@ class ProfessorClassifier:
             "\n"
             "EMAIL: {<ProfessorEmailKey>?<:>?<ProfessorEmail>+}"
             "\n"
-            "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<ProfessorPhone>?<OfficeHours.*>{2,}<GradeScaleLetter>?}"
+            "OFFICEHOURS: {<OfficeKey>?<OfficeHoursKey>?<:>?<ProfessorPhone>?<OfficeHours.*|Separator|:>{2,}<GradeScaleLetter>?}"
             "\n"
-            "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey|OfficeHoursKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
+            "OFFICELOCATION: {<OfficeKey>?<OfficeLocationKey|OfficeHoursKey|NumberKey>?<:>?<OfficeLocationBuilding|OfficeLocationRoom>+}"
             "\n"
-            "PHONE: {<OfficeKey>?<ProfessorPhoneKey>?<:>?<None>{0,1}<ProfessorPhone>?<None>{0,1}<ProfessorPhone>+}"
+            "PHONE: {<OfficeKey>?<ProfessorPhoneKey|NumberKey>?<:>?<None>{0,1}<ProfessorPhone>?<None>{0,1}<ProfessorPhone>+}"
         )
 
     # TESTS
@@ -59,7 +59,7 @@ class ProfessorClassifier:
     # Office Hours
     def extract_day(self,string):
         days = "|".join(self.day_keys)
-        r = re.compile(r'\b(?:'+days+')')
+        r = re.compile(r'\b(?:'+days+')\b')
         return r.findall(string)
 
     def extract_time(self,string):
@@ -92,7 +92,10 @@ class ProfessorClassifier:
         features["matches-regex-day"] = any(word in day for day in regex_day_matches)
         features["matches-regex-time"] = any(word in time for time in regex_time_matches)
         features["matches-regex-office-location"] = any(word in loc for loc in regex_office_location)
+        features["number-key"] = word == "#"
         features["office-key"] = word.lower() == "office"
+        features["office-hours-key"] = word.lower() == "hours" or word.lower() == "hrs"
+        features["location-key"] = word.lower() == "location"
         features["only-phone-keys"] = sum(key in word.lower() for key in self.professor_phone_key) == len(word)
         features["phone-extension-format"] = sum(key.isdigit() for key in word) == len(word)-1 and "x" in word.lower()
         return features

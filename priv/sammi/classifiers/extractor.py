@@ -83,6 +83,30 @@ class Extractor:
             final_word_boxes.append(word_boxes)
         return final_word_boxes
 
+    def find_position(self,filepath,words):
+        all_word_boxes = self.words(filepath)
+        all_content = []
+        all_pos = []
+        for boxes in all_word_boxes:
+            for box in boxes:
+                all_content.append(box.content)
+                all_pos.append(box.position)
+        split_words = words.split(" ")
+        first_word = split_words[0]
+        indices = [i for i, x in enumerate(all_content) if x == first_word]
+        # If they only gave one word to find and it occurs more than once, return everything
+        if len(indices) > 0 and len(split_words) == 1:
+            return [all_pos[i][0] for i in indices]
+        # TODO: Account for multi-word searches
+        # # If they gave multiple words, look for that in sequence
+        # elif len(indices) > 0 and len(split_words) > 1:
+        #     found = None
+        #     for ind in indices:
+        #         for i in range(len(split_words)-1):
+        #             word = split_words[i]
+        else:
+            return 'Not found'
+
     ############### GET LINE BOXES #################
 
     def lines(self,filepath):
@@ -103,4 +127,4 @@ class Extractor:
 # Allows Extractor to Be Called as Script
 if __name__ == "__main__":
     e = Extractor()
-    print(e.text(sys.argv[1]))
+    e.corporize(sys.argv[1])
