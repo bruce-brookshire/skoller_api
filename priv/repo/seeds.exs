@@ -24,9 +24,9 @@ Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 600, name: "Help", is_com
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 700, name: "Complete", is_complete: true})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 800, name: "Change", is_complete: true})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 100, name: "Incorrect"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 200, name: "Confusing"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 300, name: "File"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 100, name: "This is the wrong syllabus"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 200, name: "This syllabus is confusing"})
+Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 300, name: "Issues viewing the file"})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 400, name: "Other"})
 
 Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 100, name: "Grade Scale"})
