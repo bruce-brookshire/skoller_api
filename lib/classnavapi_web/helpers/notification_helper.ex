@@ -51,7 +51,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @auto_delete "Assignment has been removed"
   @auto_add "Assignment has been added"
   @auto_update " has been autoupdated"
-  @of_class_accepted "% of your classmates have made this change."
+  #@of_class_accepted "% of your classmates have made this change."
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
@@ -101,7 +101,6 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     mod = Repo.get(Mod, action.assignment_modification_id)
           |> Repo.preload(:assignment)
     class = mod |> get_class_from_mod()
-    title = mod.assignment.name <> @auto_update
     title = case mod.assignment_mod_type_id do
       @new_assignment_mod -> @auto_add
       @delete_assignment_mod -> @auto_delete
@@ -115,21 +114,24 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       msg = text |> String.slice(0..0) |> String.upcase()
       msg <> (text |> String.slice(1..len))
     end
+    users = get_users_from_student_class(action.student_class_id)
+    devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}))
   end
   def build_auto_update_notification(_), do: nil
 
-  defp add_acceptance_percentage(mod) do
-    actions = from(act in Action)
-    |> join(:inner, [act], mod in Mod, act.assignment_modification_id == mod.id)
-    |> where([act, mod], mod.id == ^mod.id)
-    |> Repo.all()
+  # defp add_acceptance_percentage(mod) do
+  #   actions = from(act in Action)
+  #   |> join(:inner, [act], mod in Mod, act.assignment_modification_id == mod.id)
+  #   |> where([act, mod], mod.id == ^mod.id)
+  #   |> Repo.all()
 
-    count = actions |> Enum.count()
+  #   count = actions |> Enum.count()
 
-    accepted = actions |> Enum.count(& &1.is_accepted == true)
+  #   accepted = actions |> Enum.count(& &1.is_accepted == true)
 
-    (accepted / count) * 100 |> Kernel.round()
-  end
+  #   (accepted / count) * 100 |> Kernel.round()
+  # end
 
   defp class_complete_msg(assignments) do
     case Enum.count(assignments) do
@@ -143,6 +145,14 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     from(sc in StudentClass)
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
     |> where([sc, user], sc.class_id == ^class.id)
+    |> select([sc, user], user)
+    |> Repo.all
+  end
+
+  defp get_users_from_student_class(id) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> where([sc, user], sc.id == ^id)
     |> select([sc, user], user)
     |> Repo.all
   end
