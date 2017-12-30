@@ -41,6 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     |> join(:left, [user, role], student in Student, student.id == user.student_id)
     |> join(:left, [user, role, student], school in School, school.id == student.school_id)
     |> filters(params)
+    |> distinct([user, role, student, school], user.id)
     |> select([user, role, student, school], %{user: user, student: student})
     |> Repo.all()
     render(conn, UserListView, "index.json", users: users)
