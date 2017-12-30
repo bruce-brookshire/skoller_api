@@ -145,10 +145,11 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> List.first()
   end
 
+  # needed structure is [%{count: 544, ratio: 1.0, school_id: 1}] or similar.
   defp biggest_difference(needed, workers) do
     needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
     max = needed |> Enum.reduce(%{need: 0, school: 0}, &
-      case &1.need > &2.need do
+      case &1.need >= &2.need do
         true -> &1
         false -> &2
       end)
@@ -173,6 +174,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   #   |> get_enum_ratio()
   # end
 
+  #select count(p.school_id), p.school_id from classes c inner join class_periods p on 
+  #c.class_period_id = p.id inner join schools s on s.id = p.school_id where 
+  #c.class_status_id = 300 and s.is_auto_syllabus = true group by p.school_id;
   defp get_ratios(_conn, status) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
@@ -217,6 +221,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> distinct([sc], sc.class_id)
   end
 
+  #select count(p.school_id), p.school_id from public.class_locks l inner join public.classes c 
+  #on l.class_id = c.id inner join public.class_periods p on c.class_period_id = p.id where 
+  #l.class_lock_section_id = 100 and l.is_completed = false group by p.school_id;
   defp get_workers(type) do
     from(lock in Lock)
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
