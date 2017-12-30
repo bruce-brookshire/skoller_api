@@ -11,7 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
   import Bamboo.Email
 
   @from_email "noreply@skoller.co"
-  @base_url "https://www.skoller.co"
+  @base_url "https://test.skoller.co"
   @reset_password_route "/reset_password/"
   @forgot_email_text1 "You forgot your password? It's okay. None of us are perfect. Click " 
   @forgot_email_text2 " to reset it."
