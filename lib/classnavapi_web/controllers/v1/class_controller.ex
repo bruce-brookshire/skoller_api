@@ -195,6 +195,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> prof_filter(params)
     |> prof_id_filter(params)
     |> status_filter(params)
+    |> ghost_filter(params)
     |> name_filter(params)
     |> number_filter(params)
     |> day_filter(params)
@@ -231,15 +232,24 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter, "or" => "true"}) do
-    dynamic([class, period, prof], (class.class_status_id == ^filter and class.is_ghost == false) or ^dynamic)
+    dynamic([class, period, prof], class.class_status_id == ^filter or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => "0"}) do
     dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter}) do
-    dynamic([class, period, prof], (class.class_status_id == ^filter and class.is_ghost == false) and ^dynamic)
+    dynamic([class, period, prof], class.class_status_id == ^filter and ^dynamic)
   end
   defp status_filter(dynamic, _), do: dynamic
+
+  defp ghost_filter(dynamic, %{"class_status" => "0"}), do: dynamic
+  defp ghost_filter(dynamic, %{"ghost" => "true"}) do
+    dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+  end
+  defp ghost_filter(dynamic, %{"ghost" => "false"}) do
+    dynamic([class, period, prof], class.is_ghost == false and ^dynamic)
+  end
+  defp ghost_filter(dynamic, _), do: dynamic
 
   defp name_filter(dynamic, %{"class_name" => filter, "or" => "true"}) do
     name_filter = "%" <> filter <> "%"
