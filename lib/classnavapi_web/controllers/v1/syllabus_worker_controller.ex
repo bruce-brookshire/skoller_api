@@ -52,10 +52,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     case find_existing_lock(conn, lock_type) do
       [] -> 
         workers = get_workers(lock_type)
-        require Logger
-        Logger.info(workers)
         class = workers |> get_class(conn, lock_type, status_type)
-        Logger.info(class)
         class |> lock_class(conn, lock_type)
         class
       list -> Repo.get!(Class, List.first(list).class_id)
