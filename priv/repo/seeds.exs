@@ -42,3 +42,9 @@ Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 500, name: "Delete
 Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 100, name: "Weights", is_diy: true})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 200, name: "Assignments", is_diy: true})
 Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 300, name: "Review", is_diy: false})
+
+pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
+user = Classnavapi.Repo.insert!(%Classnavapi.User{email: "dev_admin@skoller.co", 
+                              password_hash: pass.password_hash})
+Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 200})
+Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 300})
