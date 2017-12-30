@@ -18,7 +18,7 @@ config :classnavapi, ClassnavapiWeb.Endpoint,
   url: [scheme: "https", host: "classnav-api-staging.herokuapp.com", port: 443]
 
 # Do not print debug messages in production
-config :logger, level: :debug
+config :logger, level: :info
 
 # ## SSL Support
 #
