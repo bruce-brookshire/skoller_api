@@ -5,7 +5,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     alias Classnavapi.Class
     alias Classnavapi.Repo
     alias ClassnavapiWeb.Class.StatusView
-    alias ClassnavapiWeb.ClassView
     alias Classnavapi.School
     alias Classnavapi.ClassPeriod
 
@@ -13,29 +12,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     import ClassnavapiWeb.Helpers.AuthPlug
     
     @admin_role 200
+    @syllabus_worker_role 300
     
-    plug :verify_role, %{role: @admin_role}
+    plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
 
     def index(conn, %{}) do
       statuses = Repo.all(Status)
       render(conn, StatusView, "index.json", statuses: statuses)
-    end
-
-    def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
-      class = Repo.get!(Class, class_id)
-
-      results = class
-      |> Ecto.Changeset.change(%{class_status_id: id})
-      |> Repo.update()
-
-      case results do
-        {:ok, class} ->
-          render(conn, ClassView, "show.json", class: class)
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-      end
     end
 
     defp get_class_count_by_status(status) do
