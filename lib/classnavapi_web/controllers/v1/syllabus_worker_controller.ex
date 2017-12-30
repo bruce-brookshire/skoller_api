@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   alias Classnavapi.Class.Doc
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.School
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -175,9 +176,11 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   defp get_ratios(_conn, status) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
     |> where([class], class.class_status_id == ^status)
-    |> group_by([class, period], period.school_id)
-    |> select([class, period], %{count: count(period.school_id), school: period.school_id})
+    |> where([class, period, sch], sch.is_auto_syllabus == true)
+    |> group_by([class, period, sch], period.school_id)
+    |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
   end
@@ -200,9 +203,11 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], sc in subquery(enrolled_subquery()), class.id == sc.class_id)
+    |> join(:inner, [class, period, sc], sch in School, sch.id == period.school_id)
     |> where([class], class.class_status_id == ^status)
-    |> group_by([class, period, sc], period.school_id)
-    |> select([class, period, sc], %{count: count(period.school_id), school: period.school_id})
+    |> where([class, period, sc, sch], sch.is_auto_syllabus == true)
+    |> group_by([class, period, sc, sch], period.school_id)
+    |> select([class, period, sc, sch], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
   end

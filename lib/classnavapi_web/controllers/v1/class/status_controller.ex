@@ -6,6 +6,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     alias Classnavapi.Repo
     alias ClassnavapiWeb.Class.StatusView
     alias ClassnavapiWeb.ClassView
+    alias Classnavapi.School
+    alias Classnavapi.ClassPeriod
 
     import Ecto.Query
     import ClassnavapiWeb.Helpers.AuthPlug
@@ -37,7 +39,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     end
 
     defp get_class_count_by_status(status) do
-      classes = Repo.all(from class in Classnavapi.Class, where: class.class_status_id == ^status.id)
+      classes = (from class in Class)
+      |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+      |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
+      |> where([class], class.class_status_id == ^status.id)
+      |> where([class, period, sch], sch.is_auto_syllabus == true)
+      |> Repo.all()
 
       classes
       |> Enum.count(& &1)
