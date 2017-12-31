@@ -27,6 +27,10 @@ defmodule Classnavapi.DocUpload do
     "uploads/class/docs/"
   end
 
+  def s3_object_headers(_version, {file, _scope}) do
+    [content_type: Plug.MIME.path(file.file_name)] # for "image.png", would produce: "image/png"
+  end
+
   # Specify custom headers for s3 objects
   # Available options are [:cache_control, :content_disposition,
   #    :content_encoding, :content_length, :content_type,
