@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
   
   @admin_role 200
   @default_grade_scale "A,90|B,80|C,70|D,60"
@@ -68,18 +69,45 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   defp process_class_row(class, period_id) do
     case class do
       {:ok, class} ->
-        case class |> find_class do
-          nil -> class |> insert_class(period_id)
-          class -> class |> update_class()
+        class = class 
+        |> Map.put(:class_period_id, period_id)
+        class = case process_professor(class) do
+          {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
+          {:error, _} -> class |> Map.put(:professor_id, nil)
+        end
+        case class |> find_class() do
+          nil -> class |> insert_class()
+          existing -> class |> update_class(existing)
         end
       {:error, error} ->
         {:error, error}
     end
   end
 
-  defp find_class(class) do
+  defp update_class(class, old_class) do
+    changeset = Class.changeset_update(old_class, class)
+    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
+    Repo.update(changeset)
+  end
+
+  defp find_class(%{professor_id: nil} = class) do
+    from(c in Class)
+    |> where([c], c.class_period_id == ^class.class_period_id)
+    |> where([c], is_nil(c.professor_id))
+    |> where([c], c.campus == ^class.campus)
+    |> where([c], c.name == ^class.name)
+    |> where([c], c.number == ^class.number)
+    |> where([c], c.meet_days == ^class.meet_days)
+    |> where([c], c.class_start == ^class.class_start)
+    |> where([c], c.class_end == ^class.class_end)
+    |> where([c], c.meet_end_time == ^class.meet_end_time)
+    |> where([c], c.meet_start_time == ^class.meet_start_time)
+    |> Repo.one()
+  end
+
+  defp find_class(%{professor_id: prof_id} = class) do
     Repo.get_by(Class, class_period_id: class.class_period_id, 
-                        professor_id: class.professor_id,
+                        professor_id: prof_id,
                         campus: class.campus,
                         name: class.name,
                         number: class.number,
@@ -90,14 +118,9 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
                         meet_start_time: class.meet_start_time)
   end
 
-  defp insert_class(class, period_id) do
+  defp insert_class(class) do
     class = class 
-      |> Map.put(:class_period_id, period_id)
       |> Map.put(:grade_scale, @default_grade_scale)
-    class = case process_professor(class) do
-      {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
-      {:error, _} -> class
-    end
     changeset = Class.changeset_insert(%Class{}, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
     Repo.insert(changeset)
