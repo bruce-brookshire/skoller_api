@@ -40,6 +40,7 @@ defmodule Classnavapi.User do
     user
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> update_change(:email, &String.downcase(&1))
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
