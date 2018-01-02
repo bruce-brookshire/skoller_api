@@ -118,20 +118,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Shows a single `Classnavapi.Class`.
-
-  ## Returns:
-  * 422 `ClassnavapiWeb.ChangesetView`
-  * 404
-  * 401
-  * 200 `ClassnavapiWeb.ClassView`
-  """
-  def show(conn, %{"id" => id}) do
-    class = Repo.get!(Class, id)
-    render(conn, ClassView, "show.json", class: class)
-  end
-
-  @doc """
    Updates a `Classnavapi.Class`.
 
   ## Behavior:
