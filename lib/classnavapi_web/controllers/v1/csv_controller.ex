@@ -33,6 +33,18 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     end
   end
 
+  def class(conn, %{"file" => file, "period_id" => period_id, "check_filenames" => "false"}) do
+    period_id = period_id |> String.to_integer
+    uploads = file.path 
+    |> File.stream!()
+    |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
+                            :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
+                            :location, :name, :class_start, :meet_start_time, :upload_key])
+    |> Enum.map(&process_class_row(&1, period_id))
+
+    conn |> render(CSVView, "index.json", csv: uploads)
+  end
+
   def class(conn, %{"file" => file, "period_id" => period_id}) do
     changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
     case Repo.insert(changeset) do
