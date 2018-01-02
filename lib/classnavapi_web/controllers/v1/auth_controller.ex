@@ -12,7 +12,7 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
   plug :verify_user_exists
 
   def login(conn, %{"email" => email, "password" => password}) do
-    user = Repo.get_by(User, email: email)
+    user = Repo.get_by(User, email: String.downcase(email))
 
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
         {:ok, token} = TokenHelper.login(user)
