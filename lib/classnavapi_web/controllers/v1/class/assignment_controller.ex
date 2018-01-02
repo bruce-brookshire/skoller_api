@@ -20,8 +20,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   plug :verify_member, %{of: :class_assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :class_id}
-  plug :check_lock, %{type: :review_assignment, using: :id}
-  plug :check_lock, %{type: :review, using: :class_id}
 
   def create(conn, %{} = params) do
     changeset = %Assignment{}

@@ -12,6 +12,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   alias Classnavapi.Class.Assignment
 
   import Plug.Conn
+  import Ecto.Query
 
   @admin_role 200
 
@@ -26,11 +27,19 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     end
   end
 
+  defp find_lock(class_id, lock, user_id) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
+    |> where([l], l.class_lock_section_id in [^lock, @review_lock])
+    |> Repo.all()
+    |> List.first()
+  end
+
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :weight, using: :id}) do
     case conn.params |> check_using(:weight, :id) do
       true ->
         weight = Repo.get!(Weight, conn.params["id"])
-        case Repo.get_by(Lock, class_id: weight.class_id, class_lock_section_id: @weight_lock, user_id: user.id, is_completed: false) do
+        case find_lock(weight.class_id, @weight_lock, user.id) do
           nil -> conn |> unauth
           _ -> conn
         end
@@ -41,7 +50,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :weight, using: :class_id}) do
     case conn.params |> check_using(:weight, :class_id) do
       true ->
-        case Repo.get_by(Lock, class_id: conn.params["class_id"], class_lock_section_id: @weight_lock, user_id: user.id, is_completed: false) do
+        case find_lock(conn.params["class_id"], @weight_lock, user.id) do
           nil -> conn |> unauth
           _ -> conn
         end
@@ -53,7 +62,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     case conn.params |> check_using(:assignment, :id) do
       true ->
         assign = Repo.get!(Assignment, conn.params["id"])
-        case Repo.get_by(Lock, class_id: assign.class_id, class_lock_section_id: @assignment_lock, user_id: user.id, is_completed: false) do
+        case find_lock(assign.class_id, @assignment_lock, user.id) do
           nil -> conn |> unauth
           _ -> conn
         end
@@ -64,41 +73,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :assignment, using: :class_id}) do
     case conn.params |> check_using(:assignment, :class_id) do
       true ->
-        case Repo.get_by(Lock, class_id: conn.params["class_id"], class_lock_section_id: @assignment_lock, user_id: user.id, is_completed: false) do
-          nil -> conn |> unauth
-          _ -> conn
-        end
-      false -> conn
-    end
-  end
-
-  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review_assignment, using: :id}) do
-    case conn.params |> check_using(:review, :id) do
-      true ->
-        assign = Repo.get!(Assignment, conn.params["id"])
-        case Repo.get_by(Lock, class_id: assign.class_id, class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do  nil -> conn |> unauth
-          _ -> conn
-        end
-      false -> conn
-    end
-  end
-
-  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review_weight, using: :id}) do
-    case conn.params |> check_using(:review, :id) do
-      true ->
-        weight = Repo.get!(Weight, conn.params["id"])
-        case Repo.get_by(Lock, class_id: weight.class_id, class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do
-          nil -> conn |> unauth
-          _ -> conn
-        end
-      false -> conn
-    end
-  end
-
-  defp get_lock(%{assigns: %{user: user}} = conn, %{type: :review, using: :class_id}) do
-    case conn.params |> check_using(:review, :class_id) do
-      true ->
-        case Repo.get_by(Lock, class_id: conn.params["class_id"], class_lock_section_id: @review_lock, user_id: user.id, is_completed: false) do
+        case find_lock(conn.params["class_id"], @assignment_lock, user.id) do
           nil -> conn |> unauth
           _ -> conn
         end
@@ -112,8 +87,6 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   defp check_using(%{"class_id" => _}, :weight, :class_id), do: true
   defp check_using(%{"id" => _}, :assignment, :id), do: true
   defp check_using(%{"class_id" => _}, :assignment, :class_id), do: true
-  defp check_using(%{"id" => _}, :review, :id), do: true
-  defp check_using(%{"class_id" => _}, :review, :class_id), do: true
   defp check_using(_params, _, _), do: false
 
   defp is_admin(conn) do
