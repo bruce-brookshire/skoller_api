@@ -68,18 +68,39 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   defp process_class_row(class, period_id) do
     case class do
       {:ok, class} ->
-        class = class |> Map.put(:class_period_id, period_id)
-                      |> Map.put(:grade_scale, @default_grade_scale)
-        class = case process_professor(class) do
-          {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
-          {:error, _} -> class
+        case class |> find_class do
+          nil -> class |> insert_class(period_id)
+          class -> class |> update_class()
         end
-        changeset = Class.changeset_insert(%Class{}, class)
-        changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
-        Repo.insert(changeset)
       {:error, error} ->
         {:error, error}
     end
+  end
+
+  defp find_class(class) do
+    Repo.get_by(Class, class_period_id: class.class_period_id, 
+                        professor_id: class.professor_id,
+                        campus: class.campus,
+                        name: class.name,
+                        number: class.number,
+                        meet_days: class.meet_days,
+                        class_start: class.class_start,
+                        class_end: class.class_end,
+                        meet_end_time: class.meet_end_time,
+                        meet_start_time: class.meet_start_time)
+  end
+
+  defp insert_class(class, period_id) do
+    class = class 
+      |> Map.put(:class_period_id, period_id)
+      |> Map.put(:grade_scale, @default_grade_scale)
+    class = case process_professor(class) do
+      {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
+      {:error, _} -> class
+    end
+    changeset = Class.changeset_insert(%Class{}, class)
+    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
+    Repo.insert(changeset)
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
