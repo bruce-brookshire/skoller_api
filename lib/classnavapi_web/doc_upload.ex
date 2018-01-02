@@ -27,8 +27,19 @@ defmodule Classnavapi.DocUpload do
     "uploads/class/docs/"
   end
 
+  def transform(:original, {file, _scope}) do
+    case String.ends_with?(file.file_name, [".jpg", ".png", ".jpeg"]) do
+      true -> 
+        {:convert, "-gravity center", :pdf}
+      false -> case String.ends_with?(file.file_name, [".txt", ".rtf", ".doc", ".docx", ".pages"]) do
+        true -> {:soffice_pdf, fn(input, output) -> [input, output] end, :pdf}
+        false -> :noaction
+      end
+    end
+  end
+
   def s3_object_headers(_version, {file, _scope}) do
-    [content_type: Plug.MIME.path(file.file_name)] # for "image.png", would produce: "image/png"
+    [content_type: MIME.from_path(file.file_name)] # for "image.png", would produce: "image/png"
   end
 
   # Specify custom headers for s3 objects
