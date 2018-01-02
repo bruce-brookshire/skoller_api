@@ -91,7 +91,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
   
   def verify_user_exists(%{params: %{"email" => email}} = conn, _) do
-    case Repo.get_by(User, email: email) do
+    case Repo.get_by(User, email: String.downcase(email)) do
       nil -> conn |> unauth
       _ -> conn
     end
