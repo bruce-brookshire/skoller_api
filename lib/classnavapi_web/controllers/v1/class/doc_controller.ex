@@ -31,10 +31,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
       case DocUpload.store({file, scope}) do
         {:ok, inserted} ->
           DocUpload.url({inserted, scope})
-        _ ->
+        {:error, error} ->
+          require Logger
+          Logger.info(error)
           nil
       end
-
+  
     params = params 
     |> Map.put("path", location)
     |> Map.put("name", file.filename)
