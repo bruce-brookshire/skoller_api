@@ -70,6 +70,10 @@ defmodule Classnavapi.Class do
                 :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
   @all_fields @req_fields ++ @opt_fields
 
+  @csv_req []
+  @csv_opt [:credits, :crn, :location, :seat_count, :class_type]
+  @csv_all @csv_req ++ @csv_opt
+
   @doc false
   def changeset_insert(%Class{} = class, attrs) do
     class
@@ -92,6 +96,12 @@ defmodule Classnavapi.Class do
     |> cast_assoc(:weights)
     |> validate_weight_totals()
     |> unique_constraint(:class, name: :unique_class_index)
+  end
+
+  def changeset_csv(%Class{} = class, attrs) do
+    class
+    |> cast(attrs, @csv_all)
+    |> validate_required(@csv_req)
   end
 
   defp sum_weight(list) do

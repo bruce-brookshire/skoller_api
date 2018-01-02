@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
   
   @admin_role 200
   @default_grade_scale "A,90|B,80|C,70|D,60"
@@ -31,6 +32,18 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def class(conn, %{"file" => file, "period_id" => period_id, "check_filenames" => "false"}) do
+    period_id = period_id |> String.to_integer
+    uploads = file.path 
+    |> File.stream!()
+    |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
+                            :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
+                            :location, :name, :class_start, :meet_start_time, :upload_key])
+    |> Enum.map(&process_class_row(&1, period_id))
+
+    conn |> render(CSVView, "index.json", csv: uploads)
   end
 
   def class(conn, %{"file" => file, "period_id" => period_id}) do
@@ -56,18 +69,61 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   defp process_class_row(class, period_id) do
     case class do
       {:ok, class} ->
-        class = class |> Map.put(:class_period_id, period_id)
-                      |> Map.put(:grade_scale, @default_grade_scale)
+        class = class 
+        |> Map.put(:class_period_id, period_id)
         class = case process_professor(class) do
           {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
-          {:error, _} -> class
+          {:error, _} -> class |> Map.put(:professor_id, nil)
         end
-        changeset = Class.changeset_insert(%Class{}, class)
-        changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
-        Repo.insert(changeset)
+        case class |> find_class() do
+          nil -> class |> insert_class()
+          existing -> class |> update_class(existing)
+        end
       {:error, error} ->
         {:error, error}
     end
+  end
+
+  defp update_class(class, old_class) do
+    changeset = Class.changeset_update(old_class, class)
+    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
+    Repo.update(changeset)
+  end
+
+  defp find_class(%{professor_id: nil} = class) do
+    from(c in Class)
+    |> where([c], c.class_period_id == ^class.class_period_id)
+    |> where([c], is_nil(c.professor_id))
+    |> where([c], c.campus == ^class.campus)
+    |> where([c], c.name == ^class.name)
+    |> where([c], c.number == ^class.number)
+    |> where([c], c.meet_days == ^class.meet_days)
+    |> where([c], c.class_start == ^class.class_start)
+    |> where([c], c.class_end == ^class.class_end)
+    |> where([c], c.meet_end_time == ^class.meet_end_time)
+    |> where([c], c.meet_start_time == ^class.meet_start_time)
+    |> Repo.one()
+  end
+
+  defp find_class(%{professor_id: prof_id} = class) do
+    Repo.get_by(Class, class_period_id: class.class_period_id, 
+                        professor_id: prof_id,
+                        campus: class.campus,
+                        name: class.name,
+                        number: class.number,
+                        meet_days: class.meet_days,
+                        class_start: class.class_start,
+                        class_end: class.class_end,
+                        meet_end_time: class.meet_end_time,
+                        meet_start_time: class.meet_start_time)
+  end
+
+  defp insert_class(class) do
+    class = class 
+      |> Map.put(:grade_scale, @default_grade_scale)
+    changeset = Class.changeset_insert(%Class{}, class)
+    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
+    Repo.insert(changeset)
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
