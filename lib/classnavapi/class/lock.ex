@@ -8,6 +8,7 @@ defmodule Classnavapi.Class.Lock do
     field :class_lock_section_id, :id
     field :class_id, :id
     field :user_id, :id
+    belongs_to :class_lock_section, Classnavapi.Class.Lock.Section, define_field: false
 
     timestamps()
   end

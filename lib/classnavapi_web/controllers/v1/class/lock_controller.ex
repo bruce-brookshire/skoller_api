@@ -9,6 +9,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias Classnavapi.Class
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
+  alias Classnavapi.User
+  alias ClassnavapiWeb.Class.LockView
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -21,6 +23,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, %{of: :school, using: :class_id}
+
+  def index(conn, %{"class_id" => class_id} = params) do
+    locks = from(l in Lock)
+    |> join(:inner, [l], u in User, l.user_id == u.id)
+    |> where([l], l.class_id == ^class_id)
+    |> select([l, u], %{lock: l, user: u})
+    |> Repo.all()
+
+    render(conn, LockView, "index.json", locks: locks)
+  end
 
   def lock(%{assigns: %{user: %{roles: roles}}} = conn, %{"is_class" => true} = params) do
     case Enum.any?(roles, & &1.id == @admin_role) do

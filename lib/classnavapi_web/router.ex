@@ -91,6 +91,7 @@ defmodule ClassnavapiWeb.Router do
         # Class Lock routes
         post "/lock", Class.LockController, :lock
         post "/unlock", Class.LockController, :unlock
+        get "/locks", Class.LockController, :index
 
         # Class Doc routes
         resources "/docs", Class.DocController, only: [:create, :index]
