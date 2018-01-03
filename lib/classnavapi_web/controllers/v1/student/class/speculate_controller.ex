@@ -91,7 +91,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
   end
 
   defp get_grade_min(%{class: %{grade_scale: grade_scale}}) do
-    t = grade_scale
+    grade_scale
     |> String.trim_trailing("|")
     |> String.split("|")
     |> Enum.map(&String.split(&1, ","))
