@@ -87,67 +87,15 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
   defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
     class = Repo.get!(Class, class_id)
             |> Repo.preload(:professor)
-    professor_params = professor_info 
-                        |> extract_professor_details()
-                        |> Map.put("class_period_id", class.class_period_id)
     case class.professor do
-      nil -> 
-        professor_params 
-        |> find_professor()
-        |> attach_professor(class)
+      nil -> nil
       professor -> 
-        professor_params 
+        professor_info 
+        |> extract_professor_details()
+        |> Map.put("class_period_id", class.class_period_id)
         |> update_professor(professor)
     end
   end
-
-  defp find_professor(%{"name_first" => ""} = params) do
-    query = from(p in Professor)
-    |> where([p], p.class_period_id == ^params["class_period_id"])
-    |> where([p], is_nil(p.name_first))
-    |> where([p], p.name_last == ^params["name_last"])
-    |> Repo.all()
-
-    count = query |> Enum.count()
-    case count do
-      1 -> 
-        professor = query |> List.first()
-        params |> update_professor(professor)
-      _ ->
-        case params |> find_professor_by_email() do
-          nil -> 
-            params |> insert_professor()
-          professor -> 
-            params |> update_professor(professor)
-        end
-    end
-  end
-  defp find_professor(params) do
-    case Professor |> Repo.get_by(class_period_id: params["class_period_id"], 
-                                  name_first: params["name_first"], 
-                                  name_last: params["name_last"]) do
-      nil -> params |> insert_professor()
-      professor -> params |> update_professor(professor)
-    end
-  end
-
-  defp find_professor_by_email(%{"email" => email} = params) do
-    Professor 
-    |> Repo.get_by(class_period_id: params["class_period_id"], email: email)
-  end
-
-  defp insert_professor(params) do
-    %Professor{}
-    |> Professor.changeset_insert(params)
-    |> Repo.insert()
-  end
-
-  defp attach_professor({:ok, professor}, class) do
-    class 
-    |> Class.changeset_update(%{"professor_id" => professor.id})
-    |> Repo.update()
-  end
-  defp attach_professor(_professor, _class), do: nil
 
   defp update_professor(params, professor) do
     params = params |> Map.delete("name_first")
