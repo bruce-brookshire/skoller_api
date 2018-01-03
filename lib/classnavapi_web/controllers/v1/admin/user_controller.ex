@@ -126,12 +126,14 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   end
 
   defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
-  defp delete_fields_of_study(%{user: %{student: student}}, _params) do
+  defp delete_fields_of_study(%{user: %{student: _student}}, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
+  defp delete_fields_of_study(%{user: %{student: student}}, %{"student" => %{"fields_of_study" => _fields}}) do
     from(sf in StudentField)
     |> where([sf], sf.student_id == ^student.id)
     |> Repo.delete_all()
     {:ok, nil}
   end
+  defp delete_fields_of_study(%{user: %{student: _student}}, _params), do: {:ok, nil}
 
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
     status = fields |> Enum.map(&add_field_of_study(user, &1))
