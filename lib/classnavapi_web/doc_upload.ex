@@ -34,7 +34,6 @@ defmodule Classnavapi.DocUpload do
       # false -> case String.ends_with?(file.file_name, [".txt", ".rtf", ".doc", ".docx", ".pages"]) do
       #   true -> {:soffice_pdf, fn(input, output) -> [input, output] end, :pdf}
       false -> :noaction
-      end
     end
   end
 
