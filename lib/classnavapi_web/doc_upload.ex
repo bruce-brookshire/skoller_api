@@ -31,9 +31,9 @@ defmodule Classnavapi.DocUpload do
     case String.ends_with?(file.file_name, [".jpg", ".png", ".jpeg"]) do
       true -> 
         {:convert, "-gravity center", :pdf}
-      false -> case String.ends_with?(file.file_name, [".txt", ".rtf", ".doc", ".docx", ".pages"]) do
-        true -> {:soffice_pdf, fn(input, output) -> [input, output] end, :pdf}
-        false -> :noaction
+      # false -> case String.ends_with?(file.file_name, [".txt", ".rtf", ".doc", ".docx", ".pages"]) do
+      #   true -> {:soffice_pdf, fn(input, output) -> [input, output] end, :pdf}
+      false -> :noaction
       end
     end
   end
