@@ -20,6 +20,7 @@ defmodule ClassnavapiWeb.Notification do
           "body" => body
       })
     |> put_category(category)
+    |> put_sound("default")
     |> APNS.push()
     |> inspect()
     |> Logger.info()
@@ -30,6 +31,7 @@ defmodule ClassnavapiWeb.Notification do
     |> APNS.Notification.new(device, @push_topic)
     |> put_mutable_content
     |> put_category(category)
+    |> put_sound("default")
     |> APNS.push()
     |> inspect()
     |> Logger.info()
