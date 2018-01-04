@@ -1,10 +1,12 @@
 defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   
   alias Classnavapi.Repo
+  alias Classnavapi.Class
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.Status
   alias ClassnavapiWeb.Helpers.AssignmentHelper
 
   import Ecto.Query
@@ -63,14 +65,21 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     extract_name(class.professor, is_nil(class.professor))
   end
 
+  def get_class_length(class, class_period) do
+    compare_classes(class.class_start == class_period.start_date, class.class_end == class_period.end_date)
+  end
+
   def get_class_length(class) do
     class = class |> Repo.preload(:class_period)
     compare_classes(class.class_start == class.class_period.start_date, class.class_end == class.class_period.end_date)
   end
 
-  def get_class_status(class) do
+  def get_class_status(%Class{} = class) do
     class = class |> Repo.preload(:class_status)
     get_status(class)
+  end
+  def get_class_status(%Status{} = class_status) do
+    get_status(%{class_status: class_status})
   end
 
   defp get_relative_weight(%{} = params) do #good

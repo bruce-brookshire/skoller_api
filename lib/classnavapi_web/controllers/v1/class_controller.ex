@@ -12,6 +12,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Professor
+  alias Classnavapi.School
+  alias Classnavapi.Class.Status
+  alias Classnavapi.Class.StudentClass
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -107,14 +112,25 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     date = DateTime.utc_now
     query = from(class in Class)
     classes = query
-    |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
-    |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
+    |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
+    |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
+    |> join(:left, [class, period, prof, school, status], enroll in subquery(count_subquery()), enroll.class_id == class.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period, prof], ^filter(params))
-    |> select([class, period, prof], %{class: class, professor: prof})
+    |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> Repo.all()
 
     render(conn, SearchView, "index.json", classes: classes)
+  end
+
+  def count_subquery() do
+    from(c in Class)
+    |> join(:left, [c], sc in StudentClass, c.id == sc.class_id)
+    |> where([c, sc], sc.is_dropped == false)
+    |> group_by([c, sc], c.id)
+    |> select([c, sc], %{class_id: c.id, count: count(sc.id)})
   end
 
   @doc """
