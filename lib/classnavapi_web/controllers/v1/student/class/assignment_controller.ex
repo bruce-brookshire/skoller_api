@@ -60,11 +60,16 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def show(conn, %{"id" => id}) do
-    student_assignment = StudentAssignment
-    |> Repo.get!(id)
-
-    student_assignment = student_assignment
-                        |> Map.put(:pending_mods, ModHelper.pending_mods_for_assignment(student_assignment))
+    student_assignment = from(sc in StudentClass)
+                          |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
+                          |> where([sc, sa], sa.id == ^id and sc.is_dropped == false)
+                          |> Repo.all()
+                          |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
+                          |> Enum.filter(& to_string(&1.id) == id)
+                          |> List.first()
+    
+    pending_mods = ModHelper.pending_mods_for_assignment(student_assignment)
+    student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
 
     render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
   end

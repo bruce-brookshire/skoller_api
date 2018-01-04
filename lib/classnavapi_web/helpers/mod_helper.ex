@@ -131,6 +131,14 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all
   end
 
+  def pending_mods_for_assignment(%{student_class_id: student_class_id, assignment_id: assignment_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_class_id)
+    |> where([m], m.assignment_id == ^assignment_id)
+    |> where([m, act], is_nil(act.is_accepted))
+    |> Repo.all
+  end
+
   def get_new_assignment_mods(%StudentClass{} = student_class) do
     from(mod in Mod)
     |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
