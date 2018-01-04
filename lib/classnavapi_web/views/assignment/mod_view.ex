@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.Assignment.ModView do
       id: mod.id,
       data: mod.data,
       mod_type: mod.assignment_mod_type.name,
-      short_msg: assignment.name <> " " <> mod_type(mod) <> ".",
+      short_msg: assignment.name <> " " <> mod_type(mod),
       class: render_one(assignment.class, ClassView, "class.json"),
       is_accepted: action.is_accepted,
       student_assignment_id: get_student_assignment_id(student_assignment)
