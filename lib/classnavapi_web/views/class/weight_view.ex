@@ -15,7 +15,8 @@ defmodule ClassnavapiWeb.Class.WeightView do
         %{
             id: weight.id,
             name: weight.name,
-            weight: Decimal.to_float(weight.weight)
+            weight: Decimal.to_float(weight.weight),
+            inserted_at: weight.inserted_at
         }
     end
 end
