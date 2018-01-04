@@ -104,6 +104,8 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
+    name_first = name_first |> String.trim()
+    name_last = name_last |> String.trim()
     case Repo.get_by(Professor, name_first: name_first, name_last: name_last, class_period_id: class_period_id) do
       nil -> insert_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
       prof -> {:ok, prof}

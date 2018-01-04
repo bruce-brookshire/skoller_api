@@ -79,6 +79,7 @@ defmodule Classnavapi.Class do
     class
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
@@ -90,6 +91,7 @@ defmodule Classnavapi.Class do
     |> Repo.preload(:weights)
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
@@ -134,6 +136,22 @@ defmodule Classnavapi.Class do
     sum == [] -> changeset
     equal == :eq -> changeset
     true -> changeset |> add_error(:weights, "Weights do not add to 100")
+    end
+  end
+
+  defp title_case(str) do
+    str
+    |> String.split()
+    |> Enum.map(&capitalize(&1))
+    |> Enum.reduce("", & &2 <> " " <> &1)
+    |> String.trim()
+  end
+
+  defp capitalize(string) do
+    cond do
+      string in ["II", "III", "IV", "VI", "VIII", "IX"] -> string
+      string in ["ii", "iii", "iv", "vi", "viii", "ix"] -> string |> String.upcase
+      true -> String.capitalize(string)
     end
   end
 end
