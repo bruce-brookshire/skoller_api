@@ -97,7 +97,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       data: %{},
       assignment_mod_type_id: @delete_assignment_mod,
       is_private: is_private(params["is_private"]),
-      student_id: student_class.id,
+      student_id: student_class.student_id,
       assignment_id: student_assignment.assignment_id
     }
 
