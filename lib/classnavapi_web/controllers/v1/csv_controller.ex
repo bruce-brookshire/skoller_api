@@ -9,7 +9,6 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
-  import Ecto.Query
   
   @admin_role 200
   @default_grade_scale "A,90|B,80|C,70|D,60"
@@ -90,7 +89,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     Repo.update(changeset)
   end
 
-  defp find_class(%{crn: nil} = class), do: nil
+  defp find_class(%{crn: nil}), do: nil
   defp find_class(%{crn: crn} = class) do
     Repo.get_by(Class, class_period_id: class.class_period_id, 
                         crn: crn)
