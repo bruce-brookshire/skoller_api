@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Notification do
       })
     |> put_category(category)
     |> APNS.push()
-    |> Kernel.to_string()
+    |> inspect()
     |> Logger.info()
   end
 
@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Notification do
     |> put_mutable_content
     |> put_category(category)
     |> APNS.push()
-    |> Kernel.to_string()
+    |> inspect()
     |> Logger.info()
   end
 end

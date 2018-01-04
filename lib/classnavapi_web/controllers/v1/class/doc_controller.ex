@@ -33,7 +33,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
           DocUpload.url({inserted, scope})
         {:error, error} ->
           require Logger
-          Logger.info(error)
+          Logger.info(inspect(error))
           nil
       end
   
