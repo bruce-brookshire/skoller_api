@@ -32,7 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     |> where([class, period], period.school_id == ^school_id)
     |> where([class], class.class_status_id != @new_class_status)
     |> where([class, period, prof], ^filter(params))
-    |> select([class, period, prof], %{class: class, professor: prof})
+    |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
     |> Repo.all()
 
     render(conn, ClassView, "index.json", classes: classes)
