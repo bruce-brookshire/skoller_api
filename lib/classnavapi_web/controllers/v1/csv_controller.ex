@@ -90,32 +90,10 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     Repo.update(changeset)
   end
 
-  defp find_class(%{professor_id: nil} = class) do
-    from(c in Class)
-    |> where([c], c.class_period_id == ^class.class_period_id)
-    |> where([c], is_nil(c.professor_id))
-    |> where([c], c.campus == ^class.campus)
-    |> where([c], c.name == ^class.name)
-    |> where([c], c.number == ^class.number)
-    |> where([c], c.meet_days == ^class.meet_days)
-    |> where([c], c.class_start == ^class.class_start)
-    |> where([c], c.class_end == ^class.class_end)
-    |> where([c], c.meet_end_time == ^class.meet_end_time)
-    |> where([c], c.meet_start_time == ^class.meet_start_time)
-    |> Repo.one()
-  end
-
-  defp find_class(%{professor_id: prof_id} = class) do
+  defp find_class(%{crn: nil} = class), do: nil
+  defp find_class(%{crn: crn} = class) do
     Repo.get_by(Class, class_period_id: class.class_period_id, 
-                        professor_id: prof_id,
-                        campus: class.campus,
-                        name: class.name,
-                        number: class.number,
-                        meet_days: class.meet_days,
-                        class_start: class.class_start,
-                        class_end: class.class_end,
-                        meet_end_time: class.meet_end_time,
-                        meet_start_time: class.meet_start_time)
+                        crn: crn)
   end
 
   defp insert_class(class) do

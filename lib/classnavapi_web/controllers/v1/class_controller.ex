@@ -197,11 +197,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp school_filter(dynamic, _), do: dynamic
 
   defp prof_filter(dynamic, %{"professor_name" => filter, "or" => "true"}) do
-    prof_filter = "%" <> filter <> "%"
+    prof_filter = filter <> "%"
     dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter) or ^dynamic)
   end
   defp prof_filter(dynamic, %{"professor_name" => filter}) do
-    prof_filter = "%" <> filter <> "%"
+    prof_filter = filter <> "%"
     dynamic([class, period, prof], (ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter)) and ^dynamic)
   end
   defp prof_filter(dynamic, _), do: dynamic

@@ -48,7 +48,7 @@ defmodule ClassnavapiWeb.Api.V1.ProfessorController do
   end
 
   defp name_filter(query, %{"professor.name" => professor_name}) do
-    prof_filter = "%" <> professor_name <> "%"
+    prof_filter = professor_name <> "%"
     query
     |> where([p], ilike(p.name_first, ^prof_filter) or ilike(p.name_last, ^prof_filter))
   end
