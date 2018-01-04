@@ -16,7 +16,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 meet_start_time: class.meet_start_time,
                 name: class.name,
                 number: class.number,
-                enrolled: enroll.count,
+                enrolled: get_enrolled(enroll.count),
                 length: ClassCalcs.get_class_length(class, class_period),
                 campus: class.campus,
                 professor: render_one(professor, ProfessorView, "professor-short.json"),
@@ -27,5 +27,8 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 status: ClassCalcs.get_class_status(class_status)
         }
     end
+
+    defp get_enrolled(nil), do: 0
+    defp get_enrolled(val), do: val
   end
   
