@@ -57,6 +57,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @auto_update " has been autoupdated"
   #@of_class_accepted "% of your classmates have made this change."
 
+  @is_ready " is ready!"
+
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
     devices = user.user |> get_user_devices()
@@ -94,7 +96,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     class = class |> Repo.preload([:assignments])
     msg = class.assignments |> class_complete_msg()
     
-    devices |> Enum.each(&Notification.create_notification(&1.udid, msg, @class_complete_category))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
   end
 
   def send_auto_update_notification(actions) do
