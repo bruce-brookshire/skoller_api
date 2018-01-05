@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
 
   defp assignment_query(time) do
     {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
-    now = DateTime.utc_now()
+    now = DateTime.utc_now() |> DateTime.to_date()
 
     from(student in Student)
     |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
     |> join(:inner, [student, sclass, sassign, class, user], device in Device, user.id == device.user_id)
     |> where([student], student.notification_time == ^time)
     |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
-    |> where([student, sclass, sassign], sassign.due >= ^now and sassign.due <= date_add(^now, student.notification_days_notice, "day"))
+    |> where([student, sclass, sassign], fragment("?::date", sassign.due) >= ^now and fragment("?::date", sassign.due) <= date_add(^now, student.notification_days_notice, "day"))
     |> select([student, sclass, sassign, class, user, device], %{udid: device.udid, device_type: device.type, class_name: class.name, assign_name: sassign.name, assign_due: sassign.due})
     |> Repo.all()
   end
@@ -45,12 +45,12 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp due_days_away(due) do
-    # TODO: Need to double check these.
-    today = DateTime.utc_now()
-    case DateTime.diff(due, today) do
-      less when less < 86400 -> "today."
-      one when one < 86400*2 -> "tomorrow."
-      seconds -> "in " <> to_string(abs(seconds/86400)) <> " days."
+    due = due |> DateTime.to_date()
+    today = DateTime.utc_now() |> DateTime.to_date()
+    case Date.diff(due, today) do
+      0 -> "today."
+      1 -> "tomorrow."
+      num -> "in " <> to_string(num) <> " days."
     end
   end
 end
