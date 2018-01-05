@@ -322,7 +322,8 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp get_data(mod) do
     case mod.assignment_mod_type_id do
       @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
-      @due_assignment_mod -> %{due: mod.data |> Map.get("due")}
+      @due_assignment_mod -> {:ok, date, _} = mod.data |> Map.get("due") |> DateTime.from_iso8601()
+        %{due: date}
       @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
     end
   end
