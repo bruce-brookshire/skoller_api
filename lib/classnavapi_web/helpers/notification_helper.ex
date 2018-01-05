@@ -141,7 +141,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     case Enum.count(assignments) do
       0 -> @class_complete
       1 -> @we_created <> " 1 " <> @one_assign_class_complete
-      num -> @we_created <> " " <> num <> " " <> @multiple_assign_class_complete
+      num -> @we_created <> " " <> to_string(num) <> " " <> @multiple_assign_class_complete
     end
   end
 
