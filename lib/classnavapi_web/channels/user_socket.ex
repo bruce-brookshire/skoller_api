@@ -5,7 +5,8 @@ defmodule ClassnavapiWeb.UserSocket do
   # channel "room:*", ClassnavapiWeb.RoomChannel
 
   ## Transports
-  transport :websocket, Phoenix.Transports.WebSocket
+  transport :websocket, Phoenix.Transports.WebSocket,
+    timeout: 45_000
   # transport :longpoll, Phoenix.Transports.LongPoll
 
   # Socket params are passed from the client and can
@@ -23,7 +24,8 @@ defmodule ClassnavapiWeb.UserSocket do
     {:ok, socket}
   end
 
-  # Socket id's are topics that allow you to identify all sockets for a given user:
+  # Socket id's are topics that allow you to identify all sockets 
+  # for a given user:
   #
   #     def id(socket), do: "user_socket:#{socket.assigns.user_id}"
   #

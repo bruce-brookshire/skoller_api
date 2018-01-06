@@ -15,8 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :classnavapi, ClassnavapiWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  url: [scheme: "https", host: "classnav-api-staging.herokuapp.com", port: 443]
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -59,6 +58,42 @@ config :logger, level: :info
 #     config :classnavapi, ClassnavapiWeb.Endpoint, server: true
 #
 
-# Finally import the config/prod.secret.exs
-# which should be versioned separately.
-import_config "prod.secret.exs"
+# In this file, we keep production configuration that
+# you'll likely want to automate and keep away from
+# your version control system.
+#
+# You should document the content of this
+# file or create a script for recreating it, since it's
+# kept out of version control and might be hard to recover
+# or recreate for your teammates (or yourself later on).
+config :classnavapi, ClassnavapiWeb.Endpoint,
+secret_key_base: System.get_env("API_SECRET_KEY")
+
+# Configure your database
+config :classnavapi, Classnavapi.Repo,
+adapter: Ecto.Adapters.Postgres,
+url: System.get_env("DATABASE_URL"),
+pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+
+# Configure Guardian Token Generation
+config :classnavapi, Classnavapi.Auth,
+          issuer: System.get_env("API_TOKEN_ISSUER"),
+          secret_key: System.get_env("API_TOKEN_KEY")
+  
+config :pigeon, :apns,
+  apns_default: %{
+    cert: System.get_env("APNS_CERT"),
+    key: System.get_env("APNS_KEY"),
+    mode: :prod,
+    use_2197: true
+  }
+
+config :classnavapi, Classnavapi.Mailer,
+  adapter: Bamboo.SMTPAdapter,
+  server: System.get_env("SES_SERVER"),
+  port: System.get_env("SES_PORT"),
+  username: System.get_env("SMTP_USERNAME"),
+  password: System.get_env("SMTP_PASSWORD"),
+  tls: :always,
+  ssl: false,
+  retries: 1

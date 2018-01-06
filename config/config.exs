@@ -13,7 +13,7 @@ config :classnavapi,
 config :classnavapi, ClassnavapiWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
-  render_errors: [view: ClassnavapiWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [view: ClassnavapiWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Classnavapi.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
@@ -21,6 +21,28 @@ config :classnavapi, ClassnavapiWeb.Endpoint,
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+config :arc,
+  storage: Arc.Storage.S3,
+  bucket: {:system, "AWS_S3_BUCKET"}
+
+config :ex_aws,
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
+
+config :ex_twilio, 
+  account_sid: {:system, "TWILIO_ACCT_SID"},
+  auth_token: {:system, "TWILIO_AUTH"}
+
+config :pigeon, :apns,
+  apns_default: %{
+    cert: {:classnavapi, "apns/cert.pem"},
+    key: {:classnavapi, "apns/key_unencrypted.pem"},
+    mode: :dev
+  }
+
+config :classnavapi, Classnavapi.Mailer,
+  adapter: Bamboo.LocalAdapter
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

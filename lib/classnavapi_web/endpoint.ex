@@ -14,8 +14,6 @@ defmodule ClassnavapiWeb.Endpoint do
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
-    socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-    plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
   end
 
@@ -37,6 +35,8 @@ defmodule ClassnavapiWeb.Endpoint do
     store: :cookie,
     key: "_classnavapi_key",
     signing_salt: "EW+VIcw9"
+
+  plug CORSPlug
 
   plug ClassnavapiWeb.Router
 

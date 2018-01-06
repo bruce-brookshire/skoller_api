@@ -1,0 +1,10 @@
+[
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('M', 'OfficeHoursDay'), ('1.30pm—3.30pm', 'OfficeHoursTime'), (',', 'Separator'), ('R', 'OfficeHoursDay'), ('11.00am—12.00pm', 'OfficeHoursTime'), (',', 'Separator'), ('appointment', 'None')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('WED', 'OfficeHoursDay'), ('10:00-11:00', 'OfficeHoursTime'), (',', 'Separator'), ('TU/TH', 'OfficeHoursDay'), ('12:30-2:00', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('MWF', 'OfficeHoursDay'), ('10am-noon', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('Tu/Th', 'OfficeHoursDay'), ('9-Noon', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('TTH', 'OfficeHoursDay'), ('11:00am-noon', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('Tuesday', 'OfficeHoursDay'), ('noon-3:00pm', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('Fridays', 'OfficeHoursDay'), ('Noon-2', 'OfficeHoursTime')],
+  [('Office', 'OfficeKey'), ('Hours', 'OfficeHoursKey'), (':', ':'), ('Mondays', 'OfficeHoursDay'), ('noon-4pm', 'OfficeHoursTime')],
+]

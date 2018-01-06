@@ -1,0 +1,9 @@
+[
+  [('Class','None'),('Location','OfficeLocationKey'),(':',':'),('Lab','OfficeLocationRoom'),('312','OfficeLocationRoom'),(',', 'Separator'),('Massey','OfficeLocationBuilding'),('Business','OfficeLocationBuilding'),('Center','OfficeLocationBuilding')],
+  [('Office','OfficeKey'),(':',':'),('Computing','OfficeLocationBuilding'),('Services','OfficeLocationBuilding'),('Annex','OfficeLocationBuilding'),('203C','OfficeLocationRoom')],
+  [('Ofﬁce','OfficeKey'),(':',':'),('M322','OfficeLocationRoom'),('Mitchell','OfficeLocationBuilding'),('Physics','OfficeLocationBuilding'),('Institute','OfficeLocationBuilding')],
+  [('Ofﬁce','OfficeKey'),(':',':'),('Blocker','OfficeLocationBuilding'),('223D','OfficeLocationRoom')],
+  [('Office','OfficeKey'),('hours','OfficeHoursKey'),(':',':'),('Every','None'),('Tuesday','OfficeHoursDay'),('Thursday','OfficeHoursDay'),(':',':'),('10:00am','OfficeHoursTime'),('12:00pm','OfficeHoursTime'),(',', 'Separator'),('Heep','OfficeLocationBuilding'),('center','OfficeLocationBuilding'),('room','None'),('436','OfficeLocationRoom')],
+  [('Ofﬁce','OfficeKey'),(':',':'),('Allen','OfficeLocationBuilding'),('Building','OfficeLocationBuilding'),('2117','OfficeLocationRoom')],
+  [('Office','OfficeKey'),('Location','OfficeLocationKey'),(':',':'),('Bolton','OfficeLocationBuilding'),('Hall','OfficeLocationBuilding'),('211','OfficeLocationRoom')],
+]

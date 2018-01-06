@@ -11,8 +11,7 @@ config :classnavapi, ClassnavapiWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
-                    cd: Path.expand("../assets", __DIR__)]]
+  watchers: []
 
 # ## SSL Support
 #
@@ -30,17 +29,6 @@ config :classnavapi, ClassnavapiWeb.Endpoint,
 # configured to run both http and https servers on
 # different ports.
 
-# Watch static and templates for browser reloading.
-config :classnavapi, ClassnavapiWeb.Endpoint,
-  live_reload: [
-    patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{priv/gettext/.*(po)$},
-      ~r{lib/classnavapi_web/views/.*(ex)$},
-      ~r{lib/classnavapi_web/templates/.*(eex)$}
-    ]
-  ]
-
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
@@ -56,3 +44,8 @@ config :classnavapi, Classnavapi.Repo,
   database: "classnavapi_dev",
   hostname: "localhost",
   pool_size: 10
+
+# Configure Guardian Token Generation
+config :classnavapi, Classnavapi.Auth,
+            issuer: "Classnavapi",
+            secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"
