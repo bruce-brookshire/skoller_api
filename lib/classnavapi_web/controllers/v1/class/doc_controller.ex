@@ -24,8 +24,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    sammi(params)
-
     scope = %{"id" => UUID.generate()}
     location = 
       case DocUpload.store({file, scope}) do
@@ -36,6 +34,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
           Logger.info(inspect(error))
           nil
       end
+    
+    sammi(params, location)
   
     params = params 
     |> Map.put("path", location)
@@ -71,19 +71,34 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     |> Repo.update()
   end
 
-  defp sammi(%{"is_syllabus" => "true", "class_id" => class_id} = params) do
-    {sammi, _code} = get_sammi_data(params)
+  defp sammi(_params, nil), do: nil
+  defp sammi(%{"is_syllabus" => "true", "class_id" => class_id} = params, file) do
+    {sammi, _code} = get_sammi_data(params, file)
 
     Logger.info(sammi)
     
-    decoded_sammi = sammi
+    sammi = sammi
     |> String.replace("'", ~s("))
-    |> Poison.decode!
+    |> Poison.decode
 
-    decoded_sammi |> add_grade_scale(class_id)
-    decoded_sammi |> add_professor_info(class_id)
+    case sammi do
+      {:ok, decoded_sammi} ->
+        decoded_sammi |> add_grade_scale(class_id)
+        decoded_sammi |> add_professor_info(class_id)
+      {:error, val} ->
+        val
+        |> inspect()
+        |> Logger.error()
+      {:error, val1, val2} ->
+        val1
+        |> inspect()
+        |> Logger.error()
+        val2
+        |> inspect()
+        |> Logger.error()
+    end
   end
-  defp sammi(_params), do: nil
+  defp sammi(_params, _file), do: nil
 
   defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
     class = Repo.get!(Class, class_id)
@@ -208,8 +223,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     map |> Map.put("email", val)
   end
 
-  defp get_sammi_data(%{"file" => file, "is_syllabus" => "true"}) do
-    System.cmd("python3", ["./classifiers/sammi/main.py", "extract", file.path], cd: "./priv/sammi")
+  defp get_sammi_data(%{"is_syllabus" => "true"}, file) do
+    System.cmd("python3", ["./classifiers/sammi/main.py", "extract", file], cd: "./priv/sammi")
   end
-  defp get_sammi_data(_params), do: nil
+  defp get_sammi_data(_params, _file), do: nil
 end
