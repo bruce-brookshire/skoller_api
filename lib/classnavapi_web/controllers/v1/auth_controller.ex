@@ -34,9 +34,9 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
     render(conn, AuthView, "show.json", auth: conn.assigns[:user])
   end
 
-  def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid}) do
+  def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid, "type" => type}) do
     Device
-    |> Repo.get_by!(udid: udid, user_id: user.id)
+    |> Repo.get_by!(udid: udid, type: type, user_id: user.id)
     |> Repo.delete!()
 
     conn
