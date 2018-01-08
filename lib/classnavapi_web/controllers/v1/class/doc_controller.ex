@@ -24,7 +24,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    sammi(params, file.path)
+    Task.start(sammi(params, file.path))
 
     scope = %{"id" => UUID.generate()}
     location = 
