@@ -34,7 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
     |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
-    |> where([mod, action, sc, sa], sc.student_id == ^student_id)
+    |> where([mod, action, sc, sa], sc.student_id == ^student_id and sc.is_dropped == false)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
     |> Repo.all()
 
