@@ -4,11 +4,21 @@ defmodule ClassnavapiWeb.Sammi do
   alias Classnavapi.Repo
   alias Classnavapi.Class
 
+  alias Ecto.UUID
+
   require Logger
 
   def sammi(_params, nil), do: nil
   def sammi(%{"is_syllabus" => "true", "class_id" => class_id} = params, file) do
-    {sammi, _code} = get_sammi_data(params, file)
+
+    %HTTPoison.Response{body: body} = HTTPoison.get!(file)
+
+    uuid = UUID.generate()
+    path = Path.join(System.get_env("TMPDIR"), to_string(uuid) <> ".pdf")
+
+    File.write!(path, body)
+
+    {sammi, _code} = get_sammi_data(params, path)
 
     Logger.info(sammi)
     
@@ -32,6 +42,8 @@ defmodule ClassnavapiWeb.Sammi do
         |> inspect()
         |> Logger.error()
     end
+
+    File.rm(path)
   end
   def sammi(_params, _file), do: nil
 
