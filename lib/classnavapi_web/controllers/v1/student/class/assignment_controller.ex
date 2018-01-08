@@ -11,6 +11,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.ModHelper
   alias Classnavapi.Class.Weight
   alias ClassnavapiWeb.Helpers.NotificationHelper
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Status
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -50,7 +52,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
   def index(conn, %{"student_id" => student_id} = params) do
     student_assignments = from(sc in StudentClass)
+                          |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+                          |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
                           |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
+                          |> where([sc, class, cs], cs.is_complete == true)
                           |> where_filters(params)
                           |> Repo.all()
                           |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
@@ -62,7 +67,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   def show(conn, %{"id" => id}) do
     student_assignment = from(sc in StudentClass)
                           |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
+                          |> join(:inner, [sc, sa], class in Class, class.id == sc.class_id)
+                          |> join(:inner, [sc, sa, class], cs in Status, cs.id == class.class_status_id)
                           |> where([sc, sa], sa.id == ^id and sc.is_dropped == false)
+                          |> where([sc, sa, class, cs], cs.is_complete == true)
                           |> Repo.all()
                           |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
                           |> Enum.filter(& to_string(&1.id) == id)
