@@ -218,6 +218,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   defp enrolled_subquery() do
     from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
     |> distinct([sc], sc.class_id)
   end
 

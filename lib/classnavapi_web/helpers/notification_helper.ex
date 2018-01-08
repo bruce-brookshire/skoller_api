@@ -150,7 +150,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp get_users_from_class(%Class{} = class) do
     from(sc in StudentClass)
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> where([sc, user], sc.class_id == ^class.id)
+    |> where([sc, user], sc.class_id == ^class.id and sc.is_dropped == false)
     |> select([sc, user], user)
     |> Repo.all
   end
@@ -158,7 +158,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp get_users_from_student_class(id) do
     from(sc in StudentClass)
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> where([sc, user], sc.id == ^id)
+    |> where([sc, user], sc.id == ^id and sc.is_dropped == false)
     |> select([sc, user], user)
     |> Repo.all
   end
@@ -254,7 +254,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     from(sc in StudentClass)
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
     |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
-    |> where([sc, stu, usr], sc.id == ^student_class_id)
+    |> where([sc, stu, usr], sc.id == ^student_class_id and sc.is_dropped == false)
     |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
     |> select([sc, stu, usr], %{user: usr, student: stu})
     |> Repo.all

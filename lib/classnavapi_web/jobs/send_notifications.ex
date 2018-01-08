@@ -32,6 +32,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
     |> where([student], student.notification_time == ^time)
     |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
     |> where([student, sclass, sassign], fragment("?::date", sassign.due) >= ^now and fragment("?::date", sassign.due) <= date_add(^now, student.notification_days_notice, "day"))
+    |> where([student, sclass, sassign, class, user, device], sclass.is_dropped == false)
     |> select([student, sclass, sassign, class, user, device], %{udid: device.udid, device_type: device.type, class_name: class.name, assign_name: sassign.name, assign_due: sassign.due})
     |> Repo.all()
   end
