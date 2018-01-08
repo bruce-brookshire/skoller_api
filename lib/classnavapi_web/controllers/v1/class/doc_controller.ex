@@ -23,8 +23,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    Task.start(Sammi, :sammi, [params, file.path])
-
     scope = %{"id" => UUID.generate()}
     location = 
       case DocUpload.store({file, scope}) do
@@ -35,6 +33,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
           Logger.info(inspect(error))
           nil
       end
+
+    Task.start(Sammi, :sammi, [params, location])
   
     params = params 
     |> Map.put("path", location)
