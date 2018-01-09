@@ -62,17 +62,4 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     docs = Repo.all(from docs in Doc, where: docs.class_id == ^class_id)
     render(conn, DocView, "index.json", docs: docs)
   end
-
-  def delete(conn, %{"id" => id}) do
-    doc = Repo.get!(Doc, id)
-    case Repo.delete(doc) do
-      {:ok, _struct} ->
-        conn
-        |> send_resp(200, "")
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
 end
