@@ -26,7 +26,8 @@ defmodule ClassnavapiWeb.AssignmentView do
             id: assignment.id,
             due: assignment.due,
             name: assignment.name,
-            weight_id: assignment.weight_id
+            weight_id: assignment.weight_id,
+            inserted_at: assignment.inserted_at
         }
     end
 end
