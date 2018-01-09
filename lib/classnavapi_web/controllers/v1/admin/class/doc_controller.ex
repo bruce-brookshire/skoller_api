@@ -49,6 +49,19 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    doc = Repo.get!(Doc, id)
+    case Repo.delete(doc) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   defp upload_file(file) do
     scope = %{"id" => UUID.generate()}
     case DocUpload.store({file, scope}) do
