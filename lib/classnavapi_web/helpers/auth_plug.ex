@@ -54,6 +54,17 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
 
+  def verify_class_is_editable(conn, id) do
+    case conn.path_params |> Map.fetch(to_string(id)) do
+      :error -> conn
+      {:ok, class_id} ->
+        case Repo.get_by(Class, id: class_id, is_editable: true) do
+          nil -> conn |> in_role(@admin_role)
+          _ -> conn
+        end
+      end
+  end
+
   def verify_member(conn, %{of: type, using: id}) do
     case conn.path_params |> Map.fetch(to_string(id)) do
       :error -> conn
@@ -102,6 +113,13 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
       true -> conn |> unauth
       false -> conn
+    end
+  end
+
+  defp in_role(conn, role) do
+    case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
+      false -> conn |> unauth
+      true -> conn
     end
   end
 

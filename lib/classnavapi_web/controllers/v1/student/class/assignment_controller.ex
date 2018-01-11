@@ -23,6 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   plug :verify_member, :class
   plug :verify_member, :student
   plug :verify_member, %{of: :student_assignment, using: :id}
+  plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
     student_class = Repo.get_by!(StudentClass, class_id: class_id, student_id: student_id, is_dropped: false)
@@ -83,43 +84,63 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    changeset = StudentAssignment
-                |> Repo.get!(id)
-                |> StudentAssignment.changeset_update(params)
-                |> validate_class_weight()
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.update(:student_assignment, changeset)
-    |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
-
-    case Repo.transaction(multi) do
-      {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod, :notification])
-        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
-        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-      {:error, _, failed_value, _} ->
+    case get_student_assignment(id) do
+      nil ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> send_resp(401, "")
+        |> halt()
+      student_assignment -> 
+        changeset = student_assignment
+        |> StudentAssignment.changeset_update(params)
+        |> validate_class_weight()
+
+        multi = Ecto.Multi.new
+        |> Ecto.Multi.update(:student_assignment, changeset)
+        |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
+
+        case Repo.transaction(multi) do
+          {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+            Task.start(ModHelper, :process_auto_update, [mod, :notification])
+            Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
+            render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+          {:error, _, failed_value, _} ->
+            conn
+            |> RepoHelper.multi_error(failed_value)
+        end
     end
   end
 
   def delete(conn, %{"id" => id} = params) do
-    student_assignment = Repo.get!(StudentAssignment, id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.delete(:student_assignment, student_assignment)
-    |> Ecto.Multi.run(:mod, &ModHelper.insert_delete_mod(&1, params))
-
-    case Repo.transaction(multi) do
-      {:ok, %{mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod, :notification])
-        Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
+    case get_student_assignment(id) do
+      nil ->
         conn
-        |> send_resp(200, "")
-      {:error, _, failed_value, _} ->
-        conn
-        |> RepoHelper.multi_error(failed_value)
+        |> send_resp(401, "")
+        |> halt()
+      student_assignment -> 
+        multi = Ecto.Multi.new
+        |> Ecto.Multi.delete(:student_assignment, student_assignment)
+        |> Ecto.Multi.run(:mod, &ModHelper.insert_delete_mod(&1, params))
+
+        case Repo.transaction(multi) do
+          {:ok, %{mod: mod}} ->
+            Task.start(ModHelper, :process_auto_update, [mod, :notification])
+            Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
+            conn
+            |> send_resp(200, "")
+          {:error, _, failed_value, _} ->
+            conn
+            |> RepoHelper.multi_error(failed_value)
+        end
     end
+  end
+
+  defp get_student_assignment(id) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
+    |> where([sa], sa.id == ^id)
+    |> where([sa, sc, class], class.is_editable == true)
+    |> Repo.one()
   end
 
   defp where_filters(query, params) do

@@ -324,49 +324,56 @@ defmodule Mix.Tasks.Seed.Dev do
     class_id: c1.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c2.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c3.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c4.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c5.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c6.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
   Repo.insert!(%Doc{
     class_id: c7.id,
     is_syllabus: true,
     name: "Test",
-    path: "Name"
+    path: "Name",
+    user_id: user.id
   })
 
     assign_weight = Repo.insert!(%Weight{

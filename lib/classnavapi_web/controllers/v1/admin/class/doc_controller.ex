@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
   
   plug :verify_role, %{role: @admin_role}
 
-  def create(conn, %{"file" => file} = params) do
+  def create(%{assigns: %{user: user}} = conn, %{"file" => file} = params) do
 
     class = params |> get_class_from_hash()
 
@@ -32,6 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
     |> Map.put("name", file.filename)
     |> Map.put("class_id", class.id)
     |> Map.put("is_syllabus", true)
+    |> Map.put("user_id", user.id)
 
     changeset = Doc.changeset(%Doc{}, params)
 
