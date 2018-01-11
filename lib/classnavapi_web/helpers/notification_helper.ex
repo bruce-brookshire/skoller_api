@@ -156,7 +156,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp get_users_from_class(%Class{} = class) do
     from(sc in StudentClass)
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
     |> where([sc, user], sc.class_id == ^class.id and sc.is_dropped == false)
+    |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all
   end
@@ -164,7 +166,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp get_users_from_student_class(id) do
     from(sc in StudentClass)
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
     |> where([sc, user], sc.id == ^id and sc.is_dropped == false)
+    |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all
   end
