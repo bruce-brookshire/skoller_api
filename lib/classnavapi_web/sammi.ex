@@ -63,124 +63,56 @@ defmodule ClassnavapiWeb.Sammi do
     class = Repo.get!(Class, class_id)
             |> Repo.preload(:professor)
     case class.professor do
-      # nil -> 
-      #   professor_params 
-      #   |> find_professor()
-      #   |> attach_professor(class)
       nil -> nil
       professor -> 
         professor_info 
-        |> extract_professor_details()
+        |> extract_professor_details(professor)
         |> Map.put("class_period_id", class.class_period_id)
         |> update_professor(professor)
     end
   end
 
-  defp extract_professor_details(professor_info) do
+  defp extract_professor_details(professor_info, professor) do
     Map.new()
-    |> get_name(professor_info)
-    |> get_office_hours(professor_info)
-    |> get_office_location(professor_info)
-    |> get_phone(professor_info)
-    |> get_email(professor_info)
+    |> get_office_hours(professor_info, professor)
+    |> get_office_location(professor_info, professor)
+    |> get_phone(professor_info, professor)
+    |> get_email(professor_info, professor)
   end
 
-  defp get_name(map, %{"name" => %{"value" => ""}}), do: map |> Map.put("name", nil)
-  defp get_name(map, %{"name" => %{"value" => val}}) do 
-    name = val 
-    |> String.trim()
-    |> String.split()
-
-    name_last = name
-    |> List.last()
-
-    name_first = name
-    |> List.delete_at(-1)
-    |> Enum.reduce("", & &2 <> " " <> &1)
-    |> String.trim()
-
-    map |> Map.put("name_first", name_first)
-    |> Map.put("name_last", name_last)
-  end
-
-  defp get_office_hours(map, %{"office_hours" => %{"value" => ""}}), do: map |> Map.put("office_availability", nil)
-  defp get_office_hours(map, %{"office_hours" => %{"value" => val}}) do 
+  defp get_office_hours(map, %{"office_hours" => %{"value" => ""}}, %{office_availability: nil}), do: map |> Map.put("office_availability", nil)
+  defp get_office_hours(map, %{"office_hours" => %{"value" => val}}, %{office_availability: nil}) do 
     val = val |> String.trim()
     map |> Map.put("office_availability", val)
   end
+  defp get_office_hours(map, _params, %{office_availability: _val}), do: map
 
-  defp get_office_location(map, %{"office_location" => %{"value" => ""}}), do: map |> Map.put("office_location", nil)
-  defp get_office_location(map, %{"office_location" => %{"value" => val}}) do 
+  defp get_office_location(map, %{"office_location" => %{"value" => ""}}, %{office_location: nil}), do: map |> Map.put("office_location", nil)
+  defp get_office_location(map, %{"office_location" => %{"value" => val}}, %{office_location: nil}) do 
     val = val |> String.trim()
     map |> Map.put("office_location", val)
   end
+  defp get_office_location(map, _params, %{office_location: _val}), do: map
 
-  defp get_phone(map, %{"phone" => %{"value" => ""}}), do: map |> Map.put("phone", nil)
-  defp get_phone(map, %{"phone" => %{"value" => val}}) do
+  defp get_phone(map, %{"phone" => %{"value" => ""}}, %{phone: nil}), do: map |> Map.put("phone", nil)
+  defp get_phone(map, %{"phone" => %{"value" => val}}, %{phone: nil}) do
     val = val |> String.trim()
     map |> Map.put("phone", val)
   end
+  defp get_phone(map, _params, %{phone: _val}), do: map
 
-  defp get_email(map, %{"email" => %{"value" => ""}}), do: map |> Map.put("email", nil)
-  defp get_email(map, %{"email" => %{"value" => val}}) do
+  defp get_email(map, %{"email" => %{"value" => ""}}, %{email: nil}), do: map |> Map.put("email", nil)
+  defp get_email(map, %{"email" => %{"value" => val}}, %{email: nil}) do
     val = val |> String.trim()
     map |> Map.put("email", val)
   end
+  defp get_email(map, _params, %{email: _val}), do: map
 
+  defp update_professor(params, professor) when params == %{} do
+    {:ok, professor}
+  end
   defp update_professor(params, professor) do
-    params = params |> Map.delete("name_first")
-    |> Map.delete("name_last")
     Professor.changeset_update(professor, params)
     |> Repo.update()
   end
-
-  # defp find_professor(%{"name_first" => ""} = params) do
-  #   query = from(p in Professor)
-  #   |> where([p], p.class_period_id == ^params["class_period_id"])
-  #   |> where([p], is_nil(p.name_first))
-  #   |> where([p], p.name_last == ^params["name_last"])
-  #   |> Repo.all()
-
-  #   count = query |> Enum.count()
-  #   case count do
-  #     1 -> 
-  #       professor = query |> List.first()
-  #       params |> update_professor(professor)
-  #     _ ->
-  #       case params |> find_professor_by_email() do
-  #         nil -> 
-  #           params |> insert_professor()
-  #         professor -> 
-  #           params |> update_professor(professor)
-  #       end
-  #   end
-  # end
-  # defp find_professor(params) do
-  #   case Professor |> Repo.get_by(class_period_id: params["class_period_id"], 
-  #                                 name_first: params["name_first"], 
-  #                                 name_last: params["name_last"]) do
-  #     nil -> params |> insert_professor()
-  #     professor -> params |> update_professor(professor)
-  #   end
-  # end
-
-  # defp find_professor_by_email(%{"email" => email} = params) do
-  #   Professor 
-  #   |> Repo.get_by(class_period_id: params["class_period_id"], email: email)
-  # end
-
-  # defp insert_professor(params) do
-  #   %Professor{}
-  #   |> Professor.changeset_insert(params)
-  #   |> Repo.insert()
-  # end
-
-  # defp attach_professor({:ok, professor}, class) do
-  #   class 
-  #   |> Class.changeset_update(%{"professor_id" => professor.id})
-  #   |> Repo.update()
-  # end
-  # defp attach_professor(_professor, _class), do: nil
-
-  
 end
