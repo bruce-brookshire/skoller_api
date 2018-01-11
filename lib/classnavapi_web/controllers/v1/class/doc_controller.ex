@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
   plug :verify_member, :class
 
-  def create(conn, %{"file" => file, "class_id" => class_id} = params) do
+  def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
 
     scope = %{"id" => UUID.generate()}
     location = 
@@ -39,6 +39,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
     params = params 
     |> Map.put("path", location)
     |> Map.put("name", file.filename)
+    |> Map.put("user_id", user.id)
 
     changeset = Doc.changeset(%Doc{}, params)
 
