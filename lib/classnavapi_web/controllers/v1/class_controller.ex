@@ -31,6 +31,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   plug :verify_member, :class
   plug :verify_member, %{of: :school, using: :period_id}
   plug :verify_member, %{of: :class, using: :id}
+  plug :verify_class_is_editable, :class_id
+  plug :verify_class_is_editable, :id
 
   @doc """
    Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 

@@ -89,7 +89,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Repo.all
   end
 
-  def send_class_complete_notification(%Class{} = class) do
+  def send_class_complete_notification(%Class{is_editable: true} = class) do
     users = class 
             |> get_users_from_class()
     devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
@@ -98,6 +98,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     
     devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
   end
+  def send_class_complete_notification(_class), do: :ok
 
   def send_auto_update_notification(actions) do
     actions |> Enum.each(&build_auto_update_notification(&1))
@@ -107,22 +108,27 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     mod = Repo.get(Mod, action.assignment_modification_id)
           |> Repo.preload(:assignment)
     class = mod |> get_class_from_mod()
-    title = case mod.assignment_mod_type_id do
-      @new_assignment_mod -> @auto_add
-      @delete_assignment_mod -> @auto_delete
-      _ -> mod.assignment.name <> @auto_update
+    case class.is_editable do
+      true -> 
+        title = case mod.assignment_mod_type_id do
+          @new_assignment_mod -> @auto_add
+          @delete_assignment_mod -> @auto_delete
+          _ -> mod.assignment.name <> @auto_update
+        end
+        body = case mod.assignment_mod_type_id do
+          @new_assignment_mod -> mod_add_notification_text(mod, class)
+          @delete_assignment_mod -> mod_delete_notification_text(mod, class)
+          _ -> text = mod_change_notification_text(mod, class)
+          len = text |> String.length
+          msg = text |> String.slice(0..0) |> String.upcase()
+          msg <> (text |> String.slice(1..len))
+        end
+        users = get_users_from_student_class(action.student_class_id)
+        devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+        devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
+      false -> 
+        :ok
     end
-    body = case mod.assignment_mod_type_id do
-      @new_assignment_mod -> mod_add_notification_text(mod, class)
-      @delete_assignment_mod -> mod_delete_notification_text(mod, class)
-      _ -> text = mod_change_notification_text(mod, class)
-      len = text |> String.length
-      msg = text |> String.slice(0..0) |> String.upcase()
-      msg <> (text |> String.slice(1..len))
-    end
-    users = get_users_from_student_class(action.student_class_id)
-    devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
-    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
   end
   def build_auto_update_notification(_), do: nil
 
@@ -258,8 +264,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     from(sc in StudentClass)
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
     |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
+    |> join(:inner, [sc, stu, usr], class in Class, sc.class_id == class.id)
     |> where([sc, stu, usr], sc.id == ^student_class_id and sc.is_dropped == false)
     |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
+    |> where([sc, stu, usr, class], class.is_editable == true)
     |> select([sc, stu, usr], %{user: usr, student: stu})
     |> Repo.all
     |> List.first()

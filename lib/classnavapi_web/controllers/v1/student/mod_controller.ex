@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.ModHelper
   alias ClassnavapiWeb.Assignment.ModView
+  alias Classnavapi.Class
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -24,9 +25,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     |> Repo.get!(id)
     |> Repo.preload(:assignment)
 
-    student_class = Repo.get_by!(StudentClass, class_id: mod.assignment.class_id, student_id: student_id, is_dropped: false)
-
-    conn |> process_mod(mod, student_class, params)
+    case get_student_class(mod.assignment.class_id, student_id) do
+      nil ->
+        conn
+        |> send_resp(401, "")
+        |> halt()
+      student_class ->
+        conn |> process_mod(mod, student_class, params)
+    end
   end
 
   def index(conn, %{"student_id" => student_id}) do
@@ -39,6 +45,14 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     |> Repo.all()
 
     conn |> render(ModView, "index.json", mods: mod_actions)
+  end
+
+  defp get_student_class(class_id, student_id) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+    |> where([sc], sc.class_id == ^class_id and sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([sc, class], class.is_editable == true)
+    |> Repo.one()
   end
 
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do
