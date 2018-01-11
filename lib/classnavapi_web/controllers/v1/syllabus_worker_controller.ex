@@ -86,26 +86,12 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   end
   defp lock_class(class, _conn, _type), do: class
 
-  # defp get_oldest(school_id, %{assigns: %{user: user}}, @review_status, @review_lock) do
-  #   from(class in Class)
-  #   |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-  #   |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
-  #   |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and (lock.class_lock_section_id == @review_lock or lock.user_id == ^user.id))
-  #   |> where([class], class.class_status_id == @review_status)
-  #   |> where([class, period, doc, lock], doc.is_syllabus == true)
-  #   |> where([class, period, doc, lock], period.school_id == ^school_id)
-  #   |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-  #   |> order_by([class, period, doc, lock], asc: doc.inserted_at)
-  #   |> Repo.all()
-  #   |> List.first()
-  # end
-
   defp get_oldest(school_id, _conn, status, type) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
     |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
-    |> where([class], class.class_status_id == ^status)
+    |> where([class], class.class_status_id == ^status and class.is_editable = true)
     |> where([class, period, doc, lock], doc.is_syllabus == true)
     |> where([class, period, doc, lock], period.school_id == ^school_id)
     |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
@@ -114,29 +100,13 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> List.first()
   end
 
-  # Gets classes worker has NOT worked on.
-  # defp get_oldest_enrolled(school_id, %{assigns: %{user: user}}, @review_status, @review_lock) do
-  #   from(class in Class)
-  #   |> join(:inner, [class], sc in subquery(enrolled_subquery()), sc.class_id == class.id)
-  #   |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
-  #   |> join(:inner, [class, sc, period], doc in Doc, class.id == doc.class_id)
-  #   |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and (lock.class_lock_section_id == @review_lock or lock.user_id == ^user.id))
-  #   |> where([class], class.class_status_id == @review_status)
-  #   |> where([class, sc, period, doc, lock], doc.is_syllabus == true)
-  #   |> where([class, sc, period, doc, lock], period.school_id == ^school_id)
-  #   |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-  #   |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
-  #   |> Repo.all()
-  #   |> List.first()
-  # end
-
   defp get_oldest_enrolled(school_id, _conn, status, type) do
     from(class in Class)
     |> join(:inner, [class], sc in subquery(enrolled_subquery()), sc.class_id == class.id)
     |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, sc, period], doc in Doc, class.id == doc.class_id)
     |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
-    |> where([class], class.class_status_id == ^status)
+    |> where([class], class.class_status_id == ^status and class.is_editable = true)
     |> where([class, sc, period, doc, lock], doc.is_syllabus == true)
     |> where([class, sc, period, doc, lock], period.school_id == ^school_id)
     |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
@@ -161,19 +131,6 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     needed.ratio - worker_school.ratio
   end
 
-  # Gets classes worker has NOT worked on.
-  # defp get_ratios(%{assigns: %{user: user}}, @review_status) do
-  #   from(class in Class)
-  #   |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-  #   |> join(:left, [class, period], lock in Lock, lock.class_id == class.id and lock.user_id == ^user.id)
-  #   |> where([class], class.class_status_id == @review_status)
-  #   |> where([class, period, lock], is_nil(lock.id))
-  #   |> group_by([class, period, lock], period.school_id)
-  #   |> select([class, period, lock], %{count: count(period.school_id), school: period.school_id})
-  #   |> Repo.all()
-  #   |> get_enum_ratio()
-  # end
-
   #select count(p.school_id), p.school_id from classes c inner join class_periods p on 
   #c.class_period_id = p.id inner join schools s on s.id = p.school_id where 
   #c.class_status_id = 300 and s.is_auto_syllabus = true group by p.school_id;
@@ -181,7 +138,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
-    |> where([class], class.class_status_id == ^status)
+    |> where([class], class.class_status_id == ^status and class.is_editable = true)
     |> where([class, period, sch], sch.is_auto_syllabus == true)
     |> group_by([class, period, sch], period.school_id)
     |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
@@ -189,26 +146,12 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> get_enum_ratio()
   end
 
-  # Gets classes worker has NOT worked on.
-  # defp get_enrolled_ratios(%{assigns: %{user: user}}, @review_status) do
-  #   from(class in Class)
-  #   |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-  #   |> join(:left, [class, period], lock in Lock, lock.class_id == class.id and lock.user_id == ^user.id)
-  #   |> join(:inner, [class, period, lock], sc in subquery(enrolled_subquery()), class.id == sc.class_id)
-  #   |> where([class], class.class_status_id == @review_status)
-  #   |> where([class, period, lock, sc], is_nil(lock.id))
-  #   |> group_by([class, period, lock, sc], period.school_id)
-  #   |> select([class, period, lock, sc], %{count: count(period.school_id), school: period.school_id})
-  #   |> Repo.all()
-  #   |> get_enum_ratio()
-  # end
-
   defp get_enrolled_ratios(_conn, status) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], sc in subquery(enrolled_subquery()), class.id == sc.class_id)
     |> join(:inner, [class, period, sc], sch in School, sch.id == period.school_id)
-    |> where([class], class.class_status_id == ^status)
+    |> where([class], class.class_status_id == ^status and class.is_editable = true)
     |> where([class, period, sc, sch], sch.is_auto_syllabus == true)
     |> group_by([class, period, sc, sch], period.school_id)
     |> select([class, period, sc, sch], %{count: count(period.school_id), school: period.school_id})
