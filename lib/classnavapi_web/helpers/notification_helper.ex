@@ -43,6 +43,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @added "added "
   @removed "removed "
   @due "due "
+  @due_date "due date"
   @notification_end "."
   @no_weight "no weight"
 
@@ -185,10 +186,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   defp one_pending_mod_notification(action) do
     mod = get_mod_from_action(action) |> Repo.preload(:assignment)
     class = mod |> get_class_from_mod()
-    case mod.assignment_mod_type_id do
-      @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
-      @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
-      _ -> @a_classmate_has <> @updated <> @the_s <> mod_change_notification_text(mod, class)
+    cond do
+      mod.assignment_mod_type_id == @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
+      mod.assignment_mod_type_id == @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
+      is_nil(mod.data.due) -> @a_classmate_has <> @removed <> @the_s <> @due_date <> @of_s <> class_and_assign_name(mod, class)
+      true -> @a_classmate_has <> @updated <> @the_s <> mod_change_notification_text(mod, class)
     end
   end
 
@@ -197,11 +199,23 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   defp mod_add_notification_text(mod, class) do
-    mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
+    case mod.assignment.due do
+      nil ->
+        mod.assignment.name <> @in_s <> class.name <> @notification_end
+      due ->
+        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(due) <> @notification_end
+    end
   end
 
+  defp mod_change_notification_text(%{data: %{due: nil}} = mod, class) do
+    @removed <> " " <> mod_type(mod) <> @of_s <> class_and_assign_name(mod, class)
+  end
   defp mod_change_notification_text(mod, class) do
-    mod_type(mod) <> @of_s <> class.name <> " " <> mod.assignment.name <> @to_s <> mod_change(mod) <> @notification_end
+    mod_type(mod) <> @of_s <> class_and_assign_name(mod, class) <> @to_s <> mod_change(mod) <> @notification_end
+  end
+
+  defp class_and_assign_name(mod, class) do
+    class.name <> " " <> mod.assignment.name
   end
 
   defp mod_delete_notification_text(mod, class) do

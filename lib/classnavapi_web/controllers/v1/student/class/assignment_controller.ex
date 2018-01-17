@@ -163,7 +163,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   defp date_filter(enumerable, %{"date" => date}) do
     {:ok, date, _offset} = date |> DateTime.from_iso8601()
     enumerable
-    |> Enum.filter(&DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
+    |> Enum.filter(&not(is_nil(&1.due)) and DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
   end
   defp date_filter(enumerable, _params), do: enumerable
 
@@ -204,7 +204,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> where([assign, sc], sc.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
     |> compare_weights(changeset)
-    |> where([assign], ^Ecto.Changeset.get_field(changeset, :due) == assign.due)
+    |> compare_dates(changeset)
     |> Repo.all()
 
     case assign do
@@ -222,12 +222,21 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     |> where([assign], assign.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
     |> compare_weights(changeset)
-    |> where([assign], ^Ecto.Changeset.get_field(changeset, :due) == assign.due)
+    |> compare_dates(changeset)
     |> Repo.all()
 
     case assign do
       [] -> changeset |> check_student_assignment()
       assign -> {:ok, assign |> List.first}
+    end
+  end
+
+  defp compare_dates(query, changeset) do
+    case Ecto.Changeset.get_field(changeset, :due) do
+      nil -> 
+        query |> where([assign], is_nil(assign.due))
+      due -> 
+        query |> where([assign], ^due == assign.due)
     end
   end
 
