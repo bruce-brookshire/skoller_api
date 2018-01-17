@@ -203,7 +203,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
       nil ->
         mod.assignment.name <> @in_s <> class.name <> @notification_end
       due ->
-        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
+        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(due) <> @notification_end
+    end
   end
 
   defp mod_change_notification_text(%{data: %{due: nil}} = mod, class) do
