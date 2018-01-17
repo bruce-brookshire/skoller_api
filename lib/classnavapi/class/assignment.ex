@@ -26,8 +26,9 @@ defmodule Classnavapi.Class.Assignment do
     timestamps()
   end
 
-  @req_fields [:due, :name, :class_id, :weight_id]
-  @all_fields @req_fields
+  @req_fields [:name, :class_id, :weight_id]
+  @opt_fields [:due]
+  @all_fields @req_fields ++ @opt_fields
 
   @stu_req_fields [:due, :name, :class_id]
   @stu_opt_fields [:weight_id]
