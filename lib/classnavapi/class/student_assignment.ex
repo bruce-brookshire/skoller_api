@@ -29,12 +29,12 @@ defmodule Classnavapi.Class.StudentAssignment do
       timestamps()
     end
   
-    @req_fields [:due, :name, :student_class_id]
-    @opt_fields [:assignment_id, :weight_id, :is_completed]
+    @req_fields [:name, :student_class_id]
+    @opt_fields [:assignment_id, :weight_id, :is_completed, :due]
     @all_fields @req_fields ++ @opt_fields
 
-    @upd_req_fields [:due, :name, :is_notifications]
-    @upd_opt_fields [:weight_id, :is_completed]
+    @upd_req_fields [::name, :is_notifications]
+    @upd_opt_fields [due, :weight_id, :is_completed]
     @upd_fields @upd_opt_fields ++ @upd_req_fields
 
     @grd_fields [:grade]
