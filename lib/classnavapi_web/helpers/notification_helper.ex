@@ -197,7 +197,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   defp mod_add_notification_text(mod, class) do
-    mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
+    case mod.assignment.due do
+      nil ->
+        mod.assignment.name <> @in_s <> class.name <> @notification_end
+      due ->
+        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(mod.assignment.due) <> @notification_end
   end
 
   defp mod_change_notification_text(mod, class) do
