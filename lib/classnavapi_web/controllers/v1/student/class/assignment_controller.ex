@@ -62,6 +62,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
                           |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
                           |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
                           |> filter(params)
+                          |> order()
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
@@ -132,6 +133,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
             |> RepoHelper.multi_error(failed_value)
         end
     end
+  end
+
+  defp order(enumerable) do
+    sorted = enumerable
+
+    |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 
   defp get_student_assignment(id) do
