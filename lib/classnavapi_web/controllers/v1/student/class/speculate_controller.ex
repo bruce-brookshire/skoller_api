@@ -44,14 +44,10 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
     |> Enum.reduce(Decimal.new(0), &Decimal.add(&2, Decimal.mult(&1.relative_weight, get_assignment_grade(&1))))
   end
 
-  defp get_assignment_grade(%StudentAssignment{id: id}) do
-    assign = Repo.get!(StudentAssignment, id)
-    grade = assign
-    |> Map.get(:grade)
-
-    case grade do
+  defp get_assignment_grade(%StudentAssignment{} = assign) do
+    case assign |> Map.get(:grade) do
       nil -> Decimal.new(0)
-      _ -> grade
+      grade -> grade
     end
   end
 
@@ -77,7 +73,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.SpeculateController do
   defp calculate_speculation(grade, student_class) do
     grade
     |> Decimal.sub(get_class_weighted_grade(student_class))
-    |> Decimal.div(Decimal.sub(Decimal.new(1), student_class.completion)) 
+    |> Decimal.div(Decimal.sub(Decimal.new(1), student_class.completion))
     |> Decimal.max(Decimal.new(0))
   end
 
