@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
   
   @admin_role 200
   @default_grade_scale "A,90|B,80|C,70|D,60"
@@ -106,9 +107,15 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
     name_first = name_first |> String.trim()
     name_last = name_last |> String.trim()
-    case Repo.get_by(Professor, name_first: name_first, name_last: name_last, class_period_id: class_period_id) do
-      nil -> insert_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
-      prof -> {:ok, prof}
+    prof = from(p in Professor)
+    |> where([p], p.name_first == ^name_first and p.name_last == ^name_last and p.class_period_id == ^class_period_id)
+    |> Repo.all
+    case prof do
+      [] -> 
+        insert_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
+      prof -> 
+        prof = prof |> List.first()
+        {:ok, prof}
     end
   end
 

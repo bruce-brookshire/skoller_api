@@ -82,14 +82,20 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     get_status(%{class_status: class_status})
   end
 
-  defp get_relative_weight(%{} = params) do #good
-    assign_count = params
+  defp get_relative_weight(%{class_id: class_id} = params) do #good
+    assign_count_subq = params
                   |> relative_weight_subquery()
-                  |> Repo.all()
 
-    weight_sum = assign_count 
-                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+    assign_count = from(w in Weight)
+    |> join(:left, [w], s in subquery(assign_count_subq), s.weight_id == w.id)
+    |> where([w], w.class_id == ^class_id)
+    |> select([w, s], %{weight: w.weight, count: s.count, weight_id: w.id})
+    |> Repo.all()
     
+    weight_sum = assign_count 
+                  |> Enum.filter(& &1.weight != nil)
+                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+
     assign_count
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
@@ -100,7 +106,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
     |> where([assign], assign.student_class_id == ^id)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
-    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
+    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id})
   end
 
   defp relative_weight_subquery(%{class_id: class_id}) do
@@ -110,7 +116,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     |> where([assign], assign.class_id == ^class_id)
     |> where([assign], assign.from_mod == false)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
-    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
+    |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id})
   end
 
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_status
@@ -147,9 +153,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
         |> Repo.all()
   end
 
+  defp calc_relative_weight(%{count: nil}, _weight_sum), do: Decimal.new(0)
   defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
     weight
-    |> Decimal.div(weight_sum)
+    |> Decimal.div(Decimal.new(weight_sum))
     |> Decimal.div(Decimal.new(count))
   end
 
