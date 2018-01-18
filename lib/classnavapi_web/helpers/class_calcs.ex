@@ -92,7 +92,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
                   |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
 
     assign_count
-    |> Enum.filter(& &1.)
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
 
