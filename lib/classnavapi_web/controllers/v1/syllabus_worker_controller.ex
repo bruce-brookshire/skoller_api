@@ -12,6 +12,8 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
+
+  require Logger
   
   @admin_role 200
   @syllabus_worker_role 300
@@ -87,7 +89,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   defp lock_class(class, _conn, _type), do: class
 
   defp get_oldest(school_id, _conn, status, type) do
-    from(class in Class)
+    t = from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
     |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
@@ -98,10 +100,13 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> order_by([class, period, doc, lock], asc: doc.inserted_at)
     |> Repo.all()
     |> List.first()
+    Logger.info("Get oldest")
+    Logger.info(inspect(t))
+    t
   end
 
   defp get_oldest_enrolled(school_id, _conn, status, type) do
-    from(class in Class)
+    t = from(class in Class)
     |> join(:inner, [class], sc in subquery(enrolled_subquery()), sc.class_id == class.id)
     |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, sc, period], doc in Doc, class.id == doc.class_id)
@@ -113,6 +118,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
     |> Repo.all()
     |> List.first()
+    Logger.info("Get oldest enrolled")
+    Logger.info(inspect(t))
+    t
   end
 
   # needed structure is [%{count: 544, ratio: 1.0, school_id: 1}] or similar.
@@ -123,6 +131,8 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
         true -> &1
         false -> &2
       end)
+    Logger.info("biggest_difference")
+    Logger.info(inspect(max))
     max.school
   end
 
@@ -131,11 +141,11 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     needed.ratio - worker_school.ratio
   end
 
-  #select count(p.school_id), p.school_id from classes c inner join class_periods p on 
-  #c.class_period_id = p.id inner join schools s on s.id = p.school_id where 
-  #c.class_status_id = 300 and s.is_auto_syllabus = true group by p.school_id;
+  # select count(p.school_id), p.school_id from classes c inner join class_periods p on 
+  # c.class_period_id = p.id inner join schools s on s.id = p.school_id where 
+  # c.class_status_id = 300 and s.is_auto_syllabus = true group by p.school_id;
   defp get_ratios(_conn, status) do
-    from(class in Class)
+    t = from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
     |> where([class], class.class_status_id == ^status and class.is_editable == true)
@@ -144,10 +154,13 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
+    Logger.info("get ratios")
+    Logger.info(inspect(t))
+    t
   end
 
   defp get_enrolled_ratios(_conn, status) do
-    from(class in Class)
+    t = from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], sc in subquery(enrolled_subquery()), class.id == sc.class_id)
     |> join(:inner, [class, period, sc], sch in School, sch.id == period.school_id)
@@ -157,6 +170,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> select([class, period, sc, sch], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
+    Logger.info("get_enrolled_ratios")
+    Logger.info(inspect(t))
+    t
   end
 
   defp enrolled_subquery() do
@@ -169,7 +185,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   #on l.class_id = c.id inner join public.class_periods p on c.class_period_id = p.id where 
   #l.class_lock_section_id = 100 and l.is_completed = false group by p.school_id;
   defp get_workers(type) do
-    from(lock in Lock)
+    t = from(lock in Lock)
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
     |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
     |> where([lock], lock.class_lock_section_id == ^type and lock.is_completed == false)
@@ -177,6 +193,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
     |> get_enum_ratio()
+    Logger.info("get workers")
+    Logger.info(inspect(t))
+    t
   end
 
   defp get_enum_ratio(enumerable) do
