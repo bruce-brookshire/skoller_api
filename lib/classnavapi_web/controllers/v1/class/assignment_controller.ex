@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.LockPlug
+  import Ecto.Query
 
   @student_role 100
   @admin_role 200
@@ -21,10 +22,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   plug :check_lock, %{type: :assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :class_id}
 
-  def create(conn, %{} = params) do
+  def create(conn, %{"class_id" => class_id} = params) do
+    params = params |> Map.put_new("weight_id", nil)
     changeset = %Assignment{}
                 |> Assignment.changeset(params)
-                |> validate_class_weight()
+                |> check_weight_id(params)
+                |> validate_class_weight(class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
@@ -59,10 +62,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
+    params = params |> Map.put_new("weight_id", nil)
     assign_old = Repo.get!(Assignment, id)
     changeset = assign_old
                 |> Assignment.changeset(params)
-                |> validate_class_weight()
+                |> check_weight_id(params)
+                |> validate_class_weight(assign_old.class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.update(:assignment, changeset)
@@ -77,12 +82,26 @@ defmodule ClassnavapiWeb.Api.V1.Class.AssignmentController do
     end
   end
 
-  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
-  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset) do
+  defp check_weight_id(changeset, %{"weight_id" => nil}) do
+    changeset |> Ecto.Changeset.force_change(:weight_id, nil)
+  end
+  defp check_weight_id(changeset, _params), do: changeset
+
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset, class_id) do
+    weights = from(w in Weight)
+    |> where([w], w.class_id == ^class_id)
+    |> Repo.all
+
+    case weights do
+      [] -> changeset
+      _ -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight can't be null when weights exist.")
+    end
+  end
+  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) do
     case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
       _ -> changeset
     end
   end
-  defp validate_class_weight(changeset), do: changeset
+  defp validate_class_weight(changeset, _class_id), do: changeset
 end
