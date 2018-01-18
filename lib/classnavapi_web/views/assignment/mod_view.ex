@@ -54,13 +54,17 @@ defmodule ClassnavapiWeb.Assignment.ModView do
   end
 
   defp get_inserted_at(mod) do
-    inserted = mod.inserted_at |> to_string()
-    inserted <> "Z"
+    {:ok, date} = mod.inserted_at 
+    |> DateTime.from_naive("Etc/UTC")
+    date
+    |> DateTime.to_iso8601()
   end
 
   defp get_acted_on(%{is_accepted: true} = action) do
-    acted_on = action.updated_at |> to_string() 
-    acted_on <> "Z"
+    {:ok, date} = action.updated_at 
+    |> DateTime.from_naive("Etc/UTC")
+    date
+    |> DateTime.to_iso8601()
   end
   defp get_acted_on(_action), do: nil
 
