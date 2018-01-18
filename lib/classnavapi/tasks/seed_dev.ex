@@ -388,35 +388,49 @@ defmodule Mix.Tasks.Seed.Dev do
       class_id: class.id
     })
 
-    Repo.insert!(%Weight{
-      name: "Labs",
+    rp_weight = Repo.insert!(%Weight{
+      name: "RP",
       weight: 35,
       class_id: class.id
     })
 
-    a1 = Repo.insert!(%Assignment{
-      name: "Assignment 1",
+    r1 = Repo.insert!(%Assignment{
+      name: "RP 1",
       due: date2,
-      weight_id: assign_weight.id,
+      weight_id: rp_weight.id,
       class_id: class.id
     })
 
-    a2 = Repo.insert!(%Assignment{
-      name: "Assignment 2",
+    r2 = Repo.insert!(%Assignment{
+      name: "RP 2",
       due: date2,
-      weight_id: assign_weight.id,
+      weight_id: rp_weight.id,
+      class_id: class.id
+    })
+
+    r3 = Repo.insert!(%Assignment{
+      name: "RP 3",
+      due: date2,
+      weight_id: rp_weight.id,
       class_id: class.id
     })
 
     a3 = Repo.insert!(%Assignment{
-      name: "Assignment 3",
+      name: "A3",
+      due: date2,
+      weight_id: assign_weight.id,
+      class_id: class.id
+    })
+
+    a4 = Repo.insert!(%Assignment{
+      name: "A4",
       due: date2,
       weight_id: assign_weight.id,
       class_id: class.id
     })
 
     t1 = Repo.insert!(%Assignment{
-      name: "Final",
+      name: "E1",
       due: date2,
       weight_id: test_weight.id,
       class_id: class.id
@@ -454,20 +468,38 @@ defmodule Mix.Tasks.Seed.Dev do
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -476,34 +508,52 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc.id,
-      assignment_id: t1.id,
-      name: t1.name,
-      due: t1.due,
-      weight_id: t1.weight_id,
-      grade: 100
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc1.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc1.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc1.id,
+      assignment_id: t1.id,
+      name: t1.name,
+      due: t1.due,
+      weight_id: t1.weight_id,
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -512,34 +562,52 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc1.id,
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc2.id,
       assignment_id: t1.id,
       name: t1.name,
       due: t1.due,
       weight_id: t1.weight_id,
-      grade: 100
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc2.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc2.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -548,34 +616,52 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc2.id,
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc3.id,
       assignment_id: t1.id,
       name: t1.name,
       due: t1.due,
       weight_id: t1.weight_id,
-      grade: 100
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc3.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc3.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -584,34 +670,52 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc3.id,
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc4.id,
       assignment_id: t1.id,
       name: t1.name,
       due: t1.due,
       weight_id: t1.weight_id,
-      grade: 100
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc4.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc4.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -620,34 +724,52 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc4.id,
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: r1.id,
+      name: r1.name,
+      due: r1.due,
+      weight_id: r1.weight_id,
+      grade: 99
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: r2.id,
+      name: r2.name,
+      due: r2.due,
+      weight_id: r2.weight_id,
+      grade: 75
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
+      assignment_id: r3.id,
+      name: r3.name,
+      due: r3.due,
+      weight_id: r3.weight_id,
+      grade: 97
+    })
+
+    Repo.insert!(%StudentAssignment{
+      student_class_id: sc5.id,
       assignment_id: t1.id,
       name: t1.name,
       due: t1.due,
       weight_id: t1.weight_id,
-      grade: 100
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc5.id,
-      assignment_id: a1.id,
-      name: a1.name,
-      due: a1.due,
-      weight_id: a1.weight_id,
-      grade: 80
-    })
-
-    Repo.insert!(%StudentAssignment{
-      student_class_id: sc5.id,
-      assignment_id: a2.id,
-      name: a2.name,
-      due: a2.due,
-      weight_id: a2.weight_id,
-      grade: 80
+      grade: nil
     })
 
     Repo.insert!(%StudentAssignment{
@@ -656,16 +778,16 @@ defmodule Mix.Tasks.Seed.Dev do
       name: a3.name,
       due: a3.due,
       weight_id: a3.weight_id,
-      grade: 80
+      grade: 85
     })
 
     Repo.insert!(%StudentAssignment{
       student_class_id: sc5.id,
-      assignment_id: t1.id,
-      name: t1.name,
-      due: t1.due,
-      weight_id: t1.weight_id,
-      grade: 100
+      assignment_id: a4.id,
+      name: a4.name,
+      due: a4.due,
+      weight_id: a4.weight_id,
+      grade: 74
     })
 
     Repo.insert!(%FieldOfStudy{
