@@ -82,12 +82,13 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     get_status(%{class_status: class_status})
   end
 
-  defp get_relative_weight(%{} = params) do #good
+  defp get_relative_weight(%{class_id: class_id} = params) do #good
     assign_count_subq = params
                   |> relative_weight_subquery()
 
     assign_count = from(w in Weight)
     |> join(:left, [w], s in subquery(assign_count_subq), s.weight_id == w.id)
+    |> where([w], w.class_id == ^class_id)
     |> select([w, s], %{weight: w.weight, count: s.count, weight_id: w.id})
     |> Repo.all()
     
