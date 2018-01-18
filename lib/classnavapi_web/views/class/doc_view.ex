@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Class.DocView do
   alias ClassnavapiWeb.Class.DocView
   alias Classnavapi.Repo
   alias ClassnavapiWeb.UserView
+  alias ClassnavapiWeb.ClassView
 
   def render("index.json", %{docs: docs}) do
     render_many(docs, DocView, "doc.json")
@@ -14,10 +15,10 @@ defmodule ClassnavapiWeb.Class.DocView do
   end
 
   def render("doc.json", %{doc: doc}) do
-    doc = doc |> Repo.preload(:user)
+    doc = doc |> Repo.preload([:user, :class])
     %{
       path: doc.path,
-      class_id: doc.class_id,
+      class: render_one(doc.class, ClassView, "class.json"),
       is_syllabus: doc.is_syllabus,
       name: doc.name,
       id: doc.id,
