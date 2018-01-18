@@ -117,7 +117,7 @@ defmodule ClassnavapiWeb.Helpers.AssignmentHelper do
   defp update_assignment(student_assignment) do
     case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
       nil -> :ok
-      assign_old -> StudentAssignment.changeset_update(assign_old, %{name: student_assignment.name,
+      assign_old -> StudentAssignment.changeset_update_auto(assign_old, %{name: student_assignment.name,
                                                                       weight_id: student_assignment.weight_id,
                                                                       due: student_assignment.due}) 
                     |> Repo.update
