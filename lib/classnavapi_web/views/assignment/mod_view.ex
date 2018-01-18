@@ -38,7 +38,7 @@ defmodule ClassnavapiWeb.Assignment.ModView do
       is_accepted: action.is_accepted,
       student_assignment_id: get_student_assignment_id(student_assignment),
       mod_acted_on: action |> get_acted_on(),
-      mod_created_at: mod.inserted_at,
+      mod_created_at: mod |> get_inserted_at(),
       students_accepted_count: accepted |> Enum.count(),
       students_accepted_pics: accepted
     }
@@ -53,7 +53,15 @@ defmodule ClassnavapiWeb.Assignment.ModView do
     }
   end
 
-  defp get_acted_on(%{is_accepted: true} = action), do: action.updated_at
+  defp get_inserted_at(mod) do
+    inserted = mod.inserted_at |> to_string()
+    inserted <> "Z"
+  end
+
+  defp get_acted_on(%{is_accepted: true} = action) do
+    acted_on = action.updated_at |> to_string() 
+    acted_on <> "Z"
+  end
   defp get_acted_on(_action), do: nil
 
   defp get_students_accepted(mod) do
