@@ -30,7 +30,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
 
     params = params |> Map.put("student_class_id", student_class.id)
 
-    changeset = Assignment.changeset(%Assignment{}, params)
+    changeset = Assignment.student_changeset(%Assignment{}, params)
     changeset = changeset
                 |> Ecto.Changeset.change(%{from_mod: true})
                 |> validate_class_weight()

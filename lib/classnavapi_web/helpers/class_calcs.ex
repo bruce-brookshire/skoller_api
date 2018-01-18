@@ -86,15 +86,18 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     assign_count = params
                   |> relative_weight_subquery()
                   |> Repo.all()
-    
+
+    weight_sum = assign_count 
+                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+
     assign_count
-    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1)))
+    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
 
   defp relative_weight_subquery(%StudentClass{id: id}) do #good
     query = (from assign in StudentAssignment)
     query
-    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+    |> join(:left, [assign], weight in Weight, assign.weight_id == weight.id)
     |> where([assign], assign.student_class_id == ^id)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
     |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id, weight: weight.weight})
@@ -103,7 +106,7 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   defp relative_weight_subquery(%{class_id: class_id}) do
     query = (from assign in Assignment)
     query
-    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+    |> join(:left, [assign], weight in Weight, assign.weight_id == weight.id)
     |> where([assign], assign.class_id == ^class_id)
     |> where([assign], assign.from_mod == false)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
@@ -144,10 +147,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
         |> Repo.all()
   end
 
-  defp calc_relative_weight(%{weight: weight, count: count}) do
+  defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
     weight
     |> Decimal.div(Decimal.new(count))
-    |> Decimal.div(Decimal.new(100))
+    |> Decimal.div(Decimal.new(weight_sum))
   end
 
 end
