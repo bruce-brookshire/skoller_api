@@ -155,8 +155,8 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   defp calc_relative_weight(%{count: nil}, _weight_sum), do: Decimal.new(0)
   defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
     weight
-    |> Decimal.div(Decimal.new(count))
     |> Decimal.div(Decimal.new(weight_sum))
+    |> Decimal.div(Decimal.new(count))
   end
 
 end
