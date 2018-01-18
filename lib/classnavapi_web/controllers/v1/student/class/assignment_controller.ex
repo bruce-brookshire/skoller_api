@@ -62,7 +62,6 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
                           |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
                           |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
                           |> filter(params)
-                          |> order()
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
@@ -136,8 +135,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   defp order(enumerable) do
-    sorted = enumerable
-
+    enumerable
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 
@@ -171,6 +169,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
     {:ok, date, _offset} = date |> DateTime.from_iso8601()
     enumerable
     |> Enum.filter(&not(is_nil(&1.due)) and DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
+    |> order()
   end
   defp date_filter(enumerable, _params), do: enumerable
 
