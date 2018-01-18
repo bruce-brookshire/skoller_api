@@ -86,12 +86,9 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     assign_count = params
                   |> relative_weight_subquery()
                   |> Repo.all()
-
-    weight_sum = assign_count 
-                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
     
     assign_count
-    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
+    |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1)))
   end
 
   defp relative_weight_subquery(%StudentClass{id: id}) do #good
@@ -147,10 +144,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
         |> Repo.all()
   end
 
-  defp calc_relative_weight(%{weight: weight, count: count}, weight_sum) do
+  defp calc_relative_weight(%{weight: weight, count: count}) do
     weight
-    |> Decimal.div(weight_sum)
     |> Decimal.div(Decimal.new(count))
+    |> Decimal.div(Decimal.new(100))
   end
 
 end
