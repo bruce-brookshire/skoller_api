@@ -24,7 +24,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       render(conn, StatusView, "index.json", statuses: statuses)
     end
 
-    def hub(conn, %{} = params) do
+    def hub(conn, _params) do
       statuses = from(status in Status)
       |> join(:left, [status], class in Class, status.id == class.class_status_id)
       |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
