@@ -21,27 +21,14 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       render(conn, StatusView, "index.json", statuses: statuses)
     end
 
-    defp get_class_count_by_status(status) do
-      classes = (from class in Class)
-      |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-      |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
-      |> where([class], class.class_status_id == ^status.id)
-      |> where([class, period, sch], sch.is_auto_syllabus == true)
+    def hub(conn, %{} = params) do
+      statuses = from(status in Status)
+      |> join(:left, [status], class in Class, status.id == class.class_status_id)
+      |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
+      |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
+      |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
+      |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
       |> Repo.all()
-
-      classes
-      |> Enum.count(& &1)
-    end
-
-    defp put_class_status_counts(statuses) do
-      statuses 
-      |> Enum.map(&Map.put(&1, :classes, get_class_count_by_status(&1)))
-    end
-
-    def hub(conn, %{}) do
-      statuses = Repo.all(Status)
-
-      statuses = statuses |> put_class_status_counts
 
       render(conn, StatusView, "index.json", statuses: statuses)
     end
