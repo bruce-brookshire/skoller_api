@@ -32,20 +32,6 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     end
   end
 
-  def index(conn, %{"student_id" => student_id}) do
-    query = from(classes in StudentClass)
-    student_classes = query
-                      |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
-                      |> Repo.all()
-                      |> Repo.preload(:class)
-                      |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
-                      |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
-                      |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
-                      |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
-
-    render(conn, StudentClassView, "index.json", student_classes: student_classes)
-  end
-
   def show(conn, %{"student_id" => student_id, "id" => class_id}) do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
