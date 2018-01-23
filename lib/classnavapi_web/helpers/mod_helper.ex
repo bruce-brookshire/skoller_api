@@ -322,10 +322,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp get_data(mod) do
     case mod.assignment_mod_type_id do
       @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
-      @due_assignment_mod -> {:ok, date, _} = mod.data |> Map.get("due") |> DateTime.from_iso8601()
-        %{due: date}
+      @due_assignment_mod -> %{due: mod.data |> Map.get("due") |> get_due_date()}
       @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
     end
+  end
+
+  defp get_due_date(nil), do: nil
+  defp get_due_date(date) do 
+    {:ok, iso_date, _} = date |> DateTime.from_iso8601()
+    iso_date
   end
 
   #If there are no changes, this function will not be hit at all.
@@ -344,19 +349,24 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
       true -> dismiss_mods(student_assignment, @weight_assignment_mod)
     end
   end
-
   defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
-    case DateTime.compare(old_due, due) do
+    case compare_dates(old_due, due) do
       :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
       _ -> due |> insert_due_mod(student_assignment, params)
     end
   end
-
   defp check_change(:name, name, %{assignment: %{name: old_name}} = student_assignment, params) do
     case old_name == name do
       false -> name |> insert_name_mod(student_assignment, params)
       true -> dismiss_mods(student_assignment, @name_assignment_mod)
     end
+  end
+
+  defp compare_dates(nil, nil), do: :eq
+  defp compare_dates(nil, _due), do: :neq
+  defp compare_dates(_old_due, nil), do: :neq
+  defp compare_dates(old_due, due) do
+    DateTime.compare(old_due, due)
   end
 
   defp insert_weight_mod(weight_id, %{} = student_assignment, params) do

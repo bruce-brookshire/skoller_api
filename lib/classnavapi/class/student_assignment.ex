@@ -29,13 +29,17 @@ defmodule Classnavapi.Class.StudentAssignment do
       timestamps()
     end
   
-    @req_fields [:due, :name, :student_class_id]
+    @req_fields [:name, :student_class_id, :due]
     @opt_fields [:assignment_id, :weight_id, :is_completed]
     @all_fields @req_fields ++ @opt_fields
 
-    @upd_req_fields [:due, :name, :is_notifications]
+    @upd_req_fields [:name, :is_notifications, :due]
     @upd_opt_fields [:weight_id, :is_completed]
     @upd_fields @upd_opt_fields ++ @upd_req_fields
+
+    @auto_req_fields [:name, :is_notifications]
+    @auto_opt_fields [:weight_id, :is_completed, :due]
+    @auto_fields @auto_opt_fields ++ @auto_req_fields
 
     @grd_fields [:grade]
   
@@ -54,6 +58,13 @@ defmodule Classnavapi.Class.StudentAssignment do
       assignment
       |> cast(attrs, @upd_fields)
       |> validate_required(@upd_req_fields)
+      |> foreign_key_constraint(:weight_id)
+    end
+
+    def changeset_update_auto(%StudentAssignment{} = assignment, attrs) do
+      assignment
+      |> cast(attrs, @auto_fields)
+      |> validate_required(@auto_req_fields)
       |> foreign_key_constraint(:weight_id)
     end
 

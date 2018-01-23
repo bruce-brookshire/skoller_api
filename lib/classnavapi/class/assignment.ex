@@ -26,14 +26,24 @@ defmodule Classnavapi.Class.Assignment do
     timestamps()
   end
 
-  @req_fields [:due, :name, :class_id]
-  @opt_fields [:weight_id]
+  @req_fields [:name, :class_id]
+  @opt_fields [:due, :weight_id]
   @all_fields @req_fields ++ @opt_fields
+
+  @stu_req_fields [:name, :class_id, :due]
+  @stu_opt_fields [:weight_id]
+  @stu_fields @stu_req_fields ++ @stu_opt_fields
 
   @doc false
   def changeset(%Assignment{} = assignment, attrs) do
     assignment
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+  end
+
+  def student_changeset(%Assignment{} = assignment, attrs) do
+    assignment
+    |> cast(attrs, @stu_fields)
+    |> validate_required(@stu_req_fields)
   end
 end
