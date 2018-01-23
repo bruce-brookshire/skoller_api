@@ -8,8 +8,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.HelpRequestController do
   import ClassnavapiWeb.Helpers.AuthPlug
   
   @admin_role 200
+  @help_request_role 500
   
-  plug :verify_role, %{role: @admin_role}
+  plug :verify_role, %{roles: [@admin_role, @help_request_role]}
 
   def complete(conn, %{"id" => id}) do
     help_request_old = Repo.get!(HelpRequest, id)
