@@ -200,6 +200,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> prof_id_filter(params)
     |> status_filter(params)
     |> ghost_filter(params)
+    |> maint_filter(params)
     |> name_filter(params)
     |> number_filter(params)
     |> day_filter(params)
@@ -254,6 +255,14 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     dynamic([class, period, prof], class.is_ghost == false and ^dynamic)
   end
   defp ghost_filter(dynamic, _), do: dynamic
+
+  defp maint_filter(dynamic, %{"class_maint" => "true"}) do
+    dynamic([class, period, prof], class.is_editable == false and ^dynamic)
+  end
+  defp maint_filter(dynamic, %{"class_maint" => "false"}) do
+    dynamic([class, period, prof], class.is_editable == true and ^dynamic)
+  end
+  defp maint_filter(dynamic, _), do: dynamic
 
   defp name_filter(dynamic, %{"class_name" => filter, "or" => "true"}) do
     name_filter = "%" <> filter <> "%"
