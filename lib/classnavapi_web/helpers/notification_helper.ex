@@ -189,7 +189,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     cond do
       mod.assignment_mod_type_id == @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
       mod.assignment_mod_type_id == @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
-      is_nil(mod.data.due) -> @a_classmate_has <> @removed <> @the_s <> @due_date <> @of_s <> class_and_assign_name(mod, class)
+      is_nil(mod.data["due"]) -> @a_classmate_has <> @removed <> @the_s <> @due_date <> @of_s <> class_and_assign_name(mod, class)
       true -> @a_classmate_has <> @updated <> @the_s <> mod_change_notification_text(mod, class)
     end
   end

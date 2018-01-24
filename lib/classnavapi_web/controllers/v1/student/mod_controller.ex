@@ -16,6 +16,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   import Ecto.Query
   
   @student_role 100
+
+  @due_assignment_mod 300
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
@@ -36,6 +38,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   end
 
   def index(conn, %{"student_id" => student_id}) do
+    now = DateTime.utc_now()
     mod_actions = from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
     |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
@@ -43,9 +46,19 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
     |> where([mod, action, sc, sa], sc.student_id == ^student_id and sc.is_dropped == false)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
     |> Repo.all()
+    |> Enum.filter(&filter_due_date(&1, now))
 
     conn |> render(ModView, "index.json", mods: mod_actions)
   end
+
+  defp filter_due_date(%{mod: %{assignment_mod_type_id: @due_assignment_mod} = mod}, date) do
+    {:ok, mod_date, _} = DateTime.from_iso8601(mod.data["due"])
+    case DateTime.compare(date, mod_date) do
+      :gt -> false
+      _ -> true
+    end
+  end
+  defp filter_due_date(_mod, _date), do: true
 
   defp get_student_class(class_id, student_id) do
     from(sc in StudentClass)
