@@ -104,13 +104,13 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     existing_mod = mod |> find_mod()
     cond do
       existing_mod == [] -> 
-        mod |> insert_mod(student_class)
+        mod |> insert_mod(student_class, student_assignment)
       existing_mod.is_private == true and mod.is_private == false -> 
-        mod |> publish_mod(student_class)
+        mod |> publish_mod(student_class, student_assignment)
       true -> 
         Ecto.Multi.new
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1))
-        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
+        |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
         |> Repo.transaction()
     end
   end
@@ -246,6 +246,17 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
   defp get_actions_from_mod(_mod), do: []
 
+  defp insert_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
+    changeset = Mod.changeset(%Mod{}, mod)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:mod, changeset)
+    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+    |> Repo.transaction()
+  end
+
   defp insert_mod(mod, %StudentClass{} = student_class) do
     changeset = Mod.changeset(%Mod{}, mod)
 
@@ -254,6 +265,17 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
     |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
+    |> Repo.transaction()
+  end
+
+  defp publish_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
+    changeset = Mod.changeset(mod, %{is_private: false})
+    
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:mod, changeset)
+    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
     |> Repo.transaction()
   end
 
@@ -286,7 +308,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.delete(:student_assignment, student_assignment)
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
-    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class) do
@@ -296,8 +318,23 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
+    |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
+  end
+
+  # Backfills mods for a given student assignment.
+  defp backfill_mods(student_assignment) do
+    missing_mods = from(mod in Mod)
+    |> join(:left, [mod], act in Action, act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod, act], mod.assignment_id == ^student_assignment.assignment_id)
+    |> where([mod, act], is_nil(act.id))
+    |> where([mod], mod.is_private == false)
+    |> Repo.all()
+
+    status = missing_mods |> Enum.map(&Repo.insert(%Action{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_assignment.student_class_id}))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   defp insert_student_assignment(student_assignment, _) do
@@ -521,6 +558,16 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
     |> where([mod], mod.id != ^mod.id)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
+  end
+
+  defp dismiss_mods(%StudentAssignment{} = student_assignment, @delete_assignment_mod, _) do
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_mod_type_id != @delete_assignment_mod)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> select([mod, action], action)
     |> Repo.all()
     |> dismiss_from_results()
