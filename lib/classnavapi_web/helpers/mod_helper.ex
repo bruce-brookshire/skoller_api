@@ -320,7 +320,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
     |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
-    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(&1.student_assignment, @delete_assignment_mod))
   end
 
   # Backfills mods for a given student assignment.
