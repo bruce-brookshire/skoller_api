@@ -296,8 +296,21 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
+    |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
     |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
+  end
+
+  defp backfill_mods(student_assignment) do
+    missing_mods = from(mod in Mod)
+    |> join(:left, [mod], act in Action, act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod, act], mod.assignment_id == ^student_assignment.assignment_id)
+    |> where([mod, act], is_nil(act.id))
+    |> Repo.all()
+
+    status = missing_mods |> Enum.map(&Repo.insert(%Action{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_assignment.student_class_id}))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   defp insert_student_assignment(student_assignment, _) do
