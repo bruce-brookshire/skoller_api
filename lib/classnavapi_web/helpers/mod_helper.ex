@@ -306,6 +306,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> join(:left, [mod], act in Action, act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
     |> where([mod, act], mod.assignment_id == ^student_assignment.assignment_id)
     |> where([mod, act], is_nil(act.id))
+    |> where([mod], mod.is_private == false)
     |> Repo.all()
 
     status = missing_mods |> Enum.map(&Repo.insert(%Action{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_assignment.student_class_id}))
