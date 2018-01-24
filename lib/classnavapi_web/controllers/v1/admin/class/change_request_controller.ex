@@ -43,7 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
 
     case requests do
       [] -> complete_class(request.class_id)
-      requests -> {:ok, nil} 
+      _requests -> {:ok, nil} 
     end
   end
 
