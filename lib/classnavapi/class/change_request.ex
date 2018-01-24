@@ -18,7 +18,7 @@ defmodule Classnavapi.Class.ChangeRequest do
     field :user_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
     belongs_to :class_change_type, Classnavapi.Class.Change.Type, define_field: false
-    belongs_to :users, Classnavapi.User, define_field: false
+    belongs_to :user, Classnavapi.User, define_field: false
 
     timestamps()
   end
