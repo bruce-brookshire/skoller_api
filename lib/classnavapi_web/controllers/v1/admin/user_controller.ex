@@ -40,7 +40,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     |> join(:inner, [user], role in UserRole, role.user_id == user.id)
     |> join(:left, [user, role], student in Student, student.id == user.student_id)
     |> join(:left, [user, role, student], school in School, school.id == student.school_id)
-    |> filters(params)
+    |> where([user, role, student, school], ^filters(params))
     |> distinct([user, role, student, school], user.id)
     |> select([user, role, student, school], %{user: user, student: student})
     |> Repo.all()
@@ -73,8 +73,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     end
   end
 
-  defp filters(query, params) do
-    query
+  defp filters(params) do
+    dynamic = params["or"] != "true"
+
+    dynamic
     |> account_type_filter(params)
     |> school_filter(params)
     |> name_filter(params)
@@ -82,41 +84,43 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     |> suspended_filter(params)
   end
 
-  defp account_type_filter(query, %{"account_type" => filter}) do
-    query
-    |> where([user, role, student, school], role.role_id == ^filter)
+  defp account_type_filter(dynamic, %{"account_type" => filter}) do
+    dynamic([user, role, student, school], role.role_id == ^filter and ^dynamic)
   end
-  defp account_type_filter(query, _params), do: query
+  defp account_type_filter(dynamic, _params), do: dynamic
 
-  defp school_filter(query, %{"account_type" => @student_role, "school_id" => filter}) do
-    query
-    |> where([user, role, student, school], school.id == ^filter)
+  defp school_filter(dynamic, %{"account_type" => @student_role, "school_id" => filter}) do
+    dynamic([user, role, student, school], school.id == ^filter and ^dynamic)
   end
-  defp school_filter(query, _params), do: query
+  defp school_filter(dynamic, _params), do: dynamic
 
-  defp name_filter(query, %{"account_type" => @student_role, "user_name" => filter}) do
+  defp name_filter(dynamic, %{"account_type" => @student_role, "user_name" => filter, "or" => "true"}) do
     filter = "%" <> filter <> "%"
-    query
-    |> where([user, role, student, school], ilike(student.name_first, ^filter) or ilike(student.name_last, ^filter))
+    dynamic([user, role, student, school], (ilike(student.name_first, ^filter) or ilike(student.name_last, ^filter)) or ^dynamic)
   end
-  defp name_filter(query, _params), do: query
-
-  defp email_filter(query, %{"email" => filter}) do
+  defp name_filter(dynamic, %{"account_type" => @student_role, "user_name" => filter}) do
     filter = "%" <> filter <> "%"
-    query
-    |> where([user, role, student, school], ilike(user.email, ^filter))
+    dynamic([user, role, student, school], (ilike(student.name_first, ^filter) or ilike(student.name_last, ^filter)) and ^dynamic)
   end
-  defp email_filter(query, _params), do: query
+  defp name_filter(dynamic, _params), do: dynamic
 
-  defp suspended_filter(query, %{"is_suspended" => "true"}) do
-    query
-    |> where([user, role, student, school], user.is_active == false)
+  defp email_filter(dynamic, %{"email" => filter, "or" => "true"}) do
+    filter = "%" <> filter <> "%"
+    dynamic([user, role, student, school], ilike(user.email, ^filter) or ^dynamic)
   end
-  defp suspended_filter(query, %{"is_suspended" => "false"}) do
-    query
-    |> where([user, role, student, school], user.is_active == true)
+  defp email_filter(dynamic, %{"email" => filter}) do
+    filter = "%" <> filter <> "%"
+    dynamic([user, role, student, school], ilike(user.email, ^filter) and ^dynamic)
   end
-  defp suspended_filter(query, _params), do: query
+  defp email_filter(dynamic, _params), do: dynamic
+
+  defp suspended_filter(dynamic, %{"is_suspended" => "true"}) do
+    dynamic([user, role, student, school], user.is_active == false and ^dynamic)
+  end
+  defp suspended_filter(dynamic, %{"is_suspended" => "false"}) do
+    dynamic([user, role, student, school], user.is_active == true and ^dynamic)
+  end
+  defp suspended_filter(dynamic, _params), do: dynamic
 
   defp delete_roles(%{user: user}, _params) do
     from(role in UserRole)
