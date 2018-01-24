@@ -436,12 +436,18 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   defp insert_due_mod(due, %{} = student_assignment, params) do
     student_class = Repo.get!(StudentClass, student_assignment.student_class_id)
 
+    now = DateTime.utc_now()
+    is_private = case DateTime.compare(now, due) do
+      :gt -> true
+      _ -> is_private(params["is_private"])
+    end
+
     mod = %{
       data: %{
         due: due
       },
       assignment_mod_type_id: @due_assignment_mod,
-      is_private: is_private(params["is_private"]),
+      is_private: is_private,
       student_id: student_class.student_id,
       assignment_id: student_assignment.assignment.id
     }
