@@ -301,6 +301,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
+  # Backfills mods for a given student assignment.
   defp backfill_mods(student_assignment) do
     missing_mods = from(mod in Mod)
     |> join(:left, [mod], act in Action, act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
