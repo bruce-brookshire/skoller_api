@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
+defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Repo
@@ -15,12 +15,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
 
   @syllabus_request 100
 
+  @help_status 600
+  @change_status 800
+
   plug :verify_role, %{roles: [@student_role, @admin_role]}
   plug :verify_member, :class
 
   def create(%{assigns: %{user: user}} = conn, %{} = params) do
-
-    upload = user |> upload_class_doc(params)
 
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
     
@@ -39,16 +40,24 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   end
 
   defp update_class_status(%{class_id: class_id}) do
-    class = Repo.get!()
+    class = Repo.get!(Class, class_id)
+    |> Repo.preload(:class_status)
+
+    changeset = case class.class_status.is_complete do
+      false -> Ecto.Changeset.change(class, %{class_status_id: @help_status})
+      true -> Ecto.Changeset.change(class, %{class_status_id: @change_status})
+    end
+
+    Repo.update(changeset)
   end
 
-  defp upload_class_docs(user, {"files" => files, "class_id" => class_id} = params, student_request) do 
+  defp upload_class_docs(user, %{"files" => files} = params, student_request) do 
     status = files |> Enum.map(&upload_class_doc(user, &1, params, student_request))
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
-  defp upload_class_docs(_user, _params, _student_request) do 
+  defp upload_class_docs(_user, _params, _student_request), do: {:ok, nil}
 
-  defp upload_class_doc(user, file, %{"class_id" => class_id} = params, student_request) do 
+  defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
     location = ClassDocUpload.upload_class_doc(file)
 
     params = %{} 

@@ -22,7 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    location = class_doc_upload(file)
+    location = ClassDocUpload.upload_class_doc(file)
 
     Task.start(Sammi, :sammi, [params, location])
   
