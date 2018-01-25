@@ -1,7 +1,7 @@
 defmodule Classnavapi.Class.StudentRequest.Docs do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.Class.StudentRequest.Docs
+  alias Classnavapi.Class.StudentRequest.Doc
 
 
   schema "class_student_request_docs" do
