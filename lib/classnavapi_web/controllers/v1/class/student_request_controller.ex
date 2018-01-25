@@ -58,6 +58,10 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
   end
   defp upload_class_docs(_user, _params, _student_request), do: {:ok, nil}
 
+  defp upload_class_doc(user, {_num, file}, params, student_request) do 
+    upload_class_doc(user, file, params, student_request)
+  end
+
   defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
     location = ClassDocUpload.upload_class_doc(file)
 
@@ -68,7 +72,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
     |> Map.put("is_syllabus", get_is_syllabus(student_request))
     |> Map.put("class_id", class_id)
 
-    doc = Doc.changeset(%Doc{}, params)
+    {:ok, doc} = Doc.changeset(%Doc{}, params)
     |> Repo.insert()
 
     Repo.insert(%StudentRequest.Doc{doc_id: doc.id, class_student_request_id: student_request.id})
