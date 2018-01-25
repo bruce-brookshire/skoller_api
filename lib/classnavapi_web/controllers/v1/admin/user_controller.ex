@@ -77,10 +77,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
     dynamic = params["or"] != "true"
 
     dynamic
-    |> account_type_filter(params)
-    |> school_filter(params)
     |> name_filter(params)
     |> email_filter(params)
+    |> account_type_filter(params)
+    |> school_filter(params)
     |> suspended_filter(params)
   end
 
