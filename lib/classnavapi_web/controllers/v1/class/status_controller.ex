@@ -16,6 +16,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
 
     @new_syllabus_status 200
     @complete_status 700
+    @maint_status 999
+    @maint_name "Under Maintenance"
     
     plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
 
@@ -33,6 +35,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
       |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
       |> Repo.all()
+
+      maint = from(class in Class)
+      |> where([class], class.is_editable == false)
+      |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
+      |> Repo.all()
+
+      statuses = statuses ++ maint
 
       render(conn, StatusView, "index.json", statuses: statuses)
     end
