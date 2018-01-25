@@ -3,15 +3,14 @@ defmodule Classnavapi.Class.StudentRequest do
   import Ecto.Changeset
   alias Classnavapi.Class.StudentRequest
 
-
   schema "class_student_requests" do
     field :is_completed, :boolean, default: false
     field :notes, :string
     field :class_student_request_type_id, :id
     field :class_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
-    belongs_to :class_request_type, StudentRequest.Type, define_field: false
-    has_many :student_request_docs, StudentRequest.Doc
+    belongs_to :class_student_request_type, Classnavapi.Class.StudentRequest.Type, define_field: false
+    has_many :student_request_docs,  Classnavapi.Class.StudentRequest.Doc
     has_many :request_docs, through: [:student_request_docs, :docs]
 
     timestamps()

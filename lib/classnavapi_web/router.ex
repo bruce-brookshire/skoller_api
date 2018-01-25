@@ -108,6 +108,7 @@ defmodule ClassnavapiWeb.Router do
         # Class Request routes
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
+        post "/student-request/:class_student_request_type_id", Class.StudentRequestController, :create
       end
       post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete

@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
   alias Classnavapi.Class.Doc
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias Classnavapi.Class
+  alias ClassnavapiWeb.Class.StudentRequestView
 
   import ClassnavapiWeb.Helpers.AuthPlug
 
@@ -31,8 +32,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
     |> Ecto.Multi.run(:status, &update_class_status(&1.student_request))
 
     case Repo.transaction(multi) do
-      {:ok, %{class: class}} ->
-        render(conn, ClassView, "show.json", class: class)
+      {:ok, %{student_request: student_request}} ->
+        render(conn, StudentRequestView, "show.json", student_request: student_request)
       {:error, _, failed_value, _} ->
         conn
         |> RepoHelper.multi_error(failed_value)
