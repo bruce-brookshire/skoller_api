@@ -10,8 +10,8 @@ defmodule Classnavapi.Class.StudentRequest do
     field :class_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
     belongs_to :class_student_request_type, Classnavapi.Class.StudentRequest.Type, define_field: false
-    has_many :student_request_docs,  Classnavapi.Class.StudentRequest.Doc
-    has_many :request_docs, through: [:student_request_docs, :docs]
+    has_many :class_student_request_docs,  Classnavapi.Class.StudentRequest.Doc, foreign_key: :class_student_request_id
+    has_many :request_docs, through: [:class_student_request_docs, :docs]
 
     timestamps()
   end

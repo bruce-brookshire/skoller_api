@@ -25,4 +25,13 @@ defmodule ClassnavapiWeb.Class.DocView do
       user: render_one(doc.user, UserView, "user.json")
     }
   end
+
+  def render("doc-short.json", %{doc: doc}) do
+    %{
+      path: doc.path,
+      is_syllabus: doc.is_syllabus,
+      name: doc.name,
+      id: doc.id,
+    }
+  end
 end
