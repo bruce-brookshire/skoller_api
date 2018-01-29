@@ -26,10 +26,4 @@ defmodule ClassnavapiWeb.Class.StudentRequestView do
       change_type: render_one(student_request.class_student_request_type, TypeView, "type.json")
     }
   end
-
-  defp get_docs([]), do: []
-  defp get_docs(docs) do
-    docs |> Enum.map(& &1 |> Repo.preload(:docs))
-    |> Enum.map(& &1.docs)
-  end
 end
