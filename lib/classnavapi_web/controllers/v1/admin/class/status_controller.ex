@@ -18,7 +18,11 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
 
       status = Repo.get!(Status, id)
 
-      case class |> compare_class_status_completion(id, class.class_status.is_complete, status.is_complete) do
+      changeset = class
+      |> Ecto.Changeset.change(%{class_status_id: id})
+      |> compare_class_status_completion(class.class_status.is_complete, status.is_complete)
+
+      case Repo.update(changeset) do
         {:ok, class} ->
           render(conn, ClassView, "show.json", class: class)
         {:error, changeset} ->
@@ -28,15 +32,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       end
     end
 
-    defp compare_class_status_completion(class, id, true, false) do
-      class
-      |> Ecto.Changeset.change(%{class_status_id: id})
+    defp compare_class_status_completion(changeset, true, false) do
+      changeset
       |> Ecto.Changeset.add_error(:class_status_id, "Class status moving from complete to incomplete")
-      |> Repo.update()
     end
-    defp compare_class_status_completion(class, id, _, _) do
-      class
-      |> Ecto.Changeset.change(%{class_status_id: id})
-      |> Repo.update()
-    end
+    defp compare_class_status_completion(changeset, _, _), do: changeset
   end
