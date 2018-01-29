@@ -93,7 +93,6 @@ defmodule ClassnavapiWeb.Router do
       get "/classes/:id", NonMemberClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
-        post "/confirm", ClassController, :confirm
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock

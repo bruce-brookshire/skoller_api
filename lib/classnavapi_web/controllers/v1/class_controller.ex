@@ -35,26 +35,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   plug :verify_class_is_editable, :id
 
   @doc """
-   Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 
-   from a status that will not auto progress to the next step.
-
-  ## Returns:
-  * 422 `ClassnavapiWeb.ChangesetView`
-  * 404
-  * 401
-  * 200 `ClassnavapiWeb.ClassView`
-  """
-  def confirm(conn, %{"class_id" => id} = params) do
-    class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, %{})
-
-    changeset = changeset
-                |> StatusHelper.confirm_class(params)
-
-    conn |> update_class(changeset)
-  end
-
-  @doc """
    Creates a new `Classnavapi.Class` for a `Classnavapi.ClassPeriod`
 
   ## Behavior:

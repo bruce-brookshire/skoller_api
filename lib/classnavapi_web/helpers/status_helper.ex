@@ -15,8 +15,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   check_changeset_status/2 takes a changeset and params and returns a changeset.
 
-  confirm_class/2 takes a changeset and params and returns a changeset.
-
   """
 
   @new_class_status 100
@@ -70,13 +68,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_assignments(params)
   end
   def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
-
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @new_class_status}} = changeset, %{}) do
-    changeset
-    |> check_needs_syllabus(changeset.data)
-    |> check_needs_weight(changeset.data)
-  end
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
     changeset
