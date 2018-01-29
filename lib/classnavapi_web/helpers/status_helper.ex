@@ -63,10 +63,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_syllabus(params)
     |> check_needs_weight(params)
   end
-  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_assignments(params)
-  end
   def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
 
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
@@ -131,9 +127,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   defp check_needs_weight(changeset, %{}), do: changeset
 
   defp check_needs_assignments(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_assignments(%Ecto.Changeset{changes: %{weights: _}} = changeset, %{"weights" => _}) do
-    changeset |> change_changeset_status(@assignment_status)
-  end
   defp check_needs_assignments(changeset, %{"class_lock_section_id" => @weight_lock, "is_completed" => true}) do
     case changeset.changes |> Map.equal?(%{}) do
       true -> changeset |> change_changeset_status(@assignment_status)

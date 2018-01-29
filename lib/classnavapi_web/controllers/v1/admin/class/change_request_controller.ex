@@ -11,8 +11,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   
   @admin_role 200
   @change_req_role 400
-
-  @complete_class_status 700
   
   plug :verify_role, %{roles: [@change_req_role, @admin_role]}
 

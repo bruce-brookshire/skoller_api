@@ -52,7 +52,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
             |> Map.put("class_period_id", period_id)
             |> check_conn_for_student(conn)
 
-    changeset = Class.changeset_insert(%Class{}, params)
+    changeset = Class.changeset(%Class{}, params)
     changeset = changeset
                 |> StatusHelper.check_changeset_status(params)
 
@@ -130,10 +130,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 
-    changeset = Class.changeset_update(class_old, params)
-    
-    changeset = changeset
-    |> StatusHelper.check_changeset_status(params)
+    changeset = Class.changeset(class_old, params)
 
     conn |> update_class(changeset)
   end
