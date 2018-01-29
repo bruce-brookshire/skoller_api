@@ -168,11 +168,17 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     case update do
       {:ok, _} ->
         Ecto.Multi.new
+        |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
         |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
         |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
         |> Repo.transaction()
       {:error, _msg} -> {:ok, nil}
     end
+  end
+
+  defp update_mod(mod, _) do
+    Ecto.Changeset.change(mod, %{is_auto_update: true})
+    |> Repo.update()
   end
 
   defp apply_action_mods(action) do
