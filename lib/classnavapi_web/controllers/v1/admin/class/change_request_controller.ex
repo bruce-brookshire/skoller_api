@@ -8,7 +8,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   alias Classnavapi.Class.ChangeRequest
 
   import ClassnavapiWeb.Helpers.AuthPlug
-  import Ecto.Query
   
   @admin_role 200
   @change_req_role 400
@@ -33,11 +32,5 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
-  end
-
-  defp complete_class(class_id) do
-    Repo.get!(Class, class_id)
-    |> Ecto.Changeset.change(%{class_status_id: @complete_class_status})
-    |> Repo.update()
   end
 end
