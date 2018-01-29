@@ -1,11 +1,11 @@
 defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   use ClassnavapiWeb, :controller
   
-  alias Classnavapi.Class.ChangeRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.ChangeRequestView
   alias ClassnavapiWeb.Helpers.RepoHelper
-  alias Classnavapi.Class
+  alias ClassnavapiWeb.Helpers.StatusHelper
+  alias Classnavapi.Class.ChangeRequest
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -22,9 +22,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
 
     changeset = ChangeRequest.changeset(change_request_old, %{is_completed: true})
 
-    multi = Ecto.Multi.new
+    multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)
-    |> Ecto.Multi.run(:status, &check_change_requests(&1))
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_change_req_status(&1.change_request))
 
     case Repo.transaction(multi) do
       {:ok, %{change_request: change_request}} ->
@@ -32,18 +32,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
       {:error, _, failed_value, _} ->
         conn
         |> RepoHelper.multi_error(failed_value)
-    end
-  end
-
-  defp check_change_requests(%{change_request: request}) do
-    requests = from(cr in ChangeRequest)
-    |> where([cr], cr.class_id == ^request.class_id and cr.id != ^request.id)
-    |> where([cr], cr.is_completed == false)
-    |> Repo.all()
-
-    case requests do
-      [] -> complete_class(request.class_id)
-      _requests -> {:ok, nil} 
     end
   end
 

@@ -4,6 +4,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StudentRequestController do
   alias Classnavapi.Class.StudentRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentRequestView
+  alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.StatusHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -18,13 +20,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StudentRequestController do
 
     changeset = StudentRequest.changeset(student_request_old, %{is_completed: true})
 
-    case Repo.update(changeset) do
-      {:ok, student_request} ->
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.update(:student_request, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_change_req_status(&1.student_request))
+
+    case Repo.transaction(multi) do
+      {:ok, %{student_request: student_request}} ->
         render(conn, StudentRequestView, "show.json", student_request: student_request)
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 end
