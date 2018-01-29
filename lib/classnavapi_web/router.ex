@@ -112,6 +112,7 @@ defmodule ClassnavapiWeb.Router do
       end
       post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
+      post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
       resources "/class-student-request-types", Class.StudentRequest.TypeController, only: [:index]
