@@ -1,9 +1,11 @@
 defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   use ClassnavapiWeb, :controller
   
-  alias Classnavapi.Class.ChangeRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.ChangeRequestView
+  alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.StatusHelper
+  alias Classnavapi.Class.ChangeRequest
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -17,13 +19,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
 
     changeset = ChangeRequest.changeset(change_request_old, %{is_completed: true})
 
-    case Repo.update(changeset) do
-      {:ok, change_request} ->
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.update(:change_request, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_change_req_status(&1.change_request))
+
+    case Repo.transaction(multi) do
+      {:ok, %{change_request: change_request}} ->
         render(conn, ChangeRequestView, "show.json", change_request: change_request)
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 end

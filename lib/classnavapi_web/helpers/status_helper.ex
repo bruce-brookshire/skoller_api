@@ -1,6 +1,11 @@
 defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   alias Classnavapi.Repo
+  alias Classnavapi.Class.StudentRequest
+  alias Classnavapi.Class
+  alias Classnavapi.Class.ChangeRequest
+
+  import Ecto.Query
 
   @moduledoc """
   
@@ -88,6 +93,27 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> check_needs_complete(params)
   end
   def unlock_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
+
+  def check_change_req_status(%{class_id: class_id}) do
+    cr_query = from(cr in ChangeRequest)
+    |> where([cr], cr.class_id == ^class_id and cr.is_completed == false)
+    |> Repo.all()
+
+    sr_query = from(sr in StudentRequest)
+    |> where([sr], sr.class_id == ^class_id and sr.is_completed == false)
+    |> Repo.all()
+
+    results = cr_query ++ sr_query
+
+    case results do
+      [] -> 
+        Repo.get(Class, class_id)
+        |> Ecto.Changeset.change(%{class_status_id: @complete_status})
+        |> Repo.update()
+      _results -> 
+        {:ok, nil}
+    end
+  end
 
   defp check_new_class(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
   defp check_new_class(changeset, %{"is_student" => true}) do
