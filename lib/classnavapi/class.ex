@@ -58,6 +58,7 @@ defmodule Classnavapi.Class do
     many_to_many :students, Classnavapi.Student, join_through: "student_classes"
     has_many :help_requests, Classnavapi.Class.HelpRequest
     has_many :change_requests, Classnavapi.Class.ChangeRequest
+    has_many :student_requests, Classnavapi.Class.StudentRequest
     has_many :assignments, Classnavapi.Class.Assignment
 
     timestamps()

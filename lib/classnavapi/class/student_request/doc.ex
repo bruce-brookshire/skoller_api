@@ -8,7 +8,7 @@ defmodule Classnavapi.Class.StudentRequest.Doc do
     field :class_student_request_id, :id
     field :doc_id, :id
     belongs_to :docs, Classnavapi.Class.Doc, define_field: false
-    belongs_to :student_requests, Classnavapi.Class.StudentRequest, define_field: false
+    belongs_to :class_student_requests, Classnavapi.Class.StudentRequest, define_field: false
 
     timestamps()
   end
