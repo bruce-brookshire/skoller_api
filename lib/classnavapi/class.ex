@@ -21,8 +21,6 @@ defmodule Classnavapi.Class do
   alias Classnavapi.Class
   alias Classnavapi.Helpers.ChangesetValidation
 
-  @needs_syllabus_status 200
-
   schema "classes" do
     field :class_end, :utc_datetime
     field :class_start, :utc_datetime
@@ -42,7 +40,7 @@ defmodule Classnavapi.Class do
     field :seat_count, :integer
     field :professor_id, :id
     field :class_period_id, :id
-    field :class_status_id, :id, default: @needs_syllabus_status
+    field :class_status_id, :id
     field :grade_scale, :string
     field :class_type, :string
     field :campus, :string, default: ""
