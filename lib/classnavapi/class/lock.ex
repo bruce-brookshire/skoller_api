@@ -1,4 +1,9 @@
 defmodule Classnavapi.Class.Lock do
+
+  # @weight_lock 100
+  # @assignment_lock 200
+  # @review_lock 300
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Lock
