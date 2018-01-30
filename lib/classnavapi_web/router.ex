@@ -43,6 +43,8 @@ defmodule ClassnavapiWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
+
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
