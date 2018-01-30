@@ -113,20 +113,18 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
+  def check_status(%Class{is_ghost: true} = class, %{student_class: student_class}) do
+    case student_class.class_id == class.id do
+      true -> class |> remove_ghost()
+      false -> {:error, %{class_id: "Class id enrolled into does not match"}}
+    end
+  end
   def check_status(_class, _params), do: {:ok, nil}
 
   defp set_status(class, status) do
     Ecto.Changeset.change(class, %{class_status_id: status})
     |> Repo.update()
   end
-
-  def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
-    case class_id == id do
-      true -> remove_ghost(class)
-      false -> {:error, %{class_id: "Class id enrolled into does not match"}}
-    end
-  end
-  def check_status(%{}, %{}), do: {:ok, nil}
 
   defp check_req_status(%{class_id: class_id} = class) do
     cr_query = from(cr in ChangeRequest)
@@ -147,8 +145,8 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     end
   end
 
-  defp remove_ghost(%{} = params) do
-    params
+  defp remove_ghost(%{} = class) do
+    class
     |> Ecto.Changeset.change(%{is_ghost: false})
     |> Repo.update()
   end

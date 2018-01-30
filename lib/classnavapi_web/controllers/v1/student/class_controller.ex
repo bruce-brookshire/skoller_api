@@ -83,7 +83,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
     |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
