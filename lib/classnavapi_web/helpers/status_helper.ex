@@ -144,13 +144,13 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
     |> Repo.update()
   end
 
-  defp check_req_status(%{class_id: class_id} = class) do
+  defp check_req_status(%Class{} = class) do
     cr_query = from(cr in ChangeRequest)
-    |> where([cr], cr.class_id == ^class_id and cr.is_completed == false)
+    |> where([cr], cr.class_id == ^class.id and cr.is_completed == false)
     |> Repo.all()
 
     sr_query = from(sr in StudentRequest)
-    |> where([sr], sr.class_id == ^class_id and sr.is_completed == false)
+    |> where([sr], sr.class_id == ^class.id and sr.is_completed == false)
     |> Repo.all()
 
     results = cr_query ++ sr_query
