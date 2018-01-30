@@ -19,13 +19,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChangeRequestController do
   def create(conn, %{"class_id" => class_id} = params) do
 
     class = Repo.get!(Class, class_id)
-    class = class |> Repo.preload(:class_status)
 
     changeset = ChangeRequest.changeset(%ChangeRequest{}, params)
     
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:change_request, changeset)
-    |> Ecto.Multi.run(:class, &StatusHelper.set_change_status(&1, class))
+    |> Ecto.Multi.run(:class, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{class: class}} ->

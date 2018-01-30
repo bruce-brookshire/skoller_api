@@ -17,6 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias Classnavapi.School
   alias Classnavapi.Class.Status
   alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -33,26 +34,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   plug :verify_member, %{of: :class, using: :id}
   plug :verify_class_is_editable, :class_id
   plug :verify_class_is_editable, :id
-
-  @doc """
-   Confirms that a `Classnavapi.Class` is ready to change `Classnavapi.Class.Status` 
-   from a status that will not auto progress to the next step.
-
-  ## Returns:
-  * 422 `ClassnavapiWeb.ChangesetView`
-  * 404
-  * 401
-  * 200 `ClassnavapiWeb.ClassView`
-  """
-  def confirm(conn, %{"class_id" => id} = params) do
-    class_old = Repo.get!(Class, id)
-    changeset = Class.changeset_update(class_old, %{})
-
-    changeset = changeset
-                |> StatusHelper.confirm_class(params)
-
-    conn |> update_class(changeset)
-  end
 
   @doc """
    Creates a new `Classnavapi.Class` for a `Classnavapi.ClassPeriod`
@@ -72,11 +53,19 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
             |> Map.put("class_period_id", period_id)
             |> check_conn_for_student(conn)
 
-    changeset = Class.changeset_insert(%Class{}, params)
-    changeset = changeset
-                |> StatusHelper.check_changeset_status(params)
+    changeset = Class.changeset(%Class{}, params)
 
-    conn |> create_class(changeset)
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.insert(:class, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
+
+    case Repo.transaction(multi) do
+      {:ok, %{class_status: class}} ->
+        render(conn, ClassView, "show.json", class: class)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
   end
 
   @doc """
@@ -150,10 +139,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 
-    changeset = Class.changeset_update(class_old, params)
-    
-    changeset = changeset
-    |> StatusHelper.check_changeset_status(params)
+    changeset = Class.changeset(class_old, params)
 
     conn |> update_class(changeset)
   end
@@ -167,17 +153,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp grade_scale(%{"grade_scale" => _} = params), do: params
   defp grade_scale(%{} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)
-  end
-
-  defp create_class(conn, changeset) do
-    case Repo.insert(changeset) do
-      {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
   end
 
   defp update_class(conn, changeset) do

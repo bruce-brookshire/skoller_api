@@ -103,7 +103,7 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class_detail.json", %{class: class}) do
-        class = class |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests, :school])
+        class = class |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests, :school], force: true)
         class
         |> render_one(ClassView, "class.json")
         |> Map.merge(

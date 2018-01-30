@@ -20,10 +20,6 @@ defmodule Classnavapi.Class do
   import Ecto.Changeset
   alias Classnavapi.Class
   alias Classnavapi.Helpers.ChangesetValidation
-  alias Classnavapi.Repo
-  alias Ecto.Changeset
-
-  @needs_syllabus_status 200
 
   schema "classes" do
     field :class_end, :utc_datetime
@@ -44,7 +40,7 @@ defmodule Classnavapi.Class do
     field :seat_count, :integer
     field :professor_id, :id
     field :class_period_id, :id
-    field :class_status_id, :id, default: @needs_syllabus_status
+    field :class_status_id, :id
     field :grade_scale, :string
     field :class_type, :string
     field :campus, :string, default: ""
@@ -72,7 +68,7 @@ defmodule Classnavapi.Class do
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
-  def changeset_insert(%Class{} = class, attrs) do
+  def changeset(%Class{} = class, attrs) do
     class
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
@@ -81,53 +77,6 @@ defmodule Classnavapi.Class do
     |> foreign_key_constraint(:professor_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> unique_constraint(:class, name: :unique_class_index)
-  end
-
-  def changeset_update(%Class{} = class, attrs) do
-    class
-    |> Repo.preload(:weights)
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-    |> update_change(:name, &title_case(&1))
-    |> foreign_key_constraint(:class_period_id)
-    |> foreign_key_constraint(:professor_id)
-    |> ChangesetValidation.validate_dates(:class_start, :class_end)
-    |> cast_assoc(:weights)
-    |> validate_weight_totals()
-    |> unique_constraint(:class, name: :unique_class_index)
-  end
-
-  defp sum_weight(list) do
-    case list do
-      [] -> list
-      _ -> list |> Enum.reduce(Decimal.new(0), &(Decimal.add(&1, &2)))
-    end
-  end
-
-  defp validate_weight_totals(%Ecto.Changeset{changes: %{weights: _weights}} = changeset) do
-    case changeset |> get_field(:is_points) do
-      false -> changeset |> validate_weight_pct()
-      true -> changeset
-    end
-  end
-  defp validate_weight_totals(changeset), do: changeset
-
-  defp validate_weight_pct(changeset) do
-    sum = changeset
-          |> Changeset.get_field(:weights)
-          |> Enum.map(&Map.get(&1, :weight))
-          |> Enum.filter(& &1)
-          |> sum_weight
-
-    target = Decimal.new(100)
-
-    equal = Decimal.cmp(sum, target)
-
-    cond do
-    sum == [] -> changeset
-    equal == :eq -> changeset
-    true -> changeset |> add_error(:weights, "Weights do not add to 100")
-    end
   end
 
   defp title_case(str) do

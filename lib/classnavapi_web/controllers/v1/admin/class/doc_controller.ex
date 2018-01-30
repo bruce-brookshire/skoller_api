@@ -38,7 +38,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{doc: doc}} ->
@@ -84,7 +84,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.DocController do
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
   defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
     class = Repo.get!(Class, class_id)
-    Class.changeset_update(class, %{"grade_scale" => val})
+    Class.changeset(class, %{"grade_scale" => val})
     |> Repo.update()
   end
 

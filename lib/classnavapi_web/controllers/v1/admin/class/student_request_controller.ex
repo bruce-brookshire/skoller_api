@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StudentRequestController do
   alias ClassnavapiWeb.Class.StudentRequestView
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias Classnavapi.Class
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -20,9 +21,11 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StudentRequestController do
 
     changeset = StudentRequest.changeset(student_request_old, %{is_completed: true})
 
+    class = Repo.get(Class, student_request_old.class_id)
+
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:student_request, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_change_req_status(&1.student_request))
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_request: student_request}} ->

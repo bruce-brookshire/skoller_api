@@ -11,6 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias ClassnavapiWeb.Helpers.NotificationHelper
   alias Classnavapi.User
   alias ClassnavapiWeb.Class.LockView
+  alias Classnavapi.Class
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -55,10 +56,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   end
 
   def unlock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
+    class = Repo.get(Class, params["class_id"])
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_full_class(user, params, &1))
-    |> Ecto.Multi.run(:status, &process_unlocks(&1, params))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
@@ -75,9 +77,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id} = params) do
     lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id, is_completed: false)
 
+    class = Repo.get(Class, params["class_id"])
+
     multi = Ecto.Multi.new
-    |> Ecto.Multi.run(:unlock, &unlock_class(lock_old, params, &1))
-    |> Ecto.Multi.run(:status, &process_unlocks(&1, params))
+    |> Ecto.Multi.run(:unlock, &unlock_lock(lock_old, params, &1))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
@@ -136,29 +140,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
-  defp process_unlocks(%{unlock: []}, _map), do: {:ok, nil}
-  defp process_unlocks(%{unlock: %Lock{} = unlock}, params) do
-    check_class_status(unlock, params)
-  end
-  defp process_unlocks(%{unlock: unlock}, params) do
-    status = unlock |> Enum.map(&check_class_status(&1, params))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
-  end
-
-  defp check_class_status({:ok, lock}, params), do: check_class_status(lock, params)
-  defp check_class_status(%Lock{is_completed: true} = lock, params) do
-    Repo.get!(Class, lock.class_id)
-    |> Ecto.Changeset.change()
-    |> StatusHelper.unlock_class(params)
-    |> Repo.update()
-  end
-  defp check_class_status(_tuple, _map), do: {:ok, nil}
-
   defp unlock_full_class(user, %{"class_id" => class_id} = params, _) do
     status = from(l in Lock)
     |> where([l], l.class_id == ^class_id and l.user_id == ^user.id and l.is_completed == false)
     |> Repo.all()
-    |> Enum.map(&unlock_class(&1, params))
+    |> Enum.map(&unlock_lock(&1, params))
 
     status
     |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
@@ -176,16 +162,16 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     end
   end
 
-  defp unlock_class(lock_old, map, _) do
-    unlock_class(lock_old, map)
+  defp unlock_lock(lock_old, map, _) do
+    unlock_lock(lock_old, map)
   end
 
-  defp unlock_class(lock_old, %{"is_completed" => true}) do
+  defp unlock_lock(lock_old, %{"is_completed" => true}) do
     changeset = Lock.changeset(lock_old, %{is_completed: true})
     Repo.update(changeset)
   end
 
-  defp unlock_class(lock_old, %{}) do
+  defp unlock_lock(lock_old, %{}) do
     Repo.insert!(%AbandonedLock{
       class_lock_section_id: lock_old.class_lock_section_id,
       class_id: lock_old.class_id,
