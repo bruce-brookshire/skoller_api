@@ -14,8 +14,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   All check_status/2 return either {:ok, value} or {:error, value}
 
-  check_changeset_status/2 takes a changeset and params and returns a changeset.
-
   """
 
   # @new_class_status 100
@@ -81,9 +79,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   # A class has been fully unlocked. Get the highest lock
   def check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock
-    |> Enum.filter(& &1.is_completed and &1.class_id == class.id)
-    |> Enum.reduce(0, &case &1 > &2 do
-        true -> &1
+    |> Enum.filter(& elem(&1, 1).is_completed and elem(&1, 1).class_id == class.id)
+    |> Enum.reduce(0, &case elem(&1, 1).class_lock_section_id > &2 do
+        true -> elem(&1, 1).class_lock_section_id
         false -> &2
       end)
     case max_lock do
@@ -122,6 +120,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
+  # A student created a student request.
   def check_status(%Class{} = class, %{student_request: %{is_completed: false} = student_request}) do
     case student_request.class_id == class.id do
       true -> class |> Repo.preload(:class_status) |> set_request_status()
