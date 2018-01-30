@@ -77,12 +77,39 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
-  # def check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
-    
-  # end
+  # A class has been fully unlocked. Get the highest lock
+  def check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
+    max_lock = unlock
+    |> Enum.filter(& &1.is_completed and &1.class_id == class.id)
+    |> Enum.reduce(0, &case &1 > &2 do
+        true -> &1
+        false -> &2
+      end)
+    case max_lock do
+      @review_lock -> class |> set_status(@complete_status)
+      @assignment_lock -> class |> set_status(@complete_status)
+      @weight_lock -> class |> set_status(@assignment_lock)
+      _ -> {:ok, nil}
+    end
+  end
+  # A class has been unlocked in the weights status.
   def check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock, is_completed: true} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@assignment_status)
+      false -> {:error, %{class_id: "Class and lock do not match"}}
+    end
+  end
+  # A class has been unlocked in the assignments status.
+  def check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock, is_completed: true} = unlock}) do
+    case unlock.class_id == class.id do
+      true -> class |> set_status(@review_status)
+      false -> {:error, %{class_id: "Class and lock do not match"}}
+    end
+  end
+  # A class has been unlocked from the review status.
+  def check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
+    case unlock.class_id == class.id do
+      true -> class |> set_status(@complete_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
@@ -101,17 +128,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   end
   def check_status(%{}, %{}), do: {:ok, nil}
 
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_review(params)
-    |> check_needs_complete(params)
-  end
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @review_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_complete(params)
-  end
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
-
   defp check_req_status(%{class_id: class_id} = class) do
     cr_query = from(cr in ChangeRequest)
     |> where([cr], cr.class_id == ^class_id and cr.is_completed == false)
@@ -129,22 +145,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
       _results -> 
         {:ok, nil}
     end
-  end
-
-  defp check_needs_review(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_review(changeset, %{"class_lock_section_id" => @assignment_lock, "is_completed" => true}) do
-    changeset |> change_changeset_status(@review_status)
-  end
-  defp check_needs_review(changeset, %{}), do: changeset
-
-  defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_complete(changeset, %{"is_completed" => true}) do
-    changeset |> change_changeset_status(@complete_status)
-  end
-  defp check_needs_complete(changeset, %{}), do: changeset
-
-  defp change_changeset_status(changeset, new_status) do
-    changeset |> Ecto.Changeset.change(%{class_status_id: new_status})
   end
 
   defp remove_ghost(%{} = params) do
