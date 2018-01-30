@@ -60,7 +60,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
 
     case Repo.transaction(multi) do
-      {:ok, %{class: class}} ->
+      {:ok, %{class_status: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
         conn
