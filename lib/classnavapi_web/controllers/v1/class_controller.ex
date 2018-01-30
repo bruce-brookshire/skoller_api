@@ -17,6 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias Classnavapi.School
   alias Classnavapi.Class.Status
   alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -58,7 +59,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> Ecto.Multi.insert(:class, changeset)
     |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
 
-    case Repo.transtaction(multi) do
+    case Repo.transaction(multi) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
