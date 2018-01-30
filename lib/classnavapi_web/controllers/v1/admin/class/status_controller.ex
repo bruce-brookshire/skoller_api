@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     alias ClassnavapiWeb.ClassView
     alias Classnavapi.Class.Lock
     alias ClassnavapiWeb.Helpers.RepoHelper
+    alias ClassnavapiWeb.Helpers.NotificationHelper
 
     import ClassnavapiWeb.Helpers.AuthPlug
     import Ecto.Query
@@ -16,6 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @assignment_status 400
     @review_status 500
     @help_status 600
+    @complete_status 700
 
     @weight_lock 100
     @assignment_lock 200
@@ -24,20 +26,25 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     plug :verify_role, %{role: @admin_role}
 
     def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
-      class = Repo.get!(Class, class_id)
+      old_class = Repo.get!(Class, class_id)
       |> Repo.preload(:class_status)
 
       status = Repo.get!(Status, id)
 
-      changeset = class
+      changeset = old_class
       |> Ecto.Changeset.change(%{class_status_id: id})
-      |> compare_class_status_completion(class.class_status.is_complete, status.is_complete)
+      |> compare_class_status_completion(old_class.class_status.is_complete, status.is_complete)
 
       multi = Ecto.Multi.new()
       |> Ecto.Multi.update(:class, changeset)
-      |> Ecto.Multi.run(:class_locs, &reset_locks(&1.class, status))
+      |> Ecto.Multi.run(:class_locks, &reset_locks(&1.class, status))
 
       case Repo.transaction(multi) do
+        {:ok, %{class: %{class_status_id: @complete_status} = class}} ->
+          if old_class.class_status.is_complete == false do
+            Task.start(NotificationHelper, :send_class_complete_notification, [class])
+          end
+          render(conn, ClassView, "show.json", class: class)
         {:ok, %{class: class}} ->
           render(conn, ClassView, "show.json", class: class)
         {:error, _, failed_value, _} ->
