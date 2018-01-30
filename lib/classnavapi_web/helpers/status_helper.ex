@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   alias Classnavapi.Class.StudentRequest
   alias Classnavapi.Class
   alias Classnavapi.Class.ChangeRequest
-  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import Ecto.Query
 
@@ -108,8 +107,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   # A class has been unlocked from the review status.
   def check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
     case unlock.class_id == class.id do
-      true -> 
-        class |> set_status(@complete_status)
+      true -> class |> set_status(@complete_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
@@ -129,16 +127,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   end
   def check_status(_class, _params), do: {:ok, nil}
 
-  defp set_status(class, @complete_status) do
-    class = class |> Repo.preload(:class_status)
-    if not class.class_status.is_complete do
-      Task.start(NotificationHelper, :send_class_complete_notification, [class])
-    end
-    class |> update_status(@complete_status)
-  end
-  defp set_status(class, status), do: class |> update_status(status)
-
-  defp update_status(class, status) do
+  defp set_status(class, status) do
     Ecto.Changeset.change(class, %{class_status_id: status})
     |> Repo.update()
   end
