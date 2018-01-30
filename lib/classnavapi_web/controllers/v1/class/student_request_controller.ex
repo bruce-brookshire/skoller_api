@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
   alias ClassnavapiWeb.Helpers.ClassDocUpload
   alias Classnavapi.Class.Doc
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.StatusHelper
   alias Classnavapi.Class
   alias ClassnavapiWeb.Class.StudentRequestView
 
@@ -16,20 +17,19 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
 
   @syllabus_request 100
 
-  @help_status 600
-  @change_status 800
-
   plug :verify_role, %{roles: [@student_role, @admin_role]}
   plug :verify_member, :class
 
   def create(%{assigns: %{user: user}} = conn, %{} = params) do
 
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
+
+    class = Repo.get!(Class, params["class_id"])
     
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
     |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
-    |> Ecto.Multi.run(:status, &update_class_status(&1.student_request))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_request: student_request}} ->
@@ -38,18 +38,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
-  end
-
-  defp update_class_status(%{class_id: class_id}) do
-    class = Repo.get!(Class, class_id)
-    |> Repo.preload(:class_status)
-
-    changeset = case class.class_status.is_complete do
-      false -> Ecto.Changeset.change(class, %{class_status_id: @help_status})
-      true -> Ecto.Changeset.change(class, %{class_status_id: @change_status})
-    end
-
-    Repo.update(changeset)
   end
 
   defp upload_class_docs(user, %{"files" => files} = params, student_request) do 

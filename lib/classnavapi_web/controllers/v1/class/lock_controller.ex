@@ -8,7 +8,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias Classnavapi.Class
   alias ClassnavapiWeb.Helpers.RepoHelper
-  alias ClassnavapiWeb.Helpers.NotificationHelper
   alias Classnavapi.User
   alias ClassnavapiWeb.Class.LockView
   alias Classnavapi.Class
@@ -19,8 +18,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
-
-  @complete_status 700
   
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, %{of: :school, using: :class_id}
@@ -63,9 +60,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
-      {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
-        Task.start(NotificationHelper, :send_class_complete_notification, [class])
-        conn |> send_resp(204, "")
       {:ok, _lock} -> 
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
@@ -84,9 +78,6 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
     |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
-      {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
-        Task.start(NotificationHelper, :send_class_complete_notification, [class])
-        conn |> send_resp(204, "")
       {:ok, _lock} -> 
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
