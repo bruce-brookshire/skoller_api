@@ -48,6 +48,9 @@ defmodule ClassnavapiWeb.Router do
       post "/users/token-login", AuthController, :token
       post "/reset", ForgotEmailController, :reset
 
+      # Analytics routes
+      get "/analytics", Analytics.AnalyticsController, :index
+
       # User routes
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
