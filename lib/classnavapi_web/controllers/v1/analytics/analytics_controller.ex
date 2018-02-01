@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Class.Lock
   alias Classnavapi.User
   alias Classnavapi.UserRole
+  alias Classnavapi.Class.Doc
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -41,6 +42,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:class_in_review, class_in_review(dates, params))
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
+    |> Map.put(:class_syllabus_count, syllabus_count(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
@@ -132,6 +134,27 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(c in Class)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
+  end
+
+  defp syllabus_count(dates, %{"school_id" => school_id}) do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [c, p], d in subquery(syllabus_subquery), d.class_id == c.id)
+    |> where([c, p], p.school_id == ^school_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp syllabus_count(dates, _params) do
+    from(c in Class)
+    |> join(:inner, [c], d in subquery(syllabus_subquery), d.class_id == c.id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp syllabus_subquery() do
+    from(d in Doc)
+    |> where([d], d.is_syllabus == true)
+    |> distinct([d], d.class_id)
   end
 
   defp completed_by_diy(dates, %{"school_id" => school_id}) do
