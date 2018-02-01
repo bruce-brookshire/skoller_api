@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   @admin_role 200
 
   @completed_status 700
+  @in_review_status 300
 
   @community_enrollment 2
   
@@ -28,6 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:enrollment, enrollment_count(dates, params))
     |> Map.put(:completed_class, completed_class(dates, params))
     |> Map.put(:communitites, communitites(dates, params))
+    |> Map.put(:class_in_review, class_in_review(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
@@ -72,6 +74,21 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(c in Class)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> where([c], c.class_status_id == @completed_status)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp class_in_review(dates, %{"school_id" => school_id}) do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([c, p], p.school_id == ^school_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp class_in_review(dates, _params) do
+    from(c in Class)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
     |> Repo.aggregate(:count, :id)
   end
 
