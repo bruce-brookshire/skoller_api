@@ -30,13 +30,17 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
             |> Map.put(:date_start, Date.from_iso8601!(params["date_start"]))
             |> Map.put(:date_end, Date.from_iso8601!(params["date_end"]))
 
+    completed_classes = completed_class(dates, params)
+    completed_by_diy = completed_by_diy(dates, params)
+
     analytics = Map.new()
     |> Map.put(:class_count, class_count(dates, params))
     |> Map.put(:enrollment, enrollment_count(dates, params))
-    |> Map.put(:completed_class, completed_class(dates, params))
+    |> Map.put(:completed_class, completed_classes)
     |> Map.put(:communitites, communitites(dates, params))
     |> Map.put(:class_in_review, class_in_review(dates, params))
-    |> Map.put(:completed_by_diy, completed_by_diy(dates, params))
+    |> Map.put(:completed_by_diy, completed_by_diy)
+    |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
