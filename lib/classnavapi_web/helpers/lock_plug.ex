@@ -10,15 +10,21 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   alias Classnavapi.Class.Lock
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.Assignment
+  alias Classnavapi.Class
 
   import Plug.Conn
   import Ecto.Query
 
   @admin_role 200
+  @change_req_role 400
+  @help_req_role 500
 
   @weight_lock 100
   @assignment_lock 200
   @review_lock 300
+
+  @help_status 600
+  @change_status 800
 
   def check_lock(conn, params) do
     case conn |> is_admin() do
@@ -40,7 +46,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
       true ->
         weight = Repo.get!(Weight, conn.params["id"])
         case find_lock(weight.class_id, @weight_lock, user.id) do
-          nil -> conn |> unauth
+          nil -> conn |> check_maintenance(weight.class_id)
           _ -> conn
         end
       false -> conn
@@ -51,7 +57,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     case conn.params |> check_using(:weight, :class_id) do
       true ->
         case find_lock(conn.params["class_id"], @weight_lock, user.id) do
-          nil -> conn |> unauth
+          nil -> conn |> check_maintenance(conn.params["class_id"])
           _ -> conn
         end
       false -> conn
@@ -63,7 +69,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
       true ->
         assign = Repo.get!(Assignment, conn.params["id"])
         case find_lock(assign.class_id, @assignment_lock, user.id) do
-          nil -> conn |> unauth
+          nil -> conn |> check_maintenance(assign.class_id)
           _ -> conn
         end
       false -> conn
@@ -74,10 +80,22 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
     case conn.params |> check_using(:assignment, :class_id) do
       true ->
         case find_lock(conn.params["class_id"], @assignment_lock, user.id) do
-          nil -> conn |> unauth
+          nil -> conn |> check_maintenance(conn.params["class_id"])
           _ -> conn
         end
       false -> conn
+    end
+  end
+
+  defp check_maintenance(conn, class_id) do
+    case Enum.any?(conn.assigns[:user].roles, & &1.id in[@change_req_role, @help_req_role]) do
+      true -> 
+        class = Repo.get!(Class, class_id)
+        case class.class_status_id in [@help_status, @change_status] do
+          true -> conn
+          false -> conn |> unauth()
+        end
+      false -> conn |> unauth()
     end
   end
 
