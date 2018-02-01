@@ -85,7 +85,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => false}) do
     action = Repo.get_by!(Action, assignment_modification_id: mod.id, student_class_id: student_class.id)
 
-    case Repo.update(Ecto.Changeset.change(action, %{is_accepted: false})) do
+    case Repo.update(Ecto.Changeset.change(action, %{is_accepted: false, is_manual: true})) do
       {:ok, _} ->
         conn
         |> send_resp(204, "")
