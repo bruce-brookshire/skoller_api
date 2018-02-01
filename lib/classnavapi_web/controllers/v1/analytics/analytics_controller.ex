@@ -141,13 +141,13 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
     |> join(:inner, [c, p], d in subquery(syllabus_subquery), d.class_id == c.id)
     |> where([c, p], p.school_id == ^school_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
   defp syllabus_count(dates, _params) do
     from(c in Class)
     |> join(:inner, [c], d in subquery(syllabus_subquery), d.class_id == c.id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -155,6 +155,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(d in Doc)
     |> where([d], d.is_syllabus == true)
     |> distinct([d], d.class_id)
+    |> order_by([d], asc: d.inserted_at)
   end
 
   defp completed_by_diy(dates, %{"school_id" => school_id}) do
