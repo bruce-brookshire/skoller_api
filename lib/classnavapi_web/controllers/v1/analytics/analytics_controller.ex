@@ -6,14 +6,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.AnalyticsView
+  alias Classnavapi.Class.Lock
+  alias Classnavapi.User
+  alias Classnavapi.UserRole
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
   
+  @student_role 100
   @admin_role 200
 
   @completed_status 700
   @in_review_status 300
+
+  @diy_complete_lock 200
 
   @community_enrollment 2
   
@@ -30,6 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:completed_class, completed_class(dates, params))
     |> Map.put(:communitites, communitites(dates, params))
     |> Map.put(:class_in_review, class_in_review(dates, params))
+    |> Map.put(:completed_by_diy, completed_by_diy(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
@@ -119,6 +126,27 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   end
   defp class_count(dates, _params) do
     from(c in Class)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp completed_by_diy(dates, %{"school_id" => school_id}) do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [c, p], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
+    |> join(:inner, [c, p, l], u in User, u.id == l.user_id)
+    |> join(:inner, [c, p, l, u], r in UserRole, r.user_id == u.id)
+    |> where([c, p, l, u, r], r.role_id == @student_role)
+    |> where([c, p], p.school_id == ^school_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp completed_by_diy(dates, _params) do
+    from(c in Class)
+    |> join(:inner, [c], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
+    |> join(:inner, [c, l], u in User, u.id == l.user_id)
+    |> join(:inner, [c, l, u], r in UserRole, r.user_id == u.id)
+    |> where([c, l, u, r], r.role_id == @student_role)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
