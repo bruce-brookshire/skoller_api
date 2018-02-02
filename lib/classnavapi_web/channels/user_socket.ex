@@ -1,6 +1,8 @@
 defmodule ClassnavapiWeb.UserSocket do
   use Phoenix.Socket
 
+  alias ClassnavapiWeb.Helpers.AuthPlug
+
   ## Channels
   channel "chat:*", ClassnavapiWeb.ChatChannel
 
@@ -23,9 +25,11 @@ defmodule ClassnavapiWeb.UserSocket do
   def connect(%{"token" => token}, socket) do
     case Guardian.Phoenix.Socket.authenticate(socket, Classnavapi.Auth, token) do
       {:ok, authed_socket} ->
-        require IEx
-        IEx.pry
-        {:ok, authed_socket}
+        case authed_socket |> AuthPlug.get_auth_obj() do
+          {:ok, user} ->
+            {:ok, assign(authed_socket, :user, user)}
+          {:error, _} -> :error
+        end
       {:error, _} -> :error
     end
   end
