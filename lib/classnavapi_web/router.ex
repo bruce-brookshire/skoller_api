@@ -98,7 +98,7 @@ defmodule ClassnavapiWeb.Router do
 
         # Chat routes
         resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete]
-        resources "/posts", Class.ChatPostController, only: [:create] do
+        resources "/posts", Class.ChatPostController, only: [:create, :update] do
           resources "/comments", Class.ChatCommentController, only: [:create]
         end
         put "/comments/:id", Class.ChatCommentController, :update

@@ -16,11 +16,21 @@ defmodule Classnavapi.Chat.Reply do
   @req_fields [:reply, :student_id, :chat_comment_id]
   @all_fields @req_fields
 
+  @upd_req [:reply]
+  @upd_fields @upd_req
+
   @doc false
   def changeset(%Reply{} = reply, attrs) do
     reply
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:chat_comment_id)
+  end
+
+  def update_changeset(%Reply{} = reply, attrs) do
+    reply
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@upd_req)
     |> foreign_key_constraint(:chat_comment_id)
   end
 end
