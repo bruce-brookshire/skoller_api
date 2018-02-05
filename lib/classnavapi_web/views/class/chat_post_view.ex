@@ -9,6 +9,10 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
     render_many(chat_posts, ChatPostView, "chat_post.json")
   end
 
+  def render("show.json", %{chat_post: chat_post}) do
+    render_one(chat_post, ChatPostView, "chat_post.json")
+  end
+
   def render("chat_post.json", %{chat_post: chat_post}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments])
     %{

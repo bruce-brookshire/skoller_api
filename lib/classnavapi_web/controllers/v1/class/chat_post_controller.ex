@@ -10,17 +10,24 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
   import ClassnavapiWeb.Helpers.ChatPlug
 
   @student_role 100
-  @admin_role 200
 
-  plug :verify_role, %{roles: [@student_role, @admin_role]}
+  plug :verify_role, %{role: @student_role}
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def index(conn, %{"class_id" => class_id}) do
-    posts = from(p in Post)
-    |> where([p], p.class_id == ^class_id)
-    |> Repo.all()
+  def create(conn, %{"class_id" => class_id} = params) do
 
-    render(conn, ChatPostView, "index.json", chat_posts: posts)
+    params = params |> Map.put("student_id", conn.assigns[:user].student_id)
+
+    changeset = Post.changeset(%Post{}, params)
+
+    case Repo.insert(changeset) do
+      {:ok, post} -> 
+        render(conn, ChatPostView, "show.json", chat_post: post)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 end
