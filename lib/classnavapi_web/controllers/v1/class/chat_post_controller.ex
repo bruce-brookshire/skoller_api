@@ -7,11 +7,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
+  import ClassnavapiWeb.Helpers.ChatPlug
 
   @student_role 100
   @admin_role 200
 
   plug :verify_role, %{roles: [@student_role, @admin_role]}
+  plug :check_chat_enabled
   plug :verify_member, :class
 
   def index(conn, %{"class_id" => class_id}) do
