@@ -8,6 +8,7 @@ defmodule Classnavapi.Chat.Reply do
     field :reply, :string
     field :student_id, :id
     field :chat_comment_id, :id
+    belongs_to :student, Classnavapi.Student, define_field: false
 
     timestamps()
   end

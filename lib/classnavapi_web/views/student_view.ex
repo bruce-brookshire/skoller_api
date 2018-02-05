@@ -36,4 +36,14 @@ defmodule ClassnavapiWeb.StudentView do
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }
   end
+
+  def render("student-short.json", %{student: student}) do
+    %{
+      id: student.id,
+      name_first: student.name_first,
+      name_last: student.name_last,
+      organization: student.organization,
+      bio: student.bio
+    }
+  end
 end

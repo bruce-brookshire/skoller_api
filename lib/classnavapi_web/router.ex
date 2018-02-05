@@ -96,6 +96,9 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
 
+        # Chat routes
+        get "/posts", Class.ChatPostController, :index
+
         # Class Lock routes
         post "/lock", Class.LockController, :lock
         post "/unlock", Class.LockController, :unlock

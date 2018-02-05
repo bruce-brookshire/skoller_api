@@ -8,6 +8,8 @@ defmodule Classnavapi.Chat.Post do
     field :post, :string
     field :student_id, :id
     field :class_id, :id
+    has_many :chat_comments, Classnavapi.Chat.Comment, foreign_key: :chat_post_id
+    belongs_to :student, Classnavapi.Student, define_field: false
 
     timestamps()
   end
