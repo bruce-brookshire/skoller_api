@@ -6,11 +6,21 @@ defmodule ClassnavapiWeb.ChatChannel do
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
+  alias Classnavapi.Class
+  alias Classnavapi.School
+  alias Classnavapi.ClassPeriod
+
+  import Ecto.Query
 
   def join("chat:" <> class_id, _params, socket) do
-    case Repo.get_by(StudentClass, student_id: socket.assigns.user.student.id, class_id: class_id, is_dropped: false) do
-      nil -> {:error, %{reason: "unauthorized"}}
-      _ -> {:ok, socket}
+    case get_class_enabled(class_id) do
+      {:ok, _val} ->
+        case Repo.get_by(StudentClass, student_id: socket.assigns.user.student.id, class_id: class_id, is_dropped: false) do
+          nil -> {:reply, %{error: "unauthorized"}}
+          _ -> {:ok, socket}
+        end
+      {:error, _val} ->
+        {:error, %{reason: "Chat disabled"}}
     end
   end
 
@@ -45,6 +55,36 @@ defmodule ClassnavapiWeb.ChatChannel do
         {:noreply, socket}
       {:error, _changeset} ->
         {:reply, %{error: "Failed to reply"}}
+    end
+  end
+
+  defp get_class_enabled (class_id) do
+    {:ok, Map.new}
+    |> get_class(class_id)
+    |> get_school()
+  end
+
+  defp get_class({:ok, map}, class_id) do
+    case Repo.get(Class, class_id) do
+      %{is_chat_enabled: true} = class -> 
+        {:ok, map |> Map.put(:class, class)}
+      _ -> {:error, map}
+    end
+  end
+
+  defp get_school({:error, _nil} = map), do: map
+  defp get_school({:ok, %{class: %{class_period_id: class_period_id}} = map}) do
+    school = from(cp in ClassPeriod)
+    |> join(:inner, [cp], s in School, s.id == cp.school_id)
+    |> where([cp], cp.id == ^class_period_id)
+    |> select([cp, s], s)
+    |> Repo.one()
+
+    case school do
+      %{is_chat_enabled: true} = school -> 
+        {:ok, map |> Map.put(:school, school)}
+      _ -> 
+        {:error, map}
     end
   end
 end
