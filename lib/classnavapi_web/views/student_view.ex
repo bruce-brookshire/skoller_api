@@ -46,7 +46,7 @@ defmodule ClassnavapiWeb.StudentView do
       name_last: student.name_last,
       organization: student.organization,
       bio: student.bio,
-      users: render_many(student.users, UserView, "user.json"),
+      users: render_many(student.users, UserView, "user.json")
     }
   end
 end
