@@ -5,7 +5,7 @@ defmodule Classnavapi.Repo.Migrations.CreateChatComments do
     create table(:chat_comments) do
       add :comment, :string
       add :student_id, references(:students, on_delete: :nothing)
-      add :chat_post_id, references(:chat_posts, on_delete: :nothing)
+      add :chat_post_id, references(:chat_posts, on_delete: :delete_all)
 
       timestamps()
     end

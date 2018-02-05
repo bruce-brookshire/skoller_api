@@ -9,13 +9,17 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
     render_many(chat_comments, ChatCommentView, "chat_comment.json")
   end
 
+  def render("show.json", %{chat_comment: chat_comment}) do
+    render_one(chat_comment, ChatCommentView, "chat_comment.json")
+  end
+
   def render("chat_comment.json", %{chat_comment: chat_comment}) do
     chat_comment = chat_comment |> Repo.preload([:student, :chat_replies])
     %{
       comment: chat_comment.comment,
       student: render_one(chat_comment.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_comment.id,
-      comments: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply.json")
+      replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply.json")
     }
   end
 end

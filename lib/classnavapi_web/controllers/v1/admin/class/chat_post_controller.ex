@@ -16,6 +16,19 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
+  def delete(conn, %{"id" => id}) do
+    post = Repo.get!(Post, id)
+    case Repo.delete(post) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   def index(conn, %{"class_id" => class_id}) do
     posts = from(p in Post)
     |> where([p], p.class_id == ^class_id)

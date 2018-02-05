@@ -1,9 +1,9 @@
-defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
+defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
   use ClassnavapiWeb, :controller
   
   alias Classnavapi.Repo
-  alias Classnavapi.Chat.Post
-  alias ClassnavapiWeb.Class.ChatPostView
+  alias Classnavapi.Chat.Comment
+  alias ClassnavapiWeb.Class.ChatCommentView
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -18,11 +18,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    changeset = Post.changeset(%Post{}, params)
+    changeset = Comment.changeset(%Comment{}, params)
 
     case Repo.insert(changeset) do
-      {:ok, post} -> 
-        render(conn, ChatPostView, "show.json", chat_post: post)
+      {:ok, comment} -> 
+        render(conn, ChatCommentView, "show.json", chat_comment: comment)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
