@@ -27,10 +27,9 @@ defmodule Classnavapi.Chat.Reply do
     |> foreign_key_constraint(:chat_comment_id)
   end
 
-  def update_changeset(%Reply{} = reply, attrs) do
+  def changeset_update(%Reply{} = reply, attrs) do
     reply
     |> cast(attrs, @upd_fields)
     |> validate_required(@upd_req)
-    |> foreign_key_constraint(:chat_comment_id)
   end
 end

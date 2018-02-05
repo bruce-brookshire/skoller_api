@@ -27,7 +27,7 @@ defmodule Classnavapi.Chat.Post do
     |> validate_required(@req_fields)
   end
 
-  def update_changeset(%Post{} = post, attrs) do
+  def changeset_update(%Post{} = post, attrs) do
     post
     |> cast(attrs, @upd_fields)
     |> validate_required(@upd_req)

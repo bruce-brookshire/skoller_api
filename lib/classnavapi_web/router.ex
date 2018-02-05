@@ -106,6 +106,7 @@ defmodule ClassnavapiWeb.Router do
           resources "/replies", Class.ChatReplyController, only: [:create]
         end
         resources "/replies", Admin.Class.ChatReplyController, only: [:delete]
+        put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock

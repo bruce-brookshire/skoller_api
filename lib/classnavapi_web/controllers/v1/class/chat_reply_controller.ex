@@ -29,4 +29,19 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatReplyController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def update(conn, %{"id" => id} = params) do
+    reply_old = Repo.get!(Reply, id)
+    
+    changeset = Reply.changeset_update(reply_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, reply} -> 
+        render(conn, ChatReplyView, "show.json", chat_reply: reply)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end

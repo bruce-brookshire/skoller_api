@@ -34,7 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     post_old = Repo.get!(Post, id)
 
-    changeset = Post.changeset(post_old, params)
+    changeset = Post.changeset_update(post_old, params)
 
     case Repo.update(changeset) do
       {:ok, post} -> 
