@@ -29,4 +29,19 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def update(conn, %{"id" => id} = params) do
+    comment_old = Repo.get!(Comment, id)
+
+    changeset = Comment.changeset_update(comment_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, comment} ->
+        render(conn, ChatCommentView, "show.json", chat_comment: comment)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end
