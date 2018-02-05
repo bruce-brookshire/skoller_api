@@ -21,5 +21,6 @@ defmodule Classnavapi.Chat.Reply do
     reply
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:chat_comment_id)
   end
 end

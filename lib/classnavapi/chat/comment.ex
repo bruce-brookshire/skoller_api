@@ -22,5 +22,6 @@ defmodule Classnavapi.Chat.Comment do
     comment
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:chat_post_id)
   end
 end
