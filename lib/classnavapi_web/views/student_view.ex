@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.StudentView do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.School.FieldOfStudyView
   alias ClassnavapiWeb.SchoolView
+  alias ClassnavapiWeb.UserView
 
   def render("index.json", %{students: students}) do
     render_many(students, StudentView, "student.json")
@@ -38,12 +39,14 @@ defmodule ClassnavapiWeb.StudentView do
   end
 
   def render("student-short.json", %{student: student}) do
+    student = student |> Repo.preload(:users)
     %{
       id: student.id,
       name_first: student.name_first,
       name_last: student.name_last,
       organization: student.organization,
-      bio: student.bio
+      bio: student.bio,
+      users: render_many(student.users, UserView, "user.json"),
     }
   end
 end
