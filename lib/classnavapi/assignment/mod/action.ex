@@ -14,6 +14,7 @@ defmodule Classnavapi.Assignment.Mod.Action do
     field :is_accepted, :boolean
     field :assignment_modification_id, :id
     field :student_class_id, :id
+    field :is_manual, :boolean, default: false
 
     timestamps()
   end
