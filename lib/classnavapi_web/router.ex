@@ -97,16 +97,19 @@ defmodule ClassnavapiWeb.Router do
         put "/statuses", Admin.Class.StatusController, :update
 
         # Chat routes
-        resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete]
+        resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete, :show]
         resources "/posts", Class.ChatPostController, only: [:create, :update] do
           resources "/comments", Class.ChatCommentController, only: [:create]
+          resources "/like", Class.Chat.PostLikeController, only: [:create, :delete]
         end
         put "/comments/:id", Class.ChatCommentController, :update
         resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
           resources "/replies", Class.ChatReplyController, only: [:create]
           resources "/like", Class.Chat.CommentLikeController, only: [:create, :delete]
         end
-        resources "/replies", Admin.Class.ChatReplyController, only: [:delete]
+        resources "/replies", Admin.Class.ChatReplyController, only: [:delete] do
+          resources "/like", Class.Chat.ReplyLikeController, only: [:create, :delete]
+        end
         put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
