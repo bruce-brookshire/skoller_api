@@ -10,6 +10,10 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
     render_many(chat_replies, ChatReplyView, "chat_reply.json")
   end
 
+  def render("show.json", %{chat_reply: chat_reply, current_student_id: current_student_id}) do
+    render_one(chat_reply, ChatReplyView, "chat_reply_detail.json", %{current_student_id: current_student_id})
+  end
+
   def render("show.json", %{chat_reply: chat_reply}) do
     render_one(chat_reply, ChatReplyView, "chat_reply_detail.json")
   end
