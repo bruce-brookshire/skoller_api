@@ -7,6 +7,7 @@ defmodule Classnavapi.Chat.Reply.Like do
   schema "chat_reply_likes" do
     field :chat_reply_id, :id
     field :student_id, :id
+    belongs_to :chat_reply, Classnavapi.Chat.Reply, define_field: false
 
     timestamps()
   end

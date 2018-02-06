@@ -3,13 +3,14 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
 
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.ChatReplyView
+  alias ClassnavapiWeb.Class.Chat.LikeView
 
   def render("index.json", %{chat_replies: chat_replies}) do
     render_many(chat_replies, ChatReplyView, "chat_reply.json")
   end
 
   def render("show.json", %{chat_reply: chat_reply}) do
-    render_one(chat_reply, ChatReplyView, "chat_reply.json")
+    render_one(chat_reply, ChatReplyView, "chat_reply_detail.json")
   end
 
   def render("chat_reply.json", %{chat_reply: chat_reply}) do
