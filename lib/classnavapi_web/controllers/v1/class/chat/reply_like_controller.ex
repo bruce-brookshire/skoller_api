@@ -32,7 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.ReplyLikeController do
   end
 
   def delete(conn, %{"chat_reply_id" => reply_id}) do
-    like = Repo.get_by(Like, chat_reply_id: reply_id, student_id: conn.assigns[:user].student_id)
+    like = Repo.get_by!(Like, chat_reply_id: reply_id, student_id: conn.assigns[:user].student_id)
     case Repo.delete(like) do
       {:ok, _struct} ->
         like = like |> Repo.preload(:chat_reply)
