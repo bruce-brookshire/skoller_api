@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
   alias ClassnavapiWeb.Class.ChatPostView
-  alias ClassnavapiWeb.Helpers.ChatHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -44,7 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
   end
 
   def render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
-    render(conn, ChatPostView, "show.json", chat_post: %{chat_post: post, current_student_id: id})
+    render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: id})
   end
   def render_show_view(conn, post) do
     render(conn, ChatPostView, "show.json", chat_post: post)

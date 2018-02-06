@@ -11,6 +11,10 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
     render_many(chat_posts, ChatPostView, "chat_post.json")
   end
 
+  def render("show.json", %{chat_post: chat_post, current_student_id: current_student_id}) do
+    render_one(chat_post, ChatPostView, "chat_post_detail.json", %{current_student_id: current_student_id})
+  end
+
   def render("show.json", %{chat_post: chat_post}) do
     render_one(chat_post, ChatPostView, "chat_post_detail.json")
   end
@@ -26,7 +30,7 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
     }
   end
 
-  def render("chat_post_detail.json", %{chat_post: %{chat_post: chat_post, current_student_id: student_id}}) do
+  def render("chat_post_detail.json", %{chat_post: chat_post, current_student_id: student_id}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes])
     %{
       post: chat_post.post,
