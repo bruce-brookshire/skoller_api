@@ -15,7 +15,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   """
 
-  # @new_class_status 100
+  @new_class_status 100
   @syllabus_status 200
   @weight_status 300
   @assignment_status 400
@@ -29,9 +29,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   @review_lock 300
 
   # A new class has been created by a student.
-  # def check_status(%Class{class_status_id: nil} = class, %{params: %{is_student: true}}) do
-  #   class |> set_status(@new_class_status)
-  # end
+  def check_status(%Class{class_status_id: nil} = class, %{params: %{"is_student" => true}}) do
+    class |> set_status(@new_class_status)
+  end
   # A new class has been added, and it is a class that will never have a syllabus.
   def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
     class |> set_status(@weight_status)
