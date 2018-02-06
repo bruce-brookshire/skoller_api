@@ -20,4 +20,14 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
       id: chat_reply.id
     }
   end
+
+  def render("chat_reply_detail.json", %{chat_reply: chat_reply}) do
+    chat_reply = chat_reply |> Repo.preload([:student, :likes])
+    %{
+      reply: chat_reply.reply,
+      student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
+      id: chat_reply.id,
+      likes: render_many(chat_reply.likes, LikeView, "like.json")
+    }
+  end
 end

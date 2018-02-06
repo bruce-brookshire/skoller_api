@@ -30,7 +30,7 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
       comment: chat_comment.comment,
       student: render_one(chat_comment.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_comment.id,
-      replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply.json"),
+      replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply_detail.json"),
       likes: render_many(chat_comment.likes, LikeView, "like.json")
     }
   end
