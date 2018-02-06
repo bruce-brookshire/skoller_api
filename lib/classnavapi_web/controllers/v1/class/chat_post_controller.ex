@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
   alias ClassnavapiWeb.Class.ChatPostView
+  alias Classnavapi.Chat.Post.Star
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -20,8 +21,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     changeset = Post.changeset(%Post{}, params)
 
-    case Repo.insert(changeset) do
-      {:ok, post} -> 
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:post, changeset)
+    |> Ecto.Multi.run(:star, &insert_star(&1.post, conn.assigns[:user].student_id))
+
+    case Repo.transaction(multi) do
+      {:ok, %{post: post}} -> 
         render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
@@ -44,5 +49,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp insert_star(post, student_id) do
+    %Star{}
+    |> Star.changeset(%{chat_post_id: post.id, student_id: student_id})
+    |> Repo.insert()
   end
 end

@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
   alias ClassnavapiWeb.Class.ChatCommentView
   alias ClassnavapiWeb.Class.Chat.LikeView
   alias ClassnavapiWeb.Helpers.ChatHelper
+  alias Classnavapi.Chat.Post.Star
 
   def render("index.json", %{chat_posts: chat_posts, current_student_id: current_student_id}) do
     render_many(chat_posts, ChatPostView, "chat_post.json", %{current_student_id: current_student_id})
@@ -31,7 +32,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id)
+      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
+      is_starred: chat_post |> is_starred(student_id)
     }
   end
 
@@ -54,7 +56,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json", %{current_student_id: student_id}),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id)
+      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
+      is_starred: chat_post |> is_starred(student_id)
     }
   end
 
@@ -67,5 +70,12 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json")
     }
+  end
+
+  defp is_starred(post, student_id) do
+    case Repo.get_by(Star, chat_post_id: post.id, student_id: student_id) do
+      nil -> false
+      _ -> true
+    end
   end
 end
