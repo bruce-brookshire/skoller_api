@@ -11,5 +11,6 @@ defmodule Classnavapi.Repo.Migrations.CreateChatCommentLikes do
 
     create index(:chat_comment_likes, [:chat_comment_id])
     create index(:chat_comment_likes, [:student_id])
+    create unique_index(:chat_comment_likes, [:student_id, :chat_comment_id], name: :unique_comment_like_index)
   end
 end

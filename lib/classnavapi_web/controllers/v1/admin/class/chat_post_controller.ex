@@ -36,4 +36,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
 
     render(conn, ChatPostView, "index.json", chat_posts: posts)
   end
+
+  def show(conn, %{"id" => id}) do
+    post = Repo.get!(Post, id)
+    render(conn, ChatPostView, "show.json", chat_post: post)
+  end
 end

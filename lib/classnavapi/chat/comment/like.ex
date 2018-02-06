@@ -21,5 +21,6 @@ defmodule Classnavapi.Chat.Comment.Like do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:chat_comment_id)
+    |> unique_constraint(:like, name: :unique_comment_like_index)
   end
 end
