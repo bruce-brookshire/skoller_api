@@ -102,6 +102,8 @@ defmodule ClassnavapiWeb.Router do
           resources "/comments", Class.ChatCommentController, only: [:create]
           resources "/like", Class.Chat.PostLikeController,  only: [:create]
           delete "/unlike", Class.Chat.PostLikeController, :delete
+          resources "/star", Class.Chat.PostStarController, only: [:create]
+          delete "/unstar", Class.Chat.PostStarController, :delete
         end
         put "/comments/:id", Class.ChatCommentController, :update
         resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
