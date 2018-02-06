@@ -11,6 +11,10 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
     render_many(chat_comments, ChatCommentView, "chat_comment.json")
   end
 
+  def render("show.json", %{chat_comment: chat_comment, current_student_id: current_student_id}) do
+    render_one(chat_comment, ChatCommentView, "chat_comment_detail.json", %{current_student_id: current_student_id})
+  end
+
   def render("show.json", %{chat_comment: chat_comment}) do
     render_one(chat_comment, ChatCommentView, "chat_comment_detail.json")
   end

@@ -31,12 +31,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.ReplyLikeController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    like = Repo.get!(Like, id)
+  def delete(conn, %{"chat_reply_id" => reply_id}) do
+    like = Repo.get_by(Like, chat_reply_id: reply_id, student_id: conn.assigns[:user].student_id)
     case Repo.delete(like) do
       {:ok, _struct} ->
-        conn
-        |> send_resp(200, "")
+        like = like |> Repo.preload(:chat_reply)
+        render(conn, ChatReplyView, "show.json", %{chat_reply: like.chat_reply, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
