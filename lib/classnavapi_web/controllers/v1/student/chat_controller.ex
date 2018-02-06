@@ -18,6 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     posts = from(p in Post)
     |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> select([p, sc], %{chat_post: p, color: sc.color})
     |> Repo.all()
 
     render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: student_id})
