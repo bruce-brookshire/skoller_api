@@ -34,7 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
     |> where([p], p.class_id == ^class_id)
     |> Repo.all()
 
-    render(conn, ChatPostView, "index.json", chat_posts: posts)
+    conn |> render_index_view(posts)
   end
 
   def show(conn, %{"id" => id}) do
@@ -42,10 +42,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
     conn |> render_show_view(post)
   end
 
-  def render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
+  defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts) do
+    render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: id})
+  end
+  defp render_index_view(conn, posts) do
+    render(conn, ChatPostView, "index.json", chat_posts: posts)
+  end
+  defp render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
     render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: id})
   end
-  def render_show_view(conn, post) do
+  defp render_show_view(conn, post) do
     render(conn, ChatPostView, "show.json", chat_post: post)
   end
 end
