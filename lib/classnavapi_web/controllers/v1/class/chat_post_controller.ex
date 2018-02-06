@@ -22,7 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     case Repo.insert(changeset) do
       {:ok, post} -> 
-        render(conn, ChatPostView, "show.json", chat_post: post)
+        render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -38,7 +38,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     case Repo.update(changeset) do
       {:ok, post} -> 
-        render(conn, ChatPostView, "show.json", chat_post: post)
+        render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

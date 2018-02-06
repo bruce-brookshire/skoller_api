@@ -23,7 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostLikeController do
     case Repo.insert(changeset) do
       {:ok, like} -> 
         like = like |> Repo.preload(:chat_post)
-        render(conn, ChatPostView, "show.json", chat_post: like.chat_post)
+        render(conn, ChatPostView, "show.json", %{chat_post: like.chat_post, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
