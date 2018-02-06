@@ -7,6 +7,7 @@ defmodule Classnavapi.Chat.Post.Star do
   schema "chat_post_stars" do
     field :chat_post_id, :id
     field :student_id, :id
+    belongs_to :chat_post, Classnavapi.Chat.Post, define_field: false
 
     timestamps()
   end
