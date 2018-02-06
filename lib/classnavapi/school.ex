@@ -25,6 +25,7 @@ defmodule Classnavapi.School do
     field :name, :string
     field :timezone, :string
     field :short_name, :string
+    field :is_chat_enabled, :boolean, default: true
     has_many :students, Classnavapi.Student
     has_many :email_domains, School.EmailDomain, on_replace: :delete
     has_many :class_periods, Classnavapi.ClassPeriod
@@ -33,7 +34,7 @@ defmodule Classnavapi.School do
     timestamps()
   end
 
-  @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone]
+  @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :is_chat_enabled]
   @opt_fields [:adr_line_2, :is_active_enrollment, :is_readonly,
               :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus, :short_name]
   @all_fields @req_fields ++ @opt_fields

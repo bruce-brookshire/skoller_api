@@ -18,14 +18,32 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   @admin_role 200
 
   def authenticate(conn, _) do
-    case Repo.get(User, Guardian.Plug.current_resource(conn)) do
-      %User{is_active: false} -> conn |> unauth
-      %User{} = user ->
-        user = user |> Repo.preload([:roles, :student])
+    case conn |> get_auth_obj() do
+      {:ok, user} ->
         assign(conn, :user, user)
-      nil -> conn |> unauth
+      {:error, _} -> conn |> unauth
     end
   end
+
+  def get_auth_obj(%Phoenix.Socket{} = socket) do
+    case Repo.get(User, Guardian.Phoenix.Socket.current_resource(socket)) do
+      %User{is_active: false} -> {:error, :inactive}
+      %User{} = user ->
+        user = user |> Repo.preload([:roles, :student])
+        {:ok, user}
+      nil -> {:error, :no_user}
+    end
+  end 
+
+  def get_auth_obj(conn) do
+    case Repo.get(User, Guardian.Plug.current_resource(conn)) do
+      %User{is_active: false} -> {:error, :inactive}
+      %User{} = user ->
+        user = user |> Repo.preload([:roles, :student])
+        {:ok, user}
+      nil -> {:error, :no_user}
+    end
+  end 
 
   def is_phone_verified(%{assigns: %{user: %{student: nil}}} = conn, _), do: conn
   def is_phone_verified(%{assigns: %{user: %{student: student}}} = conn, _) do

@@ -43,6 +43,8 @@ defmodule ClassnavapiWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
+
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
@@ -93,6 +95,22 @@ defmodule ClassnavapiWeb.Router do
       get "/classes/:id", NonMemberClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
+
+        # Chat routes
+        resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete, :show]
+        resources "/posts", Class.ChatPostController, only: [:create, :update] do
+          resources "/comments", Class.ChatCommentController, only: [:create]
+          resources "/like", Class.Chat.PostLikeController, only: [:create, :delete]
+        end
+        put "/comments/:id", Class.ChatCommentController, :update
+        resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
+          resources "/replies", Class.ChatReplyController, only: [:create]
+          resources "/like", Class.Chat.CommentLikeController, only: [:create, :delete]
+        end
+        resources "/replies", Admin.Class.ChatReplyController, only: [:delete] do
+          resources "/like", Class.Chat.ReplyLikeController, only: [:create, :delete]
+        end
+        put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock

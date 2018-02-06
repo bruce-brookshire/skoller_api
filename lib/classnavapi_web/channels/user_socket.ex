@@ -1,8 +1,10 @@
 defmodule ClassnavapiWeb.UserSocket do
   use Phoenix.Socket
 
+  alias ClassnavapiWeb.Helpers.AuthPlug
+
   ## Channels
-  # channel "room:*", ClassnavapiWeb.RoomChannel
+  channel "chat:*", ClassnavapiWeb.ChatChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket,
@@ -20,8 +22,16 @@ defmodule ClassnavapiWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"token" => token}, socket) do
+    case Guardian.Phoenix.Socket.authenticate(socket, Classnavapi.Auth, token) do
+      {:ok, authed_socket} ->
+        case authed_socket |> AuthPlug.get_auth_obj() do
+          {:ok, user} ->
+            {:ok, assign(authed_socket, :user, user)}
+          {:error, _} -> :error
+        end
+      {:error, _} -> :error
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets 
