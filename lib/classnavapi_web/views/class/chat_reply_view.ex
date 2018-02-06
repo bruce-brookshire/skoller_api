@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.ChatReplyView
   alias ClassnavapiWeb.Class.Chat.LikeView
+  alias ClassnavapiWeb.Helpers.ChatHelper
 
   def render("index.json", %{chat_replies: chat_replies}) do
     render_many(chat_replies, ChatReplyView, "chat_reply.json")
@@ -19,6 +20,17 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
       reply: chat_reply.reply,
       student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_reply.id
+    }
+  end
+
+  def render("chat_reply_detail.json", %{chat_reply: chat_reply, current_student_id: student_id}) do
+    chat_reply = chat_reply |> Repo.preload([:student, :likes])
+    %{
+      reply: chat_reply.reply,
+      student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
+      id: chat_reply.id,
+      likes: render_many(chat_reply.likes, LikeView, "like.json"),
+      is_liked: chat_reply.likes |> ChatHelper.is_liked(student_id)
     }
   end
 
