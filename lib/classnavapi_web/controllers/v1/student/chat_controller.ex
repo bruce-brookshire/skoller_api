@@ -1,16 +1,26 @@
 defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
+  use ClassnavapiWeb, :controller
+
+  alias Classnavapi.Repo
+  alias Classnavapi.Chat.Post
+  alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Class.ChatPostView
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import Ecto.Query
 
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
-  plug :verify_member, %{of: :school, using: :class_id}
-  plug :verify_member, %{of: :class, using: :id}
 
-  def chat(conn, params) do
-    
+  def chat(conn, %{"student_id" => student_id}) do
+    posts = from(p in Post)
+    |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
+    |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> Repo.all()
+
+    render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: student_id})
   end
 
   def inbox(conn, params) do

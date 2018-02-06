@@ -25,7 +25,7 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
   end
 
   def render("chat_post.json", %{chat_post: chat_post, current_student_id: student_id}) do
-    chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes])
+    chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes, :class])
     %{
       post: chat_post.post,
       student: render_one(chat_post.student, ClassnavapiWeb.StudentView, "student-short.json"),
@@ -33,7 +33,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
       is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
-      is_starred: chat_post |> is_starred(student_id)
+      is_starred: chat_post |> is_starred(student_id),
+      class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json")
     }
   end
 
@@ -49,7 +50,7 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
   end
 
   def render("chat_post_detail.json", %{chat_post: chat_post, current_student_id: student_id}) do
-    chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes])
+    chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes, :class])
     %{
       post: chat_post.post,
       student: render_one(chat_post.student, ClassnavapiWeb.StudentView, "student-short.json"),
@@ -57,7 +58,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json", %{current_student_id: student_id}),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
       is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
-      is_starred: chat_post |> is_starred(student_id)
+      is_starred: chat_post |> is_starred(student_id),
+      class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json"),
     }
   end
 

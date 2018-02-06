@@ -152,8 +152,8 @@ defmodule ClassnavapiWeb.Router do
         resources "/fields", Student.FieldController, only: [:create, :delete]
 
         # Chat routes
-        index "/chat", Student.ChatController, :chat
-        index "/inbox", Student.ChatController, :inbox
+        get "/chat", Student.ChatController, :chat
+        get "/inbox", Student.ChatController, :inbox
 
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify

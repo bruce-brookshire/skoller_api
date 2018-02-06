@@ -116,4 +116,15 @@ defmodule ClassnavapiWeb.ClassView do
             }
         )
     end
+
+    def render("class_short.json", %{class: class}) do
+        %{
+            id: class.id,
+            name: class.name,
+            number: class.number,
+            is_editable: class.is_editable,
+            campus: class.campus,
+            class_period_id: class.class_period_id,
+        }
+    end
 end
