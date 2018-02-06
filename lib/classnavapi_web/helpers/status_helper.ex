@@ -40,6 +40,14 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def check_status(%Class{class_status_id: nil} = class, _params) do
     class |> set_status(@syllabus_status)
   end
+  # A new class has been approved, and it is a class that will never have a syllabus.
+  def check_status(%Class{class_status_id: @new_class_status, is_syllabus: false} = class, _params) do
+    class |> set_status(@weight_status)
+  end
+  # A new class has been approved.
+  def check_status(%Class{class_status_id: @new_class_status} = class, _params) do
+    class |> set_status(@syllabus_status)
+  end
   # A syllabus has been added to a class that needs a syllabus.
   def check_status(%Class{class_status_id: @syllabus_status} = class, %{doc: %{is_syllabus: true} = doc}) do
     case doc.class_id == class.id do
