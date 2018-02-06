@@ -11,7 +11,7 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
   end
 
   def render("show.json", %{chat_comment: chat_comment}) do
-    render_one(chat_comment, ChatCommentView, "chat_comment.json")
+    render_one(chat_comment, ChatCommentView, "chat_comment_detail.json")
   end
 
   def render("chat_comment.json", %{chat_comment: chat_comment}) do
