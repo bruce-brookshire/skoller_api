@@ -75,6 +75,7 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json"),
+      color: color
     }
   end
 
