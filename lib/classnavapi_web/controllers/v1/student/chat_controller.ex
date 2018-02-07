@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
+  alias Classnavapi.Chat.Post.Like
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.Class.ChatPostView
 
@@ -13,9 +14,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   # @sort_hot 100
   @sort_recent "200"
-  # @sort_top_day 300
-  # @sort_top_week 400
-  # @sort_top_period 500
+  @sort_top_day "300"
+  @sort_top_week "400"
+  @sort_top_period "500"
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
@@ -24,12 +25,28 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     posts = from(p in Post)
     |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
     |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), enroll.class_id == sc.class_id)
+    |> join(:left, [p, sc, enroll], l in subquery(like_subquery(student_id)), l.chat_post_id == p.id)
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
-    |> select([p, sc, enroll], %{chat_post: p, color: sc.color, enroll: enroll.count})
+    |> select([p, sc, enroll, l], %{chat_post: p, color: sc.color, enroll: enroll.count, likes: l.count})
     |> order_by_params(params)
     |> Repo.all()
+    |> sort_by_params(params)
 
     render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: student_id})
+  end
+
+  defp sort_by_params(enum, %{"sort" => sort}) when sort in [@sort_top_day, @sort_top_period, @sort_top_week] do
+    enum |> Enum.sort(& &1.likes / &1.enroll >= &2.likes / &2.enroll)
+  end
+  defp sort_by_params(enum, _params), do: enum
+
+  defp like_subquery(student_id) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], p in Post, sc.class_id == p.class_id)
+    |> join(:left, [sc, p], l in Like, l.chat_post_id == p.id)
+    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> group_by([sc, p, l], p.id)
+    |> select([sc, p, l], %{chat_post_id: p.id, count: count(l.id)})
   end
 
   defp enrollment_subquery(student_id) do
@@ -41,7 +58,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end
 
-  defp order_by_params(query, %{"sort" => @sort_recent}) do
+  defp order_by_params(query, %{"sort" => sort}) when sort in [@sort_recent, @sort_top_day, @sort_top_period, @sort_top_week] do
     query
     |> order_by([p, sc], desc: p.inserted_at)
   end
