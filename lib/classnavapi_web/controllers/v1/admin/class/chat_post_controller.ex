@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
   alias ClassnavapiWeb.Class.ChatPostView
+  alias Classnavapi.Class.StudentClass
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -34,7 +35,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
     |> where([p], p.class_id == ^class_id)
     |> Repo.all()
 
-    conn |> render_index_view(posts)
+    conn |> render_index_view(posts, class_id)
   end
 
   def show(conn, %{"id" => id}) do
@@ -42,14 +43,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChatPostController do
     conn |> render_show_view(post)
   end
 
-  defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts) do
-    render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: id})
+  defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts, class_id) do
+    sc = Repo.get_by!(StudentClass, student_id: id, class_id: class_id, is_dropped: false)
+    render(conn, ChatPostView, "index.json", %{chat_posts: %{chat_posts: posts, color: sc.color}, current_student_id: id})
   end
-  defp render_index_view(conn, posts) do
+  defp render_index_view(conn, posts, _class_id) do
     render(conn, ChatPostView, "index.json", chat_posts: posts)
   end
   defp render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
-    render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: id})
+    sc = Repo.get_by!(StudentClass, student_id: id, class_id: post.class_id, is_dropped: false)
+    render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: id})
   end
   defp render_show_view(conn, post) do
     render(conn, ChatPostView, "show.json", chat_post: post)

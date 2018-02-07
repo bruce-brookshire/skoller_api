@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
   alias Classnavapi.Chat.Post
   alias ClassnavapiWeb.Class.ChatPostView
   alias Classnavapi.Chat.Post.Star
+  alias Classnavapi.Class.StudentClass
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -15,7 +16,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def create(conn, params) do
+  def create(conn, %{"class_id" => class_id} = params) do
 
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
@@ -27,7 +28,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     case Repo.transaction(multi) do
       {:ok, %{post: post}} -> 
-        render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: conn.assigns[:user].student_id})
+        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: class_id, is_dropped: false)
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -35,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
     end
   end
 
-  def update(conn, %{"id" => id} = params) do
+  def update(conn, %{"id" => id, "class_id" => class_id} = params) do
 
     post_old = Repo.get!(Post, id)
 
@@ -43,7 +45,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     case Repo.update(changeset) do
       {:ok, post} -> 
-        render(conn, ChatPostView, "show.json", %{chat_post: post, current_student_id: conn.assigns[:user].student_id})
+        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: class_id, is_dropped: false)
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

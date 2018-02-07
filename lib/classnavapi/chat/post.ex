@@ -11,6 +11,7 @@ defmodule Classnavapi.Chat.Post do
     has_many :chat_comments, Classnavapi.Chat.Comment, foreign_key: :chat_post_id
     belongs_to :student, Classnavapi.Student, define_field: false
     has_many :likes, Classnavapi.Chat.Post.Like, foreign_key: :chat_post_id
+    belongs_to :class, Classnavapi.Class, define_field: false
 
     timestamps()
   end
