@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostLikeController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post.Like
   alias ClassnavapiWeb.Class.ChatPostView
+  alias Classnavapi.Class.StudentClass
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -14,7 +15,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostLikeController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def create(conn, params) do
+  def create(conn, %{"class_id" => class_id} = params) do
 
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
@@ -23,7 +24,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostLikeController do
     case Repo.insert(changeset) do
       {:ok, like} -> 
         like = like |> Repo.preload(:chat_post)
-        render(conn, ChatPostView, "show.json", %{chat_post: like.chat_post, current_student_id: conn.assigns[:user].student_id})
+        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: class_id, is_dropped: false)
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -36,7 +38,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostLikeController do
     case Repo.delete(like) do
       {:ok, _struct} ->
         like = like |> Repo.preload(:chat_post)
-        render(conn, ChatPostView, "show.json", %{chat_post: like.chat_post, current_student_id: conn.assigns[:user].student_id})
+        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: like.chat_post.class_id, is_dropped: false)
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
