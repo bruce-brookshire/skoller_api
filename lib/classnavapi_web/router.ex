@@ -43,6 +43,8 @@ defmodule ClassnavapiWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
+
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
@@ -94,6 +96,29 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
         post "/approve", Admin.Class.StatusController, :approve
+
+        # Chat routes
+        resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete, :show]
+        resources "/posts", Class.ChatPostController, only: [:create, :update] do
+          resources "/comments", Class.ChatCommentController, only: [:create]
+          resources "/like", Class.Chat.PostLikeController,  only: [:create]
+          delete "/unlike", Class.Chat.PostLikeController, :delete
+          resources "/star", Class.Chat.PostStarController, only: [:create]
+          delete "/unstar", Class.Chat.PostStarController, :delete
+        end
+        put "/comments/:id", Class.ChatCommentController, :update
+        resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
+          resources "/replies", Class.ChatReplyController, only: [:create]
+          resources "/star", Class.Chat.CommentStarController, only: [:create]
+          delete "/unstar", Class.Chat.CommentStarController, :delete
+          resources "/like", Class.Chat.CommentLikeController, only: [:create]
+          delete "/unlike", Class.Chat.CommentLikeController, :delete
+        end
+        resources "/replies", Admin.Class.ChatReplyController, only: [:delete] do
+          resources "/like", Class.Chat.ReplyLikeController, only: [:create]
+          delete "/unlike", Class.Chat.ReplyLikeController, :delete
+        end
+        put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock

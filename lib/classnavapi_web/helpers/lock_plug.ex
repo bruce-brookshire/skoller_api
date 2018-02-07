@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   
   @moduledoc """
   
-  Handles auth plugs.
+  Handles lock auth.
 
   """
 
