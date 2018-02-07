@@ -27,6 +27,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), enroll.class_id == sc.class_id)
     |> join(:left, [p, sc, enroll], l in subquery(like_subquery(student_id)), l.chat_post_id == p.id)
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where_by_params(params)
     |> select([p, sc, enroll, l], %{chat_post: p, color: sc.color, enroll: enroll.count, likes: l.count})
     |> order_by_params(params)
     |> Repo.all()
@@ -34,6 +35,16 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
     render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: student_id})
   end
+
+  defp where_by_params(query, %{"sort" => @sort_top_day}) do
+    query 
+    |> where([p], p.inserted_at > ago(^1, "day"))
+  end
+  defp where_by_params(query, %{"sort" => @sort_top_week}) do
+    query 
+    |> where([p], p.inserted_at > ago(^7, "day"))
+  end
+  defp where_by_params(query, _params), do: query 
 
   defp sort_by_params(enum, %{"sort" => sort}) when sort in [@sort_top_day, @sort_top_period, @sort_top_week] do
     enum |> Enum.sort(& &1.likes / &1.enroll >= &2.likes / &2.enroll)
