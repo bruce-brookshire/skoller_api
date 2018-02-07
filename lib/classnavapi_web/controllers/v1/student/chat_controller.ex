@@ -12,11 +12,13 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   @student_role 100
 
-  # @sort_hot 100
+  @sort_hot "100"
   @sort_recent "200"
   @sort_top_day "300"
   @sort_top_week "400"
   @sort_top_period "500"
+
+  @sensitivity 0.4
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
@@ -46,10 +48,19 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   end
   defp where_by_params(query, _params), do: query 
 
+  defp sort_by_params(enum, %{"sort" => @sort_hot}) do
+    enum
+    |> Enum.sort(&hot_algorithm(&1) > hot_algorithm(&2))
+  end
   defp sort_by_params(enum, %{"sort" => sort}) when sort in [@sort_top_day, @sort_top_period, @sort_top_week] do
     enum |> Enum.sort(& &1.likes / &1.enroll >= &2.likes / &2.enroll)
   end
   defp sort_by_params(enum, _params), do: enum
+
+  defp hot_algorithm(%{enroll: enroll, likes: likes, inserted_at: tsp}) do
+    ratio = likes / enroll
+    e = :math.exp(1)
+  end
 
   defp like_subquery(student_id) do
     from(sc in StudentClass)
