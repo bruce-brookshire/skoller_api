@@ -5,10 +5,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
   alias Classnavapi.Class.Doc
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.DocView
-  alias Classnavapi.DocUpload
   alias ClassnavapiWeb.ChangesetView
-  alias Ecto.UUID
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias ClassnavapiWeb.Helpers.ClassDocUpload
   alias ClassnavapiWeb.Sammi
 
   import Ecto.Query
@@ -23,16 +22,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    scope = %{"id" => UUID.generate()}
-    location = 
-      case DocUpload.store({file, scope}) do
-        {:ok, inserted} ->
-          DocUpload.url({inserted, scope})
-        {:error, error} ->
-          require Logger
-          Logger.info(inspect(error))
-          nil
-      end
+    location = ClassDocUpload.upload_class_doc(file)
 
     Task.start(Sammi, :sammi, [params, location])
   
@@ -47,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.DocController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(&1, class))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{doc: doc}} ->

@@ -8,6 +8,15 @@ defmodule Classnavapi.Class.Status do
 
   """
 
+  # @new_class_status 100
+  # @syllabus_status 200
+  # @weight_status 300
+  # @assignment_status 400
+  # @review_status 500
+  # @help_status 600
+  # @complete_status 700
+  # @change_status 800
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Status

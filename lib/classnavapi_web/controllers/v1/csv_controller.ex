@@ -85,7 +85,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   end
 
   defp update_class(class, old_class) do
-    changeset = Class.changeset_update(old_class, class)
+    changeset = Class.changeset(old_class, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
     Repo.update(changeset)
   end
@@ -99,7 +99,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   defp insert_class(class) do
     class = class 
       |> Map.put(:grade_scale, @default_grade_scale)
-    changeset = Class.changeset_insert(%Class{}, class)
+    changeset = Class.changeset(%Class{}, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
     Repo.insert(changeset)
   end

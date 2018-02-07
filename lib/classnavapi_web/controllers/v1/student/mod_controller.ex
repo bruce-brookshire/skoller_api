@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
 
   @due_assignment_mod 300
   @new_assignment_mod 400
-  
+
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
 

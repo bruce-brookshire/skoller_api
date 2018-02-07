@@ -1,6 +1,11 @@
 defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   alias Classnavapi.Repo
+  alias Classnavapi.Class.StudentRequest
+  alias Classnavapi.Class
+  alias Classnavapi.Class.ChangeRequest
+
+  import Ecto.Query
 
   @moduledoc """
   
@@ -8,13 +13,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   All check_status/2 return either {:ok, value} or {:error, value}
 
-  check_changeset_status/2 takes a changeset and params and returns a changeset.
-
-  confirm_class/2 takes a changeset and params and returns a changeset.
-
   """
 
-  @new_class_status 100
+  # @new_class_status 100
   @syllabus_status 200
   @weight_status 300
   @assignment_status 400
@@ -25,152 +26,155 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   @weight_lock 100
   @assignment_lock 200
+  @review_lock 300
 
-  def check_status(%{student_class: %{class_id: class_id}}, %{is_ghost: true, id: id} = class) do
-    case class_id == id do
-      true -> remove_ghost(class)
+  # A new class has been created by a student.
+  # def check_status(%Class{class_status_id: nil} = class, %{params: %{is_student: true}}) do
+  #   class |> set_status(@new_class_status)
+  # end
+  # A new class has been added, and it is a class that will never have a syllabus.
+  def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
+    class |> set_status(@weight_status)
+  end
+  # A new class has been added.
+  def check_status(%Class{class_status_id: nil} = class, _params) do
+    class |> set_status(@syllabus_status)
+  end
+  # A syllabus has been added to a class that needs a syllabus.
+  def check_status(%Class{class_status_id: @syllabus_status} = class, %{doc: %{is_syllabus: true} = doc}) do
+    case doc.class_id == class.id do
+      true -> class |> set_status(@weight_status)
+      false -> {:error, %{class_id: "Class and doc do not match"}}
+    end
+  end
+  # A class in the change status has a change request completed.
+  def check_status(%Class{class_status_id: @change_status} = class, %{change_request: %{is_completed: true} = change_request}) do
+    case change_request.class_id == class.id do
+      true -> check_req_status(class)
+      false -> {:error, %{class_id: "Class and change request do not match"}}
+    end
+  end
+  # A class in the change status has a student request completed.
+  def check_status(%Class{class_status_id: @change_status} = class, %{student_request: %{is_completed: true} = student_request}) do
+    case student_request.class_id == class.id do
+      true -> check_req_status(class)
+      false -> {:error, %{class_id: "Class and student request do not match"}}
+    end
+  end
+  # A class has a change request created.
+  def check_status(%Class{} = class, %{change_request: %{is_completed: false} = change_request}) do
+    case change_request.class_id == class.id do
+      true -> class |> Repo.preload(:class_status) |> change_status_check()
+      false -> {:error, %{class_id: "Class and change request do not match"}}
+    end
+  end
+  # A class has a help request created.
+  def check_status(%Class{} = class, %{help_request: %{is_completed: false} = help_request}) do
+    case help_request.class_id == class.id do
+      true -> class |> Repo.preload(:class_status) |> help_status_check()
+      false -> {:error, %{class_id: "Class and change request do not match"}}
+    end
+  end
+  # A class has been fully unlocked. Get the highest lock
+  def check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
+    max_lock = unlock
+    |> Enum.filter(& elem(&1, 1).is_completed and elem(&1, 1).class_id == class.id)
+    |> Enum.reduce(0, &case elem(&1, 1).class_lock_section_id > &2 do
+        true -> elem(&1, 1).class_lock_section_id
+        false -> &2
+      end)
+    case max_lock do
+      @review_lock -> class |> set_status(@complete_status)
+      @assignment_lock -> class |> set_status(@complete_status)
+      @weight_lock -> class |> set_status(@assignment_lock)
+      _ -> {:ok, nil}
+    end
+  end
+  # A class has been unlocked in the weights status.
+  def check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock, is_completed: true} = unlock}) do
+    case unlock.class_id == class.id do
+      true -> class |> set_status(@assignment_status)
+      false -> {:error, %{class_id: "Class and lock do not match"}}
+    end
+  end
+  # A class has been unlocked in the assignments status.
+  def check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock, is_completed: true} = unlock}) do
+    case unlock.class_id == class.id do
+      true -> class |> set_status(@review_status)
+      false -> {:error, %{class_id: "Class and lock do not match"}}
+    end
+  end
+  # A class has been unlocked from the review status.
+  def check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
+    case unlock.class_id == class.id do
+      true -> class |> set_status(@complete_status)
+      false -> {:error, %{class_id: "Class and lock do not match"}}
+    end
+  end
+  # A student enrolled into a ghost class.
+  def check_status(%Class{is_ghost: true} = class, %{student_class: student_class}) do
+    case student_class.class_id == class.id do
+      true -> class |> remove_ghost()
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
-  def check_status(%{doc: %{class_id: class_id, is_syllabus: true}}, %{id: id} = class) do
-    case class_id == id do
-      true -> syllabus_status_check(class)
-      false -> {:error, %{class_id: "Doc upload and class do not match."}}
+  # A student created a student request.
+  def check_status(%Class{} = class, %{student_request: %{is_completed: false} = student_request}) do
+    case student_request.class_id == class.id do
+      true -> class |> Repo.preload(:class_status) |> set_request_status()
+      false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
-  def check_status(%{}, %{}), do: {:ok, nil}
+  def check_status(_class, _params), do: {:ok, nil}
 
-  def set_help_status(%{help_request: %{class_id: class_id}}, %{id: id} = class) do
-    case class_id == id do
-      true -> help_status_check(class)
-      false -> {:error, %{class_id: "Class and issue do not match."}}
+  defp set_status(class, status) do
+    Ecto.Changeset.change(class, %{class_status_id: status})
+    |> Repo.update()
+  end
+
+  defp check_req_status(%Class{} = class) do
+    cr_query = from(cr in ChangeRequest)
+    |> where([cr], cr.class_id == ^class.id and cr.is_completed == false)
+    |> Repo.all()
+
+    sr_query = from(sr in StudentRequest)
+    |> where([sr], sr.class_id == ^class.id and sr.is_completed == false)
+    |> Repo.all()
+
+    results = cr_query ++ sr_query
+
+    case results do
+      [] -> 
+        class |> set_status(@complete_status)
+      _results -> 
+        {:ok, nil}
     end
   end
 
-  def set_change_status(%{change_request: %{class_id: class_id}}, %{id: id} = class) do
-    case class_id == id do
-      true -> change_status_check(class)
-      false -> {:error, %{class_id: "Class and issue do not match."}}
-    end
-  end
-
-  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: nil}} = changeset, %{} = params) do
-    changeset
-    |> check_new_class(params)
-    |> check_needs_syllabus(params)
-    |> check_needs_weight(params)
-  end
-  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_assignments(params)
-  end
-  def check_changeset_status(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
-
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: @new_class_status}} = changeset, %{}) do
-    changeset
-    |> check_needs_syllabus(changeset.data)
-    |> check_needs_weight(changeset.data)
-  end
-  def confirm_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
-
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @weight_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_assignments(params)
-    |> check_needs_complete(params)
-  end
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @assignment_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_review(params)
-    |> check_needs_complete(params)
-  end
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: @review_status}} = changeset, %{} = params) do
-    changeset
-    |> check_needs_complete(params)
-  end
-  def unlock_class(%Ecto.Changeset{data: %{class_status_id: _}} = changeset, %{}), do: changeset
-
-  defp check_new_class(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_new_class(changeset, %{"is_student" => true}) do
-    changeset |> change_changeset_status(@new_class_status)
-  end
-  defp check_new_class(changeset, %{}), do: changeset
-
-  defp check_needs_syllabus(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_syllabus(changeset, %{"is_syllabus" => true}) do
-    changeset |> change_changeset_status(@syllabus_status)
-  end
-  defp check_needs_syllabus(changeset, %{is_syllabus: true}) do
-    changeset |> change_changeset_status(@syllabus_status)
-  end
-  defp check_needs_syllabus(changeset, %{}), do: changeset
-
-  defp check_needs_weight(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_weight(changeset, %{"is_syllabus" => false}) do
-    changeset |> change_changeset_status(@weight_status)
-  end
-  defp check_needs_weight(changeset, %{is_syllabus: false}) do
-    changeset |> change_changeset_status(@weight_status)
-  end
-  defp check_needs_weight(changeset, %{}), do: changeset
-
-  defp check_needs_assignments(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_assignments(%Ecto.Changeset{changes: %{weights: _}} = changeset, %{"weights" => _}) do
-    changeset |> change_changeset_status(@assignment_status)
-  end
-  defp check_needs_assignments(changeset, %{"class_lock_section_id" => @weight_lock, "is_completed" => true}) do
-    case changeset.changes |> Map.equal?(%{}) do
-      true -> changeset |> change_changeset_status(@assignment_status)
-      false -> changeset
-    end
-  end
-  defp check_needs_assignments(changeset, %{}), do: changeset
-
-  defp check_needs_review(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_review(changeset, %{"class_lock_section_id" => @assignment_lock, "is_completed" => true}) do
-    changeset |> change_changeset_status(@review_status)
-  end
-  defp check_needs_review(changeset, %{}), do: changeset
-
-  defp check_needs_complete(%Ecto.Changeset{changes: %{class_status_id: _}} = changeset, %{}), do: changeset
-  defp check_needs_complete(changeset, %{"is_completed" => true}) do
-    changeset |> change_changeset_status(@complete_status)
-  end
-  defp check_needs_complete(changeset, %{}), do: changeset
-
-  defp change_changeset_status(changeset, new_status) do
-    changeset |> Ecto.Changeset.change(%{class_status_id: new_status})
-  end
-
-  defp remove_ghost(%{} = params) do
-    params
+  defp remove_ghost(%{} = class) do
+    class
     |> Ecto.Changeset.change(%{is_ghost: false})
     |> Repo.update()
   end
 
-  defp syllabus_status_check(%{class_status_id: @syllabus_status} = params) do
-    params
-    |> Ecto.Changeset.change(%{class_status_id: @weight_status})
-    |> Repo.update()
-  end
-  defp syllabus_status_check(%{}), do: {:ok, nil}
-
   defp change_status_check(%{class_status: %{is_complete: false}}) do
     {:error, %{error: "Class is incomplete, use Help Request."}}
   end
-  defp change_status_check(%{class_status: %{is_complete: true}} = params) do
-    params
-    |> Ecto.Changeset.change(%{class_status_id: @change_status})
-    |> Repo.update()
+  defp change_status_check(%{class_status: %{is_complete: true}} = class) do
+    class |> set_status(@change_status)
   end
-  defp change_status_check(%{}), do: {:ok, nil}
 
   defp help_status_check(%{class_status: %{is_complete: true}}) do
     {:error, %{error: "Class is complete, use Change Request."}}
   end
-  defp help_status_check(%{class_status: %{is_complete: false}} = params) do
-    params
-    |> Ecto.Changeset.change(%{class_status_id: @help_status})
-    |> Repo.update()
+  defp help_status_check(%{class_status: %{is_complete: false}} = class) do
+    class |> set_status(@help_status)
   end
-  defp help_status_check(%{}), do: {:ok, nil}
+
+  defp set_request_status(%{class_status: %{is_complete: true}} = class) do
+    class |> set_status(@change_status)
+  end
+  defp set_request_status(%{class_status: %{is_complete: false}} = class) do
+    class |> set_status(@help_status)
+  end
 end

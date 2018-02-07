@@ -89,11 +89,10 @@ defmodule ClassnavapiWeb.Router do
       # Class routes
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
-      post "/classes/:class_hash/pydocs", Admin.Class.DocController, :create
+      post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
-        post "/confirm", ClassController, :confirm
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock
@@ -114,11 +113,14 @@ defmodule ClassnavapiWeb.Router do
         # Class Request routes
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
+        post "/student-request/:class_student_request_type_id", Class.StudentRequestController, :create
       end
       post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
+      post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
+      resources "/class-student-request-types", Class.StudentRequest.TypeController, only: [:index]
 
       # Student routes
       resources "/students", StudentController, only: [] do
