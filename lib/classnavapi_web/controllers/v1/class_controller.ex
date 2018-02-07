@@ -57,7 +57,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.insert(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
 
     case Repo.transaction(multi) do
       {:ok, %{class_status: class}} ->

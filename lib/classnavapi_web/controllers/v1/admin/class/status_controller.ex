@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     alias Classnavapi.Class.Lock
     alias ClassnavapiWeb.Helpers.RepoHelper
     alias ClassnavapiWeb.Helpers.NotificationHelper
+    alias ClassnavapiWeb.Helpers.StatusHelper
 
     import ClassnavapiWeb.Helpers.AuthPlug
     import Ecto.Query
@@ -25,6 +26,25 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @review_lock 300
     
     plug :verify_role, %{roles: [@admin_role, @help_status]}
+
+    def approve(conn, %{"class_id" => class_id}) do
+      class = Class
+      |> Repo.get!(class_id)
+
+      updated = class
+      |> StatusHelper.check_status(nil)
+
+      case updated do
+        {:ok, nil} ->
+          render(conn, ClassView, "show.json", class: class)
+        {:ok, class} ->
+          render(conn, ClassView, "show.json", class: class)
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+      end
+    end
 
     def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
       old_class = Repo.get!(Class, class_id)
