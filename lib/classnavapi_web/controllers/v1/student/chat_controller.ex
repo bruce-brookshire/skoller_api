@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where_by_params(params)
     |> select([p, sc, enroll, l], %{chat_post: p, color: sc.color, enroll: enroll.count, likes: l.count})
-    |> order_by_params(params)
+    |> order_by([p, sc], desc: p.inserted_at)
     |> Repo.all()
     |> sort_by_params(params)
 
@@ -50,16 +50,19 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   defp sort_by_params(enum, %{"sort" => @sort_hot}) do
     enum
-    |> Enum.sort(&hot_algorithm(&1) > hot_algorithm(&2))
+    |> Enum.sort(&hot_algorithm(&1) >= hot_algorithm(&2))
   end
   defp sort_by_params(enum, %{"sort" => sort}) when sort in [@sort_top_day, @sort_top_period, @sort_top_week] do
     enum |> Enum.sort(& &1.likes / &1.enroll >= &2.likes / &2.enroll)
   end
   defp sort_by_params(enum, _params), do: enum
 
-  defp hot_algorithm(%{enroll: enroll, likes: likes, inserted_at: tsp}) do
+  defp hot_algorithm(%{enroll: enroll, likes: likes, chat_post: %{inserted_at: tsp} = chat_post}) do
     ratio = likes / enroll
-    e = :math.exp(1)
+    tsp = tsp |> DateTime.from_naive!("Etc/UTC")
+    tsp = DateTime.utc_now() |> DateTime.diff(tsp, :second)
+    tsp = tsp / 86_400
+    1 / (1 + (:math.exp(tsp * @sensitivity * :math.log(tsp + 1) - ratio)))
   end
 
   defp like_subquery(student_id) do
@@ -79,10 +82,4 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end
-
-  defp order_by_params(query, %{"sort" => sort}) when sort in [@sort_recent, @sort_top_day, @sort_top_period, @sort_top_week] do
-    query
-    |> order_by([p, sc], desc: p.inserted_at)
-  end
-  defp order_by_params(query, _params), do: query
 end
