@@ -63,7 +63,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([c, p, sc, s, r, ps], is_nil(ps.id)) # Don't get comment stars if post commented.
     |> order_by([c, p, sc, s, r], desc: r.updated_at)
     |> distinct([c], c.chat_post_id)
-    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true}})
+    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true, id: r.id}})
     |> Repo.all()
 
     inbox = posts ++ comments
@@ -82,7 +82,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([c], c.chat_post_id == ^post_id and c.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([c], desc: c.updated_at)
     |> limit(1)
-    |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false, updated_at: c.updated_at})
+    |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false, updated_at: c.updated_at, id: c.id})
     |> Repo.one()
 
     reply = from(r in Reply)
@@ -90,7 +90,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([r, c], c.chat_post_id == ^post_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)
-    |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true, updated_at: r.updated_at})
+    |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true, updated_at: r.updated_at, id: r.id})
     |> Repo.one()
 
     compate_dates(comment, reply)

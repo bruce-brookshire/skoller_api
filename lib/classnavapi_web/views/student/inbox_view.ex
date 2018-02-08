@@ -14,7 +14,8 @@ defmodule ClassnavapiWeb.Student.InboxView do
     %{
       chat_post: render_one(chat_post, ChatPostView, "chat_post_short.json"),
       color: color,
-      response: render_one(response, ResponseView, "response.json")
+      response: render_one(response, ResponseView, "response.json"),
+      is_read: star.is_read
     }
   end
 
@@ -22,7 +23,8 @@ defmodule ClassnavapiWeb.Student.InboxView do
     %{
       chat_post: render_one(parent, ChatPostView, "chat_post_short.json"),
       color: color,
-      response: render_one(response, ResponseView, "response.json")
+      response: render_one(response, ResponseView, "response.json"),
+      is_read: star.is_read
     }
   end
 end

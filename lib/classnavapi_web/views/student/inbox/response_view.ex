@@ -10,7 +10,8 @@ defmodule ClassnavapiWeb.Student.Inbox.ResponseView do
   def render("response.json", %{response: response}) do
     %{
       response: response.response,
-      is_reply: response.is_reply
+      is_reply: response.is_reply,
+      id: response.id
     }
   end
 end
