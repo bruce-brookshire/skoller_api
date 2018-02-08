@@ -3,11 +3,15 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostStarController do
   
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post.Star
+  alias Classnavapi.Chat.Comment
+  alias Classnavapi.Chat.Comment.Star, as: CommentStar
   alias ClassnavapiWeb.Class.ChatPostView
   alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
+  import Ecto.Query
 
   @student_role 100
 
@@ -44,6 +48,27 @@ defmodule ClassnavapiWeb.Api.V1.Class.Chat.PostStarController do
         conn
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def update(conn, %{"chat_post_id" => post_id}) do
+    cstar = from(cs in CommentStar)
+    |> join(:inner, [cs], c in Comment, cs.chat_comment_id == c.id)
+    |> where([cs], cs.is_read == false and cs.student_id == ^conn.assigns[:user].student_id)
+    |> where([cs, c], c.chat_post_id == ^post_id)
+    |> Repo.all()
+
+    update = case Repo.get_by(Star, chat_post_id: post_id, student_id: conn.assigns[:user].student_id) do
+      nil -> cstar
+      star -> cstar ++ star |> List.wrap()
+    end
+
+    status = update
+    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: true})))
+    
+    case status |> Enum.find({:ok, status}, &RepoHelper.errors(&1)) do
+      {:ok, _} -> conn |> send_resp(204, "")
+      {:error, _} -> conn |> send_resp(422, "")
     end
   end
 end
