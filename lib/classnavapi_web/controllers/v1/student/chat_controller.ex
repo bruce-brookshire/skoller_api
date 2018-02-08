@@ -60,7 +60,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
     |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
     |> where([c, p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
-    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: r})
+    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true}})
     |> Repo.all()
 
     inbox = posts ++ comments
@@ -73,7 +73,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([c], c.chat_post_id == ^post_id and c.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([c], desc: c.updated_at)
     |> limit(1)
-    |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false})
+    |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false, updated_at: c.updated_at})
     |> Repo.one()
 
     reply = from(r in Reply)
@@ -81,7 +81,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> where([r, c], c.chat_post_id == ^post_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)
-    |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true})
+    |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true, updated_at: r.updated_at})
     |> Repo.one()
 
     compate_dates(comment, reply)
@@ -89,7 +89,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   defp compate_dates(comment, nil), do: comment
   defp compate_dates(comment, reply) do
-    case DateTime.compare(comment, reply) do
+    case DateTime.compare(DateTime.from_naive!(comment.updated_at, "Etc/UTC"), DateTime.from_naive!(reply.updated_at, "Etc/UTC")) do
       :gt -> comment
       _ -> reply
     end
