@@ -31,10 +31,9 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
     case Repo.transaction(multi) do
       {:ok, %{comment: comment}} -> 
         render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
@@ -55,7 +54,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
 
   defp unread_posts(comment, student_id) do
     items = from(s in PostStar)
-    |> where([s], s.id == ^comment.chat_post_id and s.is_read == true)
+    |> where([s], s.id == ^comment.chat_post_id and s.is_read == true and s.student_id != ^student_id)
     |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
     {:ok, items}
   end
