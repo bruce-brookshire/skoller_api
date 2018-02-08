@@ -4,8 +4,13 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Post.Like
+  alias Classnavapi.Chat.Post.Star, as: PStar
+  alias Classnavapi.Chat.Comment
+  alias Classnavapi.Chat.Comment.Star, as: CStar
+  alias Classnavapi.Chat.Reply
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.Class.ChatPostView
+  alias ClassnavapiWeb.Student.InboxView
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -36,6 +41,64 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> sort_by_params(params)
 
     render(conn, ChatPostView, "index.json", %{chat_posts: posts, current_student_id: student_id})
+  end
+
+  def inbox(conn, %{"student_id" => student_id}) do
+    posts = from(p in Post)
+    |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
+    |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
+    |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> select([p, sc, s, r], %{chat_post: p, color: sc.color, star: s})
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :response, most_recent_response(&1.chat_post.id)))
+
+    comments = from(c in Comment)
+    |> join(:inner, [c], p in Post, c.chat_post_id == p.id)
+    |> join(:inner, [c, p], sc in StudentClass, sc.class_id == p.class_id)
+    |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
+    |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
+    |> where([c, p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: r})
+    |> Repo.all()
+
+    inbox = posts ++ comments
+
+    render(conn, InboxView, "index.json", %{inbox: inbox, current_student_id: student_id})
+  end
+
+  defp most_recent_response(post_id) do
+    comment = from(c in Comment)
+    |> where([c], c.chat_post_id == ^post_id)
+    |> order_by([c], desc: c.updated_at)
+    |> limit(1)
+    |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false})
+    |> Repo.one()
+
+    reply = from(r in Reply)
+    |> join(:inner, [r], c in Comment, c.id == r.chat_comment_id)
+    |> where([r, c], c.chat_post_id == ^post_id)
+    |> order_by([r], desc: r.updated_at)
+    |> limit(1)
+    |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true})
+    |> Repo.one()
+
+    compate_dates(comment, reply)
+  end
+
+  defp compate_dates(comment, nil), do: comment
+  defp compate_dates(comment, reply) do
+    case DateTime.compare(comment, reply) do
+      :gt -> comment
+      _ -> reply
+    end
+  end
+
+  defp most_recent_reply(student_id) do
+    from(r in Reply)
+    |> join(:inner, [r], s in CStar, s.chat_comment_id == r.chat_comment_id)
+    |> where([r, s], s.student_id == ^student_id)
+    |> order_by([r], desc: r.updated_at)
+    |> limit(1)
   end
 
   defp where_by_params(query, %{"sort" => @sort_top_day}) do
