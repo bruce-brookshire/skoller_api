@@ -5,9 +5,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
   alias Classnavapi.Chat.Comment
   alias ClassnavapiWeb.Class.ChatCommentView
   alias Classnavapi.Chat.Comment.Star
+  alias Classnavapi.Chat.Post.Star, as: PostStar
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
+  import Ecto.Query
 
   @student_role 100
 
@@ -24,6 +26,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:comment, changeset)
     |> Ecto.Multi.run(:star, &insert_star(&1.comment, conn.assigns[:user].student_id))
+    |> Ecto.Multi.run(:unread, &unread_posts(&1.comment, conn.assigns[:user].student_id))
 
     case Repo.transaction(multi) do
       {:ok, %{comment: comment}} -> 
@@ -48,6 +51,13 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp unread_posts(comment, student_id) do
+    items = from(s in PostStar)
+    |> where([s], s.id == ^comment.chat_post_id and s.is_read == true)
+    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
+    {:ok, items}
   end
 
   defp insert_star(comment, student_id) do
