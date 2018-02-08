@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
   alias ClassnavapiWeb.Class.ChatCommentView
   alias Classnavapi.Chat.Comment.Star
   alias Classnavapi.Chat.Post.Star, as: PostStar
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug

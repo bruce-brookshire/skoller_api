@@ -18,7 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   @student_role 100
 
   @sort_hot "100"
-  @sort_recent "200"
+  #@sort_recent "200"
   @sort_top_day "300"
   @sort_top_week "400"
   @sort_top_period "500"
