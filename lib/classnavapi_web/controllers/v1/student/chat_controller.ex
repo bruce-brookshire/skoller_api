@@ -61,6 +61,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> join(:left, [c, p, sc, s, r], ps in PStar, ps.chat_post_id == p.id and ps.student_id == ^student_id)
     |> where([c, p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where([c, p, sc, s, r, ps], is_nil(ps.id)) # Don't get comment stars if post commented.
+    |> order_by([c, p, sc, s, r], desc: r.updated_at)
+    |> distinct([c], c.chat_post_id)
     |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true}})
     |> Repo.all()
 
