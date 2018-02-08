@@ -14,7 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     import Ecto.Query
     
     @admin_role 200
-    @help_status 600
+    @help_role 500
 
     @assignment_status 400
     @review_status 500
@@ -25,7 +25,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @assignment_lock 200
     @review_lock 300
     
-    plug :verify_role, %{roles: [@admin_role, @help_status]}
+    plug :verify_role, %{roles: [@admin_role, @help_role]}
 
     def approve(conn, %{"class_id" => class_id}) do
       class = Class
