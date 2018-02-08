@@ -57,7 +57,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   end
   defp sort_by_params(enum, _params), do: enum
 
-  defp hot_algorithm(%{enroll: enroll, likes: likes, chat_post: %{inserted_at: tsp} = chat_post}) do
+  defp hot_algorithm(%{enroll: enroll, likes: likes, chat_post: %{inserted_at: tsp}}) do
     ratio = likes / enroll
     tsp = tsp |> DateTime.from_naive!("Etc/UTC")
     tsp = DateTime.utc_now() |> DateTime.diff(tsp, :second)
