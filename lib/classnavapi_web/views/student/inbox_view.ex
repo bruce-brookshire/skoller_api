@@ -3,19 +3,20 @@ defmodule ClassnavapiWeb.Student.InboxView do
 
   alias ClassnavapiWeb.Student.InboxView
   alias ClassnavapiWeb.Class.ChatPostView
+  alias ClassnavapiWeb.Student.Inbox.ResponseView
 
   def render("index.json", %{inbox: inbox, current_student_id: current_student_id}) do
     render_many(inbox, InboxView, "inbox.json", %{current_student_id: current_student_id})
   end
 
-  def render("inbox.json", %{inbox: %{chat_post: chat_post, star: star, color: color}, current_student_id: student_id}) do
+  def render("inbox.json", %{inbox: %{chat_post: chat_post, star: star, color: color, response: response}, current_student_id: student_id}) do
     %{
       chat_post: %{
         id: chat_post.id,
         post: chat_post.post
       },
-      color: color
-
+      color: color,
+      response: render_one(response, ResponseView, "response.json")
     }
   end
 

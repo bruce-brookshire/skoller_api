@@ -47,10 +47,12 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     posts = from(p in Post)
     |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
     |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
+    |> join(:inner, [p, sc, s], c in Comment, c.chat_post_id == p.id)
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
-    |> select([p, sc, s, r], %{chat_post: p, color: sc.color, star: s})
+    |> where([p, sc, s, c], c.student_id != ^student_id) #Stop a student from getting hit with their own updates
+    |> select([p, sc, s, c], %{chat_post: p, color: sc.color, star: s})
     |> Repo.all()
-    |> Enum.map(&Map.put(&1, :response, most_recent_response(&1.chat_post.id)))
+    |> Enum.map(&Map.put(&1, :response, most_recent_response(&1.chat_post.id, student_id)))
 
     comments = from(c in Comment)
     |> join(:inner, [c], p in Post, c.chat_post_id == p.id)
@@ -66,9 +68,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     render(conn, InboxView, "index.json", %{inbox: inbox, current_student_id: student_id})
   end
 
-  defp most_recent_response(post_id) do
+  defp most_recent_response(post_id, student_id) do
     comment = from(c in Comment)
-    |> where([c], c.chat_post_id == ^post_id)
+    |> where([c], c.chat_post_id == ^post_id and c.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([c], desc: c.updated_at)
     |> limit(1)
     |> select([c], %{chat_post_id: c.chat_post_id, response: c.comment, is_reply: false})
@@ -76,7 +78,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
     reply = from(r in Reply)
     |> join(:inner, [r], c in Comment, c.id == r.chat_comment_id)
-    |> where([r, c], c.chat_post_id == ^post_id)
+    |> where([r, c], c.chat_post_id == ^post_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)
     |> select([r, c], %{chat_post_id: c.chat_post_id, response: r.reply, is_reply: true})
@@ -96,7 +98,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   defp most_recent_reply(student_id) do
     from(r in Reply)
     |> join(:inner, [r], s in CStar, s.chat_comment_id == r.chat_comment_id)
-    |> where([r, s], s.student_id == ^student_id)
+    |> where([r, s], s.student_id == ^student_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)
   end
