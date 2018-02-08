@@ -47,9 +47,8 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     posts = from(p in Post)
     |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
     |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
-    |> join(:inner, [p, sc, s], c in Comment, c.chat_post_id == p.id)
+    |> join(:inner, [p, sc, s], c in subquery(distinct_post_id(student_id)), c.chat_post_id == p.id)
     |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
-    |> where([p, sc, s, c], c.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> select([p, sc, s, c], %{chat_post: p, color: sc.color, star: s})
     |> Repo.all()
     |> Enum.map(&Map.put(&1, :response, most_recent_response(&1.chat_post.id, student_id)))
@@ -59,13 +58,21 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     |> join(:inner, [c, p], sc in StudentClass, sc.class_id == p.class_id)
     |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
     |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
+    |> join(:left, [c, p, sc, s, r], ps in PStar, ps.chat_post_id == p.id and ps.student_id == ^student_id)
     |> where([c, p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([c, p, sc, s, r, ps], is_nil(ps.id)) # Don't get comment stars if post commented.
     |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true}})
     |> Repo.all()
 
     inbox = posts ++ comments
 
     render(conn, InboxView, "index.json", %{inbox: inbox, current_student_id: student_id})
+  end
+
+  defp distinct_post_id(student_id) do
+    from(c in Comment)
+    |> where([c], c.student_id != ^student_id) #Stop a student from getting hit with their own updates
+    |> distinct([c], c.chat_post_id)
   end
 
   defp most_recent_response(post_id, student_id) do
