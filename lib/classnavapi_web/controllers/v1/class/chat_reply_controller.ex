@@ -33,7 +33,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatReplyController do
 
     case Repo.transaction(multi) do
       {:ok, %{reply: reply}} -> 
-        Task.start(NotificationHelper, :send_new_reply_notification, [reply])
+        Task.start(NotificationHelper, :send_new_reply_notification, [reply, conn.assigns[:user].student_id])
         render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
       {:error, _, failed_value, _} ->
         conn

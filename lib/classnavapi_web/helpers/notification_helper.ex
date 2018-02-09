@@ -141,11 +141,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
   def build_auto_update_notification(_), do: nil
 
-  def send_new_comment_notification(comment) do
+  def send_new_comment_notification(comment, student_id) do
     users = from(s in PostStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
     |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.id == ^comment.chat_post_id and s.student_id != ^comment.student_id)
+    |> where([s], s.id == ^comment.chat_post_id and s.student_id != ^student_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> select([s, stu, u], u)
     |> Repo.all()
@@ -159,12 +159,12 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Enum.each(&Notification.create_notification(&1.udid, msg, @class_chat_comment))
   end
 
-  def send_new_reply_notification(reply) do
+  def send_new_reply_notification(reply, student_id) do
     post_users = from(s in PostStar)
     |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
     |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
     |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.student_id != ^reply.student_id)
+    |> where([s], s.student_id != ^student_id)
     |> where([s, c], c.id == ^reply.chat_comment_id)
     |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> select([s, c, stu, u], u)
@@ -175,7 +175,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     comment_users = from(s in CommentStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
     |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.student_id != ^reply.student_id)
+    |> where([s], s.student_id != ^student_id)
     |> where([s], s.chat_comment_id == ^reply.chat_comment_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> where([s, stu, u], u.id not in ^user_ids)
