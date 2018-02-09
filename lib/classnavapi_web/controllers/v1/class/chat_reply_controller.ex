@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatReplyController do
   alias Classnavapi.Chat.Comment.Star, as: CommentStar
   alias Classnavapi.Chat.Post.Star, as: PostStar
   alias Classnavapi.Chat.Comment
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -32,6 +33,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatReplyController do
 
     case Repo.transaction(multi) do
       {:ok, %{reply: reply}} -> 
+        Task.start(NotificationHelper, :send_new_reply_notification, [reply])
         render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
       {:error, _, failed_value, _} ->
         conn
