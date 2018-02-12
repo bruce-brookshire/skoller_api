@@ -14,6 +14,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
+
+  require Logger
   
   @admin_role 200
   
@@ -76,6 +78,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
   end
 
   defp sammi(%Class{id: id}, %{"sammi" => sammi}) do
+    Logger.info(inspect(sammi))
+    
     decoded_sammi = sammi
     |> String.replace("'", ~s("))
     |> Poison.decode!
