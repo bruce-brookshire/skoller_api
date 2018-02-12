@@ -9,13 +9,18 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     alias ClassnavapiWeb.Helpers.RepoHelper
     alias ClassnavapiWeb.Helpers.NotificationHelper
     alias ClassnavapiWeb.Helpers.StatusHelper
+    alias Classnavapi.Mailer
+    alias Classnavapi.User
+    alias Classnavapi.Class.StudentClass
 
     import ClassnavapiWeb.Helpers.AuthPlug
     import Ecto.Query
+    import Bamboo.Email
     
     @admin_role 200
     @help_role 500
 
+    @new_class_status 100
     @assignment_status 400
     @review_status 500
     @help_status 600
@@ -24,6 +29,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @weight_lock 100
     @assignment_lock 200
     @review_lock 300
+
+    @from_email "support@skoller.co"
+    @deny_subj " has been denied"
+    @greeting "Hi "
+    @comma ","
+    @ending "Thank you"
+
+    @your_request "Your request to create a new class, "
+    @has_been_denied " has been denied. "
+    @reason "The reason is because that class already exists at your school or the request is illegitimate. Please contact us at support@skoller.co for further assistance."
     
     plug :verify_role, %{roles: [@admin_role, @help_role]}
 
@@ -44,6 +59,13 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
           |> put_status(:unprocessable_entity)
           |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
       end
+    end
+
+    def deny(conn, %{"class_id" => class_id}) do
+      class = Class
+      |> Repo.get!(class_id)
+
+      conn |> deny_class(class)
     end
 
     def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
@@ -72,6 +94,52 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
           conn
           |> RepoHelper.multi_error(failed_value)
       end
+    end
+
+    defp deny_class(conn, %Class{class_status_id: @new_class_status} = class) do
+      users = from(u in User)
+      |> join(:inner, [u], sc in StudentClass, sc.student_id == u.student_id)
+      |> where([u, sc], sc.class_id == ^class.id and sc.is_dropped == false)
+      |> Repo.all()
+
+      case Repo.delete(class) do
+        {:ok, _struct} ->
+          users |> Enum.each(&send_deny_email(&1, class))
+          conn
+          |> send_resp(200, "")
+        {:error, changeset} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+      end
+    end
+    defp deny_class(conn, _class), do: conn |> send_resp(422, "")
+
+    defp send_deny_email(user, class) do
+      user = user |> Repo.preload(:student)
+      new_email()
+      |> to(user.email)
+      |> Bamboo.Email.from(@from_email)
+      |> subject(class.name <> @deny_subj)
+      |> html_body(deny_html_body(class, user))
+      |> text_body(deny_text_body(class, user))
+      |> Mailer.deliver_later
+    end
+
+    defp deny_html_body(class, user) do
+      "<p>" <> @greeting <> user.student.name_first <> @comma <>  "<br />" <>
+      "<br />" <>
+      @your_request <> class.name <> @has_been_denied <> @reason <> "<br />" <>
+      "<br />" <>
+      @ending <> "</p>"
+    end
+
+    defp deny_text_body(class, user) do
+      @greeting <> user.student.name_first <> @comma <>  "\n" <>
+      "\n" <>
+      @your_request <> class.name <> @has_been_denied <> @reason <> "\n" <>
+      "\n" <>
+      @ending
     end
 
     defp reset_locks(_class, %{is_complete: true}), do: {:ok, nil}
