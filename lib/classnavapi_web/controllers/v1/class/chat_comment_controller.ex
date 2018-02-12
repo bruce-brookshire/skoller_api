@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
   alias Classnavapi.Chat.Comment.Star
   alias Classnavapi.Chat.Post.Star, as: PostStar
   alias ClassnavapiWeb.Helpers.RepoHelper
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -31,6 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
 
     case Repo.transaction(multi) do
       {:ok, %{comment: comment}} -> 
+        Task.start(NotificationHelper, :send_new_comment_notification, [comment, conn.assigns[:user].student_id])
         render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
       {:error, _, failed_value, _} ->
         conn
