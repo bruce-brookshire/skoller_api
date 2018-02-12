@@ -50,7 +50,7 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
     |> from(@from_email)
     |> subject("Forgot Password")
     |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>")
-    |> text_body(@forgot_email_text1 <> @base_url <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2)
+    |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2)
   end
 
   defp update_user(changeset) do
