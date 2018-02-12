@@ -67,7 +67,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   @commented " commented on a post you follow."
   @commented_yours " commented on your post."
-  @replied " replied to your comment."
+  @replied_yours " replied to your comment."
+  @replied " replied to a comment you follow."
+  @replied_post " replied in a post you follow"
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
@@ -160,17 +162,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   def send_new_reply_notification(reply, student_id) do
-    post_users = from(s in PostStar)
-    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
-    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.student_id != ^student_id)
-    |> where([s, c], c.id == ^reply.chat_comment_id)
-    |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
-    |> select([s, c, stu, u], u)
-    |> Repo.all()
-
-    user_ids = post_users |> List.foldl([], &List.wrap(&1.id) ++ &2)
+    reply = reply |> Repo.preload([:student, :chat_comment])
 
     comment_users = from(s in CommentStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
@@ -178,19 +170,29 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> where([s], s.student_id != ^student_id)
     |> where([s], s.chat_comment_id == ^reply.chat_comment_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
-    |> where([s, stu, u], u.id not in ^user_ids)
     |> select([s, stu, u], u)
     |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, get_chat_reply_msg(&1, reply)))
+
+    user_ids = comment_users |> List.foldl([], &List.wrap(&1.id) ++ &2)
+
+    post_users = from(s in PostStar)
+    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
+    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.student_id != ^student_id)
+    |> where([s, c], c.id == ^reply.chat_comment_id)
+    |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> where([s, c, stu, u], u.id not in ^user_ids)
+    |> select([s, c, stu, u], u)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, reply.student.name_first <> " " <> reply.student.name_last <> @replied_post))
 
     users = post_users ++ comment_users
 
-    reply = reply |> Repo.preload([:student])
-
-    msg = reply.student.name_first <> " " <> reply.student.name_last <> @replied
-
     users 
-    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
-    |> Enum.each(&Notification.create_notification(&1.udid, msg, @class_chat_reply))
+    |> Enum.reduce([], &put_user_devices(&1) ++ &2)
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.msg, @class_chat_reply))
   end
 
   # defp add_acceptance_percentage(mod) do
@@ -210,6 +212,13 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     case user.student_id == comment.chat_post.student_id do
       false -> comment.student.name_first <> " " <> comment.student.name_last <> @commented
       true -> comment.student.name_first <> " " <> comment.student.name_last <> @commented_yours
+    end
+  end
+
+  defp get_chat_reply_msg(user, reply) do
+    case user.student_id == reply.chat_comment.student_id do
+      false -> reply.student.name_first <> " " <> reply.student.name_last <> @replied
+      true -> reply.student.name_first <> " " <> reply.student.name_last <> @replied_yours
     end
   end
 
