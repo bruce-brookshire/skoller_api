@@ -49,13 +49,3 @@ config :classnavapi, Classnavapi.Repo,
 config :classnavapi, Classnavapi.Auth,
             issuer: "Classnavapi",
             secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"
-
-config :classnavapi, Classnavapi.Mailer,
-      adapter: Bamboo.SMTPAdapter,
-      server: System.get_env("SES_SERVER"),
-      port: System.get_env("SES_PORT"),
-      username: System.get_env("SMTP_USERNAME"),
-      password: System.get_env("SMTP_PASSWORD"),
-      tls: :always,
-      ssl: false,
-      retries: 1

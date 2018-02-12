@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @ending "Thank you"
 
     @your_request "Your request to create a new class, "
-    @has_been_denied "has been denied. "
+    @has_been_denied " has been denied. "
     @reason "The reason is because that class already exists at your school or the request is illegitimate. Please contact us at support@skoller.co for further assistance."
     
     plug :verify_role, %{roles: [@admin_role, @help_role]}
