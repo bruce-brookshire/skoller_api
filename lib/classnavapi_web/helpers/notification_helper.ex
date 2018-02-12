@@ -65,7 +65,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   @is_ready " is ready!"
 
-  @commented " commented on your post."
+  @commented " commented on a post you follow."
+  @commented_yours " commented on your post."
   @replied " replied to your comment."
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
@@ -142,6 +143,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   def build_auto_update_notification(_), do: nil
 
   def send_new_comment_notification(comment, student_id) do
+    comment = comment |> Repo.preload([:student, :chat_post])
+
     users = from(s in PostStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
     |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
@@ -149,14 +152,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> select([s, stu, u], u)
     |> Repo.all()
-
-    comment = comment |> Repo.preload([:student])
-
-    msg = comment.student.name_first <> " " <> comment.student.name_last <> @commented
+    |> Enum.map(&Map.put(&1, :msg, get_chat_message(&1, comment)))
 
     users 
-    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
-    |> Enum.each(&Notification.create_notification(&1.udid, msg, @class_chat_comment))
+    |> Enum.reduce([], &put_user_devices(&1) ++ &2)
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.msg, @class_chat_comment))
   end
 
   def send_new_reply_notification(reply, student_id) do
@@ -205,6 +205,21 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   #   (accepted / count) * 100 |> Kernel.round()
   # end
+
+  defp get_chat_message(user, comment) do
+    case user.student_id == comment.chat_post.student_id do
+      false -> comment.student.name_first <> " " <> comment.student.name_last <> @commented
+      true -> comment.student.name_first <> " " <> comment.student.name_last <> @commented_yours
+    end
+  end
+
+  defp put_user_devices(user) do
+    from(dev in Device)
+    |> join(:inner, [dev], user in User, user.id == dev.user_id)
+    |> where([dev, user], user.id == ^user.id)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, user.msg))
+  end
 
   defp class_complete_msg(assignments) do
     case Enum.count(assignments) do
