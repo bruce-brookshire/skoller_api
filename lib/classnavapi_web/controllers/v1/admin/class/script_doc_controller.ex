@@ -77,6 +77,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
     |> Repo.update()
   end
 
+  defp sammi(_class, %{"sammi" => ""}), do: nil
   defp sammi(%Class{id: id}, %{"sammi" => sammi}) do
     Logger.info(inspect(sammi))
     
