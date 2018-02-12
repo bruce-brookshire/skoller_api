@@ -142,7 +142,7 @@
 					},
 					"response": [
 						{
-							"id": "2ed920cd-44a1-415d-adb7-b94fbaefcaf9",
+							"id": "65e517fd-d3b7-41f0-899c-dfceb9070a6a",
 							"name": "Logout",
 							"originalRequest": {
 								"method": "POST",
@@ -379,7 +379,7 @@
 					},
 					"response": [
 						{
-							"id": "f98a03e5-aaaf-4c41-bfb7-4a3ebfe04542",
+							"id": "0c890e6b-0774-47df-b9ec-f5de3bcd2c10",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "POST",
@@ -494,7 +494,7 @@
 					},
 					"response": [
 						{
-							"id": "2de47e38-05ef-47e6-b371-ef17c7468642",
+							"id": "32a5a4af-f178-4c18-9bf7-26ead7e7c48f",
 							"name": "Add Assignment Grade",
 							"originalRequest": {
 								"method": "PUT",
@@ -608,7 +608,7 @@
 					},
 					"response": [
 						{
-							"id": "729b913e-e252-4e4c-8ebe-1a46156dd74d",
+							"id": "1e2077b1-5794-4997-b501-03ead1d821f4",
 							"name": "Delete Student Assignments",
 							"originalRequest": {
 								"method": "DELETE",
@@ -715,7 +715,7 @@
 					},
 					"response": [
 						{
-							"id": "cb712f52-b09e-456b-87fe-31452fd1c1c8",
+							"id": "04d0c018-2d44-499e-8d1c-dfaefe10bf73",
 							"name": "Update Student Assignments Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -828,7 +828,7 @@
 					},
 					"response": [
 						{
-							"id": "12f1ba88-e354-4830-b7ea-9317d2110c36",
+							"id": "f6769715-b71d-4db4-b606-3a72f5880567",
 							"name": "Get Student Assignment by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -984,7 +984,7 @@
 							},
 							"response": [
 								{
-									"id": "79f9033e-5038-4f74-95b5-45e621de3c43",
+									"id": "8daccfef-1b1a-4cad-adde-e0862394362a",
 									"name": "Create Class Assignment",
 									"originalRequest": {
 										"method": "POST",
@@ -1134,7 +1134,7 @@
 							},
 							"response": [
 								{
-									"id": "062e0d3c-da46-42b1-85df-3591b2aed3ff",
+									"id": "58944eea-e5db-4843-9757-5a3c72b1c338",
 									"name": "Delete Class Assignments",
 									"originalRequest": {
 										"method": "DELETE",
@@ -1297,7 +1297,7 @@
 							},
 							"response": [
 								{
-									"id": "78c73eda-df86-43f7-890b-0945b1b9a609",
+									"id": "31f772f8-5085-427c-b348-5e3d4f74ac91",
 									"name": "Add Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -1407,7 +1407,7 @@
 							},
 							"response": [
 								{
-									"id": "7a6502ce-b290-420d-8e64-2e3a5acf786a",
+									"id": "1e7989ee-70f1-4a68-b220-a66b0c4c4786",
 									"name": "Add Change Request",
 									"originalRequest": {
 										"method": "POST",
@@ -1712,10 +1712,10 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n\t\"comment\": \"Psych I changed\"\n}"
+											"raw": ""
 										},
 										"url": {
-											"raw": "{{BaseUrl}}/api/v1/classes/1/comments/1/star",
+											"raw": "{{BaseUrl}}/api/v1/classes/1/comments/2/star",
 											"host": [
 												"{{BaseUrl}}"
 											],
@@ -1725,7 +1725,7 @@
 												"classes",
 												"1",
 												"comments",
-												"1",
+												"2",
 												"star"
 											]
 										},
@@ -2401,7 +2401,7 @@
 							},
 							"response": [
 								{
-									"id": "0b5087b9-1b27-4780-b7d4-8fc02a94c336",
+									"id": "4a65e276-4fbc-4c76-bf13-2ff8db2c4079",
 									"name": "Get Class Files",
 									"originalRequest": {
 										"method": "GET",
@@ -2522,7 +2522,7 @@
 							},
 							"response": [
 								{
-									"id": "6bf2ea57-0ee4-408f-85fe-574b971c0bcb",
+									"id": "3a1a6922-770a-4de2-a9c1-dbfa00a6f325",
 									"name": "Upload Class File",
 									"originalRequest": {
 										"method": "POST",
@@ -2757,7 +2757,7 @@
 							},
 							"response": [
 								{
-									"id": "2f24243c-f536-4253-bb91-95b18906af02",
+									"id": "e6ecddec-92cc-48ed-9fd3-ea124fae0685",
 									"name": "Add Help Request Error",
 									"originalRequest": {
 										"method": "POST",
@@ -2837,7 +2837,7 @@
 									"body": "{\"error\":{\"error\":\"Class is complete, use Change Request.\"}}"
 								},
 								{
-									"id": "12025359-afdc-4a0c-b898-00a591446e56",
+									"id": "3fd62917-e7cc-44f6-a343-3b55b8ec5f20",
 									"name": "Add Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -2948,7 +2948,7 @@
 							},
 							"response": [
 								{
-									"id": "fc796c81-7fab-4a4f-a514-5b806489f22d",
+									"id": "c71ddc52-3c1a-4af2-8617-fcff7e0f8eaf",
 									"name": "Resolve Help Request",
 									"originalRequest": {
 										"method": "POST",
@@ -3133,7 +3133,7 @@
 							},
 							"response": [
 								{
-									"id": "fad70f9c-d90a-49b4-9527-1a2eadedbfe1",
+									"id": "5e821386-3310-4668-a44d-7f07fea661fa",
 									"name": "Get Class Locks",
 									"originalRequest": {
 										"method": "GET",
@@ -3264,7 +3264,7 @@
 							},
 							"response": [
 								{
-									"id": "67dee837-4fa9-4688-a051-b196aa60fb69",
+									"id": "2fb075b4-e1c5-4b82-96a9-d219a56ddce5",
 									"name": "Get Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -3362,7 +3362,7 @@
 							},
 							"response": [
 								{
-									"id": "ec6b66a5-3567-42d8-8fdb-3cd25d9d9712",
+									"id": "151144ae-5e7a-4999-8621-0d65a1ca5dec",
 									"name": "Get Hub Class Statuses",
 									"originalRequest": {
 										"method": "GET",
@@ -3460,7 +3460,7 @@
 							},
 							"response": [
 								{
-									"id": "781a57e4-3caf-4e8a-aefc-77fe878456b9",
+									"id": "07b509ea-9ee7-404b-9753-ce59d8069398",
 									"name": "Get Class Help Types",
 									"originalRequest": {
 										"method": "GET",
@@ -3557,7 +3557,7 @@
 							},
 							"response": [
 								{
-									"id": "d8c116f5-034f-41fe-9317-436435e1604d",
+									"id": "7b6f1ddc-6ba6-4655-85bb-cf4b0a99f9c0",
 									"name": "Get Class Change Types",
 									"originalRequest": {
 										"method": "GET",
@@ -3663,7 +3663,7 @@
 							},
 							"response": [
 								{
-									"id": "dd3e4715-31f6-44d0-a1d2-5d8266906acc",
+									"id": "2891029c-990d-4207-ad8d-e672a413377a",
 									"name": "Update Class Status",
 									"originalRequest": {
 										"method": "PUT",
@@ -3810,7 +3810,7 @@
 							},
 							"response": [
 								{
-									"id": "d9ee0d14-1a3e-43ea-a188-250d706b1e32",
+									"id": "f442e89a-de3e-4315-ba59-e183524b98e3",
 									"name": "Resolve Student Request",
 									"originalRequest": {
 										"method": "POST",
@@ -3977,7 +3977,7 @@
 							},
 							"response": [
 								{
-									"id": "a72e615e-0d25-40cf-bc57-198bcea5dcf9",
+									"id": "4b3677aa-c1d2-4e75-90b1-73413550c396",
 									"name": "Update Class Weights",
 									"originalRequest": {
 										"method": "PUT",
@@ -4091,7 +4091,7 @@
 							},
 							"response": [
 								{
-									"id": "191775bf-cd4d-48af-b73c-d56df6cbb603",
+									"id": "65b07684-ed2a-43c9-9c78-1db743ccd716",
 									"name": "Create Class Weights",
 									"originalRequest": {
 										"method": "POST",
@@ -4223,7 +4223,7 @@
 							},
 							"response": [
 								{
-									"id": "f8032e9c-d0ab-47be-b57d-851e99696623",
+									"id": "4d223590-a5a0-4c62-aafd-1c276a4c5da5",
 									"name": "Delete Class Weights",
 									"originalRequest": {
 										"method": "DELETE",
@@ -4377,7 +4377,7 @@
 					},
 					"response": [
 						{
-							"id": "5c832bbf-26d6-47be-b91b-7a1bd0b1c097",
+							"id": "a84014d2-bc95-410f-ab3a-df898ac35f36",
 							"name": "Update Class",
 							"originalRequest": {
 								"method": "PUT",
@@ -4473,7 +4473,7 @@
 							"body": "{\"type\":null,\"status\":{\"name\":\"Help\",\"id\":600},\"seat_count\":200,\"number\":\"8002-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Custom\",\"is_syllabus\":true,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"help_requests\":[{\"note\":\"It broke.\",\"is_completed\":true,\"id\":3,\"help_type\":{\"name\":\"Incorrect\",\"id\":100}}],\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-08-30\",\"class_end\":\"2017-11-11\",\"change_requests\":[]}"
 						},
 						{
-							"id": "28abb6c1-cd64-4f8b-a82f-7b97e2819987",
+							"id": "8d980115-f869-4c4f-a679-3eb93af51c26",
 							"name": "Update Class No Weight",
 							"originalRequest": {
 								"method": "PUT",
@@ -4599,7 +4599,7 @@
 					},
 					"response": [
 						{
-							"id": "09c0ea0b-3bee-4446-b970-298ed56bb7a0",
+							"id": "2f88c4fd-6c27-41cb-9de2-41698eeafa5f",
 							"name": "Get School Classes by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -4724,7 +4724,7 @@
 					},
 					"response": [
 						{
-							"id": "49b8e63f-e2de-4cf5-bb4a-4fd5632ca9cd",
+							"id": "c9fbf529-b1ca-4703-9497-02a48f8bddf9",
 							"name": "Confirm Class",
 							"originalRequest": {
 								"method": "POST",
@@ -4903,7 +4903,7 @@
 							},
 							"response": [
 								{
-									"id": "1e7cbd84-031c-454f-ad2b-ecb82a0341ba",
+									"id": "e029e8fe-aca3-4f09-94d5-1e1e39725f57",
 									"name": "Create Professor",
 									"originalRequest": {
 										"method": "POST",
@@ -5037,7 +5037,7 @@
 							},
 							"response": [
 								{
-									"id": "e9c0d7ee-d387-46d8-9beb-09a39d994298",
+									"id": "702715cc-8ca2-4e8d-9627-3604ab0b961b",
 									"name": "Get Professors",
 									"originalRequest": {
 										"method": "GET",
@@ -5135,7 +5135,7 @@
 									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":null,\"id\":1,\"email\":null}]"
 								},
 								{
-									"id": "18249c0f-c563-49d1-aba2-1d7f942ed529",
+									"id": "7becff5f-7157-4704-be81-42e7d67a85c8",
 									"name": "Get Professors filter",
 									"originalRequest": {
 										"method": "GET",
@@ -5274,7 +5274,7 @@
 							},
 							"response": [
 								{
-									"id": "4826af9a-4336-4366-b226-18e82b30c0b3",
+									"id": "b8caa9a4-5602-4903-819c-a22f2e120311",
 									"name": "Get Professors by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -5405,7 +5405,7 @@
 							},
 							"response": [
 								{
-									"id": "654afeef-7bc0-491f-88ac-07753d755789",
+									"id": "ab962c5e-ae5e-42d8-8105-6a9dac33b0e6",
 									"name": "Update Professor",
 									"originalRequest": {
 										"method": "PUT",
@@ -5539,7 +5539,7 @@
 					},
 					"response": [
 						{
-							"id": "fca2acaa-247e-46d2-b2bd-627dbd71dbdf",
+							"id": "350935e5-f031-49f1-bab4-e478a135f84d",
 							"name": "Get Class Period by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -5670,7 +5670,7 @@
 					},
 					"response": [
 						{
-							"id": "00311f9e-0928-4280-8b50-64e05dc9e087",
+							"id": "6efc11e3-06dd-478f-af98-f9f09dc4470e",
 							"name": "Update Class Period",
 							"originalRequest": {
 								"method": "PUT",
@@ -5805,7 +5805,7 @@
 					},
 					"response": [
 						{
-							"id": "cd9ec4c9-804f-46fd-878d-a1209452c82d",
+							"id": "61a1a036-b8fc-443d-a276-a74b9bebf248",
 							"name": "Get Roles",
 							"originalRequest": {
 								"method": "GET",
@@ -5932,7 +5932,7 @@
 					},
 					"response": [
 						{
-							"id": "3fa2eddc-d48e-4dc2-927f-a69450a5a438",
+							"id": "895b47a6-43f3-4420-88c1-8bdf42671beb",
 							"name": "Get Role by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -6072,7 +6072,7 @@
 							},
 							"response": [
 								{
-									"id": "e59144f0-1b87-4698-b264-729040a96b9d",
+									"id": "66113853-e405-4bdc-96cb-4f661804af0e",
 									"name": "Create School Class Period",
 									"originalRequest": {
 										"method": "POST",
@@ -6206,7 +6206,7 @@
 							},
 							"response": [
 								{
-									"id": "653e352e-bb68-4888-b362-14318efb4416",
+									"id": "67f03108-aeea-4083-aa5b-c44bee5b8648",
 									"name": "Get School Class Periods",
 									"originalRequest": {
 										"method": "GET",
@@ -6393,7 +6393,7 @@
 							},
 							"response": [
 								{
-									"id": "a2b7681c-dfa7-476d-98c6-8eec8a25d86d",
+									"id": "433cfa29-16ac-489e-aa58-0b7c76f4f591",
 									"name": "Add Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -6525,7 +6525,7 @@
 							},
 							"response": [
 								{
-									"id": "12365e9c-6a72-4502-bbdf-cb72089c6e14",
+									"id": "f0e327db-7fe6-42bc-8f28-c75b08aa78d4",
 									"name": "Get Field of Study by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -6657,7 +6657,7 @@
 							},
 							"response": [
 								{
-									"id": "f2c0ead4-bfd2-4e86-96a8-e55cdf61ffeb",
+									"id": "012c8cb3-883d-4300-a598-284d6e7a1f0c",
 									"name": "Get Fields of Study",
 									"originalRequest": {
 										"method": "GET",
@@ -6789,7 +6789,7 @@
 							},
 							"response": [
 								{
-									"id": "a013f313-c5b6-4552-8df6-1e4e139c6201",
+									"id": "394d87ba-7aea-46f0-b1f8-d404a7b66aa6",
 									"name": "Update Field of Study",
 									"originalRequest": {
 										"method": "PUT",
@@ -6954,7 +6954,7 @@
 					},
 					"response": [
 						{
-							"id": "fb91b539-8697-4ef9-91cb-f2e706e2053b",
+							"id": "1cbb9861-587b-4860-bf9e-91fe8b563d15",
 							"name": "Create School",
 							"originalRequest": {
 								"method": "POST",
@@ -7077,7 +7077,7 @@
 					},
 					"response": [
 						{
-							"id": "29350d14-c022-4767-a1df-39a693b549a5",
+							"id": "fcdd4c6c-6298-4210-89ed-8dc6b1a940b2",
 							"name": "Get Schools",
 							"originalRequest": {
 								"method": "GET",
@@ -7166,7 +7166,7 @@
 							"body": "[{\"timezone\":\"CST\",\"name\":\"Hard Knocks University\",\"is_readonly\":false,\"is_diy_preferred\":false,\"is_diy_enabled\":true,\"is_auto_syllabus\":true,\"is_active_enrollment\":true,\"id\":1,\"adr_zip\":\"37201\",\"adr_state\":\"TN\",\"adr_line_2\":null,\"adr_line_1\":\"530 Church St\",\"adr_city\":\"Nashville\"},{\"timezone\":\"CST\",\"name\":\"Hard Knocks University\",\"is_readonly\":false,\"is_diy_preferred\":false,\"is_diy_enabled\":true,\"is_auto_syllabus\":true,\"is_active_enrollment\":true,\"id\":2,\"adr_zip\":\"37201\",\"adr_state\":\"TN\",\"adr_line_2\":null,\"adr_line_1\":\"530 Church St\",\"adr_city\":\"Nashville\"}]"
 						},
 						{
-							"id": "c34b8286-52fb-4ea4-a74b-764fd7303b8d",
+							"id": "ed2969df-5925-41cb-b1ce-fb91e0cbb3ba",
 							"name": "Get Schools with filter",
 							"originalRequest": {
 								"method": "GET",
@@ -7289,7 +7289,7 @@
 					},
 					"response": [
 						{
-							"id": "e68613f6-fdcf-49eb-b28d-c6c906bdf524",
+							"id": "31892e61-98cc-4b71-80af-e2745cbb7199",
 							"name": "Get School by Id",
 							"originalRequest": {
 								"method": "GET",
@@ -7413,7 +7413,7 @@
 					},
 					"response": [
 						{
-							"id": "cd6f7603-a6ed-4fdb-8f25-d9e9c49512e6",
+							"id": "66992095-be1d-4c3a-9c9e-12c96ca31556",
 							"name": "Update School",
 							"originalRequest": {
 								"method": "PUT",
@@ -7537,7 +7537,7 @@
 					},
 					"response": [
 						{
-							"id": "875b4498-4b68-48a4-a1a9-2346bbce46e5",
+							"id": "554c9571-3b78-42cd-b952-66f0e73a716c",
 							"name": "Get Schools Hub",
 							"originalRequest": {
 								"method": "GET",
@@ -7649,7 +7649,7 @@
 					},
 					"response": [
 						{
-							"id": "277a6aec-129a-4962-8441-4017dd1844eb",
+							"id": "5e0d3972-e02d-4075-ad47-ffd199538869",
 							"name": "Get Schools No Auth",
 							"originalRequest": {
 								"method": "GET",
@@ -7768,7 +7768,7 @@
 					},
 					"response": [
 						{
-							"id": "f856ee4d-a67f-4411-8ccd-a37c1ce7d0eb",
+							"id": "0e9c087a-b73f-4d7d-963d-2aea0e7f8ef9",
 							"name": "Get School Classes",
 							"originalRequest": {
 								"method": "GET",
@@ -7943,7 +7943,7 @@
 							},
 							"response": [
 								{
-									"id": "f4e233f4-8ec9-456b-b911-c338a92a6b59",
+									"id": "04d6544e-de75-4c43-9ab8-28aa0ca490b4",
 									"name": "Speculate Grades Complete Class",
 									"originalRequest": {
 										"method": "GET",
@@ -8049,7 +8049,7 @@
 									"body": "{\"error\":\"Class is already complete.\"}"
 								},
 								{
-									"id": "6d96c8ef-fe6f-4eef-b439-6dfe3a05c790",
+									"id": "4fc055a0-012e-4706-8333-cdf2ccd73b07",
 									"name": "Speculate Grades by Grade",
 									"originalRequest": {
 										"method": "GET",
@@ -8157,7 +8157,7 @@
 									"body": "{\"speculation\":93.33333333333333,\"grade\":\"A\"}"
 								},
 								{
-									"id": "02b42a05-704b-407f-a5c3-33f77e4e4245",
+									"id": "48b44402-3e50-4d0b-a564-b95f981c5606",
 									"name": "Speculate Grades",
 									"originalRequest": {
 										"method": "GET",
@@ -8294,7 +8294,7 @@
 							},
 							"response": [
 								{
-									"id": "16ff9150-94d2-4493-8eca-b28dade243b0",
+									"id": "a921271c-a754-4b73-9356-bc9415cf2114",
 									"name": "Get Student Assignments Date",
 									"originalRequest": {
 										"method": "GET",
@@ -8398,7 +8398,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "d7f2da7f-cc74-45e7-beb1-1fbefd5343c2",
+									"id": "af6bfea5-f174-4a48-baed-7c7e9153776e",
 									"name": "Get Student Assignments Complete",
 									"originalRequest": {
 										"method": "GET",
@@ -8504,7 +8504,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4},{\"weight_id\":4,\"weight\":0.49455984174085066,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":11,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":5},{\"weight_id\":5,\"weight\":0.20276953511374876,\"student_class_id\":4,\"name\":\"assign 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":10,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":6},{\"weight_id\":6,\"weight\":0.3026706231454006,\"student_class_id\":4,\"name\":\"assign 2343\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":9,\"grade\":null,\"due\":\"2017-10-12\",\"assignment_id\":7}]"
 								},
 								{
-									"id": "a1db695a-dbdd-4c0e-a904-9b9c8a2c26d2",
+									"id": "838f8042-f8e1-46f7-b5a0-15cbb4dc7668",
 									"name": "Get Student Assignments Class",
 									"originalRequest": {
 										"method": "GET",
@@ -8610,7 +8610,7 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
-									"id": "d4d3c35a-ff7c-4d07-8557-e765bd0f8e67",
+									"id": "e8f374fc-485a-432a-86d4-c0cd9ad1a24f",
 									"name": "Get Student Assignments",
 									"originalRequest": {
 										"method": "GET",
@@ -8745,7 +8745,7 @@
 							},
 							"response": [
 								{
-									"id": "2b4352b1-2bcb-459a-b3f4-b7b0a092a30f",
+									"id": "6598c9ad-7110-487e-8890-1a52373b2b95",
 									"name": "Create Student Assignments",
 									"originalRequest": {
 										"method": "POST",
@@ -8893,7 +8893,7 @@
 									},
 									"response": [
 										{
-											"id": "3576df69-0bdd-49b9-beff-7b9b2a98de5e",
+											"id": "98aae34f-6da0-4b85-8fa8-feb2b5c9e3ed",
 											"name": "Get Pending New Assignments None",
 											"originalRequest": {
 												"method": "GET",
@@ -8992,7 +8992,7 @@
 											"body": "[]"
 										},
 										{
-											"id": "ef54b1c4-1d64-4fe8-b580-9c2aaa173fb7",
+											"id": "dcff841c-9f5e-4e11-b252-1e580e5c4e48",
 											"name": "Get Pending New Assignments",
 											"originalRequest": {
 												"method": "GET",
@@ -9169,7 +9169,7 @@
 							},
 							"response": [
 								{
-									"id": "116e78f4-e452-4b8c-bd04-da9bcd2764a5",
+									"id": "abbe71b3-8523-4ec0-a371-73d114311f4f",
 									"name": "Get Student Class by Id",
 									"originalRequest": {
 										"method": "GET",
@@ -9340,7 +9340,7 @@
 							},
 							"response": [
 								{
-									"id": "6e82344e-29e5-4e4e-8c3c-25cb30923ee7",
+									"id": "dfb705b0-2df8-4ca1-a2bf-ea4366151745",
 									"name": "Update Student Class",
 									"originalRequest": {
 										"method": "PUT",
@@ -9475,7 +9475,7 @@
 							},
 							"response": [
 								{
-									"id": "cb61a688-792f-41d8-93d2-f12334f530cd",
+									"id": "f3e394cc-fe34-416f-a2d1-1cf15a23efd1",
 									"name": "UnEnroll In Class",
 									"originalRequest": {
 										"method": "DELETE",
@@ -9610,7 +9610,7 @@
 							},
 							"response": [
 								{
-									"id": "06b49cc8-8a92-44c1-b8a3-a93d89a4d87c",
+									"id": "a6fcc016-4a85-4725-8479-33675a30e45d",
 									"name": "Add Student Field of Study",
 									"originalRequest": {
 										"method": "POST",
@@ -9737,7 +9737,7 @@
 							},
 							"response": [
 								{
-									"id": "f678fb43-05e0-4727-8dbc-f00c026428d2",
+									"id": "4e30653c-ad6e-439a-a4b1-6b1a68c7d65a",
 									"name": "Delete Student Field of Study",
 									"originalRequest": {
 										"method": "DELETE",
@@ -9866,7 +9866,7 @@
 							},
 							"response": [
 								{
-									"id": "ca808f22-0085-423e-9442-f4e8a7bb7497",
+									"id": "d050e535-86fb-4b45-8b74-be358e170baf",
 									"name": "Respond to Mod",
 									"originalRequest": {
 										"method": "POST",
@@ -10110,7 +10110,7 @@
 					},
 					"response": [
 						{
-							"id": "aa965ef6-4ec3-4e5e-bd19-347ab58ae582",
+							"id": "05877271-a731-4bcb-b400-8331582da0f4",
 							"name": "Resend Verification",
 							"originalRequest": {
 								"method": "POST",
@@ -10239,7 +10239,7 @@
 					},
 					"response": [
 						{
-							"id": "2f010319-b6d2-4089-87d1-10ed3cf64346",
+							"id": "0d7a652a-7523-41d4-ba36-8fb3dd6bece0",
 							"name": "Verify Phone",
 							"originalRequest": {
 								"method": "POST",
@@ -10484,7 +10484,7 @@
 							},
 							"response": [
 								{
-									"id": "96ef2fe4-42cb-4e65-bf83-d25ada71fb8c",
+									"id": "d5c54e99-2c1a-4bc7-adb6-39e754896d2b",
 									"name": "Add Role To User",
 									"originalRequest": {
 										"method": "POST",
@@ -10615,7 +10615,7 @@
 							},
 							"response": [
 								{
-									"id": "de97c5eb-aa39-484f-a481-79743e523fc2",
+									"id": "8f16f23e-92ea-4345-8b1e-907d42682895",
 									"name": "Get Roles by User",
 									"originalRequest": {
 										"method": "GET",
@@ -10746,7 +10746,7 @@
 							},
 							"response": [
 								{
-									"id": "d499f06d-9fcb-4e1c-bedc-0cd5be997769",
+									"id": "c1261b88-abed-47a9-964a-bcfdef473e2c",
 									"name": "Remove Role From User",
 									"originalRequest": {
 										"method": "DELETE",
@@ -10899,7 +10899,7 @@
 					},
 					"response": [
 						{
-							"id": "14738a9e-e3bb-4616-afb9-986cde5e9d91",
+							"id": "5b108920-1511-4878-bff1-6748b09c72b8",
 							"name": "Get Users",
 							"originalRequest": {
 								"method": "GET",
@@ -10997,7 +10997,7 @@
 					},
 					"response": [
 						{
-							"id": "d0c7b570-0477-452d-bea2-a5208c8a7228",
+							"id": "7b094a8c-ca97-4b67-84f7-49c29b4656bc",
 							"name": "Get User by Id no student",
 							"originalRequest": {
 								"method": "GET",
@@ -11068,7 +11068,7 @@
 							"body": "{\"student\":null,\"roles\":[],\"id\":1,\"email\":\"tyler@fortyau.com\"}"
 						},
 						{
-							"id": "2eda1cef-09c4-4d46-a739-e37dc99bc3e3",
+							"id": "947920fc-27b6-4830-8608-b1420948aeab",
 							"name": "Get User by Id w student",
 							"originalRequest": {
 								"method": "GET",
@@ -11175,7 +11175,7 @@
 					},
 					"response": [
 						{
-							"id": "2ad8153d-53dc-41ec-8029-1c078c8df780",
+							"id": "8f9e4eb4-5317-4412-a18c-4e9fffd394eb",
 							"name": "Update Student Notifications",
 							"originalRequest": {
 								"method": "PUT",
@@ -11271,7 +11271,7 @@
 							"body": "{\"student\":{\"school\":{\"periods\":[{\"start_date\":\"2017-10-12\",\"name\":\"Q1\",\"id\":1,\"end_date\":\"2018-10-12\"}],\"name\":\"Hard Knocks University\",\"id\":1,\"email_domains\":[{\"is_professor_only\":false,\"email_domain\":\"@hku.edu\"}]},\"phone\":\"6158675309\",\"notification_time\":\"21:20:00.000000\",\"notification_days_notice\":4,\"name_last\":\"Witt\",\"name_first\":\"Tyler\",\"is_verified\":false,\"is_reminder_notifications\":true,\"is_notifications\":true,\"is_mod_notifications\":false,\"is_chat_notifications\":true,\"id\":1,\"gender\":\"Male\",\"fields_of_study\":[],\"birthday\":\"2017-10-12\"},\"roles\":[{\"name\":\"Student\",\"id\":100}],\"id\":2,\"email\":\"tyler@hku.edu\"}"
 						},
 						{
-							"id": "1304362f-b3e8-4969-9ac5-d482e0871e58",
+							"id": "838d7c6f-6dfc-4739-a06f-c8c91d57f2a4",
 							"name": "Update User Avatar",
 							"originalRequest": {
 								"method": "PUT",
