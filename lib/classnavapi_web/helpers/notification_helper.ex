@@ -145,7 +145,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     users = from(s in PostStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
     |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.id == ^comment.chat_post_id and s.student_id != ^student_id)
+    |> where([s], s.chat_post_id == ^comment.chat_post_id and s.student_id != ^student_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> select([s, stu, u], u)
     |> Repo.all()
