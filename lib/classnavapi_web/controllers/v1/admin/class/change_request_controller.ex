@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   @from_email "noreply@skoller.co"
   @change_approved " info change has been approved!"
   @we_approved_change "We have approved your request to change class information for "
+  @ending "We hope you and your classmates have a great semester!"
   
   @admin_role 200
   @change_req_role 400
@@ -53,7 +54,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
     |> to(user.email)
     |> from(@from_email)
     |> subject(class.name <> @change_approved)
-    |> html_body("<p>" <> user.student.name_first <> ",<br /><br >" <> @we_approved_change <> class.name <> "</p>" <> Mailer.signature())
-    |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Mailer.text_signature())
+    |> html_body("<p>" <> user.student.name_first <> ",<br /><br >" <> @we_approved_change <> class.name <> "<br /><br />" <> @ending <> "</p>" <> Mailer.signature())
+    |> text_body(user.student.name_first <> ",\n \n" <> @we_approved_change <> class.name <> "\n \n" <> @ending <> "\n \n" <> Mailer.text_signature())
+    |> Mailer.deliver_later
   end
 end
