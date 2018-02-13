@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.NotificationController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.Repo
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   
@@ -9,7 +9,8 @@ defmodule ClassnavapiWeb.Api.V1.NotificationController do
   
   plug :verify_role, %{role: @admin_role}
 
-  def syllabus(conn, %{} = params) do
-    
+  def syllabus(conn, _params) do
+    Task.start(NotificationHelper, :send_needs_syllabus_notifications, [])
+    conn |> send_resp(200, "")
   end
 end

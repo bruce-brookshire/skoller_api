@@ -28,12 +28,15 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @pending_update_category "Update.Pending"
   @class_chat_comment "ClassChat.Comment"
   @class_chat_reply "ClassChat.Reply"
+  @manual_syllabus_category "Manual.NeedsSyllabus"
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
   @due_assignment_mod 300
   @new_assignment_mod 400
   @delete_assignment_mod 500
+
+  @syllabus_status 200
 
   @a_classmate_has "A classmate has "
   @you_have "You have "
@@ -70,6 +73,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @replied_yours " replied to your comment."
   @replied " replied to a comment you follow."
   @replied_post " replied in a post you follow"
+
+  @needs_syllabus_msg "This is just a test."
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
@@ -193,6 +198,20 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     users 
     |> Enum.reduce([], &put_user_devices(&1) ++ &2)
     |> Enum.each(&Notification.create_notification(&1.udid, &1.msg, @class_chat_reply))
+  end
+
+  def send_needs_syllabus_notifications() do
+    from(u in User)
+    |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> join(:inner, [u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [u, s, sc], c in Class, c.id == sc.class_id)
+    |> where([u, s], s.is_notifications == true)
+    |> where([u, s, sc], sc.is_dropped == false)
+    |> where([u, s, sc, c], c.class_status_id == @syllabus_status)
+    |> distinct([u], u.id)
+    |> Repo.all()
+    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+    |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
   end
 
   # defp add_acceptance_percentage(mod) do
