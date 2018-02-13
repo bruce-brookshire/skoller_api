@@ -43,7 +43,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       student: render_one(chat_post.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment.json"),
-      likes: render_many(chat_post.likes, LikeView, "like.json")
+      likes: render_many(chat_post.likes, LikeView, "like.json"),
+      inserted_at: chat_post.inserted_at
     }
   end
 
@@ -58,7 +59,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json"),
-      color: color
+      color: color,
+      inserted_at: chat_post.inserted_at
     }
   end
 
@@ -69,7 +71,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       student: render_one(chat_post.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json"),
-      likes: render_many(chat_post.likes, LikeView, "like.json")
+      likes: render_many(chat_post.likes, LikeView, "like.json"),
+      inserted_at: chat_post.inserted_at
     }
   end
 
@@ -91,7 +94,8 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
       is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json"),
-      color: color
+      color: color,
+      inserted_at: chat_post.inserted_at
     }
   end
 

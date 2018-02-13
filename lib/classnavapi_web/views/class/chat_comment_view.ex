@@ -26,7 +26,8 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
       comment: chat_comment.comment,
       student: render_one(chat_comment.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_comment.id,
-      replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply.json")
+      replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply.json"),
+      inserted_at: chat_comment.inserted_at
     }
   end
 
@@ -39,7 +40,8 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
       replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply_detail.json", %{current_student_id: student_id}),
       likes: render_many(chat_comment.likes, LikeView, "like.json"),
       is_liked: chat_comment.likes |> ChatHelper.is_liked(student_id),
-      is_starred: chat_comment |> is_starred(student_id)
+      is_starred: chat_comment |> is_starred(student_id),
+      inserted_at: chat_comment.inserted_at
     }
   end
       
@@ -50,7 +52,8 @@ defmodule ClassnavapiWeb.Class.ChatCommentView do
       student: render_one(chat_comment.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_comment.id,
       replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply_detail.json"),
-      likes: render_many(chat_comment.likes, LikeView, "like.json")
+      likes: render_many(chat_comment.likes, LikeView, "like.json"),
+      inserted_at: chat_comment.inserted_at
     }
   end
 

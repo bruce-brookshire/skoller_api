@@ -23,7 +23,8 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
     %{
       reply: chat_reply.reply,
       student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
-      id: chat_reply.id
+      id: chat_reply.id,
+      inserted_at: chat_reply.inserted_at
     }
   end
 
@@ -34,7 +35,8 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
       student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_reply.id,
       likes: render_many(chat_reply.likes, LikeView, "like.json"),
-      is_liked: chat_reply.likes |> ChatHelper.is_liked(student_id)
+      is_liked: chat_reply.likes |> ChatHelper.is_liked(student_id),
+      inserted_at: chat_reply.inserted_at
     }
   end
 
@@ -44,7 +46,8 @@ defmodule ClassnavapiWeb.Class.ChatReplyView do
       reply: chat_reply.reply,
       student: render_one(chat_reply.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: chat_reply.id,
-      likes: render_many(chat_reply.likes, LikeView, "like.json")
+      likes: render_many(chat_reply.likes, LikeView, "like.json"),
+      inserted_at: chat_reply.inserted_at
     }
   end
 end
