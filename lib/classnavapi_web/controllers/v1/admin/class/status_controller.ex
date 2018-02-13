@@ -38,8 +38,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @greeting "Hi "
     @comma ","
     @ending "Thank you"
-    @divider "--"
-    @skoller "The Skoller Team"
 
     @your_request "Your request to create a new class, "
     @has_been_denied " has been denied. "
@@ -181,8 +179,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       @upload_correct_syllabus <> "<br />" <>
       "<br />" <>
       @syllabus_ending <> "</p>" <> 
-      "<h3>" <> @divider <> "</h3>" <> 
-      "<h3>" <> @skoller <> "</h3>"
+      Mailer.signature()
     end
 
     defp syllabus_text_body(class) do
@@ -192,8 +189,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       "\n" <>
       @syllabus_ending <> "\n" <>
       "\n" <>
-      @divider <> "\n" <>
-      @skoller
+      Mailer.text_signature()
     end
 
     defp reset_locks(_class, %{is_complete: true}), do: {:ok, nil}
