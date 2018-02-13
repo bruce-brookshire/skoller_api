@@ -201,6 +201,8 @@ defmodule ClassnavapiWeb.Router do
       post "/syllabus-workers/weights", SyllabusWorkerController, :weights
       post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
       post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
+
+      post "/notifications/syllabus-needed", NotificationController, :syllabus
     end
   end
 
