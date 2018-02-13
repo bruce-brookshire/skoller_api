@@ -43,6 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
     |> Map.put(:class_syllabus_count, syllabus_count(dates, params))
+    |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
@@ -139,14 +140,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   defp syllabus_count(dates, %{"school_id" => school_id}) do
     from(c in Class)
     |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [c, p], d in subquery(syllabus_subquery), d.class_id == c.id)
+    |> join(:inner, [c, p], d in subquery(syllabus_subquery()), d.class_id == c.id)
     |> where([c, p], p.school_id == ^school_id)
     |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
   defp syllabus_count(dates, _params) do
     from(c in Class)
-    |> join(:inner, [c], d in subquery(syllabus_subquery), d.class_id == c.id)
+    |> join(:inner, [c], d in subquery(syllabus_subquery()), d.class_id == c.id)
     |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -177,5 +178,27 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([c, l, u, r], r.role_id == @student_role)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
+  end
+
+  defp classes_multiple_files(dates, %{"school_id" => school_id}) do
+    from(d in Doc)
+    |> join(:inner, [d], c in Class, c.id == d.class_id)
+    |> join(:inner, [d, c], p in ClassPeriod, p.id == c.class_period_id)
+    |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> where([d, c, p], p.school_id == ^school_id)
+    |> group_by([d], d.class_id)
+    |> having([d], count(d.class_id) > 1)
+    |> select([d], count(d.class_id, :distinct))
+    |> Repo.all()
+    |> Enum.count()
+  end
+  defp classes_multiple_files(dates, _params) do
+    from(d in Doc)
+    |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> group_by([d], d.class_id)
+    |> having([d], count(d.class_id) > 1)
+    |> select([d], count(d.class_id, :distinct))
+    |> Repo.all()
+    |> Enum.count()
   end
 end
