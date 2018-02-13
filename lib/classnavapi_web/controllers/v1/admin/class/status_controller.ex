@@ -160,7 +160,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       "<br />" <>
       @your_request <> class.name <> @has_been_denied <> @reason <> "<br />" <>
       "<br />" <>
-      @ending <> "</p>"
+      @ending <> "</p>" <> 
+      Mailer.signature()
     end
 
     defp deny_text_body(class, user) do
@@ -168,7 +169,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       "\n" <>
       @your_request <> class.name <> @has_been_denied <> @reason <> "\n" <>
       "\n" <>
-      @ending
+      @ending <> "\n" <> "\n" <>
+      Mailer.text_signature()
     end
 
     defp syllabus_html_body(class) do
