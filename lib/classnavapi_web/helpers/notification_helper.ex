@@ -74,7 +74,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @replied " replied to a comment you follow."
   @replied_post " replied in a post you follow"
 
-  @needs_syllabus_msg "This is just a test."
+  @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
