@@ -36,7 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
     case Repo.transaction(multi) do
       {:ok, %{change_request: %{user_id: nil} = change_request}} ->
         render(conn, ChangeRequestView, "show.json", change_request: change_request)
-      {:ok, %{change_request: %{user_id: user_id} = change_request}} ->
+      {:ok, %{change_request: %{user_id: _user_id} = change_request}} ->
         change_request = change_request |> Repo.preload([:user, :class])
         change_request.user |> send_request_completed_email(change_request.class)
         render(conn, ChangeRequestView, "show.json", change_request: change_request)
