@@ -81,12 +81,15 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
   defp sammi(%Class{id: id}, %{"sammi" => sammi}) do
     Logger.info(inspect(sammi))
     
-    decoded_sammi = sammi
+    sammi = sammi
     |> String.replace("'", ~s("))
-    |> Poison.decode!
 
-    decoded_sammi |> add_grade_scale(id)
-    decoded_sammi |> add_professor_info(id)
+    case sammi |> Poison.decode do
+      {:ok, decoded_sammi} ->
+        decoded_sammi |> add_grade_scale(id)
+        decoded_sammi |> add_professor_info(id)
+      {:error, _} -> nil
+    end
   end
   defp sammi(_class, _params), do: nil
 
