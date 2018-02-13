@@ -59,6 +59,7 @@ defmodule Classnavapi.Class.StudentAssignment do
       assignment
       |> cast(attrs, @upd_fields)
       |> validate_required(@upd_req_fields)
+      |> validate_length(:notes, max: 2000)
       |> foreign_key_constraint(:weight_id)
     end
 

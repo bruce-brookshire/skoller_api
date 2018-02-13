@@ -43,6 +43,8 @@ defmodule ClassnavapiWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
+
       # Login/out routes
       post "/logout", AuthController, :logout
       post "/users/token-login", AuthController, :token
@@ -92,10 +94,36 @@ defmodule ClassnavapiWeb.Router do
       # Class routes
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
-      post "/classes/:class_hash/pydocs", Admin.Class.DocController, :create
+      post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
+        post "/approve", Admin.Class.StatusController, :approve
+        post "/deny", Admin.Class.StatusController, :deny
+
+        # Chat routes
+        resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete, :show]
+        resources "/posts", Class.ChatPostController, only: [:create, :update] do
+          resources "/comments", Class.ChatCommentController, only: [:create]
+          resources "/like", Class.Chat.PostLikeController,  only: [:create]
+          delete "/unlike", Class.Chat.PostLikeController, :delete
+          resources "/star", Class.Chat.PostStarController, only: [:create]
+          delete "/unstar", Class.Chat.PostStarController, :delete
+          post "/read", Class.Chat.PostStarController, :update
+        end
+        put "/comments/:id", Class.ChatCommentController, :update
+        resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
+          resources "/replies", Class.ChatReplyController, only: [:create]
+          resources "/star", Class.Chat.CommentStarController, only: [:create]
+          delete "/unstar", Class.Chat.CommentStarController, :delete
+          resources "/like", Class.Chat.CommentLikeController, only: [:create]
+          delete "/unlike", Class.Chat.CommentLikeController, :delete
+        end
+        resources "/replies", Admin.Class.ChatReplyController, only: [:delete] do
+          resources "/like", Class.Chat.ReplyLikeController, only: [:create]
+          delete "/unlike", Class.Chat.ReplyLikeController, :delete
+        end
+        put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock
@@ -128,6 +156,10 @@ defmodule ClassnavapiWeb.Router do
       # Student routes
       resources "/students", StudentController, only: [] do
         resources "/fields", Student.FieldController, only: [:create, :delete]
+
+        # Chat routes
+        get "/chat", Student.ChatController, :chat
+        get "/inbox", Student.ChatController, :inbox
 
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify
@@ -172,6 +204,8 @@ defmodule ClassnavapiWeb.Router do
       post "/syllabus-workers/weights", SyllabusWorkerController, :weights
       post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
       post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
+
+      post "/notifications/syllabus-needed", NotificationController, :syllabus
     end
   end
 

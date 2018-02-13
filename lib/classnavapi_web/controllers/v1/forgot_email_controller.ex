@@ -11,7 +11,6 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
   import Bamboo.Email
 
   @from_email "noreply@skoller.co"
-  @base_url "https://test.skoller.co"
   @reset_password_route "/reset_password/"
   @forgot_email_text1 "You forgot your password? It's okay. None of us are perfect. Click " 
   @forgot_email_text2 " to reset it."
@@ -50,8 +49,8 @@ defmodule ClassnavapiWeb.Api.V1.ForgotEmailController do
     |> to(user.email)
     |> from(@from_email)
     |> subject("Forgot Password")
-    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> @base_url <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>")
-    |> text_body(@forgot_email_text1 <> @base_url <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2)
+    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Mailer.signature())
+    |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Mailer.text_signature())
   end
 
   defp update_user(changeset) do
