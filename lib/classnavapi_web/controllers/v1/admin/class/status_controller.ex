@@ -7,8 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     alias ClassnavapiWeb.ClassView
     alias Classnavapi.Class.Lock
     alias ClassnavapiWeb.Helpers.RepoHelper
-    alias ClassnavapiWeb.Helpers.NotificationHelper
-    alias ClassnavapiWeb.Helpers.StatusHelper
+    alias ClassnavapiWeb.Helpers.NotificationHelper 
     alias Classnavapi.Mailer
     alias Classnavapi.User
     alias Classnavapi.Class.StudentClass
@@ -20,7 +19,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @admin_role 200
     @help_role 500
 
-    @new_class_status 100
     @syllabus_status 200
     @assignment_status 400
     @review_status 500
@@ -58,7 +56,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       |> Repo.get!(class_id)
 
       updated = class
-      |> StatusHelper.check_status(nil)
+      |> Ecto.Changeset.change(%{is_new_class: false})
 
       case updated do
         {:ok, nil} ->
@@ -125,7 +123,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       |> Mailer.deliver_later
     end
 
-    defp deny_class(conn, %Class{class_status_id: @new_class_status} = class) do
+    defp deny_class(conn, %Class{is_new_class: true} = class) do
       users = from(u in User)
       |> join(:inner, [u], sc in StudentClass, sc.student_id == u.student_id)
       |> where([u, sc], sc.class_id == ^class.id and sc.is_dropped == false)

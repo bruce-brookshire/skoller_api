@@ -46,6 +46,8 @@ defmodule Classnavapi.Class do
     field :class_type, :string
     field :campus, :string, default: ""
     field :class_upload_key, :string
+    field :is_student_created, :boolean, default: false
+    field :is_new_class, :boolean, default: false
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
     belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
