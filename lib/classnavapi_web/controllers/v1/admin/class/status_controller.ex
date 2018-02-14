@@ -55,12 +55,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
       class = Class
       |> Repo.get!(class_id)
 
-      updated = class
+      changeset = class
       |> Ecto.Changeset.change(%{is_new_class: false})
 
-      case updated do
-        {:ok, nil} ->
-          render(conn, ClassView, "show.json", class: class)
+      case Repo.update(changeset) do
         {:ok, class} ->
           render(conn, ClassView, "show.json", class: class)
         {:error, changeset} ->
