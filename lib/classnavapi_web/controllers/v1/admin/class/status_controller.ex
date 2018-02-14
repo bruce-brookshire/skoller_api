@@ -43,7 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     @has_been_denied " has been denied. "
     @reason "The reason is because that class already exists at your school or the request is illegitimate. Please contact us at support@skoller.co for further assistance."
 
-    @wrong_syllabus_submitted "Our team hass noticed that the wrong syllabus was submitted for "
+    @wrong_syllabus_submitted "Our team has noticed that the wrong syllabus was submitted for "
     @no_biggie ". No biggie, we all goof up every now and then!"
     @we_deleted_it " We deleted the wrong syllabus."
     @you_should " You should now be able to "
