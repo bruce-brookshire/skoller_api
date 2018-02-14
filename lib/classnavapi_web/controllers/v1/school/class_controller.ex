@@ -16,8 +16,6 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   import ClassnavapiWeb.Helpers.AuthPlug
   
   @student_role 100
-
-  @new_class_status 100
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :school
@@ -30,7 +28,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period], period.school_id == ^school_id)
-    |> where([class], class.class_status_id != @new_class_status)
+    |> where([class], class.is_new_class == false)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
     |> Repo.all()
@@ -46,7 +44,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period], period.school_id == ^school_id)
-    |> where([class], class.class_status_id != @new_class_status)
+    |> where([class], class.is_new_class == false)
     |> select([class, period, prof], %{class: class, professor: prof})
     |> Repo.all()
 
