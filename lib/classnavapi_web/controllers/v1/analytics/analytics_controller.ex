@@ -45,6 +45,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
     |> Map.put(:class_syllabus_count, syllabus_count(dates, params))
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
+    |> Map.put(:student_created_classes, student_created_count(dates, params))
     |> Map.put(:avg_classes, avg_classes(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
@@ -136,6 +137,21 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   defp class_count(dates, _params) do
     from(c in Class)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp student_created_count(dates, %{"school_id" => school_id}) do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([c, p], p.school_id == ^school_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.is_student_created == true)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp student_created_count(dates, _params) do
+    from(c in Class)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.is_student_created == true)
     |> Repo.aggregate(:count, :id)
   end
 
