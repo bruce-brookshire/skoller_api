@@ -24,6 +24,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                     id: school.id,
                     name: school.name
                 },
+                is_new_class: class.is_new_class,
                 status: ClassCalcs.get_class_status(class_status)
         }
     end
