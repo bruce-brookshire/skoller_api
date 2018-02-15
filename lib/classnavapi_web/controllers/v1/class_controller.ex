@@ -211,11 +211,17 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp status_filter(dynamic, %{"class_status" => "0", "or" => "true"}) do
     dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
   end
+  defp status_filter(dynamic, %{"class_status" => "100", "or" => "true"}) do
+    dynamic([class, period, prof], class.is_new_class == true or ^dynamic)
+  end
   defp status_filter(dynamic, %{"class_status" => filter, "or" => "true"}) do
     dynamic([class, period, prof], class.class_status_id == ^filter or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => "0"}) do
     dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+  end
+  defp status_filter(dynamic, %{"class_status" => "100"}) do
+    dynamic([class, period, prof], class.is_new_class == true and ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter}) do
     dynamic([class, period, prof], class.class_status_id == ^filter and ^dynamic)
