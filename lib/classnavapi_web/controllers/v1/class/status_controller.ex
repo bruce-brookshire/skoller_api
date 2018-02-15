@@ -16,7 +16,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
 
     @needs_syllabus_status 200
     @complete_status 700
-    @new_status 0
+    @new_status 100
     @new_name "New Class"
     @maint_status 999
     @maint_name "Under Maintenance"
