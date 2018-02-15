@@ -14,6 +14,9 @@ defmodule Classnavapi.Repo.Migrations.AddStudentBooleansToClass do
     |> where([c], c.class_status_id == 100)
     |> Classnavapi.Repo.update_all([])
   
-    Classnavapi.Repo.delete!(%Classnavapi.Class.Status{id: 100, name: "New Class"})
+    case Classnavapi.Repo.get(Classnavapi.Class.Status, 100) do
+      nil -> nil
+      item -> Classnavapi.Repo.delete!(item)
+    end
   end
 end
