@@ -141,7 +141,17 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
     changeset = Class.changeset(class_old, params)
 
-    conn |> update_class(changeset)
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.update(:class, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
+
+    case Repo.transaction(multi) do
+      {:ok, %{class: class}} ->
+        render(conn, ClassView, "show.json", class: class)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
   end
 
   defp check_conn_for_student(params, %{assigns: %{user: %{student: nil}}}), do: params
@@ -153,17 +163,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp grade_scale(%{"grade_scale" => _} = params), do: params
   defp grade_scale(%{} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)
-  end
-
-  defp update_class(conn, changeset) do
-    case Repo.update(changeset) do
-      {:ok, class} ->
-        render(conn, ClassView, "show.json", class: class)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
   end
 
   defp filter(%{} = params) do

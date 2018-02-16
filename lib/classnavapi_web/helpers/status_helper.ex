@@ -36,6 +36,9 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
   def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
     class |> set_status(@complete_status)
   end
+  def check_status(%Class{class_status_id: status, is_syllabus: false} = class, _params) when status < @complete_status do
+    class |> set_status(@complete_status)
+  end
   # A new class has been added.
   def check_status(%Class{class_status_id: nil} = class, _params) do
     class |> set_status(@syllabus_status)
