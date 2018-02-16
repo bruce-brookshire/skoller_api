@@ -8,9 +8,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.DocView
   alias Classnavapi.DocUpload
-  alias ClassnavapiWeb.ChangesetView
   alias Ecto.UUID
   alias ClassnavapiWeb.Helpers.StatusHelper
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -23,33 +23,48 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file} = params) do
 
-    class = params |> get_class_from_hash()
+    classes = params |> get_class_from_hash()
 
-    class |> sammi(params)
+    classes |> Enum.each(&sammi(&1, params))
 
     location = file |> upload_file()
 
     params = params 
     |> Map.put("path", location)
     |> Map.put("name", file.filename)
-    |> Map.put("class_id", class.id)
     |> Map.put("is_syllabus", true)
     |> Map.put("user_id", user.id)
 
-    changeset = Doc.changeset(%Doc{}, params)
-
     multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:doc, &insert_class_doc(classes, params, &1))
+    |> Ecto.Multi.run(:status, &check_statuses(classes, &1.doc))
 
     case Repo.transaction(multi) do
       {:ok, %{doc: doc}} ->
-        render(conn, DocView, "show.json", doc: doc)
+        render(conn, DocView, "index.json", docs: doc)
       {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ChangesetView, "error.json", changeset: failed_value)
+        |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp check_statuses(classes, docs) do
+    status = classes |> Enum.map(&StatusHelper.check_status(&1, %{doc: elem(docs |> Enum.find(fn(x) -> elem(x, 1).class_id == &1.id end), 1)}))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp insert_class_doc(classes, params, _) do
+    status = classes |> Enum.map(&insert_doc(&1, params))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp insert_doc(class, params) do
+    params = params 
+    |> Map.put("class_id", class.id)
+
+    changeset = Doc.changeset(%Doc{}, params)
+
+    Repo.insert(changeset)
   end
 
   defp upload_file(file) do
@@ -67,7 +82,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> where([class, period], period.id == ^period_id)
     |> where([class], class.class_upload_key == ^class_hash)
-    |> Repo.one!()
+    |> Repo.all()
   end
 
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
