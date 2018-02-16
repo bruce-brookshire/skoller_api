@@ -29,7 +29,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   # A new class has been added, and it is a class that will never have a syllabus.
   def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
-    class |> set_status(@weight_status)
+    class |> set_status(@complete_status)
   end
   # A new class has been added.
   def check_status(%Class{class_status_id: nil} = class, _params) do
