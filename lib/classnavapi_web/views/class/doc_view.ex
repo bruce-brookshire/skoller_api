@@ -14,6 +14,18 @@ defmodule ClassnavapiWeb.Class.DocView do
     render_one(doc, DocView, "doc.json")
   end
 
+  def render("doc.json", %{doc: {:ok, doc}}) do
+    doc = doc |> Repo.preload([:user, :class])
+    %{
+      path: doc.path,
+      class: render_one(doc.class, ClassView, "class.json"),
+      is_syllabus: doc.is_syllabus,
+      name: doc.name,
+      id: doc.id,
+      user: render_one(doc.user, UserView, "user.json")
+    }
+  end
+
   def render("doc.json", %{doc: doc}) do
     doc = doc |> Repo.preload([:user, :class])
     %{
