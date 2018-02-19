@@ -5,8 +5,8 @@ defmodule Classnavapi.Notification.ManualLog do
 
 
   schema "manual_notification_logs" do
-    field :affected_users, :string
-    field :notification_category, :integer
+    field :affected_users, :integer
+    field :notification_category, :string
 
     timestamps()
   end

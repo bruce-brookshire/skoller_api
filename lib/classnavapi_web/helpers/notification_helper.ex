@@ -210,11 +210,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> where([u, s, sc, c], c.class_status_id == @syllabus_status)
     |> distinct([u], u.id)
     |> Repo.all()
+    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
 
     Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category})
 
     users
-    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
     |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
   end
 
