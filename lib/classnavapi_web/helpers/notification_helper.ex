@@ -201,7 +201,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
 
   def send_needs_syllabus_notifications() do
-    from(u in User)
+    users = from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
     |> join(:inner, [u, s], sc in StudentClass, sc.student_id == s.id)
     |> join(:inner, [u, s, sc], c in Class, c.id == sc.class_id)
@@ -211,6 +211,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> distinct([u], u.id)
     |> Repo.all()
     |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category})
+
+    users
     |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
   end
 
