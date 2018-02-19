@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Class.HelpRequestView do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.HelpRequestView
   alias ClassnavapiWeb.Class.Help.TypeView
+  alias ClassnavapiWeb.UserView
 
   def render("show.json", %{help_request: help_request}) do
     render_one(help_request, HelpRequestView, "help_request.json")

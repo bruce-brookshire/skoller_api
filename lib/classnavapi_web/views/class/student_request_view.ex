@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Class.StudentRequestView do
   alias ClassnavapiWeb.Class.StudentRequestView
   alias ClassnavapiWeb.Class.StudentRequest.TypeView
   alias ClassnavapiWeb.Class.DocView
+  alias ClassnavapiWeb.UserView
 
   import Ecto.Query
 
