@@ -22,6 +22,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
     class = Repo.get!(Class, class_id)
     class = class |> Repo.preload(:class_status)
 
+    params = params |> Map.put("user_id", conn.assigns[:user].id)
+
     changeset = HelpRequest.changeset(%HelpRequest{}, params)
     
     multi = Ecto.Multi.new
