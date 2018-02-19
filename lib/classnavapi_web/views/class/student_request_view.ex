@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Class.StudentRequestView do
   alias ClassnavapiWeb.Class.StudentRequestView
   alias ClassnavapiWeb.Class.StudentRequest.TypeView
   alias ClassnavapiWeb.Class.DocView
+  alias ClassnavapiWeb.UserView
 
   import Ecto.Query
 
@@ -13,7 +14,7 @@ defmodule ClassnavapiWeb.Class.StudentRequestView do
   end
 
   def render("student_request.json", %{student_request: student_request}) do
-    student_request = student_request |> Repo.preload([:class_student_request_type])
+    student_request = student_request |> Repo.preload([:class_student_request_type, :user])
     docs = from(d in Classnavapi.Class.Doc)
     |> join(:inner, [d], srd in Classnavapi.Class.StudentRequest.Doc, srd.doc_id == d.id)
     |> where([d, srd], srd.class_student_request_id == ^student_request.id)
@@ -23,6 +24,7 @@ defmodule ClassnavapiWeb.Class.StudentRequestView do
       notes: student_request.notes,
       is_completed: student_request.is_completed,
       id: student_request.id,
+      user: render_one(student_request.user, UserView, "user.json"),
       change_type: render_one(student_request.class_student_request_type, TypeView, "type.json")
     }
   end

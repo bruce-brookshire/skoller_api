@@ -22,6 +22,8 @@ defmodule ClassnavapiWeb.Api.V1.Class.StudentRequestController do
 
   def create(%{assigns: %{user: user}} = conn, %{} = params) do
 
+    params = params |> Map.put("user_id", conn.assigns[:user].id)
+    
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
 
     class = Repo.get!(Class, params["class_id"])
