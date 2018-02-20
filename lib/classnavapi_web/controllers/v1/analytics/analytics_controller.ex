@@ -221,22 +221,23 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp avg_classes(dates, params) do
-    from(a in subquery(avg_classes_subquery(dates, params)))
-    |> select([a], avg(a.count))
+    from(s in subquery(avg_classes_subquery(dates, params)))
+    |> select([s], avg(s.count))
     |> Repo.one()
+    |> Decimal.to_float()
   end
 
   defp avg_classes_subquery(dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
     |> where([s], s.school_id == ^school_id)
-    |> group_by([s], s.id)
-    |> select([s], %{count: count(s.id)})
+    |> group_by([s, sc], sc.student_id)
+    |> select([s, sc], %{count: count(sc.student_id)})
   end
   defp avg_classes_subquery(dates, _params) do
     from(s in Student)
     |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
-    |> group_by([s], s.id)
-    |> select([s], %{count: count(s.id)})
+    |> group_by([s, sc], sc.student_id)
+    |> select([s, sc], %{count: count(sc.student_id)})
   end
 end
