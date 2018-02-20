@@ -11,6 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.UserRole
   alias Classnavapi.Class.Doc
   alias Classnavapi.Student
+  alias Classnavapi.Class.Assignment
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -35,7 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
 
-    analytics = Map.new()
+    class = Map.new()
     |> Map.put(:class_count, class_count(dates, params))
     |> Map.put(:enrollment, enrollment_count(dates, params))
     |> Map.put(:completed_class, completed_classes)
@@ -47,6 +48,13 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
     |> Map.put(:student_created_classes, student_created_count(dates, params))
     |> Map.put(:avg_classes, avg_classes(dates, params))
+
+    assignment = Map.new()
+    |> Map.put(:assign_count, assign_count(dates, params))
+
+    analytics = Map.new()
+    |> Map.put(:class, class)
+    |> Map.put(:assignment, assignment)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
@@ -239,6 +247,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
+  end
+
+  defp assign_count(dates, %{"school_id" => school_id}) do
+    from(a in Assignment)
+    |> join(:inner, [a], c in Class, a.class_id == c.id)
+    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([a, c, p], p.school_id == ^school_id)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp assign_count(dates, _params) do
+    from(a in Assignment)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp convert_to_float(nil), do: 0.0
