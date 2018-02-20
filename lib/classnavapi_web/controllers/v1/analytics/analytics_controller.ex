@@ -224,7 +224,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(s in subquery(avg_classes_subquery(dates, params)))
     |> select([s], avg(s.count))
     |> Repo.one()
-    |> Decimal.to_float()
+    |> convert_to_float()
   end
 
   defp avg_classes_subquery(dates, %{"school_id" => school_id}) do
@@ -240,4 +240,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end
+
+  defp convert_to_float(nil), do: 0.0
+  defp convert_to_float(val), do: Decimal.to_float()
 end
