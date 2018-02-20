@@ -53,6 +53,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:assign_count, assign_count(dates, params))
     |> Map.put(:assign_due_date_count, assign_due_date_count(dates, params))
 
+    assignment = assignment
+    |> Map.put(:assign_per_student, assign_per_student(class, assignment))
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
@@ -278,6 +281,11 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> where([a], not(is_nil(a.due)))
     |> Repo.aggregate(:count, :id)
+  end
+
+  defp assign_per_student(%{completed_class: 0}, _assign), do: 0
+  defp assign_per_student(class, assign) do
+    Kernel.div(assign.assign_count, class.completed_class) * class.avg_classes
   end
 
   defp convert_to_float(nil), do: 0.0
