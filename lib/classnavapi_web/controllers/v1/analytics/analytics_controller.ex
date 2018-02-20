@@ -56,9 +56,12 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     assignment = assignment
     |> Map.put(:assign_per_student, assign_per_student(class, assignment))
 
+    mod = Map.new()
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
+    |> Map.put(:mod, mod)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
