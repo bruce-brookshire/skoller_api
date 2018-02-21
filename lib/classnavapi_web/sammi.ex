@@ -97,14 +97,20 @@ defmodule ClassnavapiWeb.Sammi do
   defp get_phone(map, %{"phone" => %{"value" => ""}}, %{phone: nil}), do: map |> Map.put("phone", nil)
   defp get_phone(map, %{"phone" => %{"value" => val}}, %{phone: nil}) do
     val = val |> String.trim()
-    map |> Map.put("phone", val)
+    case val |> String.match?(~r/\d{10}/) do
+      true -> map |> Map.put("phone", val)
+      false -> map |> Map.put("phone", nil)
+    end
   end
   defp get_phone(map, _params, %{phone: _val}), do: map
 
   defp get_email(map, %{"email" => %{"value" => ""}}, %{email: nil}), do: map |> Map.put("email", nil)
   defp get_email(map, %{"email" => %{"value" => val}}, %{email: nil}) do
     val = val |> String.trim()
-    map |> Map.put("email", val)
+    case val |> String.match?(~r/.{2,}@/) do
+      true -> map |> Map.put("email", val)
+      false -> map |> Map.put("email", nil)
+    end
   end
   defp get_email(map, _params, %{email: _val}), do: map
 

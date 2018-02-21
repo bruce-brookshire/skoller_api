@@ -36,6 +36,7 @@ defmodule Classnavapi.Professor do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> validate_format(:email, ~r/@/)
+    |> validate_format(:phone, ~r/\d{10}/)
     |> foreign_key_constraint(:class_period_id)
   end
 
@@ -44,5 +45,6 @@ defmodule Classnavapi.Professor do
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
     |> validate_format(:email, ~r/@/)
+    |> validate_format(:phone, ~r/\d{10}/)
   end
 end
