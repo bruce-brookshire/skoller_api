@@ -17,6 +17,16 @@ defmodule ClassnavapiWeb.Api.V1.NotificationController do
     conn |> send_resp(200, "")
   end
 
+  def custom(conn, %{"message" => msg, "password" => password}) do
+    if Comeonin.Bcrypt.checkpw(password, conn.assigns[:user].password_hash) do
+      Task.start(NotificationHelper, :send_custom_notification, [msg])
+      conn |> send_resp(200, "")
+    else
+      conn
+        |> send_resp(401, "")
+    end
+  end
+
   def index(conn, _params) do
     logs = Repo.all(ManualLog)
     render(conn, NotificationView, "index.json", notifications: logs)

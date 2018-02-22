@@ -203,6 +203,7 @@ defmodule ClassnavapiWeb.Router do
       post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
 
       post "/notifications/syllabus-needed", NotificationController, :syllabus
+      post "/notifications/custom", NotificationController, :custom
       get "/notifications", NotificationController, :index
     end
   end
