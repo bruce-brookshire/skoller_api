@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Student.Inbox.ResponseView do
     %{
       response: response.response,
       is_reply: response.is_reply,
+      inserted_at: comment.inserted_at,
       student: render_one(comment.student, ClassnavapiWeb.StudentView, "student-short.json")
     }
   end
@@ -24,6 +25,7 @@ defmodule ClassnavapiWeb.Student.Inbox.ResponseView do
     %{
       response: response.response,
       is_reply: response.is_reply,
+      inserted_at: reply.inserted_at,
       student: render_one(reply.student, ClassnavapiWeb.StudentView, "student-short.json")
     }
   end
