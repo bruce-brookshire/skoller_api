@@ -54,6 +54,9 @@ defmodule ClassnavapiWeb.Sammi do
 
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
   defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
+    val = val
+    |> String.trim()
+    |> String.trim("|")
     class = Repo.get!(Class, class_id)
     Class.changeset(class, %{"grade_scale" => val})
     |> Repo.update()
