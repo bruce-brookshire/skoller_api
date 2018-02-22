@@ -77,9 +77,11 @@ defmodule ClassnavapiWeb.Class.ChatPostView do
   end
 
   def render("chat_post_short.json", %{chat_post: chat_post}) do
+    chat_post = chat_post |> Repo.preload(:class)
     %{
       post: chat_post.post,
-      id: chat_post.id
+      id: chat_post.id,
+      class: render_one(chat_post.class, ClassnavapiWeb.ClassView, "class_short.json")
     }
   end
 
