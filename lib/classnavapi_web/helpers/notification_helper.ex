@@ -213,7 +213,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Repo.all()
     |> Enum.reduce([], &get_user_devices(&1) ++ &2)
 
-    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category})
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
 
     users
     |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
@@ -227,7 +227,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Repo.all()
     |> Enum.reduce([], &get_user_devices(&1) ++ &2)
 
-    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category})
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category, msg: msg})
   
     users
     |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))

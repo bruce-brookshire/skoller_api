@@ -19,8 +19,13 @@ defmodule ClassnavapiWeb.Api.V1.NotificationController do
 
   def custom(conn, %{"message" => msg, "password" => password}) do
     if Comeonin.Bcrypt.checkpw(password, conn.assigns[:user].password_hash) do
-      Task.start(NotificationHelper, :send_custom_notification, [msg])
-      conn |> send_resp(200, "")
+      if msg |> String.length > 400 do
+        conn
+        |> send_resp(422, "")
+      else
+        Task.start(NotificationHelper, :send_custom_notification, [msg])
+        conn |> send_resp(200, "")
+      end
     else
       conn
         |> send_resp(401, "")
