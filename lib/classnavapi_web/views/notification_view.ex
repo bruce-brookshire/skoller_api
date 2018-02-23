@@ -11,6 +11,7 @@ defmodule ClassnavapiWeb.NotificationView do
     %{
       affected_users: notification.affected_users,
       notification_category: notification.notification_category,
+      msg: notification.msg,
       inserted_at: notification.inserted_at
     }
   end

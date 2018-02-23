@@ -29,6 +29,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @class_chat_comment "ClassChat.Comment"
   @class_chat_reply "ClassChat.Reply"
   @manual_syllabus_category "Manual.NeedsSyllabus"
+  @manual_custom_category "Manual.Custom"
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -212,10 +213,24 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Repo.all()
     |> Enum.reduce([], &get_user_devices(&1) ++ &2)
 
-    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category})
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
 
     users
     |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
+  end
+
+  def send_custom_notification(msg) do
+    users = from(u in User)
+    |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> where([u, s], s.is_notifications == true)
+    |> distinct([u], u.id)
+    |> Repo.all()
+    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category, msg: msg})
+  
+    users
+    |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
   end
 
   # defp add_acceptance_percentage(mod) do
