@@ -222,10 +222,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   def send_custom_notification(msg) do
     users = from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> join(:inner, [u, s], d in Device, d.user_id == u.id)
     |> where([u, s], s.is_notifications == true)
-    |> distinct([u], u.id)
+    |> distinct([u, s, d], d.udid)
+    |> select([u, s, d], d)
     |> Repo.all()
-    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
 
     Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category, msg: msg})
   
