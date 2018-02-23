@@ -13,6 +13,8 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   
   @admin_role 200
   @default_grade_scale "A,90|B,80|C,70|D,60"
+
+  @syllabus_status 200
   
   plug :verify_role, %{role: @admin_role}
 
@@ -100,7 +102,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     class = class 
       |> Map.put(:grade_scale, @default_grade_scale)
     changeset = Class.changeset(%Class{}, class)
-    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
+    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key, class_status_id: @syllabus_status})
     Repo.insert(changeset)
   end
 
