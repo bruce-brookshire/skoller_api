@@ -16,6 +16,8 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Chat.Post
+  alias Classnavapi.Chat.Comment
+  alias Classnavapi.Chat.Reply
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -64,6 +66,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:chat_classes, get_chat_classes(dates, params))
     |> Map.put(:chat_post_count, get_chat_post_count(dates, params))
     |> Map.put(:max_chat_activity, get_max_chat_activity(dates, params))
+    |> Map.put(:participating_students, get_chat_participating_students(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -72,6 +75,37 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:chat, chat)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_chat_participating_students(dates, %{"school_id" => school_id}) do
+
+  end
+
+  defp get_chat_participating_students(dates, _params) do
+    post_students = from(p in Post)
+    |> where([p], fragment("?::date", p.inserted_at) >= ^dates.date_start and fragment("?::date", p.inserted_at) <= ^dates.date_end)
+    |> distinct([p], p.student_id)
+    |> select([p], p.student_id)
+    |> Repo.all()
+
+    comment_students = from(c in Comment)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.student_id not in ^post_students)
+    |> distinct([c], c.student_id)
+    |> select([c], c.student_id)
+    |> Repo.all()
+
+    students = post_students ++ comment_students
+
+    reply_students = from(r in Reply)
+    |> where([r], fragment("?::date", r.inserted_at) >= ^dates.date_start and fragment("?::date", r.inserted_at) <= ^dates.date_end)
+    |> where([r], r.student_id not in ^students)
+    |> distinct([r], r.student_id)
+    |> select([r], r.student_id)
+    |> Repo.all()
+
+    students ++ reply_students
+    |> Enum.count()
   end
 
   defp get_max_chat_activity(dates, params) do
