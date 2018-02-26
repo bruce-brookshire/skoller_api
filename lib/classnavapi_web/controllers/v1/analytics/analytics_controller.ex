@@ -12,6 +12,8 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Class.Doc
   alias Classnavapi.Student
   alias Classnavapi.Class.Assignment
+  alias Classnavapi.Assignment.Mod.Type, as: ModType
+  alias Classnavapi.Assignment.Mod
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -56,14 +58,45 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     assignment = assignment
     |> Map.put(:assign_per_student, assign_per_student(class, assignment))
 
-    mod = Map.new()
-
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
-    |> Map.put(:mod, mod)
+    |> Map.put(:mod, mod_map(dates, params))
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp mod_map(dates, params) do
+    ModType 
+    |> Repo.all()
+    |> Enum.map(&build_mod_type_map(&1, dates, params))
+  end
+
+  defp build_mod_type_map(type, dates, params) do
+    Map.new()
+    |> Map.put(:type, type.name)
+    |> Map.put(:count, get_mod_count(type, dates, params))
+    # |> Map.put(:count_private, )
+    # |> Map.put(:manual_copies, )
+    # |> Map.put(:manual_dismiss, )
+    # |> Map.put(:auto_updates, )
+  end
+
+  defp get_mod_count(type, dates, %{"school_id" => school_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
+    |> join(:inner, [m, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [m, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([m], m.assignment_mod_type_id == ^type.id)
+    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_mod_count(type, dates, _params) do
+    from(m in Mod)
+    |> where([m], m.assignment_mod_type_id == ^type.id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp communitites(dates, %{"school_id" => school_id}) do
