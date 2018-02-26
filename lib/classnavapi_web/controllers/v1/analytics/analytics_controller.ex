@@ -63,6 +63,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     chat = Map.new()
     |> Map.put(:chat_classes, get_chat_classes(dates, params))
     |> Map.put(:chat_post_count, get_chat_post_count(dates, params))
+    |> Map.put(:max_chat_activity, get_max_chat_activity(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -71,6 +72,40 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:chat, chat)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_max_chat_activity(dates, params) do
+    class = from(c in Class)
+    |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), cp.class_id == c.id)
+    |> select([c, cp], %{class: c, count: cp.count})
+    |> Repo.one()
+
+    Map.new()
+    |> Map.put(:class_name, class.class.name)
+    |> Map.put(:count, class.count)
+  end
+
+  defp get_max_chat_activity_subquery(dates, params) do
+    from(cp in subquery(get_chat_activity_subquery(dates, params)))
+    |> group_by([cp], cp.class_id)
+    |> select([cp], %{class_id: cp.class_id, count: max(cp.count)})
+    |> limit(1)
+  end
+
+  defp get_chat_activity_subquery(dates, %{"school_id" => school_id}) do
+    from(cp in Post)
+    |> join(:inner, [cp], c in Class, c.id == cp.class_id)
+    |> join(:inner, [cp, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([cp, c, p], p.school_id == ^school_id)
+    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
+    |> group_by([cp], cp.class_id)
+    |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})
+  end
+  defp get_chat_activity_subquery(dates, _params) do
+    from(cp in Post)
+    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
+    |> group_by([cp], cp.class_id)
+    |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})
   end
 
   defp get_chat_post_count(dates, %{"school_id" => school_id}) do
