@@ -14,6 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Assignment.Mod.Type, as: ModType
   alias Classnavapi.Assignment.Mod
+  alias Classnavapi.Assignment.Mod.Action
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -77,9 +78,30 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:type, type.name)
     |> Map.put(:count, get_mod_count(type, dates, params))
     |> Map.put(:count_private, get_private_mod_count(type, dates, params))
-    # |> Map.put(:manual_copies, )
+    |> Map.put(:manual_copies, get_manual_copies(type, dates, params))
     # |> Map.put(:manual_dismiss, )
     # |> Map.put(:auto_updates, )
+  end
+
+  defp get_manual_copies(type, dates, %{"school_id" => school_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
+    |> join(:inner, [m, act, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [m, act, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
+    |> where([m, act], act.is_manual == true)
+    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_manual_copies(type, dates, _params) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
+    |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> where([m, act], act.is_manual == true)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_mod_count(type, dates, %{"school_id" => school_id}) do
