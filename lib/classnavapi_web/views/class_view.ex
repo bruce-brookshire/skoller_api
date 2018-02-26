@@ -10,6 +10,9 @@ defmodule ClassnavapiWeb.ClassView do
     alias Classnavapi.Repo
     alias ClassnavapiWeb.SchoolView
     alias ClassnavapiWeb.Class.StudentRequestView
+    alias Classnavapi.Class.StudentClass
+
+    import Ecto.Query
 
     def render("index.json", %{classes: classes}) do
         render_many(classes, ClassView, "class.json")
@@ -38,6 +41,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             is_points: class.is_points,
+            is_new_class: class.is_new_class,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
@@ -65,6 +69,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             is_points: class.is_points,
+            is_new_class: class.is_new_class,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
@@ -93,6 +98,7 @@ defmodule ClassnavapiWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             is_points: class.is_points,
+            is_new_class: class.is_new_class,
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
@@ -112,8 +118,26 @@ defmodule ClassnavapiWeb.ClassView do
                 status: render_one(class.class_status, StatusView, "status.json"),
                 help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json"),
                 change_requests: render_many(class.change_requests, ChangeRequestView, "change_request.json"),
-                student_requests: render_many(class.student_requests, StudentRequestView, "student_request.json")
+                student_requests: render_many(class.student_requests, StudentRequestView, "student_request.json"),
+                enrollment: class |> get_class_enrollment()
             }
         )
+    end
+
+    def render("class_short.json", %{class: class}) do
+        %{
+            id: class.id,
+            name: class.name,
+            number: class.number,
+            is_editable: class.is_editable,
+            campus: class.campus,
+            class_period_id: class.class_period_id,
+        }
+    end
+
+    defp get_class_enrollment(class) do
+        from(sc in StudentClass)
+        |> where([sc], sc.class_id == ^class.id and sc.is_dropped == false)
+        |> Repo.aggregate(:count, :id)
     end
 end

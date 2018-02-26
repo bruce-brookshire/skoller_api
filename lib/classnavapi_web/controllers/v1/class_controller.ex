@@ -51,13 +51,13 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     params = params
             |> grade_scale()
             |> Map.put("class_period_id", period_id)
-            |> check_conn_for_student(conn)
 
     changeset = Class.changeset(%Class{}, params)
+    |> add_student_created_class_fields(conn)
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.insert(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
 
     case Repo.transaction(multi) do
       {:ok, %{class_status: class}} ->
@@ -154,11 +154,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     end
   end
 
-  defp check_conn_for_student(params, %{assigns: %{user: %{student: nil}}}), do: params
-  defp check_conn_for_student(params, %{assigns: %{user: %{student: _}}}) do
-    params |> Map.put("is_student", true)
+  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: nil}}}), do: changeset
+  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: _}}}) do
+    changeset |> Ecto.Changeset.change(%{is_new_class: true, is_student_created: true})
   end
-  defp check_conn_for_student(params, _conn), do: params
+  defp add_student_created_class_fields(changeset, _conn), do: changeset
 
   defp grade_scale(%{"grade_scale" => _} = params), do: params
   defp grade_scale(%{} = params) do
@@ -210,11 +210,17 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp status_filter(dynamic, %{"class_status" => "0", "or" => "true"}) do
     dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
   end
+  defp status_filter(dynamic, %{"class_status" => "100", "or" => "true"}) do
+    dynamic([class, period, prof], class.is_new_class == true or ^dynamic)
+  end
   defp status_filter(dynamic, %{"class_status" => filter, "or" => "true"}) do
     dynamic([class, period, prof], class.class_status_id == ^filter or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => "0"}) do
     dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+  end
+  defp status_filter(dynamic, %{"class_status" => "100"}) do
+    dynamic([class, period, prof], class.is_new_class == true and ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter}) do
     dynamic([class, period, prof], class.class_status_id == ^filter and ^dynamic)

@@ -15,14 +15,16 @@ defmodule Classnavapi.Class.HelpRequest do
     field :is_completed, :boolean, default: false
     field :class_id, :id
     field :class_help_type_id, :id
+    field :user_id, :id
     belongs_to :class, Classnavapi.Class, define_field: false
     belongs_to :class_help_type, Classnavapi.Class.Help.Type, define_field: false
+    belongs_to :user, Classnavapi.User, define_field: false
 
     timestamps()
   end
 
   @req_fields [:class_id, :class_help_type_id]
-  @opt_fields [:note, :is_completed]
+  @opt_fields [:note, :is_completed, :user_id]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false

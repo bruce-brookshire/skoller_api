@@ -8,7 +8,6 @@ defmodule Classnavapi.Class.Status do
 
   """
 
-  # @new_class_status 100
   # @syllabus_status 200
   # @weight_status 300
   # @assignment_status 400

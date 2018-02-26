@@ -9,11 +9,9 @@ defmodule ClassnavapiWeb.Notification do
 
   require Logger
 
-  @push_topic "co.skoller.skoller"
-
   def create_notification(device, %{title: title, body: body}, category) do
     ""
-    |> APNS.Notification.new(device, @push_topic)
+    |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_alert(%{
           "title" => title,
@@ -28,7 +26,7 @@ defmodule ClassnavapiWeb.Notification do
 
   def create_notification(device, msg, category) do
     msg
-    |> APNS.Notification.new(device, @push_topic)
+    |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_category(category)
     |> put_sound("default")

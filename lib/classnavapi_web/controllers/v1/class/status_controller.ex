@@ -14,8 +14,10 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     @admin_role 200
     @syllabus_worker_role 300
 
-    @new_syllabus_status 200
+    @needs_syllabus_status 200
     @complete_status 700
+    @new_status 100
+    @new_name "New Class"
     @maint_status 999
     @maint_name "Under Maintenance"
     
@@ -31,7 +33,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       |> join(:left, [status], class in Class, status.id == class.class_status_id)
       |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
       |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
-      |> where([status], status.id not in [@new_syllabus_status, @complete_status])
+      |> where([status], status.id not in [@needs_syllabus_status, @complete_status])
       |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
       |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
       |> Repo.all()
@@ -41,7 +43,12 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
       |> Repo.all()
 
-      statuses = statuses ++ maint
+      new = from(class in Class)
+      |> where([class], class.is_new_class == true and class.is_editable == true)
+      |> select([class], %{id: @new_status, name: @new_name, classes: count(class.id)})
+      |> Repo.all()
+
+      statuses = statuses ++ maint ++ new
 
       render(conn, StatusView, "index.json", statuses: statuses)
     end

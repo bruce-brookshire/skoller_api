@@ -11,6 +11,9 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Class
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
+  alias Classnavapi.Chat.Comment.Star, as: CommentStar
+  alias Classnavapi.Chat.Post.Star, as: PostStar
+  alias Classnavapi.Chat.Comment
 
   import Ecto.Query
 
@@ -23,12 +26,18 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @class_complete_category "Class.Complete"
   @auto_update_category "Update.Auto"
   @pending_update_category "Update.Pending"
+  @class_chat_comment "ClassChat.Comment"
+  @class_chat_reply "ClassChat.Reply"
+  @manual_syllabus_category "Manual.NeedsSyllabus"
+  @manual_custom_category "Manual.Custom"
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
   @due_assignment_mod 300
   @new_assignment_mod 400
   @delete_assignment_mod 500
+
+  @syllabus_status 200
 
   @a_classmate_has "A classmate has "
   @you_have "You have "
@@ -59,6 +68,14 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   #@of_class_accepted "% of your classmates have made this change."
 
   @is_ready " is ready!"
+
+  @commented " commented on a post you follow."
+  @commented_yours " commented on your post."
+  @replied_yours " replied to your comment."
+  @replied " replied to a comment you follow."
+  @replied_post " replied in a post you follow"
+
+  @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = get_user_from_student_class(action.student_class_id)
@@ -133,6 +150,90 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   end
   def build_auto_update_notification(_), do: nil
 
+  def send_new_comment_notification(comment, student_id) do
+    comment = comment |> Repo.preload([:student, :chat_post])
+
+    users = from(s in PostStar)
+    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.chat_post_id == ^comment.chat_post_id and s.student_id != ^student_id)
+    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> select([s, stu, u], u)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, get_chat_message(&1, comment)))
+
+    users 
+    |> Enum.reduce([], &put_user_devices(&1) ++ &2)
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.msg, @class_chat_comment))
+  end
+
+  def send_new_reply_notification(reply, student_id) do
+    reply = reply |> Repo.preload([:student, :chat_comment])
+
+    comment_users = from(s in CommentStar)
+    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.student_id != ^student_id)
+    |> where([s], s.chat_comment_id == ^reply.chat_comment_id)
+    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> select([s, stu, u], u)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, get_chat_reply_msg(&1, reply)))
+
+    user_ids = comment_users |> List.foldl([], &List.wrap(&1.id) ++ &2)
+
+    post_users = from(s in PostStar)
+    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
+    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.student_id != ^student_id)
+    |> where([s, c], c.id == ^reply.chat_comment_id)
+    |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> where([s, c, stu, u], u.id not in ^user_ids)
+    |> select([s, c, stu, u], u)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, reply.student.name_first <> " " <> reply.student.name_last <> @replied_post))
+
+    users = post_users ++ comment_users
+
+    users 
+    |> Enum.reduce([], &put_user_devices(&1) ++ &2)
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.msg, @class_chat_reply))
+  end
+
+  def send_needs_syllabus_notifications() do
+    users = from(u in User)
+    |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> join(:inner, [u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [u, s, sc], c in Class, c.id == sc.class_id)
+    |> where([u, s], s.is_notifications == true)
+    |> where([u, s, sc], sc.is_dropped == false)
+    |> where([u, s, sc, c], c.class_status_id == @syllabus_status)
+    |> distinct([u], u.id)
+    |> Repo.all()
+    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
+
+    users
+    |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
+  end
+
+  def send_custom_notification(msg) do
+    users = from(u in User)
+    |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> join(:inner, [u, s], d in Device, d.user_id == u.id)
+    |> where([u, s], s.is_notifications == true)
+    |> distinct([u, s, d], d.udid)
+    |> select([u, s, d], d)
+    |> Repo.all()
+
+    Repo.insert(%Classnavapi.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category, msg: msg})
+  
+    users
+    |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
+  end
+
   # defp add_acceptance_percentage(mod) do
   #   actions = from(act in Action)
   #   |> join(:inner, [act], mod in Mod, act.assignment_modification_id == mod.id)
@@ -145,6 +246,28 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   #   (accepted / count) * 100 |> Kernel.round()
   # end
+
+  defp get_chat_message(user, comment) do
+    case user.student_id == comment.chat_post.student_id do
+      false -> comment.student.name_first <> " " <> comment.student.name_last <> @commented
+      true -> comment.student.name_first <> " " <> comment.student.name_last <> @commented_yours
+    end
+  end
+
+  defp get_chat_reply_msg(user, reply) do
+    case user.student_id == reply.chat_comment.student_id do
+      false -> reply.student.name_first <> " " <> reply.student.name_last <> @replied
+      true -> reply.student.name_first <> " " <> reply.student.name_last <> @replied_yours
+    end
+  end
+
+  defp put_user_devices(user) do
+    from(dev in Device)
+    |> join(:inner, [dev], user in User, user.id == dev.user_id)
+    |> where([dev, user], user.id == ^user.id)
+    |> Repo.all()
+    |> Enum.map(&Map.put(&1, :msg, user.msg))
+  end
 
   defp class_complete_msg(assignments) do
     case Enum.count(assignments) do
