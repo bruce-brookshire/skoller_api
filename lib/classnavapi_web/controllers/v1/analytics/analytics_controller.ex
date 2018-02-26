@@ -62,6 +62,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
     chat = Map.new()
     |> Map.put(:chat_classes, get_chat_classes(dates, params))
+    |> Map.put(:chat_post_count, get_chat_post_count(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -70,6 +71,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:chat, chat)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_chat_post_count(dates, %{"school_id" => school_id}) do
+    from(cp in Post)
+    |> join(:inner, [cp], c in Class, c.id == cp.class_id)
+    |> join(:inner, [cp, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([cp, c, p], p.school_id == ^school_id)
+    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_chat_post_count(dates, _params) do
+    from(cp in Post)
+    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_chat_classes(dates, %{"school_id" => school_id}) do
