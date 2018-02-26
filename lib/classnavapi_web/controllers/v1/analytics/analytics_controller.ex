@@ -92,14 +92,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == true)
     |> where([m, a, c, p], p.school_id == ^school_id)
-    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
   defp get_manual_copies(type, dates, _params) do
     from(m in Mod)
     |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
-    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> where([m, act], act.is_manual == true and act.is_accepted == true)
     |> Repo.aggregate(:count, :id)
   end
@@ -113,14 +113,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == false)
     |> where([m, a, c, p], p.school_id == ^school_id)
-    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
   defp get_manual_dismisses(type, dates, _params) do
     from(m in Mod)
     |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
-    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> where([m, act], act.is_manual == true and act.is_accepted == false)
     |> Repo.aggregate(:count, :id)
   end
