@@ -15,6 +15,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Assignment.Mod.Type, as: ModType
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
+  alias Classnavapi.Chat.Post
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -59,12 +60,34 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     assignment = assignment
     |> Map.put(:assign_per_student, assign_per_student(class, assignment))
 
+    chat = Map.new()
+    |> Map.put(:chat_classes, get_chat_classes(dates, params))
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
     |> Map.put(:mod, mod_map(dates, params))
+    |> Map.put(:chat, chat)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_chat_classes(dates, %{"school_id" => school_id}) do
+    from(cp in subquery(get_unique_chat_class(dates)))
+    |> join(:inner, [cp], c in Class, c.id == cp.class_id)
+    |> join(:inner, [cp, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([c, p], p.school_id == ^school_id)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_chat_classes(dates, _params) do
+    from(cp in subquery(get_unique_chat_class(dates)))
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_unique_chat_class(dates) do
+    from(p in Post)
+    |> where([p], fragment("?::date", p.inserted_at) >= ^dates.date_start and fragment("?::date", p.inserted_at) <= ^dates.date_end)
+    |> distinct([p], p.class_id)
   end
 
   defp mod_map(dates, params) do
