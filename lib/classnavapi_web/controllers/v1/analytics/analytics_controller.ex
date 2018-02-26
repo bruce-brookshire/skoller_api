@@ -68,11 +68,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:max_chat_activity, get_max_chat_activity(dates, params))
     |> Map.put(:participating_students, get_chat_participating_students(dates, params))
 
+    notifications = Map.new()
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
     |> Map.put(:mod, mod_map(dates, params))
     |> Map.put(:chat, chat)
+    |> Map.put(:notifications, notifications)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
