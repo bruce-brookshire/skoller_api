@@ -80,7 +80,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:count_private, get_private_mod_count(type, dates, params))
     |> Map.put(:manual_copies, get_manual_copies(type, dates, params))
     |> Map.put(:manual_dismiss, get_manual_dismisses(type, dates, params))
-    # |> Map.put(:auto_updates, )
+    |> Map.put(:auto_updates, get_auto_updates(type, dates, params))
   end
 
   defp get_manual_copies(type, dates, %{"school_id" => school_id}) do
@@ -138,6 +138,23 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   defp get_mod_count(type, dates, _params) do
     from(m in Mod)
     |> where([m], m.assignment_mod_type_id == ^type.id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_auto_updates(type, dates, %{"school_id" => school_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
+    |> join(:inner, [m, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [m, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([m], m.assignment_mod_type_id == ^type.id and m.is_auto_update == true)
+    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_auto_updates(type, dates, _params) do
+    from(m in Mod)
+    |> where([m], m.assignment_mod_type_id == ^type.id and m.is_auto_update == true)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
