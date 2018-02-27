@@ -18,6 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
+  alias Classnavapi.School
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -70,6 +71,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
     notifications = Map.new()
     |> Map.put(:avg_days_out, get_avg_days_out(dates, params))
+    |> Map.put(:common_times, get_common_times(dates, params))
+    |> Map.put(:notifications_enabled, get_notifications_enabled(dates, params))
+    |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -79,6 +83,59 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:notifications, notifications)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_common_times(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> join(:inner, [s], sc in School, sc.id == s.school_id)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> group_by([s, sc], [s.notification_time, sc.timezone])
+    |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
+    |> order_by([s], desc: count(s.notification_time))
+    |> limit([s], 3)
+    |> Repo.all()
+  end
+
+  defp get_common_times(dates, _params) do
+    from(s in Student)
+    |> join(:inner, [s], sc in School, sc.id == s.school_id)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> group_by([s, sc], [s.notification_time, sc.timezone])
+    |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
+    |> order_by([s], desc: count(s.notification_time))
+    |> limit([s], 3)
+    |> Repo.all()
+  end
+
+  defp get_notifications_enabled(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> where([s], s.is_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_notifications_enabled(dates, _params) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.is_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_mod_notifications_enabled(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> where([s], s.is_mod_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_mod_notifications_enabled(dates, _params) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.is_mod_notifications == true)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_avg_days_out(dates, %{"school_id" => school_id}) do
