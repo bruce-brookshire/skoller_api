@@ -42,6 +42,10 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
+    avg_classes = avg_classes(dates, params)
+    avg_days_out = get_avg_days_out(dates, params) |> Decimal.to_float()
+    notifications_enabled = get_notifications_enabled(dates, params)
+    reminder_notifications_enabled = get_reminder_notifications_enabled(dates, params)
 
     class = Map.new()
     |> Map.put(:class_count, class_count(dates, params))
@@ -54,14 +58,16 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:class_syllabus_count, syllabus_count(dates, params))
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
     |> Map.put(:student_created_classes, student_created_count(dates, params))
-    |> Map.put(:avg_classes, avg_classes(dates, params))
+    |> Map.put(:avg_classes, avg_classes)
 
     assignment = Map.new()
     |> Map.put(:assign_count, assign_count(dates, params))
     |> Map.put(:assign_due_date_count, assign_due_date_count(dates, params))
 
+    assign_per_student = assign_per_student(class, assignment)
+
     assignment = assignment
-    |> Map.put(:assign_per_student, assign_per_student(class, assignment))
+    |> Map.put(:assign_per_student, assign_per_student)
 
     chat = Map.new()
     |> Map.put(:chat_classes, get_chat_classes(dates, params))
@@ -69,14 +75,17 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:max_chat_activity, get_max_chat_activity(dates, params))
     |> Map.put(:participating_students, get_chat_participating_students(dates, params))
 
+    estimated_reminders = avg_classes * assign_per_student * (avg_days_out + 1) * reminder_notifications_enabled
+
     notifications = Map.new()
-    |> Map.put(:avg_days_out, get_avg_days_out(dates, params))
+    |> Map.put(:avg_days_out, avg_days_out)
     |> Map.put(:common_times, get_common_times(dates, params))
-    |> Map.put(:notifications_enabled, get_notifications_enabled(dates, params))
+    |> Map.put(:notifications_enabled, notifications_enabled)
     |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
-    |> Map.put(:reminder_notifications_enabled, get_reminder_notifications_enabled(dates, params))
+    |> Map.put(:reminder_notifications_enabled, reminder_notifications_enabled)
     |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
     |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
+    |> Map.put(:estimated_reminders, estimated_reminders)
 
     analytics = Map.new()
     |> Map.put(:class, class)
