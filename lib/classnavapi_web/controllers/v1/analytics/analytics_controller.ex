@@ -74,6 +74,8 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:common_times, get_common_times(dates, params))
     |> Map.put(:notifications_enabled, get_notifications_enabled(dates, params))
     |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
+    |> Map.put(:reminder_notifications_enabled, get_reminder_notifications_enabled(dates, params))
+    |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -135,6 +137,36 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(s in Student)
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.is_mod_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_reminder_notifications_enabled(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> where([s], s.is_reminder_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_reminder_notifications_enabled(dates, _params) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.is_reminder_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_chat_notifications_enabled(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> where([s], s.is_chat_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_chat_notifications_enabled(dates, _params) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.is_chat_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
