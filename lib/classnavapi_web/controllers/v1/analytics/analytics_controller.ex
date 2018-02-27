@@ -76,6 +76,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
     |> Map.put(:reminder_notifications_enabled, get_reminder_notifications_enabled(dates, params))
     |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
+    |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -125,11 +126,31 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
+  defp get_student_class_notifications_enabled(dates, %{"school_id" => school_id}) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], s in Student, sc.student_id == s.id)
+    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
+    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
+    |> where([sc, s], s.school_id == ^school_id)
+    |> where([sc, s], s.is_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_student_class_notifications_enabled(dates, _params) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], s in Student, sc.student_id == s.id)
+    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
+    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
+    |> where([sc, s], s.is_notifications == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
   defp get_mod_notifications_enabled(dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_mod_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -137,6 +158,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(s in Student)
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.is_mod_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -145,6 +167,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_reminder_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -152,6 +175,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(s in Student)
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.is_reminder_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -160,6 +184,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_chat_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -167,6 +192,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(s in Student)
     |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
     |> where([s], s.is_chat_notifications == true)
+    |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
