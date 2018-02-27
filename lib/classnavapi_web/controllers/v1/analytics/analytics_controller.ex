@@ -32,13 +32,21 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   @diy_complete_lock 200
 
   @community_enrollment 2
+
+  @semester_days 112
+
+  @num_notificaiton_time 3
   
   plug :verify_role, %{role: @admin_role}
 
   def index(conn, params) do
+    start_date = Date.from_iso8601!(params["date_start"])
+    end_date = Date.from_iso8601!(params["date_end"])
+    range_days = Date.diff(end_date, start_date)
+
     dates = Map.new 
-            |> Map.put(:date_start, Date.from_iso8601!(params["date_start"]))
-            |> Map.put(:date_end, Date.from_iso8601!(params["date_end"]))
+            |> Map.put(:date_start, start_date)
+            |> Map.put(:date_end, end_date)
 
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
@@ -76,6 +84,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:participating_students, get_chat_participating_students(dates, params))
 
     estimated_reminders = avg_classes * assign_per_student * (avg_days_out + 1) * reminder_notifications_enabled
+    estimated_reminders_period = (range_days / @semester_days) * estimated_reminders
 
     notifications = Map.new()
     |> Map.put(:avg_days_out, avg_days_out)
@@ -86,6 +95,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
     |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
     |> Map.put(:estimated_reminders, estimated_reminders)
+    |> Map.put(:estimated_reminders_period, estimated_reminders_period)
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -105,7 +115,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> group_by([s, sc], [s.notification_time, sc.timezone])
     |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
     |> order_by([s], desc: count(s.notification_time))
-    |> limit([s], 3)
+    |> limit([s], @num_notificaiton_time)
     |> Repo.all()
   end
 
@@ -116,7 +126,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> group_by([s, sc], [s.notification_time, sc.timezone])
     |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
     |> order_by([s], desc: count(s.notification_time))
-    |> limit([s], 3)
+    |> limit([s], @num_notificaiton_time)
     |> Repo.all()
   end
 
