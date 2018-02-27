@@ -81,7 +81,42 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_chat_participating_students(dates, %{"school_id" => school_id}) do
+    post_students = from(p in Post)
+    |> join(:inner, [p], c in Class, p.class_id == c.id)
+    |> join(:inner, [p, c], cp in ClassPeriod, cp.id == c.class_period_id)
+    |> where([p], fragment("?::date", p.inserted_at) >= ^dates.date_start and fragment("?::date", p.inserted_at) <= ^dates.date_end)
+    |> where([p, c, cp], cp.school_id == ^school_id)
+    |> distinct([p], p.student_id)
+    |> select([p], p.student_id)
+    |> Repo.all()
 
+    comment_students = from(c in Comment)
+    |> join(:inner, [c], p in Post, p.id == c.chat_post_id)
+    |> join(:inner, [c, p], cl in Class, p.class_id == cl.id)
+    |> join(:inner, [c, p, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.student_id not in ^post_students)
+    |> where([c, p, cl, cp], cp.school_id == ^school_id)
+    |> distinct([c], c.student_id)
+    |> select([c], c.student_id)
+    |> Repo.all()
+
+    students = post_students ++ comment_students
+
+    reply_students = from(r in Reply)
+    |> join(:inner, [r], c in Comment, r.chat_comment_id == c.id)
+    |> join(:inner, [r, c], p in Post, p.id == c.chat_post_id)
+    |> join(:inner, [r, c, p], cl in Class, p.class_id == cl.id)
+    |> join(:inner, [r, c, p, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
+    |> where([r], fragment("?::date", r.inserted_at) >= ^dates.date_start and fragment("?::date", r.inserted_at) <= ^dates.date_end)
+    |> where([r], r.student_id not in ^students)
+    |> where([r, c, p, cl, cp], cp.school_id == ^school_id)
+    |> distinct([r], r.student_id)
+    |> select([r], r.student_id)
+    |> Repo.all()
+
+    students ++ reply_students
+    |> Enum.count()
   end
 
   defp get_chat_participating_students(dates, _params) do
@@ -112,11 +147,19 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_max_chat_activity(dates, params) do
-    class = from(c in Class)
+    from(c in Class)
     |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), cp.class_id == c.id)
     |> select([c, cp], %{class: c, count: cp.count})
     |> Repo.one()
+    |> create_max_chat_activity_map()
+  end
 
+  defp create_max_chat_activity_map(nil) do
+    Map.new()
+    |> Map.put(:class_name, "")
+    |> Map.put(:count, 0)
+  end
+  defp create_max_chat_activity_map(class) do
     Map.new()
     |> Map.put(:class_name, class.class.name)
     |> Map.put(:count, class.count)
@@ -163,7 +206,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     from(cp in subquery(get_unique_chat_class(dates)))
     |> join(:inner, [cp], c in Class, c.id == cp.class_id)
     |> join(:inner, [cp, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([c, p], p.school_id == ^school_id)
+    |> where([cp, c, p], p.school_id == ^school_id)
     |> Repo.aggregate(:count, :id)
   end
   defp get_chat_classes(dates, _params) do
@@ -201,7 +244,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:inner, [m, act, a, c], p in ClassPeriod, c.class_period_id == p.id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == true)
-    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m, act, a, c, p], p.school_id == ^school_id)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -222,7 +265,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:inner, [m, act, a, c], p in ClassPeriod, c.class_period_id == p.id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == false)
-    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m, act, a, c, p], p.school_id == ^school_id)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
