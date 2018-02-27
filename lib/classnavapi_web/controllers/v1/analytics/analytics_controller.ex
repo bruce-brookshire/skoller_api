@@ -19,6 +19,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
   alias Classnavapi.School
+  alias Classnavapi.Class.StudentAssignment
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -97,14 +98,36 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:estimated_reminders, estimated_reminders)
     |> Map.put(:estimated_reminders_period, estimated_reminders_period)
 
+    grades = Map.new()
+    |> Map.put(:grades_entered, get_grades_entered(dates, params))
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
     |> Map.put(:mod, mod_map(dates, params))
     |> Map.put(:chat, chat)
     |> Map.put(:notifications, notifications)
+    |> Map.put(:grades, grades)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_grades_entered(dates, %{"school_id" => school_id}) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
+    |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [sa, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([sa], fragment("?::date", sa.inserted_at) >= ^dates.date_start and fragment("?::date", sa.inserted_at) <= ^dates.date_end)
+    |> where([sa, a, c, p], p.school_id == ^school_id)
+    |> where([sa], not is_nil(sa.grade))
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_grades_entered(dates, _params) do
+    from(sa in StudentAssignment)
+    |> where([sa], fragment("?::date", sa.inserted_at) >= ^dates.date_start and fragment("?::date", sa.inserted_at) <= ^dates.date_end)
+    |> where([sa], not is_nil(sa.grade))
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_common_times(dates, %{"school_id" => school_id}) do
