@@ -69,6 +69,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:participating_students, get_chat_participating_students(dates, params))
 
     notifications = Map.new()
+    |> Map.put(:avg_days_out, get_avg_days_out(dates, params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -78,6 +79,19 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:notifications, notifications)
 
     render(conn, AnalyticsView, "show.json", analytics: analytics)
+  end
+
+  defp get_avg_days_out(dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> where([s], s.school_id == ^school_id)
+    |> Repo.aggregate(:avg, :notification_days_notice)
+  end
+
+  defp get_avg_days_out(dates, _params) do
+    from(s in Student)
+    |> where([s], fragment("?::date", s.inserted_at) >= ^dates.date_start and fragment("?::date", s.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:avg, :notification_days_notice)
   end
 
   defp get_chat_participating_students(dates, %{"school_id" => school_id}) do
