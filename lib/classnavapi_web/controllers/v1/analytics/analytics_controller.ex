@@ -112,7 +112,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
 
-  defp get_grades_entered(dates, %{"school_id" => school_id}) do
+  defp get_grades_entered(_dates, %{"school_id" => school_id}) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
     |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
@@ -122,13 +122,13 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_grades_entered(dates, _params) do
+  defp get_grades_entered(_dates, _params) do
     from(sa in StudentAssignment)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_common_times(dates, %{"school_id" => school_id}) do
+  defp get_common_times(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> join(:inner, [s], sc in School, sc.id == s.school_id)
     |> where([s], s.school_id == ^school_id)
@@ -139,7 +139,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.all()
   end
 
-  defp get_common_times(dates, _params) do
+  defp get_common_times(_dates, _params) do
     from(s in Student)
     |> join(:inner, [s], sc in School, sc.id == s.school_id)
     |> group_by([s, sc], [s.notification_time, sc.timezone])
@@ -149,20 +149,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.all()
   end
 
-  defp get_notifications_enabled(dates, %{"school_id" => school_id}) do
+  defp get_notifications_enabled(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_notifications_enabled(dates, _params) do
+  defp get_notifications_enabled(_dates, _params) do
     from(s in Student)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_class_notifications_enabled(dates, %{"school_id" => school_id}) do
+  defp get_student_class_notifications_enabled(_dates, %{"school_id" => school_id}) do
     from(sc in StudentClass)
     |> join(:inner, [sc], s in Student, sc.student_id == s.id)
     |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
@@ -171,7 +171,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_class_notifications_enabled(dates, _params) do
+  defp get_student_class_notifications_enabled(_dates, _params) do
     from(sc in StudentClass)
     |> join(:inner, [sc], s in Student, sc.student_id == s.id)
     |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
@@ -179,7 +179,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_mod_notifications_enabled(dates, %{"school_id" => school_id}) do
+  defp get_mod_notifications_enabled(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_mod_notifications == true)
@@ -187,14 +187,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_mod_notifications_enabled(dates, _params) do
+  defp get_mod_notifications_enabled(_dates, _params) do
     from(s in Student)
     |> where([s], s.is_mod_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_reminder_notifications_enabled(dates, %{"school_id" => school_id}) do
+  defp get_reminder_notifications_enabled(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_reminder_notifications == true)
@@ -202,14 +202,14 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_reminder_notifications_enabled(dates, _params) do
+  defp get_reminder_notifications_enabled(_dates, _params) do
     from(s in Student)
     |> where([s], s.is_reminder_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_chat_notifications_enabled(dates, %{"school_id" => school_id}) do
+  defp get_chat_notifications_enabled(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], s.school_id == ^school_id)
     |> where([s], s.is_chat_notifications == true)
@@ -217,20 +217,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_chat_notifications_enabled(dates, _params) do
+  defp get_chat_notifications_enabled(_dates, _params) do
     from(s in Student)
     |> where([s], s.is_chat_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_avg_days_out(dates, %{"school_id" => school_id}) do
+  defp get_avg_days_out(_dates, %{"school_id" => school_id}) do
     from(s in Student)
     |> where([s], s.school_id == ^school_id)
     |> Repo.aggregate(:avg, :notification_days_notice)
   end
 
-  defp get_avg_days_out(dates, _params) do
+  defp get_avg_days_out(_dates, _params) do
     from(s in Student)
     |> Repo.aggregate(:avg, :notification_days_notice)
   end
