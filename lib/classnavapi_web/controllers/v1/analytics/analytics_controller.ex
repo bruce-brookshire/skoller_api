@@ -72,6 +72,8 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     assignment = Map.new()
     |> Map.put(:assign_count, assign_count(dates, params))
     |> Map.put(:assign_due_date_count, assign_due_date_count(dates, params))
+    |> Map.put(:skoller_assign_count, skoller_assign_count(dates, params))
+    |> Map.put(:student_assign_count, student_assign_count(dates, params))
 
     assign_per_student = assign_per_student(class, assignment)
 
@@ -688,17 +690,51 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
+  defp skoller_assign_count(dates, %{"school_id" => school_id}) do
+    from(a in Assignment)
+    |> join(:inner, [a], c in Class, a.class_id == c.id)
+    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([a, c, p], p.school_id == ^school_id)
+    |> where([a], a.from_mod == false)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp skoller_assign_count(dates, _params) do
+    from(a in Assignment)
+    |> where([a], a.from_mod == false)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp student_assign_count(dates, %{"school_id" => school_id}) do
+    from(a in Assignment)
+    |> join(:inner, [a], c in Class, a.class_id == c.id)
+    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([a, c, p], p.school_id == ^school_id)
+    |> where([a], a.from_mod == true)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp student_assign_count(dates, _params) do
+    from(a in Assignment)
+    |> where([a], a.from_mod == true)
+    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
   defp assign_due_date_count(dates, %{"school_id" => school_id}) do
     from(a in Assignment)
     |> join(:inner, [a], c in Class, a.class_id == c.id)
     |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
     |> where([a, c, p], p.school_id == ^school_id)
+    |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> where([a], not(is_nil(a.due)))
     |> Repo.aggregate(:count, :id)
   end
   defp assign_due_date_count(dates, _params) do
     from(a in Assignment)
+    |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> where([a], not(is_nil(a.due)))
     |> Repo.aggregate(:count, :id)
