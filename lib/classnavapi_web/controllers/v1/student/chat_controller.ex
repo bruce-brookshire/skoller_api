@@ -91,7 +91,9 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   defp distinct_post_id(student_id) do
     from(c in Comment)
+    |> join(:left, [c], r in Reply, r.chat_comment_id == c.id)
     |> where([c], c.student_id != ^student_id) #Stop a student from getting hit with their own updates
+    |> or_where([c, r], r.student_id != ^student_id)
     |> distinct([c], c.chat_post_id)
   end
 
@@ -114,6 +116,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
     compate_dates(comment, reply)
   end
 
+  defp compate_dates(nil, reply), do: reply
   defp compate_dates(comment, nil), do: comment
   defp compate_dates(comment, reply) do
     case DateTime.compare(DateTime.from_naive!(comment.updated_at, "Etc/UTC"), DateTime.from_naive!(reply.updated_at, "Etc/UTC")) do
