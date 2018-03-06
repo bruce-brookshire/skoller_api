@@ -64,7 +64,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:class_in_review, class_in_review(dates, params))
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
-    |> Map.put(:class_syllabus_count, syllabus_count(dates, params))
+    |> Map.put(:enrolled_class_syllabus_count, enroll_syllabus_count(dates, params))
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
     |> Map.put(:student_created_classes, student_created_count(dates, params))
     |> Map.put(:avg_classes, avg_classes)
@@ -667,17 +667,19 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp syllabus_count(dates, %{"school_id" => school_id}) do
+  defp enroll_syllabus_count(dates, %{"school_id" => school_id}) do
     from(c in Class)
     |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
     |> join(:inner, [c, p], d in subquery(syllabus_subquery()), d.class_id == c.id)
     |> where([c, p], p.school_id == ^school_id)
+    |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
-  defp syllabus_count(dates, _params) do
+  defp enroll_syllabus_count(dates, _params) do
     from(c in Class)
     |> join(:inner, [c], d in subquery(syllabus_subquery()), d.class_id == c.id)
+    |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
