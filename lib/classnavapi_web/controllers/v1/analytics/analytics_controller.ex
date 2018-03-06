@@ -52,7 +52,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
     avg_classes = avg_classes(dates, params)
-    avg_days_out = get_avg_days_out(dates, params) |> Decimal.to_float()
+    avg_days_out = get_avg_days_out(dates, params) |> convert_to_float()
     notifications_enabled = get_notifications_enabled(dates, params)
     reminder_notifications_enabled = get_reminder_notifications_enabled(dates, params)
 
