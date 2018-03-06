@@ -452,7 +452,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:percent_mods, calc_mod_percent(mod_count, mod_type_count))
   end
 
-  defp calc_mod_percent(0, type_count), do: 0
+  defp calc_mod_percent(0, _type_count), do: 0
   defp calc_mod_percent(count, type_count), do: (type_count / count) * 100
 
   defp get_manual_copies(type, dates, %{"school_id" => school_id}) do
