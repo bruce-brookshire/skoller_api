@@ -103,7 +103,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
     grades = Map.new()
     |> Map.put(:grades_entered, get_grades_entered(dates, params))
-    
+    |> Map.put(:student_classes_with_grades, get_participation(dates, params))
+    |> Map.put(:student_classes, get_student_classes(dates, params))
+
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
@@ -115,11 +117,50 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
 
+  defp get_student_classes(_dates, %{"school_id" => school_id}) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([sc, c, p], p.school_id == ^school_id)
+    |> where([sc], sc.is_dropped == false)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_student_classes(_dates, _params) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_participation(_dates, %{"school_id" => school_id}) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
+    |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [sa, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [sa, a, c, p], sc in StudentClass, sc.id == sa.student_class_id)
+    |> where([sa, a, c, p, sc], sc.is_dropped == false)
+    |> where([sa, a, c, p], p.school_id == ^school_id)
+    |> where([sa], not is_nil(sa.grade))
+    |> distinct([sa], [sa.student_class_id])
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_participation(_dates, _params) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> where([sa], not is_nil(sa.grade))
+    |> where([sa, sc], sc.is_dropped == false)
+    |> distinct([sa], [sa.student_class_id])
+    |> Repo.aggregate(:count, :id)
+  end
+
   defp get_grades_entered(_dates, %{"school_id" => school_id}) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
     |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
     |> join(:inner, [sa, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [sa, a, c, p], sc in StudentClass, sc.id == sa.student_class_id)
+    |> where([sa, a, c, p, sc], sc.is_dropped == false)
     |> where([sa, a, c, p], p.school_id == ^school_id)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
@@ -127,7 +168,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
   defp get_grades_entered(_dates, _params) do
     from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
+    |> where([sa, sc], sc.is_dropped == false)
     |> Repo.aggregate(:count, :id)
   end
 
