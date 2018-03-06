@@ -718,6 +718,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:inner, [d, c], p in ClassPeriod, p.id == c.class_period_id)
     |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> where([d, c, p], p.school_id == ^school_id)
+    |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
     |> group_by([d], d.class_id)
     |> having([d], count(d.class_id) > 1)
     |> select([d], count(d.class_id, :distinct))
@@ -727,6 +728,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   defp classes_multiple_files(dates, _params) do
     from(d in Doc)
     |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
     |> group_by([d], d.class_id)
     |> having([d], count(d.class_id) > 1)
     |> select([d], count(d.class_id, :distinct))
