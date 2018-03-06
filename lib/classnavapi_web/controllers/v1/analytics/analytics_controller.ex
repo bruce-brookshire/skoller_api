@@ -99,10 +99,11 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
     |> Map.put(:estimated_reminders, estimated_reminders)
     |> Map.put(:estimated_reminders_period, estimated_reminders_period)
+    |> Map.put(:students, get_students(dates, params))
 
     grades = Map.new()
     |> Map.put(:grades_entered, get_grades_entered(dates, params))
-
+    
     analytics = Map.new()
     |> Map.put(:class, class)
     |> Map.put(:assignment, assignment)
@@ -149,6 +150,17 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], @num_notificaiton_time)
     |> Repo.all()
+  end
+
+  defp get_students(_dates, %{"school_id" => school_id}) do
+    from(s in Student)
+    |> where([s], s.school_id == ^school_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_students(_dates, _params) do
+    from(s in Student)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_notifications_enabled(_dates, %{"school_id" => school_id}) do
