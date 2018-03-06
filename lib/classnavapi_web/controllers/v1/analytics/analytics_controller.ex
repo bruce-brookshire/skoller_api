@@ -384,14 +384,21 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp build_mod_type_map(type, dates, params) do
+    mod_count = get_mod_count(dates, params)
+    mod_type_count = get_mod_type_count(type, dates, params)
+
     Map.new()
     |> Map.put(:type, type.name)
-    |> Map.put(:count, get_mod_count(type, dates, params))
+    |> Map.put(:count, mod_type_count)
     |> Map.put(:count_private, get_private_mod_count(type, dates, params))
     |> Map.put(:manual_copies, get_manual_copies(type, dates, params))
     |> Map.put(:manual_dismiss, get_manual_dismisses(type, dates, params))
     |> Map.put(:auto_updates, get_auto_updates(type, dates, params))
+    |> Map.put(:percent_mods, calc_mod_percent(mod_count, mod_type_count))
   end
+
+  defp calc_mod_percent(0, type_count), do: 0
+  defp calc_mod_percent(count, type_count), do: (type_count / count) * 100
 
   defp get_manual_copies(type, dates, %{"school_id" => school_id}) do
     from(m in Mod)
@@ -435,7 +442,22 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_mod_count(type, dates, %{"school_id" => school_id}) do
+  defp get_mod_count(dates, %{"school_id" => school_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
+    |> join(:inner, [m, a], c in Class, c.id == a.class_id)
+    |> join(:inner, [m, a, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([m, a, c, p], p.school_id == ^school_id)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+  defp get_mod_count(dates, _params) do
+    from(m in Mod)
+    |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_mod_type_count(type, dates, %{"school_id" => school_id}) do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
     |> join(:inner, [m, a], c in Class, c.id == a.class_id)
@@ -445,7 +467,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
-  defp get_mod_count(type, dates, _params) do
+  defp get_mod_type_count(type, dates, _params) do
     from(m in Mod)
     |> where([m], m.assignment_mod_type_id == ^type.id)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
