@@ -153,6 +153,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   def build_auto_update_notification(_), do: nil
 
   def send_new_post_notification(post, student_id) do
+    student = Repo.get!(Student, student_id)
+    class = Repo.get!(Class, post.class_id)
     from(d in Device)
     |> join(:inner, [d], u in User, d.user_id == u.id)
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
@@ -162,7 +164,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> where([d, u, s, sc], sc.is_dropped == false)
     |> where([d, u, s, sc, c], c.id == ^post.class_id)
     |> Repo.all()
-    |> Enum.each(&Notification.create_notification(&1.udid, build_chat_post_notification(post, student_id), @class_chat_post))
+    |> Enum.each(&Notification.create_notification(&1.udid, build_chat_post_notification(post, student, class), @class_chat_post))
   end
 
   def send_new_comment_notification(comment, student_id) do
@@ -262,9 +264,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   #   (accepted / count) * 100 |> Kernel.round()
   # end
 
-  defp build_chat_post_notification(post, student_id) do
-    student = Repo.get!(Student, student_id)
-    class = Repo.get!(Class, post.class_id)
+  defp build_chat_post_notification(post, student, class) do
     student.name_first <> " " <> student.name_last <> @posted_s <> class.name <> ": " <> post.post
   end
 
