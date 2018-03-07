@@ -30,4 +30,19 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def update(conn, %{"id" => id} = params) do
+    post_old = Repo.get_by!(Post, id: id, student_id: conn.assigns[:user].student_id)
+
+    changeset = Post.changeset_update(post_old, params)
+
+    case Repo.update(changeset) do
+      {:ok, post} ->
+        render(conn, PostView, "show.json", %{post: post})
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end
