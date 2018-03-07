@@ -56,7 +56,8 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
       is_auto_syllabus: school.is_auto_syllabus,
       short_name: school.short_name,
       class_periods: render_many(school.class_periods, PeriodView, "period.json"),
-      is_chat_enabled: school.is_chat_enabled
+      is_chat_enabled: school.is_chat_enabled,
+      is_assignment_posts_enabled: school.is_assignment_posts_enabled
     }
   end
 
