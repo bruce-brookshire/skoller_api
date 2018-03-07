@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Helpers.ChatPlug do
   alias Classnavapi.Class
   alias Classnavapi.School
   alias Classnavapi.ClassPeriod
+  alias Classnavapi.Class.Assignment
 
   import Plug.Conn
   import Ecto.Query
@@ -61,7 +62,8 @@ defmodule ClassnavapiWeb.Helpers.ChatPlug do
     end
   end
   defp get_class({:ok, map}, conn, :assignment) do
-    case Repo.get(Class, conn.params["class_id"]) do
+    assign = Repo.get!(Assignment, conn.params["assignment_id"])
+    case Repo.get(Class, assign.class_id) do
       %{is_assignment_posts_enabled: true} = class -> 
         {:ok, map |> Map.put(:class, class)}
       _ -> {:error, map}
