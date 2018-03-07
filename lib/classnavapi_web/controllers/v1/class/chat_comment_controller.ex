@@ -41,7 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatCommentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    comment_old = Repo.get!(Comment, id)
+    comment_old = Repo.get_by!(Comment, id: id, student_id: conn.assigns[:user].student_id)
 
     changeset = Comment.changeset_update(comment_old, params)
 

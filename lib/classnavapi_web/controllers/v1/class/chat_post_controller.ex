@@ -39,7 +39,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
   def update(conn, %{"id" => id, "class_id" => class_id} = params) do
 
-    post_old = Repo.get!(Post, id)
+    post_old = Repo.get_by!(Post, id: id, student_id: conn.assigns[:user].student_id)
 
     changeset = Post.changeset_update(post_old, params)
 
