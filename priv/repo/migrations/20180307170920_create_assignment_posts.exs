@@ -12,5 +12,13 @@ defmodule Classnavapi.Repo.Migrations.CreateAssignmentPosts do
 
     create index(:assignment_posts, [:assignment_id])
     create index(:assignment_posts, [:student_id])
+
+    alter table(:classes) do
+      add :is_assignment_posts_enabled, :boolean, default: true, null: false
+    end
+
+    alter table(:schools) do
+      add :is_assignment_posts_enabled, :boolean, default: true, null: false
+    end
   end
 end
