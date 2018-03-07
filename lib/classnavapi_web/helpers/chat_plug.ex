@@ -87,6 +87,7 @@ defmodule ClassnavapiWeb.Helpers.ChatPlug do
         {:error, map}
     end
   end
+  defp get_school_enabled({:error, _nil} = map, _atom), do: map
   defp get_school_enabled({:ok, %{class: %{class_period_id: class_period_id}} = map}, :assignment) do
     case class_period_id |> get_school() do
       %{is_assignment_posts_enabled: true} = school -> 
