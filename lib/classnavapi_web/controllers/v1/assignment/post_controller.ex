@@ -32,11 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    post_old = Repo.get!(Post, id)
-
-    if post_old.student_id != conn.assigns[:user].student_id do
-      conn |> send_resp(403, "") |> halt()
-    end
+    post_old = Repo.get_by!(Post, id: id, student_id: conn.assigns[:user].student_id)
 
     changeset = Post.changeset_update(post_old, params)
 

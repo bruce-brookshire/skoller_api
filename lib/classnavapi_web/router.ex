@@ -185,6 +185,7 @@ defmodule ClassnavapiWeb.Router do
       resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
 
         # Assignment Post routes
+        resources "/posts", Admin.Assignment.PostController, only: [:delete]
         resources "/posts", Assignment.PostController, only: [:create, :update]
 
         # Assignment Grade routes
