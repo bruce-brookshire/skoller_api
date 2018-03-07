@@ -6,10 +6,12 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
   alias ClassnavapiWeb.Assignment.PostView
 
   import ClassnavapiWeb.Helpers.AuthPlug
+  import ClassnavapiWeb.Helpers.ChatPlug
 
   @student_role 100
 
   plug :verify_role, %{role: @student_role}
+  plug :check_chat_enabled, :assignment
   plug :verify_member, :class_assignment
 
   def create(conn, params) do
