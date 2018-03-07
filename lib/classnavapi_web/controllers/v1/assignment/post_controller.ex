@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
   alias Classnavapi.Repo
   alias Classnavapi.Assignment.Post
   alias ClassnavapiWeb.Assignment.PostView
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -20,7 +21,8 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
     changeset = Post.changeset(%Post{}, params)
 
     case Repo.insert(changeset) do
-      {:ok, post} -> 
+      {:ok, post} ->
+        Task.start(NotificationHelper, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
         render(conn, PostView, "show.json", %{post: post})
       {:error, changeset} ->
         conn

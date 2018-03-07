@@ -30,6 +30,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @class_chat_reply "ClassChat.Reply"
   @manual_syllabus_category "Manual.NeedsSyllabus"
   @manual_custom_category "Manual.Custom"
+  @assignment_post "Assignment.Post"
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -232,6 +233,19 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   
     users
     |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
+  end
+
+  def send_assignment_post_notification(post, student) do
+    from(d in Device)
+    |> join(:inner, [d], u in User, u.id == d.user_id)
+    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
+    |> where([d, u, s], s.id != ^post.student_id and s.is_notifications == true)
+    |> where([d, u, s, sc], sc.is_dropped == false)
+    |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
+    |> Repo.all()
+    |> Enum.each(&Notification.create_notification(&1.udid, "test", @assignment_post))
   end
 
   # defp add_acceptance_percentage(mod) do
