@@ -26,6 +26,7 @@ defmodule Classnavapi.Class.StudentAssignment do
       belongs_to :student_class, StudentClass, define_field: false
       belongs_to :weight, Weight, define_field: false
       belongs_to :assignment, Assignment, define_field: false
+      has_many :posts, through: [:assignment, :posts]
   
       timestamps()
     end
