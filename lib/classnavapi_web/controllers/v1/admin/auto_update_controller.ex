@@ -25,6 +25,28 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   def index(conn, _params) do
     settings = Settings.get_auto_update_settings()
 
+    metrics = get_metrics(settings)
+
+    render(conn, SettingView, "index.json", settings: settings)
+  end
+
+  def update(conn, %{"id" => id} = params) do
+    settings_old = Settings.get_setting_by_name!(id)
+    case Settings.update_setting(settings_old, params) do
+      {:ok, setting} ->
+        render(conn, SettingView, "show.json", setting: setting)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def forecast(conn, params) do
+    
+  end
+
+  defp get_metrics(settings) do
     eligible_communities = get_eligible_communities()
     shared_mods = get_shared_mods()
     responded_mods = get_responded_mods()
@@ -45,23 +67,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
 
     summary = get_summary(enrollment_threshold, response_threshold, approval_threshold)
 
-    render(conn, SettingView, "index.json", settings: settings)
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    settings_old = Settings.get_setting_by_name!(id)
-    case Settings.update_setting(settings_old, params) do
-      {:ok, setting} ->
-        render(conn, SettingView, "show.json", setting: setting)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
-
-  def forecast(conn, params) do
-    
+    Map.new()
+    |> Map.put(:max_metrics, max_metrics)
+    |> Map.put(:actual_metrics, actual_metrics)
+    |> Map.put(:summary, summary)
   end
 
   defp get_summary(communities, responses, approvals) do
