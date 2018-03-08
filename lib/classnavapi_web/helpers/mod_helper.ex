@@ -16,7 +16,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
-  alias Classnavapi.Admin.Setting
+  alias Classnavapi.Admin.Settings
 
   import Ecto.Query
 
@@ -29,7 +29,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
-  @auto_upd_topic "AutoUpdate"
 
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
@@ -167,9 +166,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
-    settings = from(s in Setting)
-    |> where([s], s.topic == @auto_upd_topic)
-    |> Repo.all()
+    settings = Settings.get_auto_update_settings()
 
     update = actions 
     |> Enum.count()
