@@ -7,6 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Assignment.Mod
+  alias Classnavapi.Assignment.Mod.Action
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -14,6 +15,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   @admin_role 200
 
   @community 2
+  
+  @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
+  @auto_upd_response_threshold "auto_upd_response_thresh"
+  @auto_upd_approval_threshold "auto_upd_approval_thresh"
 
   plug :verify_role, %{role: @admin_role}
 
@@ -23,6 +28,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     eligible_communities = get_eligible_communities()
     shared_mods = get_shared_mods()
     responded_mods = get_responded_mods()
+    
+    max_metrics = Map.new()
+    |> Map.put(:eligible_communities, eligible_communities |> Enum.count())
+    |> Map.put(:shared_mods, shared_mods |> Enum.count())
+    |> Map.put(:responded_mods, responded_mods |> Enum.count())
+
+    actual_metrics = Map.new()
+    |> Map.put(:eligible_communities, eligible_communities |> Enum.count(&compare_communities(&1, settings)))
+    |> Map.put(:shared_mods, shared_mods |> Enum.count(&compare_shared(&1, settings)))
+    # |> Map.put(:responded_mods, responded_mods |> Enum.count())
 
     render(conn, SettingView, "index.json", settings: settings)
   end
@@ -43,30 +58,48 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     
   end
 
+  defp compare_shared(item, settings) do
+    item.responses / item.all >= get_setting(settings, @auto_upd_response_threshold) |> String.to_float
+  end
+
+  defp compare_communities(item, settings) do
+    item.count >= get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
+  end
+
+  defp get_setting(settings, key) do
+    setting = settings |> Enum.find(nil, &key == &1.name)
+    setting.value
+  end
+
   defp get_responded_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
     |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted is not null and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
-    |> select([m], count(m.id))
-    |> Repo.one()
+    |> Repo.all()
   end
 
   defp get_shared_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
     |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
-    |> select([m], count(m.id))
-    |> Repo.one()
+    |> select([m, a, sc, act, all], %{mod: m, responses: act.count, all: act.all})
+    |> Repo.all()
   end
 
   defp get_eligible_communities() do
     from(sc in subquery(community_sub()))
     |> where([sc], fragment("exists(select 1 from assignment_modifications am inner join assignments a on a.id = am.assignment_id where am.is_private = false and a.class_id = ?)", sc.class_id))
-    |> select([sc], count(sc.class_id))
-    |> Repo.one()
+    |> Repo.all()
+  end
+
+  defp mod_responses_sub() do
+    from(a in Action)
+    |> group_by([a], a.assignment_modification_id)
+    |> select([a], %{assignment_modification_id: a.assignment_modification_id, count: count(a.is_accepted), all: count(a.id)})
   end
 
   defp community_sub() do
