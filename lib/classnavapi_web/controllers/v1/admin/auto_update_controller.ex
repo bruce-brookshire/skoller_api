@@ -28,6 +28,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     eligible_communities = get_eligible_communities()
     shared_mods = get_shared_mods()
     responded_mods = get_responded_mods()
+
+    approval_threshold = responded_mods |> Enum.filter(&compare_responses(&1, settings))
+    response_threshold = shared_mods |> Enum.filter(&compare_shared(&1, settings))
+    enrollment_threshold = eligible_communities |> Enum.filter(&compare_communities(&1, settings))
     
     max_metrics = Map.new()
     |> Map.put(:eligible_communities, eligible_communities |> Enum.count())
@@ -35,9 +39,11 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> Map.put(:responded_mods, responded_mods |> Enum.count())
 
     actual_metrics = Map.new()
-    |> Map.put(:eligible_communities, eligible_communities |> Enum.count(&compare_communities(&1, settings)))
-    |> Map.put(:shared_mods, shared_mods |> Enum.count(&compare_shared(&1, settings)))
-    |> Map.put(:responded_mods, responded_mods |> Enum.count(&compare_responses(&1, settings)))
+    |> Map.put(:eligible_communities, enrollment_threshold |> Enum.count())
+    |> Map.put(:shared_mods, response_threshold |> Enum.count())
+    |> Map.put(:responded_mods, approval_threshold |> Enum.count())
+
+    summary = get_summary(enrollment_threshold, response_threshold, approval_threshold)
 
     render(conn, SettingView, "index.json", settings: settings)
   end
@@ -56,6 +62,20 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
 
   def forecast(conn, params) do
     
+  end
+
+  defp get_summary(communities, responses, approvals) do
+    mods = approvals 
+    |> Enum.filter(&Enum.any?(responses, fn(x) -> x.mod.id == &1.mod.id end))
+    |> List.foldl([], & &2 ++ [&1.mod.id])
+    classes = communities |> List.foldl([], & &2 ++ [&1.class_id])
+
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
+    |> where([m, a], a.class_id in ^classes)
+    |> where([m], m.id in ^mods)
+    |> select([m], count(m.id))
+    |> Repo.one()
   end
 
   defp compare_responses(item, settings) do
