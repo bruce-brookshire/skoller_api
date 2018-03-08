@@ -16,6 +16,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
+  alias Classnavapi.Admin.Setting
 
   import Ecto.Query
 
@@ -25,9 +26,10 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   @new_assignment_mod 400
   @delete_assignment_mod 500
 
-  @auto_upd_enrollment_threshold 5
-  @auto_upd_response_threshold 0.35
-  @auto_upd_approval_threshold 0.75
+  @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
+  @auto_upd_response_threshold "auto_upd_response_thresh"
+  @auto_upd_approval_threshold "auto_upd_approval_thresh"
+  @auto_upd_topic "AutoUpdate"
 
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
@@ -165,12 +167,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
   def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
+    settings = from(s in Setting)
+    |> where([s], s.topic == @auto_upd_topic)
+    |> Repo.all()
 
     update = actions 
     |> Enum.count()
-    |> auto_update_count_needed()
-    |> auto_update_acted_ratio_needed(actions)
-    |> auto_update_copied_ratio_needed()
+    |> auto_update_count_needed(settings)
+    |> auto_update_acted_ratio_needed(actions, settings)
+    |> auto_update_copied_ratio_needed(settings)
 
     case update do
       {:ok, _} ->
@@ -217,36 +222,46 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.update()
   end
 
-  defp auto_update_count_needed(count) do
-    case count < @auto_upd_enrollment_threshold do
+  defp get_setting(settings, key) do
+    setting = settings |> Enum.find(nil, &key == &1.name)
+    setting.value
+  end
+
+  defp auto_update_count_needed(count, settings) do
+    threshold = settings |> get_setting(@auto_upd_enrollment_threshold) |> String.to_integer
+    case count < threshold do
       true -> {:error, :not_enough_enrolled}
       false -> {:ok, count}
     end
   end
   
-  defp auto_update_copied_ratio_needed({:error, msg}), do: {:error, msg}
-  defp auto_update_copied_ratio_needed({:ok, acted}) do
+  defp auto_update_copied_ratio_needed({:error, msg}, _settings), do: {:error, msg}
+  defp auto_update_copied_ratio_needed({:ok, acted}, settings) do
     count = acted |> Enum.count()
 
     action_count = acted
     |> Enum.filter(& &1.is_accepted == true)
     |> Enum.count()
 
-    case action_count / count < @auto_upd_approval_threshold do
+    threshold = settings |> get_setting(@auto_upd_approval_threshold) |> String.to_float
+
+    case action_count / count < threshold do
       true -> {:error, :not_enough_copied}
       false -> {:ok, nil}
     end
   end
 
-  defp auto_update_acted_ratio_needed({:error, msg}, _count), do: {:error, msg}
-  defp auto_update_acted_ratio_needed({:ok, count}, actions) do
+  defp auto_update_acted_ratio_needed({:error, msg}, _count, _settings), do: {:error, msg}
+  defp auto_update_acted_ratio_needed({:ok, count}, actions, settings) do
     acted = actions
     |> Enum.filter(& not(is_nil(&1.is_accepted)))
 
     action_count = acted
     |> Enum.count()
 
-    case action_count / count < @auto_upd_response_threshold do
+    threshold = settings |> get_setting(@auto_upd_response_threshold) |> String.to_float
+
+    case action_count / count < threshold do
       true -> {:error, :not_enough_responses}
       false -> {:ok, acted}
     end
