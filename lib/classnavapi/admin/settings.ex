@@ -3,9 +3,8 @@ defmodule Classnavapi.Admin.Settings do
   import Ecto.Changeset
   alias Classnavapi.Admin.Settings
 
-
+  @primary_key {:name, :string, []}
   schema "admin_settings" do
-    field :name, :string
     field :value, :string
 
     timestamps()
