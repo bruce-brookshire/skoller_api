@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     actual_metrics = Map.new()
     |> Map.put(:eligible_communities, eligible_communities |> Enum.count(&compare_communities(&1, settings)))
     |> Map.put(:shared_mods, shared_mods |> Enum.count(&compare_shared(&1, settings)))
-    # |> Map.put(:responded_mods, responded_mods |> Enum.count())
+    |> Map.put(:responded_mods, responded_mods |> Enum.count(&compare_responses(&1, settings)))
 
     render(conn, SettingView, "index.json", settings: settings)
   end
@@ -58,6 +58,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     
   end
 
+  defp compare_responses(item, settings) do
+    item.accepted / item.responses >= get_setting(settings, @auto_upd_approval_threshold) |> String.to_float
+  end
+
   defp compare_shared(item, settings) do
     item.responses / item.all >= get_setting(settings, @auto_upd_response_threshold) |> String.to_float
   end
@@ -75,8 +79,10 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
     |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted is not null and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
+    |> select([m, a, sc, act, all], %{mod: m, responses: act.responses, accepted: act.accepted})
     |> Repo.all()
   end
 
@@ -86,7 +92,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
-    |> select([m, a, sc, act, all], %{mod: m, responses: act.count, all: act.all})
+    |> select([m, a, sc, act, all], %{mod: m, responses: act.responses, all: act.audience})
     |> Repo.all()
   end
 
@@ -99,7 +105,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp mod_responses_sub() do
     from(a in Action)
     |> group_by([a], a.assignment_modification_id)
-    |> select([a], %{assignment_modification_id: a.assignment_modification_id, count: count(a.is_accepted), all: count(a.id)})
+    |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
 
   defp community_sub() do
