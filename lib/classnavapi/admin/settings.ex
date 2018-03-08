@@ -12,4 +12,13 @@ defmodule Classnavapi.Admin.Settings do
     |> where([s], s.topic == @auto_upd_topic)
     |> Repo.all()
   end
+
+  def get_setting_by_name!(name) do
+    Repo.get!(Setting, name)
+  end
+
+  def update_setting(old, params) do
+    Setting.changeset_update(old, params)
+    |> Repo.update()
+  end
 end

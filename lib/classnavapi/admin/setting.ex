@@ -14,10 +14,20 @@ defmodule Classnavapi.Admin.Setting do
   @req_fields [:name, :value, :topic]
   @all_fields @req_fields
 
+  @req_upd [:value]
+  @upd_fields @req_upd
+
   @doc false
-  def changeset(%Setting{} = auto_update, attrs) do
-    auto_update
+  def changeset(%Setting{} = setting, attrs) do
+    setting
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+  end
+
+  @doc false
+  def changeset_update(%Setting{} = setting, attrs) do
+    setting
+    |> cast(attrs, @upd_fields)
+    |> validate_required(@req_upd)
   end
 end
