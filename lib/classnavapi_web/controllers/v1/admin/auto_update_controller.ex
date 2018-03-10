@@ -65,6 +65,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_pending() do
     from(a in Action)
     |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> where([a, sc], sc.is_dropped == false)
     |> distinct([a, sc], sc.student_id)
