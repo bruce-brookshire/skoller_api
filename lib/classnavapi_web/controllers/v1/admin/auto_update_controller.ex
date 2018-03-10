@@ -58,6 +58,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_people() do
     Map.new()
     |> Map.put(:creators, get_creators())
+    |> Map.put(:followers, get_followers())
+  end
+
+  defp get_followers() do
+    from(a in Action)
+    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
+    |> where([a], a.is_manual == true and a.is_accepted == true)
+    |> where([a, sc], sc.is_dropped == false)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_creators() do
