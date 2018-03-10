@@ -27,6 +27,15 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
 
     metrics = get_metrics(settings)
 
+    people = get_people()
+
+    items = Map.new()
+    |> Map.put(:metrics, metrics)
+    |> Map.put(:people, people)
+
+    require IEx
+    IEx.pry
+
     render(conn, SettingView, "index.json", settings: settings)
   end
 
@@ -44,6 +53,17 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
 
   def forecast(conn, params) do
     
+  end
+
+  defp get_people() do
+    Map.new()
+    |> Map.put(:creators, get_creators())
+  end
+
+  defp get_creators() do
+    from(m in Mod)
+    |> distinct([m], m.student_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_metrics(settings) do
