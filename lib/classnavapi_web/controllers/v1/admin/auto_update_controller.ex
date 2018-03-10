@@ -8,6 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
+  alias ClassnavapiWeb.Admin.ForecastView
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -33,10 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> Map.put(:metrics, metrics)
     |> Map.put(:people, people)
 
-    require IEx
-    IEx.pry
-
-    render(conn, SettingView, "index.json", settings: settings)
+    render(conn, ForecastView, "show.json", forecast: items)
   end
 
   def update(conn, %{"id" => id} = params) do
