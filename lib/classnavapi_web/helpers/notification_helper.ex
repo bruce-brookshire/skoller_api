@@ -27,6 +27,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @auto_update_category "Update.Auto"
   @pending_update_category "Update.Pending"
   @class_chat_comment "ClassChat.Comment"
+  @class_chat_post "ClassChat.Post"
   @class_chat_reply "ClassChat.Reply"
   @manual_syllabus_category "Manual.NeedsSyllabus"
   @manual_custom_category "Manual.Custom"
@@ -74,6 +75,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @replied_yours " replied to your comment."
   @replied " replied to a comment you follow."
   @replied_post " replied in a post you follow"
+  @posted_s " posted in "
 
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
@@ -149,6 +151,21 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     end
   end
   def build_auto_update_notification(_), do: nil
+
+  def send_new_post_notification(post, student_id) do
+    student = Repo.get!(Student, student_id)
+    class = Repo.get!(Class, post.class_id)
+    from(d in Device)
+    |> join(:inner, [d], u in User, d.user_id == u.id)
+    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [d, u, s, sc], c in Class, c.id == sc.class_id)
+    |> where([d, u, s], s.is_chat_notifications == true and s.is_notifications == true and s.id != ^student_id)
+    |> where([d, u, s, sc], sc.is_dropped == false)
+    |> where([d, u, s, sc, c], c.id == ^post.class_id)
+    |> Repo.all()
+    |> Enum.each(&Notification.create_notification(&1.udid, build_chat_post_notification(post, student, class), @class_chat_post))
+  end
 
   def send_new_comment_notification(comment, student_id) do
     comment = comment |> Repo.preload([:student, :chat_post])
@@ -246,6 +263,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   #   (accepted / count) * 100 |> Kernel.round()
   # end
+
+  defp build_chat_post_notification(post, student, class) do
+    student.name_first <> " " <> student.name_last <> @posted_s <> class.name <> ": " <> post.post
+  end
 
   defp get_chat_message(user, comment) do
     case user.student_id == comment.chat_post.student_id do

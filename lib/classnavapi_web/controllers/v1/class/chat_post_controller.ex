@@ -6,6 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
   alias ClassnavapiWeb.Class.ChatPostView
   alias Classnavapi.Chat.Post.Star
   alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.NotificationHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
@@ -28,6 +29,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatPostController do
 
     case Repo.transaction(multi) do
       {:ok, %{post: post}} -> 
+        Task.start(NotificationHelper, :send_new_post_notification, [post, conn.assigns[:user].student_id])
         sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: class_id, is_dropped: false)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
