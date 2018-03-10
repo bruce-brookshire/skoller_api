@@ -60,6 +60,17 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> Map.put(:creators, get_creators())
     |> Map.put(:followers, get_followers())
     |> Map.put(:pending, get_pending())
+    |> Map.put(:joyriders, get_joyriders())
+  end
+
+  defp get_joyriders() do
+    from(a in Action)
+    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
+    |> where([a], a.is_accepted == true and a.is_manual == false)
+    |> where([a, sc], sc.is_dropped == false)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp get_pending() do
