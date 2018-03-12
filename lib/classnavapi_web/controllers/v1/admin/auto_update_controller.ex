@@ -50,7 +50,60 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   end
 
   def forecast(conn, params) do
+    settings = params |> get_settings_from_params()
+
+    metrics = get_metrics(settings)
     
+    people = get_people()
+
+    items = Map.new()
+    |> Map.put(:metrics, metrics)
+    |> Map.put(:people, people)
+
+    render(conn, ForecastView, "show.json", forecast: items)
+  end
+
+  defp get_settings_from_params(params) do
+    get_enroll_thresh(params) ++ get_response_thresh(params) ++ get_approval_thresh(params)
+  end
+
+  defp get_approval_thresh(%{@auto_upd_approval_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_approval_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_approval_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_approval_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_approval_threshold).value)
+    |> List.wrap()
+  end
+
+  defp get_response_thresh(%{@auto_upd_response_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_response_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_response_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_response_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_response_threshold).value)
+    |> List.wrap()
+  end
+
+  defp get_enroll_thresh(%{@auto_upd_enrollment_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_enrollment_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_enroll_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_enrollment_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_enrollment_threshold).value)
+    |> List.wrap()
   end
 
   defp get_people() do
@@ -141,11 +194,11 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   end
 
   defp compare_responses(item, settings) do
-    item.accepted / item.responses >= get_setting(settings, @auto_upd_approval_threshold) |> String.to_float
+    item.accepted / item.responses >= get_setting(settings, @auto_upd_approval_threshold) |> Float.parse() |> Kernel.elem(0)
   end
 
   defp compare_shared(item, settings) do
-    item.responses / item.all >= get_setting(settings, @auto_upd_response_threshold) |> String.to_float
+    item.responses / item.all >= get_setting(settings, @auto_upd_response_threshold) |> Float.parse() |> Kernel.elem(0)
   end
 
   defp compare_communities(item, settings) do
