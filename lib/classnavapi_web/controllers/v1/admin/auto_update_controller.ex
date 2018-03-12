@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
   alias ClassnavapiWeb.Admin.ForecastView
+  alias ClassnavapiWeb.Helpers.ModHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -41,6 +42,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     settings_old = Settings.get_setting_by_name!(id)
     case Settings.update_setting(settings_old, params) do
       {:ok, setting} ->
+        process_auto_updates()
         render(conn, SettingView, "show.json", setting: setting)
       {:error, changeset} ->
         conn
@@ -61,6 +63,27 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> Map.put(:people, people)
 
     render(conn, ForecastView, "show.json", forecast: items)
+  end
+
+  defp process_auto_updates() do
+    settings = Settings.get_auto_update_settings()
+    enrollment_threshold = get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
+
+    from(m in Mod)
+    |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
+    |> where([m], m.is_auto_update == false and m.is_private == false)
+    |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
+    |> select([m, act], act)
+    |> Repo.all()
+    |> Enum.filter(&compare_shared(&1, settings))
+    |> Enum.filter(&compare_responses(&1, settings))
+    |> Enum.each(&auto_update_mod(&1))
+  end
+
+  defp auto_update_mod(mod) do
+    Repo.get!(Mod, mod.assignment_modification_id)
+    |> ModHelper.auto_update_mod()
   end
 
   defp get_settings_from_params(params) do
@@ -117,7 +140,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_joyriders() do
     from(a in Action)
     |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
     |> where([a], a.is_accepted == true and a.is_manual == false)
     |> where([a, sc], sc.is_dropped == false)
     |> distinct([a, sc], sc.student_id)
@@ -127,7 +150,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_pending() do
     from(a in Action)
     |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> where([a, sc], sc.is_dropped == false)
     |> distinct([a, sc], sc.student_id)
@@ -137,7 +160,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_followers() do
     from(a in Action)
     |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
     |> where([a], a.is_manual == true and a.is_accepted == true)
     |> where([a, sc], sc.is_dropped == false)
     |> distinct([a, sc], sc.student_id)
@@ -147,20 +170,23 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_creators() do
     from(m in Mod)
     |> join(:inner, [m], sc in StudentClass, sc.student_id == m.student_id)
-    |> join(:inner, [m, sc], cm in subquery(community_sub()), cm.class_id == sc.class_id)
+    |> join(:inner, [m, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
     |> distinct([m], m.student_id)
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_metrics(settings) do
-    eligible_communities = get_eligible_communities()
+    eligible_communities = get_eligible_communities(@community)
     shared_mods = get_shared_mods()
     responded_mods = get_responded_mods()
 
     approval_threshold = responded_mods |> Enum.filter(&compare_responses(&1, settings))
     response_threshold = shared_mods |> Enum.filter(&compare_shared(&1, settings))
-    enrollment_threshold = eligible_communities |> Enum.filter(&compare_communities(&1, settings))
-    
+    enrollment_threshold = settings 
+                          |> get_setting(@auto_upd_enrollment_threshold)
+                          |> String.to_integer()
+                          |> get_eligible_communities()
+
     max_metrics = Map.new()
     |> Map.put(:eligible_communities, eligible_communities |> Enum.count())
     |> Map.put(:shared_mods, shared_mods |> Enum.count())
@@ -198,12 +224,12 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   end
 
   defp compare_shared(item, settings) do
-    item.responses / item.all >= get_setting(settings, @auto_upd_response_threshold) |> Float.parse() |> Kernel.elem(0)
+    item.responses / item.audience >= get_setting(settings, @auto_upd_response_threshold) |> Float.parse() |> Kernel.elem(0)
   end
 
-  defp compare_communities(item, settings) do
-    item.count >= get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
-  end
+  # defp compare_communities(item, settings) do
+  #   item.count >= get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
+  # end
 
   defp get_setting(settings, key) do
     setting = settings |> Enum.find(nil, &key == &1.name)
@@ -213,26 +239,26 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp get_responded_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a], sc in subquery(community_sub(@community)), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted is not null and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
-    |> select([m, a, sc, act, all], %{mod: m, responses: act.responses, accepted: act.accepted})
+    |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
     |> Repo.all()
   end
 
   defp get_shared_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(community_sub()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a], sc in subquery(community_sub(@community)), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
-    |> select([m, a, sc, act, all], %{mod: m, responses: act.responses, all: act.audience})
+    |> select([m, a, sc, act], %{mod: m, responses: act.responses, audience: act.audience})
     |> Repo.all()
   end
 
-  defp get_eligible_communities() do
-    from(sc in subquery(community_sub()))
+  defp get_eligible_communities(threshold) do
+    from(sc in subquery(community_sub(threshold)))
     |> where([sc], fragment("exists(select 1 from assignment_modifications am inner join assignments a on a.id = am.assignment_id where am.is_private = false and a.class_id = ?)", sc.class_id))
     |> Repo.all()
   end
@@ -243,11 +269,11 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
 
-  defp community_sub() do
+  defp community_sub(threshold) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false)
     |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= @community)
+    |> having([sc], count(sc.id) >= ^threshold)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 end
