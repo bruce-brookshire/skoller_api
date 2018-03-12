@@ -16,6 +16,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   alias ClassnavapiWeb.Helpers.AssignmentHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
+  alias Classnavapi.Admin.Settings
 
   import Ecto.Query
 
@@ -25,9 +26,9 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   @new_assignment_mod 400
   @delete_assignment_mod 500
 
-  @auto_upd_enrollment_threshold 5
-  @auto_upd_response_threshold 0.35
-  @auto_upd_approval_threshold 0.75
+  @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
+  @auto_upd_response_threshold "auto_upd_response_thresh"
+  @auto_upd_approval_threshold "auto_upd_approval_thresh"
 
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
@@ -163,22 +164,28 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
+  def auto_update_mod(%Mod{} = mod) do
+    actions = mod |> get_actions_from_mod()
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
+    |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
+    |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
+    |> Repo.transaction()
+  end
+
   def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
+    settings = Settings.get_auto_update_settings()
 
     update = actions 
     |> Enum.count()
-    |> auto_update_count_needed()
-    |> auto_update_acted_ratio_needed(actions)
-    |> auto_update_copied_ratio_needed()
+    |> auto_update_count_needed(settings)
+    |> auto_update_acted_ratio_needed(actions, settings)
+    |> auto_update_copied_ratio_needed(settings)
 
     case update do
       {:ok, _} ->
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
-        |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
-        |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
-        |> Repo.transaction()
+        auto_update_mod(mod)
       {:error, _msg} -> {:ok, nil}
     end
   end
@@ -217,36 +224,46 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.update()
   end
 
-  defp auto_update_count_needed(count) do
-    case count < @auto_upd_enrollment_threshold do
+  defp get_setting(settings, key) do
+    setting = settings |> Enum.find(nil, &key == &1.name)
+    setting.value
+  end
+
+  defp auto_update_count_needed(count, settings) do
+    threshold = settings |> get_setting(@auto_upd_enrollment_threshold) |> String.to_integer
+    case count < threshold do
       true -> {:error, :not_enough_enrolled}
       false -> {:ok, count}
     end
   end
   
-  defp auto_update_copied_ratio_needed({:error, msg}), do: {:error, msg}
-  defp auto_update_copied_ratio_needed({:ok, acted}) do
+  defp auto_update_copied_ratio_needed({:error, msg}, _settings), do: {:error, msg}
+  defp auto_update_copied_ratio_needed({:ok, acted}, settings) do
     count = acted |> Enum.count()
 
     action_count = acted
     |> Enum.filter(& &1.is_accepted == true)
     |> Enum.count()
 
-    case action_count / count < @auto_upd_approval_threshold do
+    threshold = settings |> get_setting(@auto_upd_approval_threshold) |> String.to_float
+
+    case action_count / count < threshold do
       true -> {:error, :not_enough_copied}
       false -> {:ok, nil}
     end
   end
 
-  defp auto_update_acted_ratio_needed({:error, msg}, _count), do: {:error, msg}
-  defp auto_update_acted_ratio_needed({:ok, count}, actions) do
+  defp auto_update_acted_ratio_needed({:error, msg}, _count, _settings), do: {:error, msg}
+  defp auto_update_acted_ratio_needed({:ok, count}, actions, settings) do
     acted = actions
     |> Enum.filter(& not(is_nil(&1.is_accepted)))
 
     action_count = acted
     |> Enum.count()
 
-    case action_count / count < @auto_upd_response_threshold do
+    threshold = settings |> get_setting(@auto_upd_response_threshold) |> String.to_float
+
+    case action_count / count < threshold do
       true -> {:error, :not_enough_responses}
       false -> {:ok, acted}
     end
@@ -265,7 +282,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :auto))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
     |> Repo.transaction()
   end
@@ -276,7 +293,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :auto))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
