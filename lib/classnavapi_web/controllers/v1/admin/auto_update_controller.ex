@@ -34,6 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     items = Map.new()
     |> Map.put(:metrics, metrics)
     |> Map.put(:people, people)
+    |> Map.put(:settings, settings)
 
     render(conn, ForecastView, "show.json", forecast: items)
   end
