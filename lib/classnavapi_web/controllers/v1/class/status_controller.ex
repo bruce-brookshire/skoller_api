@@ -34,6 +34,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
       |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
       |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
       |> where([status], status.id not in [@needs_syllabus_status, @complete_status])
+      |> where([status, class], class.is_new_class == false)
       |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
       |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
       |> Repo.all()
