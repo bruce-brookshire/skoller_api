@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   alias Classnavapi.Assignment.Mod.Action
   alias ClassnavapiWeb.Admin.ForecastView
   alias ClassnavapiWeb.Helpers.ModHelper
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -39,16 +40,19 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     render(conn, ForecastView, "show.json", forecast: items)
   end
 
-  def update(conn, %{"id" => id} = params) do
-    settings_old = Settings.get_setting_by_name!(id)
-    case Settings.update_setting(settings_old, params) do
-      {:ok, setting} ->
+  def update(conn, %{"settings" => settings}) do
+
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.run(:settings, &update_settings(settings, &1))
+   
+    case Repo.transaction(multi) do
+      {:ok, _params} ->
         process_auto_updates()
-        render(conn, SettingView, "show.json", setting: setting)
-      {:error, changeset} ->
+        settings = Settings.get_auto_update_settings()
+        render(conn, SettingView, "index.json", settings: settings)
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
@@ -64,6 +68,16 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> Map.put(:people, people)
 
     render(conn, ForecastView, "show.json", forecast: items)
+  end
+
+  defp update_settings(settings, _) do
+    status = settings |> Enum.map(&update_setting(&1))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp update_setting(%{"name" => name} = params) do
+    settings_old = Settings.get_setting_by_name!(name)
+    Settings.update_setting(settings_old, params)
   end
 
   defp process_auto_updates() do
