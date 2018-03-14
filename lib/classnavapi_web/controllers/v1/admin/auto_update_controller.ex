@@ -257,7 +257,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> join(:inner, [m, a], sc in subquery(community_sub(@community)), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
-    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted is not null and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
+    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
     |> Repo.all()
   end
