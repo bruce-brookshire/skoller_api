@@ -97,8 +97,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   end
 
   defp auto_update_mod(mod) do
-    Repo.get!(Mod, mod.assignment_modification_id)
-    |> ModHelper.auto_update_mod()
+    mod = Repo.get!(Mod, mod.assignment_modification_id)
+    ModHelper.process_auto_update(mod, :notification)
   end
 
   defp get_settings_from_params(params) do
