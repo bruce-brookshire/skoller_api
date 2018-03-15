@@ -100,7 +100,7 @@ defmodule ClassnavapiWeb.Sammi do
   defp get_phone(map, %{"phone" => %{"value" => ""}}, %{phone: nil}), do: map |> Map.put("phone", nil)
   defp get_phone(map, %{"phone" => %{"value" => val}}, %{phone: nil}) do
     val = val |> String.trim()
-    case val |> String.match?(~r/([0-9]{3}-)?[0-9]{3}-[0-9]{4}/) do
+    case val |> String.match?(~r/^([0-9]{3}-)?[0-9]{3}-[0-9]{4}$/) do
       true -> map |> Map.put("phone", val)
       false -> map |> Map.put("phone", nil)
     end
