@@ -55,9 +55,10 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
   end
 
-  def get_enrollment(%{students: _students} = class) do
-    class = class |> Repo.preload(:students)
-    get_enrolled(class.students)
+  def get_enrollment(%Class{} = class) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false and sc.class_id == ^class.id)
+    |> Repo.aggregate(:count, :id)
   end
 
   def professor_name(class) do
@@ -130,12 +131,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   defp extract_name(_, true), do: "None"
   defp extract_name(professor, false) do
       professor.name_last
-  end
-
-  defp get_enrolled(nil), do: 0
-  defp get_enrolled(students) do
-      students 
-      |> Enum.count(& &1)
   end
 
   defp get_weight(%{weight_id: weight_id}, enumerable) do
