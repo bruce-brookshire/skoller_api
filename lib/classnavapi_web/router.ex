@@ -50,6 +50,11 @@ defmodule ClassnavapiWeb.Router do
       post "/users/token-login", AuthController, :token
       post "/reset", ForgotEmailController, :reset
 
+      # Auto Update Routes
+      resources "/auto-updates", Admin.AutoUpdateController, only: [:index]
+      put "/auto-updates", Admin.AutoUpdateController, :update
+      get "/auto-updates/forecast", Admin.AutoUpdateController, :forecast
+
       # Analytics routes
       get "/analytics", Analytics.AnalyticsController, :index
 
