@@ -164,15 +164,6 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     end
   end
 
-  def auto_update_mod(%Mod{} = mod) do
-    actions = mod |> get_actions_from_mod()
-    Ecto.Multi.new
-    |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
-    |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
-    |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
-    |> Repo.transaction()
-  end
-
   def process_auto_update(mod) do
     actions = mod |> get_actions_from_mod()
     settings = Settings.get_auto_update_settings()
@@ -185,7 +176,11 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     case update do
       {:ok, _} ->
-        auto_update_mod(mod)
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
+        |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
+        |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
+        |> Repo.transaction()
       {:error, _msg} -> {:ok, nil}
     end
   end
