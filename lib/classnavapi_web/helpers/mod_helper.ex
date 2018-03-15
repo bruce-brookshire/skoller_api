@@ -276,7 +276,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     from(act in Action)
     |> join(:inner, [act], sc in StudentClass, sc.id == act.student_class_id)
     |> where([act], act.assignment_modification_id == ^id)
-    |> where([act, sc], sc.is_dropped = false)
+    |> where([act, sc], sc.is_dropped == false)
     |> Repo.all()
   end
   defp get_enrolled_actions_from_mod(_mod), do: []
