@@ -143,8 +143,13 @@ defmodule ClassnavapiWeb.ClassView do
 
     defp convert_gs_to_string(gs) do
         gs 
-        |> Enum.reduce("", & &2 <> Kernel.elem(&1, 0) <> "," <> Kernel.elem(&1, 1) <> "|")
+        |> Enum.reduce("", & &2 <> Kernel.elem(&1, 0) <> "," <> get_grade_string(Kernel.elem(&1, 1)) <> "|")
         |> String.trim_trailing("|")
+    end
+
+    defp get_grade_string(grade) when is_binary(grade), do: grade
+    defp get_grade_string(grade) do
+        grade |> Decimal.to_string()
     end
 
     defp get_class_enrollment(class) do

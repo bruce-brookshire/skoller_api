@@ -77,6 +77,7 @@ defmodule Classnavapi.Class do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> update_change(:name, &title_case(&1))
+    |> put_grade_scale()
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> ChangesetValidation.validate_dates(:class_start, :class_end)
@@ -97,5 +98,20 @@ defmodule Classnavapi.Class do
       string in ["ii", "iii", "iv", "vi", "viii", "ix"] -> string |> String.upcase
       true -> String.capitalize(string)
     end
+  end
+
+  defp put_grade_scale(%Ecto.Changeset{valid?: true, changes:
+    %{grade_scale: grade_scale}} = changeset) do
+    change(changeset, %{grade_scale_map: convert_grade_scale(grade_scale)})
+  end
+  defp put_grade_scale(changeset), do: changeset
+
+  defp convert_grade_scale(gs) do
+    gs
+    |> String.trim_trailing("|")
+    |> String.split("|")
+    |> Enum.map(&String.split(&1, ","))
+    |> Enum.sort(&List.last(&1) >= List.last(&2))
+    |> Enum.reduce(%{}, &Map.put(&2, List.first(&1), Decimal.new(List.last(&1))))
   end
 end
