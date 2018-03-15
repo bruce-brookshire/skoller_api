@@ -63,8 +63,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @one_assign_class_complete "assignment " <> @from_syllabus
   @multiple_assign_class_complete "assignments " <> @from_syllabus
 
-  @auto_delete "Autoupdate: Assignment has been removed"
-  @auto_add "Autoupdate: Assignment has been added"
+  @auto_delete "Autoupdate: assignment has been removed"
+  @auto_add "Autoupdate: assignment has been added"
   @auto_update " has been autoupdated"
   #@of_class_accepted "% of your classmates have made this change."
 
