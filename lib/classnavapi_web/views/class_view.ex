@@ -29,7 +29,8 @@ defmodule ClassnavapiWeb.ClassView do
             class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
-            grade_scale: class.grade_scale,
+            grade_scale: convert_gs_to_string(class.grade_scale_map),
+            grade_scale_obj: class.grade_scale_map,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,
@@ -58,7 +59,8 @@ defmodule ClassnavapiWeb.ClassView do
             class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
-            grade_scale: class.grade_scale,
+            grade_scale: convert_gs_to_string(class.grade_scale_map),
+            grade_scale_obj: class.grade_scale_map,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,
@@ -88,7 +90,8 @@ defmodule ClassnavapiWeb.ClassView do
             class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
-            grade_scale: class.grade_scale,
+            grade_scale: convert_gs_to_string(class.grade_scale_map),
+            grade_scale_obj: class.grade_scale_map,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,
@@ -136,6 +139,12 @@ defmodule ClassnavapiWeb.ClassView do
             campus: class.campus,
             class_period_id: class.class_period_id,
         }
+    end
+
+    defp convert_gs_to_string(gs) do
+        gs 
+        |> Enum.reduce("", & &2 <> Kernel.elem(&1, 0) <> "," <> Kernel.elem(&1, 1) <> "|")
+        |> String.trim_trailing("|")
     end
 
     defp get_class_enrollment(class) do
