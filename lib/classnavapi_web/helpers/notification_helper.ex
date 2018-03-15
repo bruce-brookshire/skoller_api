@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Student
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.User
   alias Classnavapi.User.Device
@@ -246,9 +247,11 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
     |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
     |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
-    |> where([d, u, s], s.id != ^student_id and s.is_notifications == true)
+    |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
+    |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
     |> where([d, u, s, sc], sc.is_dropped == false)
     |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
+    |> where([d, u, s, sc, a, sa], sa.is_notifications == true)
     |> Repo.all()
     |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
   end
