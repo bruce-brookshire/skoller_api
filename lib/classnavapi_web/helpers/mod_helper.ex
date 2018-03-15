@@ -165,7 +165,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
   end
 
   def process_auto_update(mod) do
-    actions = mod |> get_actions_from_mod()
+    actions = mod |> get_enrolled_actions_from_mod()
     settings = Settings.get_auto_update_settings()
 
     update = actions 
@@ -176,6 +176,7 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
 
     case update do
       {:ok, _} ->
+        actions = mod |> get_actions_from_mod()
         Ecto.Multi.new
         |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
         |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
@@ -270,6 +271,15 @@ defmodule ClassnavapiWeb.Helpers.ModHelper do
     |> Repo.all()
   end
   defp get_actions_from_mod(_mod), do: []
+
+  defp get_enrolled_actions_from_mod(%Mod{id: id}) do
+    from(act in Action)
+    |> join(:inner, [act], sc in StudentClass, sc.id == act.student_class_id)
+    |> where([act], act.assignment_modification_id == ^id)
+    |> where([act, sc], sc.is_dropped = false)
+    |> Repo.all()
+  end
+  defp get_enrolled_actions_from_mod(_mod), do: []
 
   defp insert_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
     changeset = Mod.changeset(%Mod{}, mod)
