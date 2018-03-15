@@ -281,7 +281,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
   defp mod_responses_sub() do
     from(a in Action)
     |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> where([a, sc], sc.is_dropped = false)
+    |> where([a, sc], sc.is_dropped == false)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
