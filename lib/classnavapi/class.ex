@@ -43,6 +43,7 @@ defmodule Classnavapi.Class do
     field :class_period_id, :id
     field :class_status_id, :id
     field :grade_scale, :string
+    field :grade_scale_map, :map
     field :class_type, :string
     field :campus, :string, default: ""
     field :class_upload_key, :string
