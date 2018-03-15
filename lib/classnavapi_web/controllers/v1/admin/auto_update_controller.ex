@@ -88,7 +88,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
     |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
     |> where([m], m.is_auto_update == false and m.is_private == false)
-    |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
+    |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
     |> select([m, act], act)
     |> Repo.all()
     |> Enum.filter(&compare_shared(&1, settings))
@@ -280,6 +280,8 @@ defmodule ClassnavapiWeb.Api.V1.Admin.AutoUpdateController do
 
   defp mod_responses_sub() do
     from(a in Action)
+    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
+    |> where([a, sc], sc.is_dropped = false)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
