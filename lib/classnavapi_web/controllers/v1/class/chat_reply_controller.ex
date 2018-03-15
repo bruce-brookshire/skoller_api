@@ -42,7 +42,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.ChatReplyController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    reply_old = Repo.get!(Reply, id)
+    reply_old = Repo.get_by!(Reply, id: id, student_id: conn.assigns[:user].student_id)
     
     changeset = Reply.changeset_update(reply_old, params)
 
