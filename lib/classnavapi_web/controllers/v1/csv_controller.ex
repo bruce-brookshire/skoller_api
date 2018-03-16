@@ -100,7 +100,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
 
   defp insert_class(class) do
     class = class 
-      |> Map.put(:grade_scale_map, @default_grade_scale)
+      |> Map.put(:grade_scale, @default_grade_scale)
     changeset = Class.changeset(%Class{}, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key, class_status_id: @syllabus_status})
     Repo.insert(changeset)

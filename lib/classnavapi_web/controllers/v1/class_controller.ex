@@ -161,9 +161,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   defp add_student_created_class_fields(changeset, _conn), do: changeset
 
   defp put_grade_scale(%{"grade_scale" => _} = params), do: params
-  defp put_grade_scale(%{"grade_scale_map" => _} = params), do: params
   defp put_grade_scale(%{} = params) do
-    params |> Map.put("grade_scale_map", @default_grade_scale)
+    params |> Map.put("grade_scale", @default_grade_scale)
   end
 
   defp filter(%{} = params) do

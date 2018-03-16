@@ -73,7 +73,9 @@ defmodule Classnavapi.Class do
 
   @doc false
   def changeset(%Class{} = class, attrs) do
-    attrs = attrs |> put_grade_scale()
+    attrs = attrs 
+    |> Map.delete("grade_scale_map")
+    |> put_grade_scale()
     class
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
@@ -100,7 +102,9 @@ defmodule Classnavapi.Class do
     end
   end
 
-  defp put_grade_scale(%{"grade_scale_map" => _grade_scale_map} = attrs), do: attrs
+  defp put_grade_scale(%{"grade_scale" => grade_scale} = attrs) when is_map(grade_scale) do
+    attrs |> Map.put("grade_scale_map", grade_scale)
+  end
   defp put_grade_scale(%{"grade_scale" => grade_scale} = attrs) do
     attrs |> Map.put("grade_scale_map", convert_grade_scale(grade_scale))
   end
