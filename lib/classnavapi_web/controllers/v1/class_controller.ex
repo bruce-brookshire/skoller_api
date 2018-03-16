@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   @admin_role 200
   @syllabus_worker_role 300
   @change_req_role 400
-  @default_grade_scale "A,90|B,80|C,70|D,60"
+  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
   plug :verify_member, :class
@@ -49,7 +49,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   """
   def create(conn, %{"period_id" => period_id} = params) do
     params = params
-            |> grade_scale()
+            |> put_grade_scale()
             |> Map.put("class_period_id", period_id)
 
     changeset = Class.changeset(%Class{}, params)
@@ -160,8 +160,8 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
   defp add_student_created_class_fields(changeset, _conn), do: changeset
 
-  defp grade_scale(%{"grade_scale" => _} = params), do: params
-  defp grade_scale(%{} = params) do
+  defp put_grade_scale(%{"grade_scale" => _} = params), do: params
+  defp put_grade_scale(%{} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)
   end
 
