@@ -66,7 +66,7 @@ defmodule Classnavapi.Class do
   end
 
   @req_fields [:name, :number, :class_start, :class_end, 
-                :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled, :is_assignment_posts_enabled]
+                :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled, :is_assignment_posts_enabled,
                 :is_enrollable, :grade_scale_map]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
                 :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
