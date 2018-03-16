@@ -148,6 +148,7 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     defp get_grade_string(grade) when is_binary(grade), do: grade
+    defp get_grade_string(grade) when is_integer(grade), do: to_string(grade)
     defp get_grade_string(grade) do
         grade |> Decimal.to_string()
     end

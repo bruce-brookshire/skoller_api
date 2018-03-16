@@ -65,17 +65,17 @@ defmodule Classnavapi.Class do
   end
 
   @req_fields [:name, :number, :class_start, :class_end, 
-                :is_enrollable,
-                :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled, :grade_scale_map]
+                :is_enrollable, :is_editable, :class_period_id,
+                 :is_syllabus, :is_chat_enabled, :grade_scale_map]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
-                :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count, :grade_scale]
+                :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
   def changeset(%Class{} = class, attrs) do
+    attrs = attrs |> put_grade_scale()
     class
     |> cast(attrs, @all_fields)
-    |> put_grade_scale()
     |> validate_required(@req_fields)
     |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
@@ -100,14 +100,11 @@ defmodule Classnavapi.Class do
     end
   end
 
-  defp put_grade_scale(%Ecto.Changeset{valid?: true, changes:
-    %{grade_scale_map: grade_scale_map}} = changeset), do: changeset
+  defp put_grade_scale(%{"grade_scale_map" => _grade_scale_map} = attrs), do: attrs
+  defp put_grade_scale(%{"grade_scale" => grade_scale} = attrs) do
+    attrs |> Map.put("grade_scale_map", convert_grade_scale(grade_scale))
   end
-  defp put_grade_scale(%Ecto.Changeset{valid?: true, changes:
-    %{grade_scale: grade_scale}} = changeset) do
-    change(changeset, %{grade_scale_map: convert_grade_scale(grade_scale)})
-  end
-  defp put_grade_scale(changeset), do: changeset
+  defp put_grade_scale(attrs), do: attrs
 
   defp convert_grade_scale(gs) do
     gs

@@ -49,7 +49,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   """
   def create(conn, %{"period_id" => period_id} = params) do
     params = params
-            |> grade_scale()
+            |> put_grade_scale()
             |> Map.put("class_period_id", period_id)
 
     changeset = Class.changeset(%Class{}, params)
@@ -160,9 +160,9 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
   defp add_student_created_class_fields(changeset, _conn), do: changeset
 
-  defp grade_scale(%{"grade_scale" => _} = params), do: params
-  defp grade_scale(%{"grade_scale_map" => _} = params), do: params
-  defp grade_scale(%{} = params) do
+  defp put_grade_scale(%{"grade_scale" => _} = params), do: params
+  defp put_grade_scale(%{"grade_scale_map" => _} = params), do: params
+  defp put_grade_scale(%{} = params) do
     params |> Map.put("grade_scale_map", @default_grade_scale)
   end
 
