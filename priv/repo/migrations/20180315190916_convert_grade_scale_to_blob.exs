@@ -20,7 +20,7 @@ defmodule Classnavapi.Repo.Migrations.ConvertGradeScaleToBlob do
     |> String.split("|")
     |> Enum.map(&String.split(&1, ","))
     |> Enum.sort(&List.last(&1) >= List.last(&2))
-    |> Enum.reduce(%{}, &Map.put(&2, List.first(&1), Decimal.new(List.last(&1))))
+    |> Enum.reduce(%{}, &Map.put(&2, List.first(&1), List.last(&1)))
   end
 end
 
