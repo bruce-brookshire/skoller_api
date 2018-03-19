@@ -94,7 +94,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
     |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
     |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    |> where([class, period, doc, lock], doc.is_syllabus == true)
+    # |> where([class, period, doc, lock], doc.is_syllabus == true)
     |> where([class, period, doc, lock], period.school_id == ^school_id)
     |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, period, doc, lock], asc: doc.inserted_at)
@@ -112,7 +112,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> join(:inner, [class, sc, period], doc in Doc, class.id == doc.class_id)
     |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
     |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    |> where([class, sc, period, doc, lock], doc.is_syllabus == true)
+    # |> where([class, sc, period, doc, lock], doc.is_syllabus == true)
     |> where([class, sc, period, doc, lock], period.school_id == ^school_id)
     |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
