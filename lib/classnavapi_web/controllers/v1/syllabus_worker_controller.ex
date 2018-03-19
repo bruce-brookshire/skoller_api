@@ -91,14 +91,12 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   defp get_oldest(school_id, _conn, status, type) do
     t = from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], doc in Doc, class.id == doc.class_id)
+    |> join(:inner, [class, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
     |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
     |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    # |> where([class, period, doc, lock], doc.is_syllabus == true)
-    |> where([class, period, doc, lock], period.school_id == ^school_id)
+    |> where([class, period], period.school_id == ^school_id)
     |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, period, doc, lock], asc: doc.inserted_at)
-    |> distinct([class], class.id)
     |> Repo.all()
     |> List.first()
     Logger.info("Get oldest")
@@ -110,19 +108,24 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     t = from(class in Class)
     |> join(:inner, [class], sc in subquery(enrolled_subquery()), sc.class_id == class.id)
     |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, sc, period], doc in Doc, class.id == doc.class_id)
+    |> join(:inner, [class, sc, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
     |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
     |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    # |> where([class, sc, period, doc, lock], doc.is_syllabus == true)
-    |> where([class, sc, period, doc, lock], period.school_id == ^school_id)
+    |> where([class, sc, period], period.school_id == ^school_id)
     |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
-    |> distinct([class], class.id)
     |> Repo.all()
     |> List.first()
     Logger.info("Get oldest enrolled")
     Logger.info(inspect(t))
     t
+  end
+
+  defp doc_subquery() do
+    from(d in Doc)
+    # |> where([d], d.is_syllabus == true)
+    |> group_by([d], d.class_id)
+    |> select([d], %{inserted_at: min(d.inserted_at), class_id: d.class_id})
   end
 
   # needed structure is [%{count: 544, ratio: 1.0, school_id: 1}] or similar.
