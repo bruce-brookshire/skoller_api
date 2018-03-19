@@ -98,6 +98,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> where([class, period, doc, lock], period.school_id == ^school_id)
     |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, period, doc, lock], asc: doc.inserted_at)
+    |> distinct([class], class.id)
     |> Repo.all()
     |> List.first()
     Logger.info("Get oldest")
@@ -116,6 +117,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     |> where([class, sc, period, doc, lock], period.school_id == ^school_id)
     |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
+    |> distinct([class], class.id)
     |> Repo.all()
     |> List.first()
     Logger.info("Get oldest enrolled")
