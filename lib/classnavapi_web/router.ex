@@ -175,14 +175,13 @@ defmodule ClassnavapiWeb.Router do
         get "/mods", Student.ModController, :index
         post "/classes/:class_id", Student.ClassController, :create
         delete "/classes/:class_id", Student.ClassController, :delete
-        put "/classes/:id", Student.ClassController, :update
+        put "/classes/:class_id", Student.ClassController, :update
         get "/classes/:class_id/speculate", Student.Class.SpeculateController, :speculate
         resources "/assignments", Student.Class.AssignmentController, only: [:index]
         get "/classes", Admin.Student.ClassController, :index
-        resources "/classes", Student.ClassController, only: [:show] do
-          get "/mods", Student.Class.ModController, :index
-          resources "/assignments", Student.Class.AssignmentController, only: [:create]
-        end
+        get "/classes/:class_id", Student.ClassController, :show
+        get "/classes/:class_id/mods", Student.Class.ModController, :index
+        resources "/classes/:class_id/assignments", Student.Class.AssignmentController, only: [:create]
       end
 
       # Assignment routes
