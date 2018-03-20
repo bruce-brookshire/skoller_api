@@ -40,6 +40,11 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [:index] do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
+
+      resources "/schools", Admin.SchoolController, only: [] do
+        get "/classes", School.ClassController, :index
+        get "/classes/min", School.ClassController, :index_min
+      end
     end
 
     scope "/v1", V1, as: :v1 do
