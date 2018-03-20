@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Router do
     pipe_through :api_auth_verified
 
     scope "/v2", V2, as: :v2 do
-      resources "/classes", ClassController, only: [] do
+      resources "/classes", ClassController, only: [:index] do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
     end

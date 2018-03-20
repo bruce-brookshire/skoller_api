@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.ClassController do
+defmodule ClassnavapiWeb.Api.V2.ClassController do
   use ClassnavapiWeb, :controller
 
   @moduledoc """
@@ -9,70 +9,20 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   
   alias Classnavapi.Class
   alias Classnavapi.Repo
-  alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
-  alias ClassnavapiWeb.Helpers.StatusHelper
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Professor
   alias Classnavapi.School
   alias Classnavapi.Class.Status
   alias Classnavapi.Class.StudentClass
-  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import Ecto.Query
-  import ClassnavapiWeb.Helpers.AuthPlug
   
-  @student_role 100
-  @admin_role 200
-  @syllabus_worker_role 300
-  @change_req_role 400
-  @default_grade_scale "A,90|B,80|C,70|D,60"
-  
-  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
-  plug :verify_member, :class
-  plug :verify_member, %{of: :school, using: :period_id}
-  plug :verify_member, %{of: :class, using: :id}
-  plug :verify_class_is_editable, :class_id
-  plug :verify_class_is_editable, :id
-
-  @doc """
-   Creates a new `Classnavapi.Class` for a `Classnavapi.ClassPeriod`
-
-  ## Behavior:
-   If there is no grade scale provided, a default is used: 
-   A,90|B,80|C,70|D,60
-
-  ## Returns:
-  * 422 `ClassnavapiWeb.ChangesetView`
-  * 401
-  * 200 `ClassnavapiWeb.ClassView`
-  """
-  def create(conn, %{"period_id" => period_id} = params) do
-    params = params
-            |> grade_scale()
-            |> Map.put("class_period_id", period_id)
-
-    changeset = Class.changeset(%Class{}, params)
-    |> add_student_created_class_fields(conn)
-
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.insert(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
-
-    case Repo.transaction(multi) do
-      {:ok, %{class_status: class}} ->
-        render(conn, ClassView, "show.json", class: class)
-      {:error, _, failed_value, _} ->
-        conn
-        |> RepoHelper.multi_error(failed_value)
-    end
-  end
-
   @doc """
    Shows all `Classnavapi.Class`. Can be used as a search with multiple filters.
 
   ## Behavior:
-   Only searches the current `Classnavapi.ClassPeriod`
+   Only searches the enrollable `Classnavapi.ClassPeriod`
 
   ## Filters:
   * school
@@ -100,7 +50,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   * 200 `ClassnavapiWeb.Class.SearchView`
   """
   def index(conn, %{} = params) do
-    date = DateTime.utc_now
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
@@ -108,7 +57,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
     |> join(:left, [class, period, prof, school, status], enroll in subquery(count_subquery()), enroll.class_id == class.id)
-    |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> Repo.all()
@@ -116,7 +64,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     render(conn, SearchView, "index.json", classes: classes)
   end
 
-  def count_subquery() do
+  defp count_subquery() do
     from(c in Class)
     |> join(:left, [c], sc in StudentClass, c.id == sc.class_id)
     |> where([c, sc], sc.is_dropped == false)
@@ -124,51 +72,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> select([c, sc], %{class_id: c.id, count: count(sc.id)})
   end
 
-  @doc """
-   Updates a `Classnavapi.Class`.
-
-  ## Behavior:
-   If valid `Classnavapi.Class.Weight` are provided, the `Classnavapi.Class.Status` will be checked.
-
-  ## Returns:
-  * 422 `ClassnavapiWeb.ChangesetView`
-  * 404
-  * 401
-  * 200 `ClassnavapiWeb.ClassView`
-  """
-  def update(conn, %{"id" => id} = params) do
-    class_old = Repo.get!(Class, id)
-
-    changeset = Class.changeset(class_old, params)
-
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.update(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
-
-    case Repo.transaction(multi) do
-      {:ok, %{class: class}} ->
-        render(conn, ClassView, "show.json", class: class)
-      {:error, _, failed_value, _} ->
-        conn
-        |> RepoHelper.multi_error(failed_value)
-    end
-  end
-
-  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: nil}}}), do: changeset
-  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: _}}}) do
-    changeset |> Ecto.Changeset.change(%{is_new_class: true, is_student_created: true})
-  end
-  defp add_student_created_class_fields(changeset, _conn), do: changeset
-
-  defp grade_scale(%{"grade_scale" => _} = params), do: params
-  defp grade_scale(%{} = params) do
-    params |> Map.put("grade_scale", @default_grade_scale)
-  end
-
   defp filter(%{} = params) do
     dynamic = params["or"] != "true"
+    date = DateTime.utc_now
 
     dynamic
+    |> period_filter(params, date)
     |> school_filter(params)
     |> prof_filter(params)
     |> prof_id_filter(params)
@@ -179,6 +88,19 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> number_filter(params)
     |> day_filter(params)
     |> length_filter(params)
+  end
+
+  defp period_filter(dynamic, %{"active_period" => "true", "or" => "true"}, date) do
+    dynamic([class, period, prof], period.start_date <= ^date and period.end_date >= ^date or ^dynamic)
+  end
+  defp period_filter(dynamic, %{"active_period" => "true"}, date) do
+    dynamic([class, period, prof], period.start_date <= ^date and period.end_date >= ^date and ^dynamic)
+  end
+  defp period_filter(dynamic, %{"or" => "true"}, date) do
+    dynamic([class, period, prof], period.enroll_date <= ^date and period.end_date >= ^date or ^dynamic)
+  end
+  defp period_filter(dynamic, _, date) do
+    dynamic([class, period, prof], period.enroll_date <= ^date and period.end_date >= ^date and ^dynamic)
   end
 
   defp school_filter(dynamic, %{"school" => filter, "or" => "true"}) do
