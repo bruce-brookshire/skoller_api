@@ -108,7 +108,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
     |> join(:left, [class, period, prof, school, status], enroll in subquery(count_subquery()), enroll.class_id == class.id)
-    |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
+    |> where([class, period], period.enroll_date <= ^date and period.end_date >= ^date)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> Repo.all()
