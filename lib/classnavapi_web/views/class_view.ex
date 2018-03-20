@@ -23,6 +23,11 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: %{class: class, professor: professor, class_period: class_period}}) do
+        today = DateTime.utc_now()
+        period = case DateTime.compare(class_period.start_date, today) in [:lt, :eq] and DateTime.compare(class_period.end_date, today) in [:gt, :eq] do
+            true -> class_period |> Map.put(:is_active, true)
+            false -> class_period |> Map.put(:is_active, false)
+          end
         %{
             id: class.id,
             class_end: class.class_end,
@@ -47,7 +52,8 @@ defmodule ClassnavapiWeb.ClassView do
             campus: class.campus,
             class_period_id: class.class_period_id,
             length: ClassCalcs.get_class_length(class, class_period),
-            professor: render_one(professor, ProfessorView, "professor.json")
+            professor: render_one(professor, ProfessorView, "professor.json"),
+            is_active_period: period.is_active
         }
     end
 
