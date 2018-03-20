@@ -36,7 +36,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     render(conn, ClassView, "index.json", classes: classes)
   end
 
-  def index_min(conn, %{"school_id" => school_id}) do
+  def index_min(conn, %{"school_id" => school_id} = params) do
     date = DateTime.utc_now()
     query = from(class in Class)
     classes = query
