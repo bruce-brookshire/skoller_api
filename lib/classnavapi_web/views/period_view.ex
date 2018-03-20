@@ -17,10 +17,13 @@ defmodule ClassnavapiWeb.PeriodView do
       true -> period |> Map.put(:is_active, true)
       false -> period |> Map.put(:is_active, false)
     end
-    %{id: period.id,
+    %{
+      id: period.id,
       is_active: period.is_active,
       name: period.name,
       start_date: period.start_date,
-      end_date: period.end_date}
+      end_date: period.end_date,
+      enroll_date: period.enroll_date
+    }
   end
 end
