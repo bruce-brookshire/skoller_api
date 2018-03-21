@@ -32,7 +32,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     end
   end
 
-  def show(conn, %{"student_id" => student_id, "id" => class_id}) do
+  def show(conn, %{"student_id" => student_id, "class_id" => class_id}) do
     student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     student_class = student_class |> Repo.preload(:class)
@@ -46,7 +46,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
 
-  def update(conn, %{"student_id" => student_id, "id" => class_id} = params) do
+  def update(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
     student_class_old = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
 
     changeset = StudentClass.update_changeset(student_class_old, params)
