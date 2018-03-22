@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentAssignmentView
   alias ClassnavapiWeb.Helpers.RepoHelper
