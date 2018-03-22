@@ -26,7 +26,7 @@ defmodule ClassnavapiWeb.ClassView do
         base_class_view(class)
         |> Map.merge(
             %{
-                class_period_name: class.class_period.name,
+                class_period_name: class_period.name,
                 length: ClassCalcs.get_class_length(class, class_period),
                 professor: render_one(professor, ProfessorView, "professor.json"),
             }
