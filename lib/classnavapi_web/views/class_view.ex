@@ -32,6 +32,7 @@ defmodule ClassnavapiWeb.ClassView do
             grade_scale: class.grade_scale,
             location: class.location,
             meet_days: class.meet_days,
+            class_period_name: class_period.name,
             meet_end_time: class.meet_end_time,
             meet_start_time: class.meet_start_time,
             name: class.name,
@@ -52,6 +53,7 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: %{class: class, professor: professor}}) do
+        class = class |> Repo.preload(:class_period)
         %{
             id: class.id,
             class_end: class.class_end,
@@ -75,13 +77,14 @@ defmodule ClassnavapiWeb.ClassView do
             is_chat_enabled: class.is_chat_enabled,
             campus: class.campus,
             class_period_id: class.class_period_id,
+            class_period_name: class.class_period.name,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(professor, ProfessorView, "professor.json")
         }
     end
 
     def render("class.json", %{class: class}) do
-        class = class |> Repo.preload([:professor, :class_status])
+        class = class |> Repo.preload([:professor, :class_status, :class_period])
         %{
             id: class.id,
             class_end: class.class_end,
@@ -105,6 +108,7 @@ defmodule ClassnavapiWeb.ClassView do
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
+            class_period_name: class.class_period.name,
             length: ClassCalcs.get_class_length(class),
             professor: render_one(class.professor, ProfessorView, "professor.json"),
             status: render_one(class.class_status, StatusView, "status.json")
