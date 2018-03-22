@@ -21,7 +21,8 @@ defmodule Classnavapi.Class.StudentAssignment do
       field :assignment_id, :id
       field :grade, :decimal
       field :is_completed, :boolean
-      field :is_notifications, :boolean, default: true
+      field :is_reminder_notifications, :boolean, default: true
+      field :is_post_notifications, :boolean, default: true
       field :notes, :string
       field :is_read, :boolean, default: true
       belongs_to :student_class, StudentClass, define_field: false
@@ -36,11 +37,11 @@ defmodule Classnavapi.Class.StudentAssignment do
     @opt_fields [:assignment_id, :weight_id, :is_completed]
     @all_fields @req_fields ++ @opt_fields
 
-    @upd_req_fields [:name, :is_notifications, :due, :is_read]
+    @upd_req_fields [:name, :is_post_notifications, :is_reminder_notifications, :due, :is_read]
     @upd_opt_fields [:weight_id, :is_completed, :notes]
     @upd_fields @upd_opt_fields ++ @upd_req_fields
 
-    @auto_req_fields [:name, :is_notifications]
+    @auto_req_fields [:name, :is_post_notifications, :is_reminder_notifications]
     @auto_opt_fields [:weight_id, :is_completed, :due]
     @auto_fields @auto_opt_fields ++ @auto_req_fields
 
