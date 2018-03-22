@@ -26,8 +26,10 @@ defmodule ClassnavapiWeb.Class.StudentAssignmentView do
       grade: get_grade(student_assignment),
       assignment_id: student_assignment.assignment_id,
       is_completed: is_completed(student_assignment.is_completed),
-      is_notifications: student_assignment.is_notifications,
-      notes: student_assignment.notes
+      is_reminder_notifications: student_assignment.is_reminder_notifications,
+      is_post_notifications: student_assignment.is_post_notifications,
+      notes: student_assignment.notes,
+      is_read: student_assignment.is_read
     })
     |> Map.merge(get_pending_mods(student_assignment))
   end

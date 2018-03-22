@@ -268,7 +268,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
     |> where([d, u, s, sc], sc.is_dropped == false)
     |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
-    |> where([d, u, s, sc, a, sa], sa.is_notifications == true)
+    |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
     |> Repo.all()
     |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
   end

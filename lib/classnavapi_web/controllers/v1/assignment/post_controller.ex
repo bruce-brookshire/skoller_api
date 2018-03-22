@@ -5,9 +5,13 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
   alias Classnavapi.Assignment.Post
   alias ClassnavapiWeb.Assignment.PostView
   alias ClassnavapiWeb.Helpers.NotificationHelper
+  alias Classnavapi.Class.StudentAssignment
+  alias Classnavapi.Class.StudentClass
+  alias ClassnavapiWeb.Helpers.RepoHelper
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import ClassnavapiWeb.Helpers.ChatPlug
+  import Ecto.Query
 
   @student_role 100
 
@@ -20,14 +24,17 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
     
     changeset = Post.changeset(%Post{}, params)
 
-    case Repo.insert(changeset) do
-      {:ok, post} ->
+    multi = Ecto.Multi.new()
+    |> Ecto.Multi.insert(:post, changeset)
+    |> Ecto.Multi.run(:student_assignment, &un_read_assign(&1.post))
+
+    case Repo.transaction(multi) do
+      {:ok, %{post: post}} ->
         Task.start(NotificationHelper, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
         render(conn, PostView, "show.json", %{post: post})
-      {:error, changeset} ->
+      {:error, _, failed_value, _} ->
         conn
-        |> put_status(:unprocessable_entity)
-        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
@@ -44,5 +51,16 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.PostController do
         |> put_status(:unprocessable_entity)
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  defp un_read_assign(post) do
+    status = from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> where([sa], sa.assignment_id == ^post.assignment_id)
+    |> where([sa, sc], sc.student_id != ^post.student_id)
+    |> Repo.all()
+    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: false})))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 end
