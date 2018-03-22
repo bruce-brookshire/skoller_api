@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   alias Classnavapi.Class
   alias Classnavapi.ClassPeriod
   alias Classnavapi.School
-  alias Classnavapi.Chats.Chat
+  alias Classnavapi.Chats
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -49,7 +49,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   end
 
   def inbox(conn, %{"student_id" => student_id}) do
-    inbox = Chat.get_chat_notifications(student_id)
+    inbox = Chats.get_chat_notifications(student_id)
 
     render(conn, InboxView, "index.json", %{inbox: inbox, current_student_id: student_id})
   end
