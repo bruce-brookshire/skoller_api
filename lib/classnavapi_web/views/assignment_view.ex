@@ -35,4 +35,14 @@ defmodule ClassnavapiWeb.AssignmentView do
             posts: render_many(assignment.posts, ClassnavapiWeb.Assignment.PostView, "post.json")
         }
     end
+
+    def render("assignment-short.json", %{assignment: assignment}) do
+        %{
+            id: assignment.id,
+            due: assignment.due,
+            name: assignment.name,
+            weight_id: assignment.weight_id,
+            inserted_at: assignment.inserted_at
+        }
+    end
 end

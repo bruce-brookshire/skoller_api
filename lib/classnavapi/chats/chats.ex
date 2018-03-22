@@ -1,4 +1,4 @@
-defmodule Classnavapi.Chats.Chat do
+defmodule Classnavapi.Chats do
 
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
