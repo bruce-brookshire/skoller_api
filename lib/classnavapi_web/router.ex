@@ -161,6 +161,9 @@ defmodule ClassnavapiWeb.Router do
         get "/chat", Student.ChatController, :chat
         get "/inbox", Student.ChatController, :inbox
 
+        # Notificaiton route
+        get "/notifications", Student.NotificationController, :notifications
+
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify
         post "/resend", Student.VerificationController, :resend
