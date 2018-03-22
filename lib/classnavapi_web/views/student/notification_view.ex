@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Student.NotificationView do
   alias ClassnavapiWeb.Student.NotificationView
   alias ClassnavapiWeb.Student.InboxView
   alias ClassnavapiWeb.Assignment.ModView
+  alias ClassnavapiWeb.Assignment.PostView
 
   def render("index.json", %{notifications: notifications}) do
     render_many(notifications, NotificationView, "notification.json")
@@ -15,5 +16,9 @@ defmodule ClassnavapiWeb.Student.NotificationView do
 
   def render("notification.json", %{notification: %{mod: mod}}) do
     render_one(mod, ModView, "mod.json")
+  end
+
+  def render("notification.json", %{notification: %{assignment_post: assignment_post}}) do
+    render_one(assignment_post, PostView, "post-detail.json")
   end
 end

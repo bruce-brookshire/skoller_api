@@ -4,6 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.NotificationController do
   alias ClassnavapiWeb.Student.NotificationView
   alias Classnavapi.Chats
   alias Classnavapi.Assignments.Mods
+  alias Classnavapi.Assignments
 
   import ClassnavapiWeb.Helpers.AuthPlug
 
@@ -15,15 +16,17 @@ defmodule ClassnavapiWeb.Api.V1.Student.NotificationController do
   def notifications(conn, %{"student_id" => student_id}) do
     inbox = Chats.get_chat_notifications(student_id)
             |> Enum.map(&Map.put(%{}, :inbox, &1))
-            # |> Enum.map(%Map.put(&1, :current_student_id, student_id))
     mods = Mods.get_student_mods(student_id)
             |> Enum.map(&Map.put(%{}, :mod, &1))
+    assignment_posts = Assignments.get_student_assignment_posts(student_id)
+            |> Enum.map(&Map.put(%{}, :assignment_post, &1))
 
-    notifications = inbox ++ mods |> Enum.sort(&DateTime.compare(get_date(&1), get_date(&2)) in [:gt, :eq])
+    notifications = inbox ++ mods ++ assignment_posts |> Enum.sort(&DateTime.compare(get_date(&1), get_date(&2)) in [:gt, :eq])
 
     render(conn, NotificationView, "index.json", %{notifications: notifications})
   end
 
   defp get_date(%{inbox: inbox}), do: inbox.response.updated_at |> DateTime.from_naive!("Etc/UTC")
   defp get_date(%{mod: mod}), do: mod.mod.inserted_at |> DateTime.from_naive!("Etc/UTC")
+  defp get_date(%{assignment_post: assignment_post}), do: assignment_post.post.updated_at |> DateTime.from_naive!("Etc/UTC")
 end
