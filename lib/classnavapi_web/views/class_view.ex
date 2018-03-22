@@ -26,6 +26,7 @@ defmodule ClassnavapiWeb.ClassView do
         base_class_view(class)
         |> Map.merge(
             %{
+                class_period_name: class.class_period.name,
                 length: ClassCalcs.get_class_length(class, class_period),
                 professor: render_one(professor, ProfessorView, "professor.json"),
             }
@@ -33,9 +34,11 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: %{class: class, professor: professor}}) do
+        class = class |> Repo.preload(:class_period)
         base_class_view(class)
         |> Map.merge(
             %{
+                class_period_name: class.class_period.name,
                 length: ClassCalcs.get_class_length(class),
                 professor: render_one(professor, ProfessorView, "professor.json")
             }
@@ -43,10 +46,11 @@ defmodule ClassnavapiWeb.ClassView do
     end
 
     def render("class.json", %{class: class}) do
-        class = class |> Repo.preload([:professor, :class_status])
+        class = class |> Repo.preload([:professor, :class_status, :class_period])
         base_class_view(class)
         |> Map.merge(
             %{
+                class_period_name: class.class_period.name,
                 length: ClassCalcs.get_class_length(class),
                 professor: render_one(class.professor, ProfessorView, "professor.json"),
                 status: render_one(class.class_status, StatusView, "status.json")
