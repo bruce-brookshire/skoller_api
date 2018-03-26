@@ -43,7 +43,7 @@ defmodule Classnavapi.Chats do
     |> where([c, p, sc, s, r, ps, cl, cp, sch], sch.is_chat_enabled == true)
     |> order_by([c, p, sc, s, r], desc: r.updated_at)
     |> distinct([c], c.chat_post_id)
-    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true, id: r.id}})
+    |> select([c, p, sc, s, r], %{chat_comment: c, color: sc.color, star: s, parent_post: p, response: %{response: r.reply, is_reply: true, id: r.id, updated_at: r.updated_at}})
     |> Repo.all()
   
     posts ++ comments
