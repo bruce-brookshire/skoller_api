@@ -31,6 +31,7 @@ defmodule ClassnavapiWeb.StudentView do
       is_chat_notifications: student.is_chat_notifications,
       notification_days_notice: student.notification_days_notice,
       notification_time: student.notification_time,
+      future_reminder_notification_time: student.future_reminder_notification_time,
       organization: student.organization,
       bio: student.bio,
       school: render_one(student.school, SchoolView, "school.json"),

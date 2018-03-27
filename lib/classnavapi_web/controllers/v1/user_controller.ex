@@ -9,6 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   alias Classnavapi.PicUpload
   alias Classnavapi.School.StudentField
   alias Ecto.UUID
+  alias Classnavapi.Users
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -25,6 +26,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     location = params |> upload_pic()
 
     params = params |> Map.put("pic_path", location)
+    |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
     changeset = User.changeset_update(user_old, params)
 
     multi = Ecto.Multi.new

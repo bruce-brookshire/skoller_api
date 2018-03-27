@@ -46,7 +46,6 @@ defmodule Classnavapi.Student do
 
   @doc false
   def changeset(%Student{} = student, attrs) do
-
     student
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)

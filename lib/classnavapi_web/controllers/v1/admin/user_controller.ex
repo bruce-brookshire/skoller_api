@@ -10,6 +10,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias Classnavapi.Student
   alias Classnavapi.School
+  alias Classnavapi.Users
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -20,6 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
+    params = params |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
     changeset = User.changeset_insert(%User{}, params)
 
     multi = changeset 
@@ -55,6 +57,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Repo.get!(User, user_id)
     user_old = user_old |> Repo.preload(:student)
+    params = params |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
     changeset = User.changeset_update_admin(user_old, params)
     
     multi = Ecto.Multi.new
