@@ -55,6 +55,9 @@ defmodule ClassnavapiWeb.Router do
       put "/auto-updates", Admin.AutoUpdateController, :update
       get "/auto-updates/forecast", Admin.AutoUpdateController, :forecast
 
+      # Min Ver Routes
+      put "/min-version/:name", Admin.MinVerController, :update
+
       # Analytics routes
       get "/analytics", Analytics.AnalyticsController, :index
 
@@ -241,6 +244,7 @@ defmodule ClassnavapiWeb.Router do
       get "/school/list", SchoolController, :index
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
+      get "/min-version", MinVerController, :index
     end
   end
 end
