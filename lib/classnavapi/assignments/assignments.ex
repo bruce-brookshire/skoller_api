@@ -17,6 +17,7 @@ defmodule Classnavapi.Assignments do
     |> join(:inner, [post, assign, sa, sc], class in Class, class.id == assign.class_id)
     |> where([post, assign, sa], sa.is_post_notifications == true)
     |> where([post, assign, sa, sc], sc.is_dropped == false and sc.student_id == ^student_id)
+    |> where([post], post.student_id != ^student_id)
     |> select([post, assign, sa, sc, class], %{post: post, assignment: assign, class: class})
     |> Repo.all()
   end
