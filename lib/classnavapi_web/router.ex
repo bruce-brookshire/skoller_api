@@ -56,7 +56,7 @@ defmodule ClassnavapiWeb.Router do
       get "/auto-updates/forecast", Admin.AutoUpdateController, :forecast
 
       # Min Ver Routes
-      put "/min-version/:name", Admin.MinVerController, :update
+      put "/min-version", Admin.MinVerController, :update
 
       # Analytics routes
       get "/analytics", Analytics.AnalyticsController, :index
