@@ -40,6 +40,10 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [] do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
+
+      # User routes
+      post "/users/create", Admin.UserController, :create
+      put "/users/:user_id/update", Admin.UserController, :update
     end
 
     scope "/v1", V1, as: :v1 do
@@ -219,6 +223,10 @@ defmodule ClassnavapiWeb.Router do
   scope "/api", ClassnavapiWeb.Api do
     pipe_through :api_auth
 
+    scope "/v2", V2, as: :v2 do
+      put "/users/:user_id", UserController, :update
+    end
+
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
       post "/users/:user_id/register", DeviceController, :register
@@ -228,6 +236,10 @@ defmodule ClassnavapiWeb.Router do
 
   scope "/api", ClassnavapiWeb.Api do
     pipe_through :api
+
+    scope "/v2", V2, as: :v2 do
+      resources "/users", NewUserController, only: [:create]
+    end
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
