@@ -11,11 +11,10 @@ defmodule Classnavapi.Assignments do
   @default_message_today "You have [num] assignments due today. Check them out!"
   @default_message_future "You have [num] assignments coming up. Check them out!"
 
-  def get_assignment_reminder(:today) do
+  def get_assignment_reminder(@today_topic) do
     get_assignment_reminder(@today_topic, @default_message_today)
   end
-
-  def get_assignment_reminder(:future) do
+  def get_assignment_reminder(@future_topic) do
     get_assignment_reminder(@future_topic, @default_message_future)
   end
 
