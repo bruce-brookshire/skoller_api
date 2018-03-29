@@ -18,13 +18,14 @@ defmodule ClassnavapiWeb.Assignment.PostView do
     }
   end
 
-  def render("post-detail.json", %{post: %{post: post, assignment: assign, class: class}}) do
+  def render("post-detail.json", %{post: %{post: post, assignment: assign, class: class, student_assignment: student_assignment}}) do
     post = post |> Repo.preload([:student])
     %{
       post: post.post,
       student: render_one(post.student, ClassnavapiWeb.StudentView, "student-short.json"),
       id: post.id,
       inserted_at: post.inserted_at,
+      student_assignment_id: student_assignment.id,
       assignment: render_one(assign, ClassnavapiWeb.AssignmentView, "assignment-short.json"),
       class: render_one(class, ClassnavapiWeb.ClassView, "class_short.json")
     }
