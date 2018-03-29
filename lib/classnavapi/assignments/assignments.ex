@@ -26,6 +26,10 @@ defmodule Classnavapi.Assignments do
     |> Repo.insert()
   end
 
+  def get_assignment_messages() do
+    Repo.all(ReminderNotification)
+  end
+
   def get_is_today(topic) do
     topic == @today_topic
   end

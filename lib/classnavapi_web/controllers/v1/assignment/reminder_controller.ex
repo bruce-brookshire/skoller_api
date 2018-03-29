@@ -14,4 +14,9 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.ReminderController do
         |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def index(conn, _params) do
+    rn = Assignments.get_assignment_messages()
+    conn |> render(ReminderNotificationView, "index.json", reminder_notifications: rn)
+  end
 end
