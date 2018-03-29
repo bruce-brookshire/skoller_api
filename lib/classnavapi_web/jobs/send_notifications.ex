@@ -50,7 +50,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp filter_due_date(query, date, :future) do
-    query |> where([student, sclass, sassign], fragment("?::date", sassign.due) > ^date and fragment("?::date", sassign.due) < date_add(^date, student.notification_days_notice, "day"))
+    query |> where([student, sclass, sassign], fragment("?::date", sassign.due) > ^date and fragment("?::date", sassign.due) <= date_add(^date, student.notification_days_notice, "day"))
   end
 
   defp send_notifications(assignment, atom) do
