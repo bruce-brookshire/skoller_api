@@ -30,6 +30,11 @@ defmodule Classnavapi.Assignments do
     Repo.all(ReminderNotification)
   end
 
+  def delete_assignment_messages(id) do
+    Repo.get!(ReminderNotification, id)
+    |> Repo.delete()
+  end
+
   def get_is_today(topic) do
     topic == @today_topic
   end

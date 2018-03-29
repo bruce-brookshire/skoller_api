@@ -19,4 +19,16 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.ReminderController do
     rn = Assignments.get_assignment_messages()
     conn |> render(ReminderNotificationView, "index.json", reminder_notifications: rn)
   end
+
+  def delete(conn, %{"id" => id}) do
+    case Assignments.delete_assignment_messages(id) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ClassnavapiWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end
