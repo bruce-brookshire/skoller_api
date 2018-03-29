@@ -7,11 +7,12 @@ defmodule Classnavapi.Assignments.ReminderNotification do
   schema "assignment_reminder_notifications" do
     field :message, :string
     field :topic, :string
+    field :is_plural, :boolean, default: true
 
     timestamps()
   end
 
-  @req_fields [:topic, :message]
+  @req_fields [:topic, :message, :is_plural]
   @all_fields @req_fields
 
   @doc false

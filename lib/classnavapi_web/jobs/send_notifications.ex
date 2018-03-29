@@ -58,7 +58,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp get_message(assignment, atom) do
-    Assignments.get_assignment_reminder(get_topic(atom))
+    Assignments.get_assignment_reminder(assignment.count, get_topic(atom))
     |> String.replace("[num]", assignment.count |> to_string())
   end
 
