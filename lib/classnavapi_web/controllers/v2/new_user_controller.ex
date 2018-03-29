@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.Api.V1.NewUserController do
+defmodule ClassnavapiWeb.Api.V2.NewUserController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.User
@@ -11,14 +11,11 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.VerificationHelper
   alias ClassnavapiWeb.Sms
-  alias Classnavapi.Users
 
   @student_role 100
 
   def create(conn, %{"student" => student} = params) do
     school = Repo.get(Classnavapi.School, student["school_id"])
-
-    params = params |> Map.put("student", student |> Users.put_future_reminder_notification_time())
 
     changeset = User.changeset_insert(%User{}, params)
     changeset = changeset 
