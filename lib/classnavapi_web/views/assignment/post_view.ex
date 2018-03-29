@@ -26,6 +26,7 @@ defmodule ClassnavapiWeb.Assignment.PostView do
       id: post.id,
       inserted_at: post.inserted_at,
       student_assignment_id: student_assignment.id,
+      is_read: student_assignment.is_read,
       assignment: render_one(assign, ClassnavapiWeb.AssignmentView, "assignment-short.json"),
       class: render_one(class, ClassnavapiWeb.ClassView, "class_short.json")
     }
