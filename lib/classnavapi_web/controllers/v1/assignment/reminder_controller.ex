@@ -4,6 +4,12 @@ defmodule ClassnavapiWeb.Api.V1.Assignment.ReminderController do
   alias Classnavapi.Assignments
   alias ClassnavapiWeb.Assignment.ReminderNotificationView
 
+  import ClassnavapiWeb.Helpers.AuthPlug
+
+  @admin_role 200
+
+  plug :verify_role, %{role: @admin_role}
+
   def create(conn, params) do
     case Assignments.add_assignment_message(params) do
       {:ok, reminder_notification} ->

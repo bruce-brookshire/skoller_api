@@ -16,7 +16,7 @@ defmodule ClassnavapiWeb.Assignment.ReminderNotificationView do
     %{
       id: reminder_notification.id,
       message: reminder_notification.message,
-      is_day: Assignments.get_is_today(reminder_notification.topic),
+      is_today: Assignments.get_is_today(reminder_notification.topic),
       is_plural: reminder_notification.is_plural
     }
   end
