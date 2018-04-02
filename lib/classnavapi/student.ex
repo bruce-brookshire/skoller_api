@@ -25,6 +25,7 @@ defmodule Classnavapi.Student do
     field :is_mod_notifications, :boolean, default: true
     field :is_reminder_notifications, :boolean, default: true
     field :is_chat_notifications, :boolean, default: true
+    field :is_assign_post_notifications, :boolean, default: true
     field :organization, :string
     field :bio, :string
     has_many :users, Classnavapi.User
@@ -39,7 +40,7 @@ defmodule Classnavapi.Student do
 
   @req_fields [:name_first, :name_last, :phone,
               :school_id, :notification_time, :notification_days_notice, :is_notifications,
-              :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications]
+              :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications, :is_assign_post_notifications]
   @opt_fields [:birthday, :gender, :organization, :bio]
   @all_fields @req_fields ++ @opt_fields
 
