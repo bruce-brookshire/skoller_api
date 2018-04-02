@@ -12,10 +12,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   import Ecto.Query
 
   @ghost_status "Ghost"
-  @first_half "1st Half"
-  @second_half "2nd Half"
-  @full_term "Full Term"
-  @custom "Custom"
 
   @moduledoc """
   
@@ -113,11 +109,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
 
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_status
   defp get_status(%{class_status: status}), do: status.name
-
-  defp compare_classes(true, true), do: @full_term
-  defp compare_classes(true, false), do: @first_half
-  defp compare_classes(false, true), do: @second_half
-  defp compare_classes(false, false), do: @custom
 
   defp extract_name(_, true), do: "None"
   defp extract_name(professor, false) do
