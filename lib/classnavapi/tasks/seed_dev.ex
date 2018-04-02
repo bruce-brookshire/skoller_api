@@ -165,23 +165,17 @@ defmodule Mix.Tasks.Seed.Dev do
                             
     period = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school.id,
-      start_date: date1,
-      end_date: date2
+      school_id: school.id
     })
 
     period2 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school2.id,
-      start_date: date1,
-      end_date: date2
+      school_id: school2.id
     })
 
     period3 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school3.id,
-      start_date: date1,
-      end_date: date2
+      school_id: school3.id
     })
 
     class = Repo.insert!(%Class{name: "Big Money",

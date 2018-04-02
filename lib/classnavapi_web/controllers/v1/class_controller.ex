@@ -101,7 +101,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   """
   def index(conn, %{} = params) do
     #TODO: Filter ClassPeriod
-    date = DateTime.utc_now
+    # date = DateTime.utc_now
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
@@ -109,17 +109,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
     |> join(:left, [class, period, prof, school, status], enroll in subquery(count_subquery()), enroll.class_id == class.id)
-    #|> date_filter(params, date)
+    #|> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> Repo.all()
 
     render(conn, SearchView, "index.json", classes: classes)
-  end
-
-  defp date_filter(query, _, date) do
-    query
-    |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
   end
 
   defp count_subquery() do

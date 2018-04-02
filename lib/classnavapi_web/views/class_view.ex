@@ -47,7 +47,6 @@ defmodule ClassnavapiWeb.ClassView do
             type: class.class_type,
             campus: class.campus,
             class_period_id: class.class_period_id,
-            length: ClassCalcs.get_class_length(class, class_period),
             professor: render_one(professor, ProfessorView, "professor.json")
         }
     end
@@ -78,7 +77,6 @@ defmodule ClassnavapiWeb.ClassView do
             campus: class.campus,
             class_period_id: class.class_period_id,
             class_period_name: class.class_period.name,
-            length: ClassCalcs.get_class_length(class),
             professor: render_one(professor, ProfessorView, "professor.json")
         }
     end
@@ -109,7 +107,6 @@ defmodule ClassnavapiWeb.ClassView do
             campus: class.campus,
             class_period_id: class.class_period_id,
             class_period_name: class.class_period.name,
-            length: ClassCalcs.get_class_length(class),
             professor: render_one(class.professor, ProfessorView, "professor.json"),
             status: render_one(class.class_status, StatusView, "status.json")
         }

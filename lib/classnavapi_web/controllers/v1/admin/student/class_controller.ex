@@ -23,7 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Student.ClassController do
 
   def index(conn, %{"student_id" => student_id}) do
     #TODO: Filter ClassPeriod
-    date = DateTime.utc_now
+    # date = DateTime.utc_now
     query = from(classes in StudentClass)
     student_classes = query
                       |> join(:inner, [classes], cl in Class, cl.id == classes.class_id)

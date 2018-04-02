@@ -19,19 +19,12 @@ defmodule ClassnavapiWeb.SchoolView do
     %{
       id: school.id,
       name: school.name,
-      periods: active_periods(school.class_periods),
+      periods: render_many(school.class_periods, PeriodView, "period.json"),
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
       is_auto_syllabus: school.is_auto_syllabus,
       timezone: school.timezone,
       email_domains: render_many(school.email_domains, EmailDomainView, "email_domain.json")
     }
-  end
-
-  defp active_periods(class_periods) do
-    today = DateTime.utc_now()
-    class_periods 
-    |> Enum.filter(&DateTime.compare(&1.start_date, today) in [:lt, :eq] and DateTime.compare(&1.end_date, today) in [:gt, :eq])
-    |> render_many(PeriodView, "period.json")
   end
 end

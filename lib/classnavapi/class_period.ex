@@ -11,7 +11,6 @@ defmodule Classnavapi.ClassPeriod do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.ClassPeriod
-  alias Classnavapi.Helpers.ChangesetValidation
 
   schema "class_periods" do
     field :name, :string
