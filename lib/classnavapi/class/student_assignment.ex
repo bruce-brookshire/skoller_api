@@ -76,6 +76,11 @@ defmodule Classnavapi.Class.StudentAssignment do
     def grade_changeset(%StudentAssignment{} = assignment, attrs) do
       assignment
       |> cast(attrs, @grd_fields)
+      |> complete_assignment()
+    end
+
+    defp complete_assignment(%Ecto.Changeset{changes: %{grade: _grade}, valid?: true} = changeset) do
+      changeset |> change(%{is_completed: true})
     end
   end
   
