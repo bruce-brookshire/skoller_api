@@ -199,6 +199,16 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   defp find_item(conn, %{type: :class, items: classes, using: :id}, %{"id" => class_id}) do
     conn |> compare_classes(classes, class_id)
   end
+  defp find_item(conn, %{type: :class_assignment, items: classes}, %{"assignment_id" => id}) do
+    case Repo.get(Assignment, String.to_integer(id)) do
+      nil -> conn |> unauth
+      assign -> 
+        case classes |> Enum.any?(& &1.id == assign.class_id) do
+          true -> conn
+          false -> conn |> unauth
+        end
+    end
+  end
   defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
     conn |> compare_classes(classes, class_id)
   end

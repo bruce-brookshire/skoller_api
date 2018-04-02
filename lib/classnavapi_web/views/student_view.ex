@@ -29,6 +29,7 @@ defmodule ClassnavapiWeb.StudentView do
       is_mod_notifications: student.is_mod_notifications,
       is_reminder_notifications: student.is_reminder_notifications,
       is_chat_notifications: student.is_chat_notifications,
+      is_assign_post_notifications: student.is_assign_post_notifications,
       notification_days_notice: student.notification_days_notice,
       notification_time: student.notification_time,
       future_reminder_notification_time: student.future_reminder_notification_time,

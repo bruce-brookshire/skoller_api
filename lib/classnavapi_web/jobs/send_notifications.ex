@@ -31,7 +31,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
 
     from(student in Student)
     |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
-    |> join(:inner, [student, sclass], sassign in StudentAssignment, sassign.student_class_id == sclass.id and sassign.is_notifications == true)
+    |> join(:inner, [student, sclass], sassign in StudentAssignment, sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true)
     |> join(:inner, [student, sclass, sassign], class in Class, class.id == sclass.class_id)
     |> join(:inner, [student, sclass, sassign, class], user in User, user.student_id == student.id)
     |> join(:inner, [student, sclass, sassign, class, user], device in Device, user.id == device.user_id)

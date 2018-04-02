@@ -5,6 +5,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Assignment.Mod.Action
   alias Classnavapi.Student
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.User
   alias Classnavapi.User.Device
@@ -31,6 +32,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @class_chat_reply "ClassChat.Reply"
   @manual_syllabus_category "Manual.NeedsSyllabus"
   @manual_custom_category "Manual.Custom"
+  @assignment_post "Assignment.Post"
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -76,6 +78,8 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   @replied " replied to a comment you follow."
   @replied_post " replied in a post you follow"
   @posted_s " posted in "
+
+  @commented_on_s " commented on "
 
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
@@ -251,6 +255,24 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
     |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
   end
 
+  def send_assignment_post_notification(post, student_id) do
+    student = Repo.get!(Student, student_id)
+    assignment = Repo.get!(Assignment, post.assignment_id)
+    class = Repo.get!(Class, assignment.class_id)
+    from(d in Device)
+    |> join(:inner, [d], u in User, u.id == d.user_id)
+    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
+    |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
+    |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
+    |> where([d, u, s, sc], sc.is_dropped == false)
+    |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
+    |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
+    |> Repo.all()
+    |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
+  end
+
   # defp add_acceptance_percentage(mod) do
   #   actions = from(act in Action)
   #   |> join(:inner, [act], mod in Mod, act.assignment_modification_id == mod.id)
@@ -266,6 +288,10 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
 
   defp build_chat_post_notification(post, student, class) do
     student.name_first <> " " <> student.name_last <> @posted_s <> class.name <> ": " <> post.post
+  end
+  
+  defp build_assignment_post_msg(post, student, assignment, class) do
+    student.name_first <> " " <> student.name_last <> @commented_on_s <> assignment.name <> @in_s <> class.name <> ": " <> post.post
   end
 
   defp get_chat_message(user, comment) do

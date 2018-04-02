@@ -170,6 +170,9 @@ defmodule ClassnavapiWeb.Router do
         get "/chat", Student.ChatController, :chat
         get "/inbox", Student.ChatController, :inbox
 
+        # Notificaiton route
+        get "/notifications", Student.NotificationController, :notifications
+
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify
         post "/resend", Student.VerificationController, :resend
@@ -192,6 +195,10 @@ defmodule ClassnavapiWeb.Router do
       # Assignment routes
       resources "/class/assignments", Class.AssignmentController, only: [:delete, :update]
       resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
+
+        # Assignment Post routes
+        resources "/posts", Admin.Assignment.PostController, only: [:delete]
+        resources "/posts", Assignment.PostController, only: [:create, :update]
 
         # Assignment Grade routes
         resources "/grades", Student.Class.GradeController, only: [:create]
