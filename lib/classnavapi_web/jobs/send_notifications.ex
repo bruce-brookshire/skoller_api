@@ -37,7 +37,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
     |> join(:inner, [student, sclass, sassign, class, user], device in Device, user.id == device.user_id)
     |> where([student], student.notification_time == ^time)
     |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
-    |> where([student, sclass, sassign], not(is_nil(sassign.due)))
+    |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
     |> filter_due_date(now, atom)
     |> where([student, sclass], sclass.is_dropped == false)
     |> group_by([student, sclass, sassign, class, user, device], device.udid)
