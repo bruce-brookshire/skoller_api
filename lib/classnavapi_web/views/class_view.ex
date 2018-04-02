@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.ClassView do
     alias ClassnavapiWeb.ClassView
     alias ClassnavapiWeb.Class.StatusView
     alias ClassnavapiWeb.ProfessorView
-    alias ClassnavapiWeb.Helpers.ClassCalcs
     alias ClassnavapiWeb.Class.HelpRequestView
     alias ClassnavapiWeb.Class.ChangeRequestView
     alias Classnavapi.Repo
