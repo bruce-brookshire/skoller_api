@@ -66,15 +66,6 @@ defmodule ClassnavapiWeb.Helpers.ClassCalcs do
     extract_name(class.professor, is_nil(class.professor))
   end
 
-  def get_class_length(class, class_period) do
-    compare_classes(class.class_start == class_period.start_date, class.class_end == class_period.end_date)
-  end
-
-  def get_class_length(class) do
-    class = class |> Repo.preload(:class_period)
-    compare_classes(class.class_start == class.class_period.start_date, class.class_end == class.class_period.end_date)
-  end
-
   def get_class_status(%Class{} = class) do
     class = class |> Repo.preload(:class_status)
     get_status(class)

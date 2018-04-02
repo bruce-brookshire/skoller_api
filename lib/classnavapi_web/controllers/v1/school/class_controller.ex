@@ -21,12 +21,12 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id} = params) do
-    date = DateTime.utc_now()
+    #TODO: Filter ClassPeriod
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
-    |> date_filter(params, date)
+    #|> date_filter(params, date)
     |> where([class, period], period.school_id == ^school_id)
     |> where([class], class.is_new_class == false)
     |> where([class, period, prof], ^filter(params))
@@ -36,28 +36,20 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     render(conn, ClassView, "index.json", classes: classes)
   end
 
-  def index_min(conn, %{"school_id" => school_id} = params) do
-    date = DateTime.utc_now()
+  def index_min(conn, %{"school_id" => school_id}) do
+    #TODO: Filter ClassPeriod
+    # date = DateTime.utc_now()
     query = from(class in Class)
     classes = query
     |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
-    |> date_filter(params, date)
+    #|> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period], period.school_id == ^school_id)
     |> where([class], class.is_new_class == false)
     |> select([class, period, prof], %{class: class, professor: prof})
     |> Repo.all()
 
     render(conn, MinClassView, "index.json", classes: classes)
-  end
-
-  defp date_filter(query, %{"enrollable_period" => "true"}, date) do
-    query
-    |> where([class, period], period.enroll_date <= ^date and period.end_date >= ^date)
-  end
-  defp date_filter(query, _, date) do
-    query
-    |> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
   end
 
   defp filter(%{} = params) do

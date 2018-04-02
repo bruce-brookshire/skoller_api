@@ -10,11 +10,6 @@ defmodule ClassnavapiWeb.Class.SearchView do
     end
   
     def render("class.json", %{class: %{class: class, class_period: class_period, professor: professor, school: school, class_status: class_status, enroll: enroll}}) do
-        today = DateTime.utc_now()
-        period = case DateTime.compare(class_period.start_date, today) in [:lt, :eq] and DateTime.compare(class_period.end_date, today) in [:gt, :eq] do
-            true -> class_period |> Map.put(:is_active, true)
-            false -> class_period |> Map.put(:is_active, false)
-          end
         %{
                 id: class.id,
                 meet_days: class.meet_days,
@@ -22,7 +17,6 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 name: class.name,
                 number: class.number,
                 enrolled: get_enrolled(enroll.count),
-                length: ClassCalcs.get_class_length(class, class_period),
                 campus: class.campus,
                 professor: render_one(professor, ProfessorView, "professor-short.json"),
                 school: %{
@@ -31,7 +25,7 @@ defmodule ClassnavapiWeb.Class.SearchView do
                 },
                 is_new_class: class.is_new_class,
                 status: ClassCalcs.get_class_status(class_status),
-                current_period: period.is_active
+                period_name: class_period.name
         }
     end
 

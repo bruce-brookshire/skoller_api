@@ -83,18 +83,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       end
   end
 
-  def verify_period_enrollable(conn, id) do
-    case conn.path_params |> Map.fetch(to_string(id)) do
-      :error -> conn |> unauth()
-      {:ok, class_id} ->
-        class = Repo.get!(Class, class_id)
-        case Repo.get(ClassPeriod, class.class_period_id) do
-          nil -> conn |> unauth()
-          period -> conn |> check_date(period)
-        end
-      end
-  end
-
   def verify_member(conn, %{of: type, using: id}) do
     case conn.path_params |> Map.fetch(to_string(id)) do
       :error -> conn
@@ -138,14 +126,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     end
   end
   def verify_user_exists(conn, _), do: conn
-
-  defp check_date(conn, period) do
-    today = DateTime.utc_now()
-    case DateTime.compare(period.enroll_date, today) in [:lt, :eq] and DateTime.compare(period.end_date, today) in [:gt, :eq] do
-      true -> conn
-      false -> conn |> unauth()
-    end
-  end
 
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
