@@ -22,8 +22,7 @@ defmodule ClassnavapiWeb.PeriodView do
       is_active: period.is_active,
       name: period.name,
       start_date: period.start_date,
-      end_date: period.end_date,
-      enroll_date: period.enroll_date
+      end_date: period.end_date
     }
   end
 end

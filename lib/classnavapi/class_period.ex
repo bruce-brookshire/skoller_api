@@ -14,10 +14,7 @@ defmodule Classnavapi.ClassPeriod do
   alias Classnavapi.Helpers.ChangesetValidation
 
   schema "class_periods" do
-    field :end_date, :utc_datetime
     field :name, :string
-    field :start_date, :utc_datetime
-    field :enroll_date, :utc_datetime
     field :school_id, :id
     belongs_to :school, Classnavapi.School, define_field: false
     has_many :classes, Classnavapi.Class
@@ -25,9 +22,9 @@ defmodule Classnavapi.ClassPeriod do
     timestamps()
   end
 
-  @req_fields [:name, :start_date, :end_date, :school_id, :enroll_date]
+  @req_fields [:name, :school_id]
   @all_fields @req_fields
-  @upd_req [:name, :start_date, :end_date, :enroll_date]
+  @upd_req [:name]
   @upd_all @upd_req
   
   @doc false
@@ -36,13 +33,11 @@ defmodule Classnavapi.ClassPeriod do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
-    |> ChangesetValidation.validate_dates(:start_date, :end_date)
   end
 
   def changeset_update(%ClassPeriod{} = class_period, attrs) do
     class_period
     |> cast(attrs, @upd_all)
     |> validate_required(@upd_req)
-    |> ChangesetValidation.validate_dates(:start_date, :end_date)
   end
 end
