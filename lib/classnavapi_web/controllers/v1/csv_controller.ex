@@ -13,6 +13,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   
   @admin_role 200
   @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
+  @headers [:campus, :class_type, :number, :crn, :meet_days, :meet_end_time, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
 
   @syllabus_status 200
   
@@ -40,9 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     period_id = period_id |> String.to_integer
     uploads = file.path 
     |> File.stream!()
-    |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
-                            :meet_end_time, :prof_name_first, :prof_name_last,
-                            :location, :name, :meet_start_time, :upload_key])
+    |> CSV.decode(headers: @headers)
     |> Enum.map(&process_class_row(&1, period_id))
 
     conn |> render(CSVView, "index.json", csv: uploads)
@@ -55,9 +54,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
         period_id = period_id |> String.to_integer
         uploads = file.path 
         |> File.stream!()
-        |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
-                                :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
-                                :location, :name, :meet_start_time, :upload_key])
+        |> CSV.decode(headers: @headers)
         |> Enum.map(&process_class_row(&1, period_id))
 
         conn |> render(CSVView, "index.json", csv: uploads)
