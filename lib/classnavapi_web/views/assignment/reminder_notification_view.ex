@@ -20,7 +20,7 @@ defmodule ClassnavapiWeb.Assignment.ReminderNotificationView do
       topic: render_one(
         Assignments.get_assignment_message_topic_by_id!(
         reminder_notification.assignment_reminder_notification_topic_id), 
-        TopicView, "reminder_notification.json"),
+        TopicView, "topic.json"),
       is_plural: reminder_notification.is_plural
     }
   end
