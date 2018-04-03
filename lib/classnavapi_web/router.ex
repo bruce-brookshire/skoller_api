@@ -228,6 +228,7 @@ defmodule ClassnavapiWeb.Router do
       get "/notifications", NotificationController, :index
 
       resources "/reminder-messages", Assignment.ReminderController, only: [:create, :index, :delete]
+      resources "/reminder-messages/topics", Assignment.Reminder.TopicController, only: [:index]
     end
   end
 

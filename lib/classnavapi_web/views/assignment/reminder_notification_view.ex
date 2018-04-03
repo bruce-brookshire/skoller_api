@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.Assignment.ReminderNotificationView do
 
   alias Classnavapi.Assignments
   alias ClassnavapiWeb.Assignment.ReminderNotificationView
+  alias ClassnavapiWeb.Assignment.ReminderNotification.TopicView
 
   def render("index.json", %{reminder_notifications: reminder_notifications}) do
     render_many(reminder_notifications, ReminderNotificationView, "reminder_notification.json")
@@ -16,7 +17,10 @@ defmodule ClassnavapiWeb.Assignment.ReminderNotificationView do
     %{
       id: reminder_notification.id,
       message: reminder_notification.message,
-      is_today: Assignments.get_is_today(reminder_notification.topic),
+      topic: render_one(
+        Assignments.get_assignment_message_topic_by_id!(
+        reminder_notification.assignment_reminder_notification_topic_id), 
+        TopicView, "topic.json"),
       is_plural: reminder_notification.is_plural
     }
   end
