@@ -3,6 +3,7 @@ defmodule ClassnavapiWeb.PeriodView do
 
   alias ClassnavapiWeb.PeriodView
   alias Classnavapi.Classes
+  alias Classnavapi.Students
 
   def render("index.json", %{periods: periods}) do
     render_many(periods, PeriodView, "period.json")
@@ -17,7 +18,8 @@ defmodule ClassnavapiWeb.PeriodView do
       id: period.id,
       name: period.name,
       inserted_at: period.inserted_at,
-      class_count: Classes.get_class_count_by_period(period.id)
+      class_count: Classes.get_class_count_by_period(period.id),
+      student_count: Students.get_student_count_by_period(period.id)
     }
   end
 end
