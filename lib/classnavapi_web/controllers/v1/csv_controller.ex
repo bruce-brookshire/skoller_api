@@ -41,8 +41,8 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
     uploads = file.path 
     |> File.stream!()
     |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
-                            :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
-                            :location, :name, :class_start, :meet_start_time, :upload_key])
+                            :meet_end_time, :prof_name_first, :prof_name_last,
+                            :location, :name, :meet_start_time, :upload_key])
     |> Enum.map(&process_class_row(&1, period_id))
 
     conn |> render(CSVView, "index.json", csv: uploads)
@@ -57,7 +57,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
         |> File.stream!()
         |> CSV.decode(headers: [:campus, :class_type, :number, :crn, :meet_days,
                                 :class_end, :meet_end_time, :prof_name_first, :prof_name_last,
-                                :location, :name, :class_start, :meet_start_time, :upload_key])
+                                :location, :name, :meet_start_time, :upload_key])
         |> Enum.map(&process_class_row(&1, period_id))
 
         conn |> render(CSVView, "index.json", csv: uploads)

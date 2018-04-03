@@ -179,7 +179,6 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     |> name_filter(params)
     |> number_filter(params)
     |> day_filter(params)
-    |> length_filter(params)
   end
 
   defp school_filter(dynamic, %{"school" => filter, "or" => "true"}) do
@@ -272,30 +271,4 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     dynamic([class, period, prof], class.meet_days == ^filter and ^dynamic)
   end
   defp day_filter(dynamic, _), do: dynamic
-
-  defp length_filter(dynamic, %{"class_length" => "1st Half", "or" => "true"}) do
-    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date != class.class_end) or ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "2nd Half", "or" => "true"}) do
-    dynamic([class, period, prof], (period.end_date == class.class_end and period.start_date != class.class_start) or ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "Full Term", "or" => "true"}) do
-    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date == class.class_end) or ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "Custom", "or" => "true"}) do
-    dynamic([class, period, prof], (period.start_date != class.class_start and period.end_date != class.class_end) or ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "1st Half"}) do
-    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date != class.class_end) and ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "2nd Half"}) do
-    dynamic([class, period, prof], (period.end_date == class.class_end and period.start_date != class.class_start) and ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "Full Term"}) do
-    dynamic([class, period, prof], (period.start_date == class.class_start and period.end_date == class.class_end) and ^dynamic)
-  end
-  defp length_filter(dynamic, %{"class_length" => "Custom"}) do
-    dynamic([class, period, prof], (period.start_date != class.class_start and period.end_date != class.class_end) and ^dynamic)
-  end
-  defp length_filter(dynamic, _), do: dynamic
 end

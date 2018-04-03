@@ -9,7 +9,7 @@ defmodule Classnavapi.Class do
   Weights can only be added through editing the class initially. Weights are edited individually after.
 
   Required fields: name, number, meet_days, meet_start_time, meet_end_time,
-                seat_count, class_start, class_end, is_enrollable, grade_scale,
+                seat_count, is_enrollable, grade_scale,
                 is_editable, class_period_id, is_syllabus
 
   Optional fields: crn, credits, location, professor_id, class_type, is_points
@@ -19,11 +19,8 @@ defmodule Classnavapi.Class do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class
-  alias Classnavapi.Helpers.ChangesetValidation
 
   schema "classes" do
-    field :class_end, :utc_datetime
-    field :class_start, :utc_datetime
     field :credits, :string
     field :crn, :string
     field :is_chat_enabled, :boolean, default: true
@@ -64,8 +61,7 @@ defmodule Classnavapi.Class do
     timestamps()
   end
 
-  @req_fields [:name, :number, :class_start, :class_end, 
-                :is_enrollable, :grade_scale,
+  @req_fields [:name, :number, :is_enrollable, :grade_scale,
                 :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled, :is_assignment_posts_enabled]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
                 :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
@@ -79,7 +75,6 @@ defmodule Classnavapi.Class do
     |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
-    |> ChangesetValidation.validate_dates(:class_start, :class_end)
     |> unique_constraint(:class, name: :unique_class_index)
   end
 

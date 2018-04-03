@@ -84,8 +84,6 @@ defmodule ClassnavapiWeb.ClassView do
     defp base_class_view(class) do
         %{
             id: class.id,
-            class_end: class.class_end,
-            class_start: class.class_start,
             credits: class.credits,
             crn: class.crn,
             grade_scale: class.grade_scale,
