@@ -3,8 +3,9 @@ defmodule Classnavapi.Assignments.ReminderNotification.Topic do
   import Ecto.Changeset
   alias Classnavapi.Assignments.ReminderNotification.Topic
 
-  @all_fields [:topic]
+  @all_fields [:id, :topic]
 
+  @primary_key {:id, :id, []}
   schema "assignment_reminder_notification_topics" do
     field :topic, :string
 

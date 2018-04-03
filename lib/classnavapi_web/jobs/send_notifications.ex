@@ -12,8 +12,9 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
 
   import Ecto.Query
 
-  @assignment_reminder_today_category "Assignment.Reminder.Today"
-  @assignment_reminder_future_category "Assignment.Reminder.Future"
+  @assignment_reminder_today_category 100
+  @assignment_reminder_tomorrow_category 200
+  @assignment_reminder_future_category 300
 
   def run(time) do
     time 
@@ -40,8 +41,8 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
     |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
     |> filter_due_date(now, atom)
     |> where([student, sclass], sclass.is_dropped == false)
-    |> group_by([student, sclass, sassign, class, user, device], device.udid)
-    |> select([student, sclass, sassign, class, user, device], %{udid: device.udid, count: count(sassign.id)})
+    |> group_by([student, sclass, sassign, class, user, device], [device.udid, student.notification_days_notice])
+    |> select([student, sclass, sassign, class, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
     |> Repo.all()
   end
 
@@ -54,14 +55,16 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   end
 
   defp send_notifications(assignment, atom) do
-    Notification.create_notification(assignment.udid, get_message(assignment, atom), get_topic(atom))
+    Notification.create_notification(assignment.udid, get_message(assignment, atom), get_topic(atom, assignment.days))
   end
 
   defp get_message(assignment, atom) do
-    Assignments.get_assignment_reminder(assignment.count, get_topic(atom))
+    Assignments.get_assignment_reminder(assignment.count, get_topic(atom, assignment.days))
     |> String.replace("[num]", assignment.count |> to_string())
+    |> String.replace("[days]", assignment.days |> to_string())
   end
 
-  defp get_topic(:today), do: @assignment_reminder_today_category
-  defp get_topic(:future), do: @assignment_reminder_future_category
+  defp get_topic(:today, _days), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_today_category).topic
+  defp get_topic(:future, 1), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_tomorrow_category).topic
+  defp get_topic(:future, _days), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_future_category).topic
 end

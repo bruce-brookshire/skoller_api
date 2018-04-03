@@ -11,23 +11,27 @@ defmodule Classnavapi.Assignments do
 
   import Ecto.Query
 
-  @today_topic "Assignment.Reminder.Today"
-  @future_topic "Assignment.Reminder.Future"
+  @today_topic 100
+  @tomorrow_topic 200
+  @future_topic 300
 
   @default_message_today_single "You have 1 assignment due today. Check it out!"
   @default_message_today_mult "You have [num] assignments due today. Check them out!"
-  @default_message_future_single "You have 1 assignment coming up. Check it out!"
-  @default_message_future_mult "You have [num] assignments coming up. Check them out!"
+  @default_message_tomorrow_single "You have 1 assignment tomorrow. Check it out!"
+  @default_message_tomorrow_mult "You have [num] assignments tomorrow. Check them out!"
+  @default_message_future_single "You have 1 assignment in the next [days] days. Check it out!"
+  @default_message_future_mult "You have [num] assignments in the next [days] days. Check them out!"
 
-  def get_assignment_reminder(num, @today_topic) do
-    get_assignment_reminder(num, @today_topic, :today)
-  end
-  def get_assignment_reminder(num, @future_topic) do
-    get_assignment_reminder(num, @future_topic, :future)
+  def get_assignment_reminder(num, topic) do
+    messages = get_messages(topic, num)
+
+    case messages |> get_random_message() do
+      nil -> get_default(topic, num)
+      message -> message
+    end 
   end
 
   def add_assignment_message(%{"reminder_message" => params}) do
-    params = params |> Map.put("topic", get_topic(params))
     ReminderNotification.changeset(%ReminderNotification{}, params)
     |> Repo.insert()
   end
@@ -41,41 +45,31 @@ defmodule Classnavapi.Assignments do
     |> Repo.delete()
   end
 
-  def get_is_today(topic) do
-    topic == @today_topic
-  end
-
   def get_assignment_message_topics() do
     Repo.all(Topic)
   end
 
-  defp get_assignment_reminder(num, topic, atom) do
-    messages = get_messages(topic, num)
-
-    case messages |> get_random_message() do
-      nil -> get_default(atom, num)
-      message -> message
-    end 
+  def get_assignment_message_topic_by_id!(id) do
+    Repo.get!(Topic, id)
   end
 
   defp get_messages(topic, num) when num > 1 do
     from(rn in ReminderNotification)
-    |> where([rn], rn.topic == ^topic and rn.is_plural == true)
+    |> where([rn], rn.assignment_reminder_notification_topic_id == ^topic and rn.is_plural == true)
     |> Repo.all()
   end
   defp get_messages(topic, _num) do
     from(rn in ReminderNotification)
-    |> where([rn], rn.topic == ^topic and rn.is_plural == false)
+    |> where([rn], rn.assignment_reminder_notification_topic_id == ^topic and rn.is_plural == false)
     |> Repo.all()
   end
 
-  defp get_default(:today, num) when num > 1, do: @default_message_today_mult
-  defp get_default(:today, _num), do: @default_message_today_single
-  defp get_default(:future, num) when num > 1, do: @default_message_future_mult
-  defp get_default(:future, _num), do: @default_message_future_single
-
-  defp get_topic(%{"is_today" => true}), do: @today_topic
-  defp get_topic(%{"is_today" => false}), do: @future_topic
+  defp get_default(@today_topic, num) when num > 1, do: @default_message_today_mult
+  defp get_default(@today_topic, _num), do: @default_message_today_single
+  defp get_default(@tomorrow_topic, num) when num > 1, do: @default_message_tomorrow_mult
+  defp get_default(@tomorrow_topic, _num), do: @default_message_tomorrow_single
+  defp get_default(@future_topic, num) when num > 1, do: @default_message_future_mult
+  defp get_default(@future_topic, _num), do: @default_message_future_single
 
   defp get_random_message([]), do: nil
   defp get_random_message(messages) do
