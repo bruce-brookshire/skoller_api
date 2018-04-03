@@ -14,7 +14,8 @@ defmodule ClassnavapiWeb.PeriodView do
   def render("period.json", %{period: period}) do
     %{
       id: period.id,
-      name: period.name
+      name: period.name,
+      inserted_at: period.inserted_at
     }
   end
 end
