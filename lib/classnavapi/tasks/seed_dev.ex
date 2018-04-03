@@ -28,7 +28,6 @@ defmodule Mix.Tasks.Seed.Dev do
   def run(_) do
     ensure_started(Repo, [])
  
-    {:ok, date1, _offset1} = DateTime.from_iso8601("2017-10-12T00:00:00Z")
     {:ok, date2, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
     pass = Comeonin.Bcrypt.add_hash("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
@@ -184,8 +183,6 @@ defmodule Mix.Tasks.Seed.Dev do
                   meet_start_time: "8:30:00",
                   meet_end_time: "12:00:00",
                   seat_count: 200,
-                  class_start: date1,
-                  class_end: date2,
                   is_enrollable: true,
                   is_editable: true,
                   is_syllabus: false,
@@ -201,8 +198,6 @@ defmodule Mix.Tasks.Seed.Dev do
         meet_start_time: "8:30:00",
         meet_end_time: "12:00:00",
         seat_count: 2,
-        class_start: date1,
-        class_end: date2,
         is_enrollable: true,
         is_editable: true,
         is_syllabus: false,
@@ -218,8 +213,6 @@ defmodule Mix.Tasks.Seed.Dev do
       meet_start_time: "8:30:00",
       meet_end_time: "12:00:00",
       seat_count: 200,
-      class_start: date1,
-      class_end: date2,
       is_enrollable: true,
       is_editable: true,
       is_syllabus: false,
@@ -235,8 +228,6 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_start_time: "8:30:00",
     meet_end_time: "12:00:00",
     seat_count: 200,
-    class_start: date1,
-    class_end: date2,
     is_enrollable: true,
     is_editable: true,
     is_syllabus: false,
@@ -252,8 +243,6 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_start_time: "8:00:00",
     meet_end_time: "12:00:00",
     seat_count: 200,
-    class_start: date1,
-    class_end: date2,
     is_enrollable: true,
     is_editable: true,
     is_syllabus: false,
@@ -269,8 +258,6 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_start_time: "8:30:00",
     meet_end_time: "12:00:00",
     seat_count: 200,
-    class_start: date1,
-    class_end: date2,
     is_enrollable: true,
     is_editable: true,
     is_syllabus: false,
@@ -286,8 +273,6 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_start_time: "8:30:00",
     meet_end_time: "12:00:00",
     seat_count: 200,
-    class_start: date1,
-    class_end: date2,
     is_enrollable: true,
     is_editable: true,
     is_syllabus: false,
@@ -303,8 +288,6 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_start_time: "8:30:00",
     meet_end_time: "12:00:00",
     seat_count: 200,
-    class_start: date1,
-    class_end: date2,
     is_enrollable: true,
     is_editable: true,
     is_syllabus: false,
