@@ -27,6 +27,7 @@ defmodule Classnavapi.Class do
     field :credits, :string
     field :crn, :string
     field :is_chat_enabled, :boolean, default: true
+    field :is_assignment_posts_enabled, :boolean, default: true
     field :is_editable, :boolean, default: true
     field :is_enrollable, :boolean, default: true
     field :is_ghost, :boolean, default: true
@@ -65,7 +66,7 @@ defmodule Classnavapi.Class do
 
   @req_fields [:name, :number, :class_start, :class_end, 
                 :is_enrollable, :grade_scale,
-                :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled]
+                :is_editable, :class_period_id, :is_syllabus, :is_chat_enabled, :is_assignment_posts_enabled]
   @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
                 :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
   @all_fields @req_fields ++ @opt_fields

@@ -40,6 +40,10 @@ defmodule ClassnavapiWeb.Router do
       resources "/classes", ClassController, only: [] do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
       end
+
+      # User routes
+      post "/users/create", Admin.UserController, :create
+      put "/users/:user_id/update", Admin.UserController, :update
     end
 
     scope "/v1", V1, as: :v1 do
@@ -166,6 +170,9 @@ defmodule ClassnavapiWeb.Router do
         get "/chat", Student.ChatController, :chat
         get "/inbox", Student.ChatController, :inbox
 
+        # Notificaiton route
+        get "/notifications", Student.NotificationController, :notifications
+
         #Text Verification routes
         post "/verify", Student.VerificationController, :verify
         post "/resend", Student.VerificationController, :resend
@@ -187,6 +194,10 @@ defmodule ClassnavapiWeb.Router do
       # Assignment routes
       resources "/class/assignments", Class.AssignmentController, only: [:delete, :update]
       resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
+
+        # Assignment Post routes
+        resources "/posts", Admin.Assignment.PostController, only: [:delete]
+        resources "/posts", Assignment.PostController, only: [:create, :update]
 
         # Assignment Grade routes
         resources "/grades", Student.Class.GradeController, only: [:create]
@@ -212,11 +223,17 @@ defmodule ClassnavapiWeb.Router do
       post "/notifications/syllabus-needed", NotificationController, :syllabus
       post "/notifications/custom", NotificationController, :custom
       get "/notifications", NotificationController, :index
+
+      resources "/reminder-messages", Assignment.ReminderController, only: [:create, :index, :delete]
     end
   end
 
   scope "/api", ClassnavapiWeb.Api do
     pipe_through :api_auth
+
+    scope "/v2", V2, as: :v2 do
+      put "/users/:user_id", UserController, :update
+    end
 
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
@@ -227,6 +244,10 @@ defmodule ClassnavapiWeb.Router do
 
   scope "/api", ClassnavapiWeb.Api do
     pipe_through :api
+
+    scope "/v2", V2, as: :v2 do
+      resources "/users", NewUserController, only: [:create]
+    end
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
