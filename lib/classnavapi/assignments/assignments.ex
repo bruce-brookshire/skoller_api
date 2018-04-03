@@ -2,6 +2,7 @@ defmodule Classnavapi.Assignments do
 
   alias Classnavapi.Repo
   alias Classnavapi.Assignments.ReminderNotification
+  alias Classnavapi.Assignments.ReminderNotification.Topic
   alias Classnavapi.Assignment.Post
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.StudentAssignment
@@ -42,6 +43,10 @@ defmodule Classnavapi.Assignments do
 
   def get_is_today(topic) do
     topic == @today_topic
+  end
+
+  def get_assignment_message_topics() do
+    Repo.all(Topic)
   end
 
   defp get_assignment_reminder(num, topic, atom) do

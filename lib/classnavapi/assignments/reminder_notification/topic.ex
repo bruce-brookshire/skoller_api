@@ -14,7 +14,7 @@ defmodule Classnavapi.Assignments.ReminderNotification.Topic do
   @doc false
   def changeset(%Topic{} = topic, attrs) do
     topic
-    |> cast(attrs, @all_field)
-    |> validate_required(@all_field)
+    |> cast(attrs, @all_fields)
+    |> validate_required(@all_fields)
   end
 end
