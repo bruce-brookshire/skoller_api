@@ -17,17 +17,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
                       is_active: true,
                       is_editable: true,
                       name: "HKU",
-                      timezone: "-8",
-                      email_domains: [
-                          %{
-                              email_domain: "@example.com",
-                              is_professor_only: true
-                          },
-                          %{
-                              email_domain: "@edu.edu",
-                              is_professor_only: false
-                          }
-                      ]}
+                      timezone: "-8"}
 
   @valid_student_attrs %{birthday: "2017-10-12T18:51:53Z", 
                           gender: "male", 

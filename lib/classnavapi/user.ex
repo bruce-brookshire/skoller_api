@@ -12,7 +12,6 @@ defmodule Classnavapi.User do
   import Ecto.Changeset
 
   alias Classnavapi.User
-  alias Classnavapi.Repo
 
   schema "users" do
     field :email, :string
