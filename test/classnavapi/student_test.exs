@@ -9,6 +9,8 @@ defmodule Classnavapi.StudentTest do
                 name_last: "Student", 
                 phone: "6158675309",
                 major: "Testing",
+                notification_time: "10:00:00",
+                future_reminder_notification_time: "10:00:00",
                 school_id: 1}
 
   test "student with valid attributes" do
@@ -18,12 +20,12 @@ defmodule Classnavapi.StudentTest do
 
   test "student with no birthday" do
     changeset = Student.changeset(%Student{}, Map.delete(@valid_attrs, :birthday))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
   test "student with no gender" do
     changeset = Student.changeset(%Student{}, Map.delete(@valid_attrs, :gender))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
   test "student with no first name" do
@@ -43,7 +45,7 @@ defmodule Classnavapi.StudentTest do
 
   test "student with no major" do
     changeset = Student.changeset(%Student{}, Map.delete(@valid_attrs, :major))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
   test "student with no school" do

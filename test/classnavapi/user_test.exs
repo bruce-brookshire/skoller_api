@@ -1,7 +1,7 @@
 defmodule Classnavapi.UserTest do
   use Classnavapi.DataCase
 
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
 
   @valid_attrs %{email: "test@classnav.com", password: "test"}
 
