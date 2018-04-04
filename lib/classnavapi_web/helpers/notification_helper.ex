@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Assignment.Mod
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.User.Device
   alias Classnavapi.Class
   alias Classnavapi.Class.Assignment

@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.StatusController do
     alias ClassnavapiWeb.Helpers.RepoHelper
     alias ClassnavapiWeb.Helpers.NotificationHelper 
     alias Classnavapi.Mailer
-    alias Classnavapi.User
+    alias Classnavapi.Users.User
     alias Classnavapi.Class.StudentClass
 
     import ClassnavapiWeb.Helpers.AuthPlug

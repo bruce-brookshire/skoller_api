@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.AnalyticsView
   alias Classnavapi.Class.Lock
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.UserRole
   alias Classnavapi.Class.Doc
   alias Classnavapi.Student

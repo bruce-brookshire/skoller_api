@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V2.Admin.UserController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.Repo
   alias Classnavapi.School.StudentField
   alias Classnavapi.UserRole

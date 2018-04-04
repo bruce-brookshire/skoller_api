@@ -4,7 +4,7 @@ defmodule ClassnavapiWeb.Assignment.ModView do
   alias ClassnavapiWeb.Assignment.ModView
   alias ClassnavapiWeb.ClassView
   alias Classnavapi.Repo
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.Student
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Assignment.Mod.Action

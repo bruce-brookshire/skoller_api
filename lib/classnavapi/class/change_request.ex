@@ -1,7 +1,11 @@
 defmodule Classnavapi.Class.ChangeRequest do
   use Ecto.Schema
   import Ecto.Changeset
+
   alias Classnavapi.Class.ChangeRequest
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Change.Type
+  alias Classnavapi.Users.User
 
   @moduledoc """
   
@@ -16,9 +20,9 @@ defmodule Classnavapi.Class.ChangeRequest do
     field :class_change_type_id, :id
     field :data, :map
     field :user_id, :id
-    belongs_to :class, Classnavapi.Class, define_field: false
-    belongs_to :class_change_type, Classnavapi.Class.Change.Type, define_field: false
-    belongs_to :user, Classnavapi.User, define_field: false
+    belongs_to :class, Class, define_field: false
+    belongs_to :class_change_type, Type, define_field: false
+    belongs_to :user, User, define_field: false
 
     timestamps()
   end

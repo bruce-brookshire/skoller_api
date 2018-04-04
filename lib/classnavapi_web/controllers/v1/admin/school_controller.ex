@@ -60,7 +60,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
 
   def update(conn, %{"id" => id} = params) do
     school_old = Repo.get!(School, id)
-    school_old = school_old |> Repo.preload(:email_domains)
     
     changeset = School.changeset_update(school_old, params)
 

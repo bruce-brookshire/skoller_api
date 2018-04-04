@@ -8,7 +8,7 @@ defmodule Classnavapi.ProfessorTest do
                 name_last: "Taco", 
                 office_availability: "Never", 
                 office_location: "Earth",
-                phone: "6158675309",
+                phone: "615-867-5309",
                 class_period_id: 1}
 
   test "professor insert with valid attributes" do

@@ -9,6 +9,9 @@ defmodule Classnavapi.Class.HelpRequest do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.HelpRequest
+  alias Classnavapi.Users.User
+  alias Classnavapi.Class
+  alias Classnavapi.Class.Help.Type
 
   schema "class_help_requests" do
     field :note, :string
@@ -16,9 +19,9 @@ defmodule Classnavapi.Class.HelpRequest do
     field :class_id, :id
     field :class_help_type_id, :id
     field :user_id, :id
-    belongs_to :class, Classnavapi.Class, define_field: false
-    belongs_to :class_help_type, Classnavapi.Class.Help.Type, define_field: false
-    belongs_to :user, Classnavapi.User, define_field: false
+    belongs_to :class, Class, define_field: false
+    belongs_to :class_help_type, Type, define_field: false
+    belongs_to :user, User, define_field: false
 
     timestamps()
   end

@@ -10,7 +10,7 @@ defmodule Classnavapi.Class.Doc do
   import Ecto.Changeset
   alias Classnavapi.Class.Doc
   alias Classnavapi.Class
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
 
   schema "docs" do
     field :is_syllabus, :boolean, default: false
