@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Assignment.ReminderNotification.TopicView do
   def render("topic.json", %{topic: topic}) do
     %{
       id: topic.id,
-      topic: topic.topic
+      name: topic.name
     }
   end
 end
