@@ -11,17 +11,7 @@ defmodule Classnavapi.SchoolTest do
                 is_active_enrollment: true,
                 is_readonly: true,
                 name: "HKU",
-                timezone: "-8",
-                email_domains: [
-                    %{
-                        email_domain: "@test",
-                        is_professor_only: true
-                    },
-                    %{
-                        email_domain: "@edu",
-                        is_professor_only: false
-                    }
-                ]}
+                timezone: "-8"}
 
   test "school insert with valid attributes" do
     changeset = School.changeset_insert(%School{}, @valid_attrs)
@@ -70,11 +60,6 @@ defmodule Classnavapi.SchoolTest do
 
   test "school insert with no timezone" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :timezone))
-    refute changeset.valid?
-  end
-
-  test "school insert with no email domain" do
-    changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :email_domains))
     refute changeset.valid?
   end
 end
