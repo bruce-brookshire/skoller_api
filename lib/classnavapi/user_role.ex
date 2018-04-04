@@ -9,12 +9,14 @@ defmodule Classnavapi.UserRole do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.UserRole
+  alias Classnavapi.Users.User
+  alias Classnavapi.Role
 
   schema "user_roles" do
     field :user_id, :id
     field :role_id, :id
-    belongs_to :user, Classnavapi.User, define_field: false
-    belongs_to :role, Classnavapi.Role, define_field: false
+    belongs_to :user, User, define_field: false
+    belongs_to :role, Role, define_field: false
 
     timestamps()
   end

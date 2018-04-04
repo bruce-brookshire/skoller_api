@@ -1,4 +1,4 @@
-defmodule Classnavapi.User do
+defmodule Classnavapi.Users.User do
 
   @moduledoc """
   
@@ -11,7 +11,7 @@ defmodule Classnavapi.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
 
   schema "users" do
     field :email, :string

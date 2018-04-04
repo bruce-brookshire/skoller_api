@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias Classnavapi.Class
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias ClassnavapiWeb.Class.LockView
   alias Classnavapi.Class
 

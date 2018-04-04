@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Helpers.TokenHelper do
   """
 
   alias Classnavapi.Auth
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
 
   def login(%User{id: id}) do
     {:ok, token, _} = Auth.encode_and_sign(%{:id => id}, %{typ: "access"}, ttl: {1, :day})

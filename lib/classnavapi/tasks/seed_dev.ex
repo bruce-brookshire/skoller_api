@@ -10,7 +10,7 @@ defmodule Mix.Tasks.Seed.Dev do
   import Mix.Ecto
 
   alias Classnavapi.Repo
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.Class.Doc
   alias Classnavapi.UserRole
   alias Classnavapi.School

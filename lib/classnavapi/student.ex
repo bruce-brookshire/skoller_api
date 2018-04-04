@@ -9,6 +9,11 @@ defmodule Classnavapi.Student do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Student
+  alias Classnavapi.Users.User
+  alias Classnavapi.School.FieldOfStudy
+  alias Classnavapi.School
+  alias Classnavapi.Class
+  alias Classnavapi.Class.StudentClass
 
   schema "students" do
     field :birthday, :date
@@ -29,11 +34,11 @@ defmodule Classnavapi.Student do
     field :is_assign_post_notifications, :boolean, default: true
     field :organization, :string
     field :bio, :string
-    has_many :users, Classnavapi.User
-    many_to_many :fields_of_study, Classnavapi.School.FieldOfStudy, join_through: "student_fields_of_study"
-    belongs_to :school, Classnavapi.School, define_field: false
-    many_to_many :classes, Classnavapi.Class, join_through: "student_classes"
-    has_many :student_classes, Classnavapi.Class.StudentClass
+    has_many :users, User
+    many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
+    belongs_to :school, School, define_field: false
+    many_to_many :classes, Class, join_through: "student_classes"
+    has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
 
     timestamps()

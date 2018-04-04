@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Api.V1.UserControllerTest do
   use ClassnavapiWeb.ConnCase
 
   alias Classnavapi.Repo
-  alias Classnavapi.User
+  alias Classnavapi.Users
 
   setup do
     {:ok, jwt, _} = Classnavapi.Auth.encode_and_sign(%{:id => 1}, %{typ: "access"})

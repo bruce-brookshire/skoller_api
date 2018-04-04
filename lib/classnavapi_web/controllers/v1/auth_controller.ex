@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.AuthController do
 
   alias Classnavapi.Repo
   alias ClassnavapiWeb.AuthView
-  alias Classnavapi.User
+  alias Classnavapi.Users.User
   alias Classnavapi.User.Device
   alias ClassnavapiWeb.Helpers.TokenHelper
   
