@@ -14,7 +14,6 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Class.Doc
   alias Classnavapi.UserRole
   alias Classnavapi.School
-  alias Classnavapi.School.EmailDomain
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Class
   alias Classnavapi.Class.Weight
@@ -44,12 +43,6 @@ defmodule Mix.Tasks.Seed.Dev do
                               password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
-                                    email_domains: [
-                                      %EmailDomain{
-                                        email_domain: "@fortyau.com",
-                                        is_professor_only: false
-                                      }
-                                    ],
                                     adr_zip: "37201",
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",
@@ -57,12 +50,6 @@ defmodule Mix.Tasks.Seed.Dev do
 
     school2 = Repo.insert!(%School{name: "Skoller University",
                                     timezone: "CST",
-                                    email_domains: [
-                                      %EmailDomain{
-                                        email_domain: "@skoller.co",
-                                        is_professor_only: false
-                                      }
-                                    ],
                                     adr_zip: "37201",
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",
@@ -70,12 +57,6 @@ defmodule Mix.Tasks.Seed.Dev do
     
     school3 = Repo.insert!(%School{name: "Classo University",
                                     timezone: "CST",
-                                    email_domains: [
-                                      %EmailDomain{
-                                        email_domain: "@test.com",
-                                        is_professor_only: false
-                                      }
-                                    ],
                                     adr_zip: "37201",
                                     adr_state: "TN",
                                     adr_line_1: "530 Church St",

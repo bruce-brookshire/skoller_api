@@ -28,7 +28,6 @@ defmodule Classnavapi.School do
     field :is_chat_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
     has_many :students, Classnavapi.Student
-    has_many :email_domains, School.EmailDomain, on_replace: :delete
     has_many :class_periods, Classnavapi.ClassPeriod
     has_many :classes, through: [:class_periods, :classes]
 
@@ -46,7 +45,6 @@ defmodule Classnavapi.School do
     school
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> cast_assoc(:email_domains, required: true)
   end
 
   def changeset_update(%School{} = school, attrs) do
@@ -54,7 +52,6 @@ defmodule Classnavapi.School do
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
     |> validate_editable()
-    |> cast_assoc(:email_domains, required: true)
   end
 
   defp readonly(changeset, false), do: changeset

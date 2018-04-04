@@ -44,7 +44,6 @@ defmodule Classnavapi.User do
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
-    |> validate_email(attrs["student"])
     |> put_pass_hash()
   end
 
@@ -62,43 +61,6 @@ defmodule Classnavapi.User do
     |> validate_required(@adm_upd_req)
     |> cast_assoc(:student)
     |> put_pass_hash()
-  end
-
-  defp extract_domain(changeset) do
-    changeset
-    |> get_field(:email)
-    |> String.split("@")
-    |> Enum.take(-1)
-    |> List.first()
-  end
-
-  defp preload_school(nil), do: nil
-  defp preload_school(school) do
-    Repo.preload school, :email_domains
-  end
-
-  defp validate_match(changeset, nil), do: changeset |> add_error(:student, "Invalid email for school.")
-  defp validate_match(changeset, _), do: changeset
-
-  defp compare_domains(changeset, nil), do: changeset |> add_error(:student, "Invalid school")
-  defp compare_domains(changeset, school) do
-    email_domains = school.email_domains
-
-    match = email_domains
-    |> Enum.find(& &1.email_domain == "@" <> extract_domain(changeset))
-
-    changeset
-    |> validate_match(match)
-  end
-
-  defp validate_email(changeset, nil), do: changeset
-  defp validate_email(changeset, student_obj) do
-    school = Repo.get(Classnavapi.School, student_obj["school_id"])
-
-    school = school |> preload_school
-
-    changeset
-    |> compare_domains(school)
   end
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:

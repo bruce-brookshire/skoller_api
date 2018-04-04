@@ -2,7 +2,6 @@ defmodule ClassnavapiWeb.SchoolView do
   use ClassnavapiWeb, :view
 
   alias ClassnavapiWeb.SchoolView
-  alias ClassnavapiWeb.School.EmailDomainView
   alias ClassnavapiWeb.PeriodView
   alias Classnavapi.Repo
 
@@ -15,7 +14,7 @@ defmodule ClassnavapiWeb.SchoolView do
   end
 
   def render("school.json", %{school: school}) do
-    school = school |> Repo.preload([:email_domains, :class_periods])
+    school = school |> Repo.preload([:class_periods])
     %{
       id: school.id,
       name: school.name,
@@ -23,8 +22,7 @@ defmodule ClassnavapiWeb.SchoolView do
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
       is_auto_syllabus: school.is_auto_syllabus,
-      timezone: school.timezone,
-      email_domains: render_many(school.email_domains, EmailDomainView, "email_domain.json")
+      timezone: school.timezone
     }
   end
 end
