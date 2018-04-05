@@ -21,7 +21,6 @@ defmodule ClassnavapiWeb.Api.V1.Student.ClassController do
   
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
-  plug :verify_member, %{of: :school, using: :class_id}
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do

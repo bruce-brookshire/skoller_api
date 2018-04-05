@@ -23,7 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   @complete_status 700
   
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
-  plug :verify_member, %{of: :school, using: :class_id}
+  plug :verify_member, :class
 
   def index(conn, %{"class_id" => class_id}) do
     locks = from(l in Lock)

@@ -19,7 +19,6 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
-  plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id} = params) do
     #TODO: Filter ClassPeriod

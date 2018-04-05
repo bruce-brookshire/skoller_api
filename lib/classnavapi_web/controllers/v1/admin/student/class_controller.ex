@@ -17,7 +17,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Student.ClassController do
   
   plug :verify_role, %{roles: [@student_role, @admin_role]}
   plug :verify_member, :student
-  plug :verify_member, %{of: :school, using: :class_id}
   plug :verify_member, %{of: :class, using: :id}
   plug :verify_class_is_editable, :class_id
 

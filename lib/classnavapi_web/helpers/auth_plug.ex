@@ -9,7 +9,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   alias Classnavapi.Repo
   alias Classnavapi.Users.User
   alias Classnavapi.Class
-  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Assignment
 
   import Plug.Conn
@@ -147,7 +146,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
     student = student |> Repo.preload(:classes)
     student.classes
   end
-  defp get_items(%{assigns: %{user: %{student: student}}}, :school), do: student.school_id
   defp get_items(%{assigns: %{user: %{student: student}}}, :student), do: student.id
   defp get_items(%{assigns: %{user: %{student: student}}}, :student_assignment) do
     student = student |> Repo.preload(:student_assignments)
@@ -180,22 +178,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
       false -> conn |> unauth
     end
   end
-  defp find_item(conn, %{type: :school, items: id, using: :class_id}, %{"class_id" => class_id}) do
-    class = Class
-            |> Repo.get!(class_id)
-            |> Repo.preload(:school)
-    case id == class.school.id do
-      true -> conn
-      false -> conn |> unauth
-    end
-  end
-  defp find_item(conn, %{type: :school, items: id, using: :period_id}, %{"period_id" => period_id}) do
-    period = Repo.get!(ClassPeriod, period_id)
-    case id == period.school_id do
-      true -> conn
-      false -> conn |> unauth
-    end
-  end
   defp find_item(conn, %{type: :class, items: classes, using: :id}, %{"id" => class_id}) do
     conn |> compare_classes(classes, class_id)
   end
@@ -211,12 +193,6 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
   end
   defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
     conn |> compare_classes(classes, class_id)
-  end
-  defp find_item(conn, %{type: :school, items: id}, %{"school_id" => school_id}) do
-    case id == String.to_integer(school_id) do
-      true -> conn
-      false -> conn |> unauth
-    end
   end
   defp find_item(conn, %{type: :student, items: id}, %{"student_id" => student_id}) do
     case id == String.to_integer(student_id) do

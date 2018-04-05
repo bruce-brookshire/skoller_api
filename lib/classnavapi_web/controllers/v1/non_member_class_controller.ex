@@ -19,7 +19,6 @@ defmodule ClassnavapiWeb.Api.V1.NonMemberClassController do
   @change_req_role 400
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
-  plug :verify_member, %{of: :school, using: :period_id}
 
   @doc """
    Shows a single `Classnavapi.Class`.
