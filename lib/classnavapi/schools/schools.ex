@@ -1,4 +1,7 @@
 defmodule Classnavapi.Schools do
+  @moduledoc """
+  The Schools context.
+  """
 
   alias Classnavapi.Repo
   alias Classnavapi.Schools.School

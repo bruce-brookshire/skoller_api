@@ -5,9 +5,9 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   alias Classnavapi.Class
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Status
-  alias Classnavapi.Student
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Admin.SchoolView
+  alias Classnavapi.Students
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -43,16 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   end
 
   def hub(conn, _) do
-    student_subquery = from(student in Student)
-    student_subquery = student_subquery
-              |> group_by([student], student.school_id)
-              |> select([student], %{school_id: student.school_id, count: count(student.id)})
-
-    query = from(school in School)
-    schools = query
-              |> join(:left, [school], student in subquery(student_subquery), student.school_id == school.id)
-              |> select([school, student], %{school: school, students: student.count})
-              |> Repo.all()
+    schools = Students.get_school_hub_data()
               |> Enum.map(&put_class_statuses(&1))
     
     render(conn, SchoolView, "index.json", schools: schools)
