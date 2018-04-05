@@ -1,7 +1,7 @@
 defmodule Classnavapi.SchoolTest do
   use Classnavapi.DataCase
 
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
 
   @valid_attrs %{adr_city: "Nashville",
                 adr_line_1: "530 Church St", 
