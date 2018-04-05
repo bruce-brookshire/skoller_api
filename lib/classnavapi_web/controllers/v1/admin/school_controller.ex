@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
 
   alias Classnavapi.Schools.School
   alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Status
   alias Classnavapi.Student
   alias Classnavapi.Repo

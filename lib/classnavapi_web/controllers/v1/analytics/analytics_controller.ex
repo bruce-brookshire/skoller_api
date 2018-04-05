@@ -3,7 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
   alias Classnavapi.Repo
   alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.AnalyticsView
   alias Classnavapi.Class.Lock

@@ -6,7 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     alias Classnavapi.Repo
     alias ClassnavapiWeb.Class.StatusView
     alias Classnavapi.Schools.School
-    alias Classnavapi.ClassPeriod
+    alias Classnavapi.Schools.ClassPeriod
 
     import Ecto.Query
     import ClassnavapiWeb.Helpers.AuthPlug

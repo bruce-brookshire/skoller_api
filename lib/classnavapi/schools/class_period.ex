@@ -1,4 +1,4 @@
-defmodule Classnavapi.ClassPeriod do
+defmodule Classnavapi.Schools.ClassPeriod do
 
   @moduledoc """
   
@@ -10,7 +10,7 @@ defmodule Classnavapi.ClassPeriod do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Schools.School
 
   schema "class_periods" do

@@ -8,7 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   alias ClassnavapiWeb.Class.ChatPostView
   alias ClassnavapiWeb.Student.InboxView
   alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Schools.School
   alias Classnavapi.Chats
 

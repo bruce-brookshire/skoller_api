@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.PeriodController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Repo
   alias ClassnavapiWeb.PeriodView
 
