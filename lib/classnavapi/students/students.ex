@@ -66,13 +66,22 @@ defmodule Classnavapi.Students do
     |> Repo.all()
   end
 
-  defp get_school_enrollment_subquery() do
+  @doc """
+  Returns a subquery that provides a unique list of `Classnavapi.Schools.School` ids and `Classnavapi.Student` ids
+
+  """
+  def get_schools_for_student_subquery() do
     from(student in Student)
     |> join(:inner, [student], sc in subquery(get_enrolled_student_classes_subquery()), sc.student_id == student.id)
     |> join(:inner, [student, sc], class in Class, sc.class_id == class.id)
     |> join(:inner, [student, sc, class], cp in ClassPeriod, cp.id == class.class_period_id)
-    |> group_by([student, sc, class, cp], cp.school_id)
-    |> select([student, sc, class, cp], %{school_id: cp.school_id, count: count(student.id)})
+    |> distinct([student, sc, class, cp], [student.id, cp.school_id])
+    |> select([student, sc, class, cp], %{student_id: student.id, school_id: cp.school_id})
+  end
+
+  defp get_school_enrollment_subquery() do
+    from(s in subquery(get_schools_for_student_subquery()))
+    |> select([s], %{school_id: s.school_id, count: count(s.student_id)})
   end
 
   defp get_enrolled_student_classes_subquery() do
