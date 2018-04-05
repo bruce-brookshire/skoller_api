@@ -37,6 +37,7 @@ defmodule Classnavapi.Student do
     many_to_many :classes, Class, join_through: "student_classes"
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
+    has_many :schools, through: [:student_classes, :class, :class_period, :school]
 
     timestamps()
   end
