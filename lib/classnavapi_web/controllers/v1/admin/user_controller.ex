@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.UserController do
   alias ClassnavapiWeb.UserListView
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias Classnavapi.Student
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Users
 
   import Ecto.Query

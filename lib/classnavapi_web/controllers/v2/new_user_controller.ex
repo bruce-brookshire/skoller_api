@@ -11,11 +11,12 @@ defmodule ClassnavapiWeb.Api.V2.NewUserController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.VerificationHelper
   alias ClassnavapiWeb.Sms
+  alias Classnavapi.Schools.School
 
   @student_role 100
 
   def create(conn, %{"student" => student} = params) do
-    school = Repo.get(Classnavapi.School, student["school_id"])
+    school = Repo.get(School, student["school_id"])
 
     changeset = User.changeset_insert(%User{}, params)
     changeset = changeset 

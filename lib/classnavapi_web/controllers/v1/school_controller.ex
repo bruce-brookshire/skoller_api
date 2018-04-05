@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.SchoolController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Repo
   alias ClassnavapiWeb.SchoolView
 

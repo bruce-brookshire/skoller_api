@@ -1,4 +1,4 @@
-defmodule Classnavapi.School do
+defmodule Classnavapi.Schools.School do
 
   @moduledoc """
   
@@ -9,7 +9,7 @@ defmodule Classnavapi.School do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
 
   schema "schools" do
     field :adr_city, :string

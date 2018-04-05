@@ -8,7 +8,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   alias Classnavapi.Class.Doc
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query

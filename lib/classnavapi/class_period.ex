@@ -11,11 +11,12 @@ defmodule Classnavapi.ClassPeriod do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.School
 
   schema "class_periods" do
     field :name, :string
     field :school_id, :id
-    belongs_to :school, Classnavapi.School, define_field: false
+    belongs_to :school, School, define_field: false
     has_many :classes, Classnavapi.Class
 
     timestamps()

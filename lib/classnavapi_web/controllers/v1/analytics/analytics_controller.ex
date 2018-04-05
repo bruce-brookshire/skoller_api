@@ -18,7 +18,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Class.StudentAssignment
 
   import ClassnavapiWeb.Helpers.AuthPlug

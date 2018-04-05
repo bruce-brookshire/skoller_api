@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.ChatChannel do
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
   alias Classnavapi.Class
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.ClassPeriod
 
   import Ecto.Query

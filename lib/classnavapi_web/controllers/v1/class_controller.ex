@@ -14,7 +14,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias Classnavapi.ClassPeriod
   alias Classnavapi.Professor
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Class.Status
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.Helpers.RepoHelper
@@ -76,7 +76,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   ## Filters:
   * school
-    * `Classnavapi.School` :id
+    * `Classnavapi.Schools.School` :id
   * professor.name
     * `Classnavapi.Professor` :name
   * class.status

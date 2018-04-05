@@ -12,11 +12,12 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
   alias ClassnavapiWeb.Helpers.VerificationHelper
   alias ClassnavapiWeb.Sms
   alias Classnavapi.Users
+  alias Classnavapi.Schools.School
 
   @student_role 100
 
   def create(conn, %{"student" => student} = params) do
-    school = Repo.get(Classnavapi.School, student["school_id"])
+    school = Repo.get(School, student["school_id"])
 
     params = params |> Map.put("student", student |> Users.put_future_reminder_notification_time())
 
