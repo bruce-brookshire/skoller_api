@@ -11,7 +11,6 @@ defmodule Classnavapi.Student do
   alias Classnavapi.Student
   alias Classnavapi.Users.User
   alias Classnavapi.School.FieldOfStudy
-  alias Classnavapi.School
   alias Classnavapi.Class
   alias Classnavapi.Class.StudentClass
 
@@ -23,7 +22,6 @@ defmodule Classnavapi.Student do
     field :phone, :string
     field :verification_code, :string
     field :is_verified, :boolean
-    field :school_id, :id
     field :notification_time, :time
     field :future_reminder_notification_time, :time
     field :notification_days_notice, :integer, default: 1
@@ -36,7 +34,6 @@ defmodule Classnavapi.Student do
     field :bio, :string
     has_many :users, User
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
-    belongs_to :school, School, define_field: false
     many_to_many :classes, Class, join_through: "student_classes"
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
@@ -45,7 +42,7 @@ defmodule Classnavapi.Student do
   end
 
   @req_fields [:name_first, :name_last, :phone,
-              :school_id, :notification_time, :notification_days_notice, :is_notifications,
+              :notification_time, :notification_days_notice, :is_notifications,
               :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications,
                :is_assign_post_notifications, :future_reminder_notification_time]
   @opt_fields [:birthday, :gender, :organization, :bio]
@@ -56,6 +53,5 @@ defmodule Classnavapi.Student do
     student
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> foreign_key_constraint(:school_id)
   end
 end

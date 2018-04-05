@@ -27,7 +27,6 @@ defmodule Classnavapi.School do
     field :short_name, :string
     field :is_chat_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
-    has_many :students, Classnavapi.Student
     has_many :class_periods, Classnavapi.ClassPeriod
     has_many :classes, through: [:class_periods, :classes]
 
