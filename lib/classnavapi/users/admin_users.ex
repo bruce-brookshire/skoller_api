@@ -13,7 +13,30 @@ defmodule Classnavapi.Admin.Users do
 
   @student_role "100"
 
-  def get_users(params) do
+  @doc """
+  Returns a list of `Classnavapi.Users.User` and `Classnavapi.Student` based on filters.
+
+  ## Filters
+    * or :boolean
+      * when true, will or the filters.
+    * account_type :id
+      * Takes a `Classnavapi.Role` id
+    * school_id :id
+      * Requires account_type filter of student
+      * Takes a `Classnavapi.Schools.School` id
+    * user_name :string
+      * Requires account_type filter of student
+      * Searches first or last name of student
+    * email :string
+    * is_suspended :boolean
+
+  ## Examples
+
+      iex> Classnavapi.Admin.Users.get_users(%{})
+      [{user: %Classnavapi.Users.User{}, student: %Classnavapi.Student{}]
+
+  """
+  def get_users(params \\ %{}) do
     from(user in User)
     |> join(:inner, [user], role in UserRole, role.user_id == user.id)
     |> join(:left, [user, role], student in Student, student.id == user.student_id)
@@ -24,6 +47,7 @@ defmodule Classnavapi.Admin.Users do
     |> Repo.all()
   end
 
+  defp filters(params) when params == %{}, do: true
   defp filters(params) do
     dynamic = params["or"] != "true"
 
