@@ -134,6 +134,7 @@ defmodule Classnavapi.Students do
 
   defp get_school_enrollment_subquery() do
     from(s in subquery(get_schools_for_student_subquery()))
+    |> group_by([s], s.school_id)
     |> select([s], %{school_id: s.school_id, count: count(s.student_id)})
   end
 end
