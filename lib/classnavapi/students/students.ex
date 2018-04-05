@@ -79,13 +79,49 @@ defmodule Classnavapi.Students do
     |> select([student, sc, class, cp], %{student_id: student.id, school_id: cp.school_id})
   end
 
+  @doc """
+  Returns a subquery that provides a list of `Classnavapi.Student` by `Classnavapi.Schools.School`
+
+  """
+  def get_student_subquery(%{"school_id" => school_id}) do
+    from(s in Student)
+    |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [s, sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [s, sc, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([s, sc, c, p], p.school_id == ^school_id)
+    |> where([s, sc], sc.is_dropped == false)
+    |> distinct([s], s.id)
+  end
+  @doc """
+  Returns a subquery that provides a list of `Classnavapi.Student`
+
+  """
+  def get_student_subquery(params) do
+    from(s in Student)
+  end
+
+  @doc """
+  Returns a subquery that provides a list of `Classnavapi.Class.StudentClass` where the classes are not dropped by `Classnavapi.Schools.School`
+
+  """
+  def get_enrolled_student_classes_subquery(%{"school_id" => school_id}) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([sc, c, p], p.school_id == ^school_id)
+    |> where([sc], sc.is_dropped == false)
+  end
+  @doc """
+  Returns a subquery that provides a list of `Classnavapi.Class.StudentClass` where the classes are not dropped
+
+  """
+  def get_enrolled_student_classes_subquery(_params) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+  end
+
   defp get_school_enrollment_subquery() do
     from(s in subquery(get_schools_for_student_subquery()))
     |> select([s], %{school_id: s.school_id, count: count(s.student_id)})
-  end
-
-  defp get_enrolled_student_classes_subquery() do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
   end
 end
