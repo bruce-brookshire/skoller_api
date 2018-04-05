@@ -14,7 +14,6 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
     #                     adr_line_2: "Suite 405", 
     #                     adr_state: "TN", 
     #                     adr_zip: "6158675309",
-    #                     is_active_enrollment: true,
     #                     is_readonly: true,
     #                     name: "HKU",
     #                     timezone: "-8"}
@@ -24,7 +23,6 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
     #                     adr_line_2: "Suite 405", 
     #                     adr_state: "TN", 
     #                     adr_zip: "6158675309",
-    #                     is_active_enrollment: true,
     #                     is_readonly: true,
     #                     name: "BMU",
     #                     timezone: "-8"}
@@ -35,7 +33,6 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
     #                         "adr_line_2" => @valid_school_hku.adr_line_2, 
     #                         "adr_state" => @valid_school_hku.adr_state, 
     #                         "adr_zip" => @valid_school_hku.adr_zip, 
-    #                         "is_active_enrollment" => @valid_school_hku.is_active_enrollment, 
     #                         "is_readonly" => @valid_school_hku.is_readonly, 
     #                         "is_auto_syllabus" => true, 
     #                         "is_diy_enabled" => true, 
@@ -48,7 +45,6 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
     #                     "adr_line_2" => "Suite 100", 
     #                     "adr_state" => "TN", 
     #                     "adr_zip" => "37219",
-    #                     "is_active_enrollment" => true,
     #                     "is_readonly" => true,
     #                     "name" => "BMU",
     #                     "timezone" => "-8"
@@ -60,7 +56,6 @@ defmodule ClassnavapiWeb.Api.V1.SchoolControllerTest do
     #                     "adr_line_2" => @valid_school_bmu.adr_line_2, 
     #                     "adr_state" => @valid_school_bmu.adr_state, 
     #                     "adr_zip" => @valid_school_bmu.adr_zip, 
-    #                     "is_active_enrollment" => @valid_school_bmu.is_active_enrollment, 
     #                     "is_readonly" => @valid_school_bmu.is_readonly, 
     #                     "is_auto_syllabus" => true, 
     #                     "is_diy_enabled" => true, 

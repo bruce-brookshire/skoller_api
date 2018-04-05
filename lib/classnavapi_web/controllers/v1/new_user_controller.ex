@@ -6,13 +6,11 @@ defmodule ClassnavapiWeb.Api.V1.NewUserController do
   alias Classnavapi.Repo
   alias Classnavapi.School.StudentField
   alias ClassnavapiWeb.AuthView
-  alias Ecto.Changeset
   alias ClassnavapiWeb.Helpers.TokenHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.VerificationHelper
   alias ClassnavapiWeb.Sms
   alias Classnavapi.Users
-  alias Classnavapi.Schools.School
 
   @student_role 100
 

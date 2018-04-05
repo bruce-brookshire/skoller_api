@@ -43,7 +43,7 @@ Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 200, name: "Assignm
 Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 300, name: "Review", is_diy: false})
 
 pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
-user = Classnavapi.Repo.insert!(%Classnavapi.User{email: "dev_admin@skoller.co", 
+user = Classnavapi.Repo.insert!(%Classnavapi.Users.User{email: "dev_admin@skoller.co", 
                               password_hash: pass.password_hash})
 Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 200})
 Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 300})

@@ -4,7 +4,6 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Repo
   alias Classnavapi.Class
   alias Classnavapi.Schools.ClassPeriod
-  alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.AnalyticsView
   alias Classnavapi.Class.Lock
   alias Classnavapi.Users.User
@@ -622,7 +621,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
   defp avg_classes_subquery(dates, params) do
     from(s in Student)
-    |> join(:left, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params))), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
+    |> join(:left, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end

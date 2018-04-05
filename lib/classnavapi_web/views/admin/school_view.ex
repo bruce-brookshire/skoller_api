@@ -36,7 +36,6 @@ defmodule ClassnavapiWeb.Admin.SchoolView do
       adr_state: school.adr_state,
       adr_zip: school.adr_zip,
       timezone: school.timezone,
-      is_active_enrollment: school.is_active_enrollment,
       is_readonly: school.is_readonly,
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
