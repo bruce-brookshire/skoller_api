@@ -9,6 +9,8 @@ defmodule Classnavapi.Students do
   alias Classnavapi.Schools.School
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Student
+  alias Classnavapi.School.FieldOfStudy
+  alias Classnavapi.School.StudentField
 
   import Ecto.Query
 
@@ -17,12 +19,12 @@ defmodule Classnavapi.Students do
 
   ## Examples
 
-      iex> val = Classnavapi.Students.get_student_count_by_period(1)
+      iex> val = Classnavapi.Students.get_enrollment_by_period_id(1)
       ...>Kernel.is_integer(val)
       true
 
   """
-  def get_student_count_by_period(period_id) do
+  def get_enrollment_by_period_id(period_id) do
     from(sc in subquery(get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], c in Class, c.id == sc.class_id)
     |> where([sc, c], c.class_period_id == ^period_id)
@@ -43,6 +45,24 @@ defmodule Classnavapi.Students do
     from(school in School)
     |> join(:left, [school], student in subquery(get_school_enrollment_subquery()), student.school_id == school.id)
     |> select([school, student], %{school: school, students: fragment("coalesce(?, 0)", student.count)})
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns the `Classnavapi.School.FieldOfStudy` and a count of `Classnavapi.Student`
+
+  ## Examples
+
+      iex> Classnavapi.Students.get_field_of_study_count_by_school_id()
+      [{field: %Classnavapi.School.FieldOfStudy, count: num}]
+
+  """
+  def get_field_of_study_count_by_school_id(school_id) do
+    (from fs in FieldOfStudy)
+    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
+    |> where([fs], fs.school_id == ^school_id)
+    |> group_by([fs, st], [fs.field, fs.id])
+    |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
   end
 
