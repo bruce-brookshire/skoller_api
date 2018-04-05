@@ -53,9 +53,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
     avg_classes = avg_classes(dates, params)
-    avg_days_out = get_avg_days_out(dates, params) |> convert_to_float()
+    avg_days_out = get_avg_days_out(params) |> convert_to_float()
     notifications_enabled = get_notifications_enabled(params)
-    reminder_notifications_enabled = get_reminder_notifications_enabled(dates, params)
+    reminder_notifications_enabled = get_reminder_notifications_enabled(params)
 
     class = Map.new()
     |> Map.put(:class_count, class_count(dates, params))
@@ -94,9 +94,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:avg_days_out, avg_days_out)
     |> Map.put(:common_times, get_common_times(params))
     |> Map.put(:notifications_enabled, notifications_enabled)
-    |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
+    |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(params))
     |> Map.put(:reminder_notifications_enabled, reminder_notifications_enabled)
-    |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
+    |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(params))
     |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(params))
     |> Map.put(:estimated_reminders, estimated_reminders)
     |> Map.put(:estimated_reminders_period, estimated_reminders_period)
@@ -177,44 +177,22 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_reminder_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_reminder_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_reminder_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_reminder_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_reminder_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_chat_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_chat_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_chat_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_chat_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_chat_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_avg_days_out(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
-    |> Repo.aggregate(:avg, :notification_days_notice)
-  end
-
-  defp get_avg_days_out(_dates, _params) do
-    from(s in Student)
+  defp get_avg_days_out(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> Repo.aggregate(:avg, :notification_days_notice)
   end
 

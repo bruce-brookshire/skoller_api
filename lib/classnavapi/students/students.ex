@@ -79,7 +79,7 @@ defmodule Classnavapi.Students do
     |> select([student, sc, class, cp], %{student_id: student.id, school_id: cp.school_id})
   end
 
-  def get_student_subquery(_params \\ %{}) do
+  def get_student_subquery(_params \\ %{})
   @doc """
   Returns a subquery that provides a list of `Classnavapi.Student` by `Classnavapi.Schools.School`
 
