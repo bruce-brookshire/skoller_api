@@ -4,13 +4,13 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   alias Classnavapi.Repo
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Post.Like
-  alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.Class.ChatPostView
   alias ClassnavapiWeb.Student.InboxView
   alias Classnavapi.Class
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Schools.School
   alias Classnavapi.Chats
+  alias Classnavapi.Students
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -30,13 +30,13 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
 
   def chat(conn, %{"student_id" => student_id} = params) do
     posts = from(p in Post)
-    |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
+    |> join(:inner, [p], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == p.class_id)
     |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), enroll.class_id == sc.class_id)
     |> join(:inner, [p, sc, enroll], c in Class, c.id == p.class_id)
     |> join(:inner, [p, sc, enroll, c], cp in ClassPeriod, cp.id == c.class_period_id)
     |> join(:inner, [p, sc, enroll, c, cp], s in School, cp.school_id == s.id)
     |> join(:left, [p, sc, enroll, c, cp, s], l in subquery(like_subquery(student_id)), l.chat_post_id == p.id)
-    |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([p, sc], sc.student_id == ^student_id)
     |> where([p, sc, enroll, c], c.is_chat_enabled == true)
     |> where([p, sc, enroll, c, cp, s], s.is_chat_enabled == true)
     |> where_by_params(params)
@@ -82,19 +82,18 @@ defmodule ClassnavapiWeb.Api.V1.Student.ChatController do
   end
 
   defp like_subquery(student_id) do
-    from(sc in StudentClass)
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], p in Post, sc.class_id == p.class_id)
     |> join(:left, [sc, p], l in Like, l.chat_post_id == p.id)
-    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([sc], sc.student_id == ^student_id)
     |> group_by([sc, p, l], p.id)
     |> select([sc, p, l], %{chat_post_id: p.id, count: count(l.id)})
   end
 
   defp enrollment_subquery(student_id) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], enroll in StudentClass, sc.class_id == enroll.class_id)
-    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
-    |> where([sc, enroll], enroll.is_dropped == false)
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
+    |> join(:inner, [sc], enroll in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
+    |> where([sc], sc.student_id == ^student_id)
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end
