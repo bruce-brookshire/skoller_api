@@ -43,7 +43,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   end
 
   def hub(conn, _) do
-    schools = Students.get_school_hub_data()
+    schools = Students.get_schools_with_enrollment()
               |> Enum.map(&put_class_statuses(&1))
     
     render(conn, SchoolView, "index.json", schools: schools)

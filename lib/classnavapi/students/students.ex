@@ -30,10 +30,19 @@ defmodule Classnavapi.Students do
     |> Repo.aggregate(:count, :id)
   end
 
-  def get_school_hub_data() do
+  @doc """
+  Returns the `Classnavapi.Schools.School` and a count of `Classnavapi.Student`
+
+  ## Examples
+
+      iex> Classnavapi.Students.get_schools_with_enrollment()
+      [{school: %Classnavapi.Schools.School, students: num}]
+
+  """
+  def get_schools_with_enrollment() do
     from(school in School)
     |> join(:left, [school], student in subquery(get_school_enrollment_subquery()), student.school_id == school.id)
-    |> select([school, student], %{school: school, students: student.count})
+    |> select([school, student], %{school: school, students: fragment("coalesce(?, 0)", student.count)})
     |> Repo.all()
   end
 
