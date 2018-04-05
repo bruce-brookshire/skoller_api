@@ -467,27 +467,11 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp communitites(dates, %{"school_id" => school_id}) do
-    subq = from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
+  defp communitites(dates, params) do
+    subq = from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([sc, c, p], sc.class_id)
     |> having([sc, c, p], count(sc.id) >= @community_enrollment)
-    |> select([sc], %{count: count(sc.id)})
-
-    from(c in subquery(subq))
-    |> select([c], count(c.count))
-    |> Repo.one
-  end
-  defp communitites(dates, _params) do
-    subq = from(sc in StudentClass)
-    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
-    |> where([sc], sc.is_dropped == false)
-    |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= @community_enrollment)
     |> select([sc], %{count: count(sc.id)})
 
     from(c in subquery(subq))
@@ -525,21 +509,10 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp enrollment_count(dates, %{"school_id" => school_id}) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
+  defp enrollment_count(dates, params) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> select([sc, c, p], count(sc.class_id, :distinct))
-    |> Repo.one
-  end
-  defp enrollment_count(dates, _params) do
-    from(sc in StudentClass)
-    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
-    |> where([sc], sc.is_dropped == false)
-    |> select([sc], count(sc.class_id, :distinct))
     |> Repo.one
   end
 
@@ -647,16 +620,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> convert_to_float()
   end
 
-  defp avg_classes_subquery(dates, %{"school_id" => school_id}) do
+  defp avg_classes_subquery(dates, params) do
     from(s in Student)
-    |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
-    |> where([s], s.school_id == ^school_id)
-    |> group_by([s, sc], sc.student_id)
-    |> select([s, sc], %{count: count(sc.student_id)})
-  end
-  defp avg_classes_subquery(dates, _params) do
-    from(s in Student)
-    |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
+    |> join(:left, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params))), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end
