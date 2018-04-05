@@ -79,6 +79,7 @@ defmodule Classnavapi.Students do
     |> select([student, sc, class, cp], %{student_id: student.id, school_id: cp.school_id})
   end
 
+  def get_student_subquery(_params \\ %{}) do
   @doc """
   Returns a subquery that provides a list of `Classnavapi.Student` by `Classnavapi.Schools.School`
 
@@ -96,10 +97,11 @@ defmodule Classnavapi.Students do
   Returns a subquery that provides a list of `Classnavapi.Student`
 
   """
-  def get_student_subquery(params) do
+  def get_student_subquery(_params) do
     from(s in Student)
   end
 
+  def get_enrolled_student_classes_subquery(_params \\ %{})
   @doc """
   Returns a subquery that provides a list of `Classnavapi.Class.StudentClass` where the classes are not dropped by `Classnavapi.Schools.School`
 

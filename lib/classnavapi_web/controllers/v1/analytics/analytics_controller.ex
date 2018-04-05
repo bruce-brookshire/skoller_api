@@ -97,7 +97,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
     |> Map.put(:reminder_notifications_enabled, reminder_notifications_enabled)
     |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
-    |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
+    |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(params))
     |> Map.put(:estimated_reminders, estimated_reminders)
     |> Map.put(:estimated_reminders_period, estimated_reminders_period)
     |> Map.put(:students, get_students(params))
@@ -162,33 +162,16 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_class_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(sc in StudentClass)
+  defp get_student_class_notifications_enabled(params) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> join(:inner, [sc], s in Student, sc.student_id == s.id)
-    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
-    |> where([sc, s], s.school_id == ^school_id)
+    |> where([sc], sc.is_notifications == true)
     |> where([sc, s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_class_notifications_enabled(_dates, _params) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], s in Student, sc.student_id == s.id)
-    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
-    |> where([sc, s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_mod_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
-    |> where([s], s.is_mod_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_mod_notifications_enabled(_dates, _params) do
-    from(s in Student)
+  defp get_mod_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_mod_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
