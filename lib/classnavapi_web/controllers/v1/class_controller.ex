@@ -12,9 +12,9 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
   alias ClassnavapiWeb.Helpers.StatusHelper
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Professor
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Class.Status
   alias Classnavapi.Class.StudentClass
   alias ClassnavapiWeb.Helpers.RepoHelper
@@ -30,13 +30,12 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
   plug :verify_member, :class
-  plug :verify_member, %{of: :school, using: :period_id}
   plug :verify_member, %{of: :class, using: :id}
   plug :verify_class_is_editable, :class_id
   plug :verify_class_is_editable, :id
 
   @doc """
-   Creates a new `Classnavapi.Class` for a `Classnavapi.ClassPeriod`
+   Creates a new `Classnavapi.Class` for a `Classnavapi.Schools.ClassPeriod`
 
   ## Behavior:
    If there is no grade scale provided, a default is used: 
@@ -72,11 +71,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
    Shows all `Classnavapi.Class`. Can be used as a search with multiple filters.
 
   ## Behavior:
-   Only searches the current `Classnavapi.ClassPeriod`
+   Only searches the current `Classnavapi.Schools.ClassPeriod`
 
   ## Filters:
   * school
-    * `Classnavapi.School` :id
+    * `Classnavapi.Schools.School` :id
   * professor.name
     * `Classnavapi.Professor` :name
   * class.status

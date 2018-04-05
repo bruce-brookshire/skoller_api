@@ -19,7 +19,7 @@ defmodule ClassnavapiWeb.PeriodView do
       name: period.name,
       inserted_at: period.inserted_at,
       class_count: Classes.get_class_count_by_period(period.id),
-      student_count: Students.get_student_count_by_period(period.id)
+      student_count: Students.get_enrollment_by_period_id(period.id)
     }
   end
 end

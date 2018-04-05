@@ -6,7 +6,6 @@ defmodule ClassnavapiWeb.Api.V2.NewUserController do
   alias Classnavapi.Repo
   alias Classnavapi.School.StudentField
   alias ClassnavapiWeb.AuthView
-  alias Ecto.Changeset
   alias ClassnavapiWeb.Helpers.TokenHelper
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.VerificationHelper
@@ -14,12 +13,9 @@ defmodule ClassnavapiWeb.Api.V2.NewUserController do
 
   @student_role 100
 
-  def create(conn, %{"student" => student} = params) do
-    school = Repo.get(Classnavapi.School, student["school_id"])
-
+  def create(conn, %{"student" => _student} = params) do
     changeset = User.changeset_insert(%User{}, params)
-    changeset = changeset 
-                |> school_accepting_enrollment(school)
+    changeset = changeset
                 |> verification_code()
 
     multi = changeset
@@ -70,15 +66,6 @@ defmodule ClassnavapiWeb.Api.V2.NewUserController do
 
   defp add_student_role(%{user: user}) do
     Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
-  end
-
-  defp school_enrolling(changeset, true), do: changeset
-  defp school_enrolling(changeset, false), do: changeset |> Changeset.add_error(:student, "School not accepting enrollment.")
-
-  defp school_accepting_enrollment(changeset, nil), do: changeset
-  defp school_accepting_enrollment(changeset, school) do
-    changeset
-    |> school_enrolling(school.is_active_enrollment)
   end
 
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset) do

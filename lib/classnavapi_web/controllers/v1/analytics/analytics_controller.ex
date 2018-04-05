@@ -3,8 +3,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
   alias Classnavapi.Repo
   alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
-  alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Schools.ClassPeriod
   alias ClassnavapiWeb.AnalyticsView
   alias Classnavapi.Class.Lock
   alias Classnavapi.Users.User
@@ -18,8 +17,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Class.StudentAssignment
+  alias Classnavapi.Students
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -52,9 +52,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     completed_classes = completed_class(dates, params)
     completed_by_diy = completed_by_diy(dates, params)
     avg_classes = avg_classes(dates, params)
-    avg_days_out = get_avg_days_out(dates, params) |> convert_to_float()
-    notifications_enabled = get_notifications_enabled(dates, params)
-    reminder_notifications_enabled = get_reminder_notifications_enabled(dates, params)
+    avg_days_out = get_avg_days_out(params) |> convert_to_float()
+    notifications_enabled = get_notifications_enabled(params)
+    reminder_notifications_enabled = get_reminder_notifications_enabled(params)
 
     class = Map.new()
     |> Map.put(:class_count, class_count(dates, params))
@@ -91,20 +91,20 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
 
     notifications = Map.new()
     |> Map.put(:avg_days_out, avg_days_out)
-    |> Map.put(:common_times, get_common_times(dates, params))
+    |> Map.put(:common_times, get_common_times(params))
     |> Map.put(:notifications_enabled, notifications_enabled)
-    |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(dates, params))
+    |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(params))
     |> Map.put(:reminder_notifications_enabled, reminder_notifications_enabled)
-    |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(dates, params))
-    |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(dates, params))
+    |> Map.put(:chat_notifications_enabled, get_chat_notifications_enabled(params))
+    |> Map.put(:student_class_notifications_enabled, get_student_class_notifications_enabled(params))
     |> Map.put(:estimated_reminders, estimated_reminders)
     |> Map.put(:estimated_reminders_period, estimated_reminders_period)
-    |> Map.put(:students, get_students(dates, params))
+    |> Map.put(:students, get_students(params))
 
     grades = Map.new()
-    |> Map.put(:grades_entered, get_grades_entered(dates, params))
-    |> Map.put(:student_classes_with_grades, get_participation(dates, params))
-    |> Map.put(:student_classes, get_student_classes(dates, params))
+    |> Map.put(:grades_entered, get_grades_entered(params))
+    |> Map.put(:student_classes_with_grades, get_participation(params))
+    |> Map.put(:student_classes, get_student_classes(params))
 
     analytics = Map.new()
     |> Map.put(:class, class)
@@ -117,178 +117,81 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     render(conn, AnalyticsView, "show.json", analytics: analytics)
   end
 
-  defp get_student_classes(_dates, %{"school_id" => school_id}) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
+  defp get_student_classes(params) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_classes(_dates, _params) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_participation(_dates, %{"school_id" => school_id}) do
+  defp get_participation(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
-    |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
-    |> join(:inner, [sa, a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [sa, a, c, p], sc in StudentClass, sc.id == sa.student_class_id)
-    |> where([sa, a, c, p, sc], sc.is_dropped == false)
-    |> where([sa, a, c, p], p.school_id == ^school_id)
+    |> join(:inner, [sa], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> distinct([sa], [sa.student_class_id])
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_participation(_dates, _params) do
+  defp get_grades_entered(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
-    |> where([sa], not is_nil(sa.grade))
-    |> where([sa, sc], sc.is_dropped == false)
-    |> distinct([sa], [sa.student_class_id])
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_grades_entered(_dates, %{"school_id" => school_id}) do
-    from(sa in StudentAssignment)
-    |> join(:inner, [sa], a in Assignment, a.id == sa.assignment_id)
-    |> join(:inner, [sa, a], c in Class, c.id == a.class_id)
-    |> join(:inner, [sa, a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [sa, a, c, p], sc in StudentClass, sc.id == sa.student_class_id)
-    |> where([sa, a, c, p, sc], sc.is_dropped == false)
-    |> where([sa, a, c, p], p.school_id == ^school_id)
+    |> join(:inner, [sa], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_grades_entered(_dates, _params) do
-    from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
-    |> where([sa], not is_nil(sa.grade))
-    |> where([sa, sc], sc.is_dropped == false)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_common_times(_dates, %{"school_id" => school_id}) do
+  defp get_common_times(params) do
     from(s in Student)
-    |> join(:inner, [s], sc in School, sc.id == s.school_id)
-    |> where([s], s.school_id == ^school_id)
-    |> group_by([s, sc], [s.notification_time, sc.timezone])
-    |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
+    |> join(:inner, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
+    |> join(:inner, [s, sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [s, sc, c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [s, sc, c, p], sch in School, sch.id == p.school_id)
+    |> group_by([s, sc, c, p, sch], [s.notification_time, sch.timezone])
+    |> select([s, sc, c, p, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], @num_notificaiton_time)
     |> Repo.all()
   end
 
-  defp get_common_times(_dates, _params) do
-    from(s in Student)
-    |> join(:inner, [s], sc in School, sc.id == s.school_id)
-    |> group_by([s, sc], [s.notification_time, sc.timezone])
-    |> select([s, sc], %{notification_time: s.notification_time, timezone: sc.timezone, count: count(s.notification_time)})
-    |> order_by([s], desc: count(s.notification_time))
-    |> limit([s], @num_notificaiton_time)
-    |> Repo.all()
-  end
-
-  defp get_students(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_students(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_students(_dates, _params) do
-    from(s in Student)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_student_class_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(sc in StudentClass)
+  defp get_student_class_notifications_enabled(params) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> join(:inner, [sc], s in Student, sc.student_id == s.id)
-    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
-    |> where([sc, s], s.school_id == ^school_id)
+    |> where([sc], sc.is_notifications == true)
     |> where([sc, s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_student_class_notifications_enabled(_dates, _params) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], s in Student, sc.student_id == s.id)
-    |> where([sc], sc.is_dropped == false and sc.is_notifications == true)
-    |> where([sc, s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_mod_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_mod_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_mod_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_mod_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_mod_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_reminder_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_reminder_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_reminder_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_reminder_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_reminder_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_chat_notifications_enabled(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
+  defp get_chat_notifications_enabled(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> where([s], s.is_chat_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp get_chat_notifications_enabled(_dates, _params) do
-    from(s in Student)
-    |> where([s], s.is_chat_notifications == true)
-    |> where([s], s.is_notifications == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_avg_days_out(_dates, %{"school_id" => school_id}) do
-    from(s in Student)
-    |> where([s], s.school_id == ^school_id)
-    |> Repo.aggregate(:avg, :notification_days_notice)
-  end
-
-  defp get_avg_days_out(_dates, _params) do
-    from(s in Student)
+  defp get_avg_days_out(params) do
+    from(s in subquery(Students.get_student_subquery(params)))
     |> Repo.aggregate(:avg, :notification_days_notice)
   end
 
@@ -563,27 +466,11 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp communitites(dates, %{"school_id" => school_id}) do
-    subq = from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
+  defp communitites(dates, params) do
+    subq = from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([sc, c, p], sc.class_id)
     |> having([sc, c, p], count(sc.id) >= @community_enrollment)
-    |> select([sc], %{count: count(sc.id)})
-
-    from(c in subquery(subq))
-    |> select([c], count(c.count))
-    |> Repo.one
-  end
-  defp communitites(dates, _params) do
-    subq = from(sc in StudentClass)
-    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
-    |> where([sc], sc.is_dropped == false)
-    |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= @community_enrollment)
     |> select([sc], %{count: count(sc.id)})
 
     from(c in subquery(subq))
@@ -621,21 +508,10 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.aggregate(:count, :id)
   end
 
-  defp enrollment_count(dates, %{"school_id" => school_id}) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
+  defp enrollment_count(dates, params) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> select([sc, c, p], count(sc.class_id, :distinct))
-    |> Repo.one
-  end
-  defp enrollment_count(dates, _params) do
-    from(sc in StudentClass)
-    |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
-    |> where([sc], sc.is_dropped == false)
-    |> select([sc], count(sc.class_id, :distinct))
     |> Repo.one
   end
 
@@ -743,16 +619,9 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
     |> convert_to_float()
   end
 
-  defp avg_classes_subquery(dates, %{"school_id" => school_id}) do
+  defp avg_classes_subquery(dates, params) do
     from(s in Student)
-    |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
-    |> where([s], s.school_id == ^school_id)
-    |> group_by([s, sc], sc.student_id)
-    |> select([s, sc], %{count: count(sc.student_id)})
-  end
-  defp avg_classes_subquery(dates, _params) do
-    from(s in Student)
-    |> join(:left, [s], sc in StudentClass, s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end and sc.is_dropped == false)
+    |> join(:left, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end

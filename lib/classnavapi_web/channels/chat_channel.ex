@@ -7,10 +7,7 @@ defmodule ClassnavapiWeb.ChatChannel do
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
   alias Classnavapi.Class
-  alias Classnavapi.School
-  alias Classnavapi.ClassPeriod
-
-  import Ecto.Query
+  alias Classnavapi.Schools
 
   def join("chat:" <> class_id, _params, socket) do
     case get_class_enabled(class_id) do
@@ -74,13 +71,7 @@ defmodule ClassnavapiWeb.ChatChannel do
 
   defp get_school({:error, _nil} = map), do: map
   defp get_school({:ok, %{class: %{class_period_id: class_period_id}} = map}) do
-    school = from(cp in ClassPeriod)
-    |> join(:inner, [cp], s in School, s.id == cp.school_id)
-    |> where([cp], cp.id == ^class_period_id)
-    |> select([cp, s], s)
-    |> Repo.one()
-
-    case school do
+    case Schools.get_school_from_period(class_period_id) do
       %{is_chat_enabled: true} = school -> 
         {:ok, map |> Map.put(:school, school)}
       _ -> 

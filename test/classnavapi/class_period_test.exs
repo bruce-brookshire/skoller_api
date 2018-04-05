@@ -1,7 +1,7 @@
 defmodule Classnavapi.ClassPeriodTest do
   use Classnavapi.DataCase
 
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.ClassPeriod
 
   @valid_attrs %{name: "Quarter Name",
                 school_id: 1}

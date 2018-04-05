@@ -1,4 +1,4 @@
-defmodule Classnavapi.School do
+defmodule Classnavapi.Schools.School do
 
   @moduledoc """
   
@@ -9,7 +9,8 @@ defmodule Classnavapi.School do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
+  alias Classnavapi.Schools.ClassPeriod
 
   schema "schools" do
     field :adr_city, :string
@@ -17,7 +18,6 @@ defmodule Classnavapi.School do
     field :adr_line_2, :string
     field :adr_state, :string
     field :adr_zip, :string
-    field :is_active_enrollment, :boolean
     field :is_readonly, :boolean
     field :is_diy_enabled, :boolean
     field :is_diy_preferred, :boolean
@@ -27,15 +27,14 @@ defmodule Classnavapi.School do
     field :short_name, :string
     field :is_chat_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
-    has_many :students, Classnavapi.Student
-    has_many :class_periods, Classnavapi.ClassPeriod
+    has_many :class_periods, ClassPeriod
     has_many :classes, through: [:class_periods, :classes]
 
     timestamps()
   end
 
   @req_fields [:name, :adr_line_1, :adr_city, :adr_state, :adr_zip, :timezone, :is_chat_enabled, :is_assignment_posts_enabled]
-  @opt_fields [:adr_line_2, :is_active_enrollment, :is_readonly,
+  @opt_fields [:adr_line_2, :is_readonly,
               :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus, :short_name]
   @all_fields @req_fields ++ @opt_fields
   @upd_fields @all_fields

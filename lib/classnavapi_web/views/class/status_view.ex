@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Class.StatusView do
   use ClassnavapiWeb, :view
 
   alias ClassnavapiWeb.Class.StatusView
-  alias Classnavapi.School
+  alias Classnavapi.Schools.School
   alias Classnavapi.Repo
 
   def render("index.json", %{statuses: statuses}) do

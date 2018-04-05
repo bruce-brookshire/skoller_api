@@ -6,22 +6,22 @@ defmodule Classnavapi.Chats do
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Comment.Star, as: CStar
   alias Classnavapi.Chat.Reply
-  alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Students
   alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
-  alias Classnavapi.School
+  alias Classnavapi.Schools.ClassPeriod
+  alias Classnavapi.Schools.School
 
   import Ecto.Query
 
   def get_chat_notifications(student_id) do
     posts = from(p in Post)
-    |> join(:inner, [p], sc in StudentClass, sc.class_id == p.class_id)
+    |> join(:inner, [p], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == p.class_id)
     |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
     |> join(:inner, [p, sc, s], c in subquery(distinct_post_id(student_id)), c.chat_post_id == p.id)
     |> join(:inner, [p, sc, s, c], cl in Class, cl.id == p.class_id)
     |> join(:inner, [p, sc, s, c, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
     |> join(:inner, [p, sc, s, c, cl, cp], sch in School, cp.school_id == sch.id)
-    |> where([p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([p, sc], sc.student_id == ^student_id)
     |> where([p, sc, s, c, cl], cl.is_chat_enabled == true)
     |> where([p, sc, s, c, cl, cp, sch], sch.is_chat_enabled == true)
     |> select([p, sc, s, c], %{chat_post: p, color: sc.color, star: s})
@@ -30,14 +30,14 @@ defmodule Classnavapi.Chats do
   
     comments = from(c in Comment)
     |> join(:inner, [c], p in Post, c.chat_post_id == p.id)
-    |> join(:inner, [c, p], sc in StudentClass, sc.class_id == p.class_id)
+    |> join(:inner, [c, p], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == p.class_id)
     |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
     |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
     |> join(:left, [c, p, sc, s, r], ps in PStar, ps.chat_post_id == p.id and ps.student_id == ^student_id)
     |> join(:inner, [c, p, sc, s, r, ps], cl in Class, cl.id == p.class_id)
     |> join(:inner, [c, p, sc, s, r, ps, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
     |> join(:inner, [c, p, sc, s, r, ps, cl, cp], sch in School, cp.school_id == sch.id)
-    |> where([c, p, sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where([c, p, sc], sc.student_id == ^student_id)
     |> where([c, p, sc, s, r, ps], is_nil(ps.id)) # Don't get comment stars if post commented.
     |> where([c, p, sc, s, r, ps, cl], cl.is_chat_enabled == true)
     |> where([c, p, sc, s, r, ps, cl, cp, sch], sch.is_chat_enabled == true)

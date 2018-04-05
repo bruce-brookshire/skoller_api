@@ -9,6 +9,7 @@ defmodule Classnavapi.Professor do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Professor
+  alias Classnavapi.Schools.ClassPeriod
 
   schema "professors" do
     field :email, :string
@@ -18,7 +19,7 @@ defmodule Classnavapi.Professor do
     field :office_location, :string
     field :phone, :string
     field :class_period_id, :id
-    belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
+    belongs_to :class_period, ClassPeriod, define_field: false
 
     timestamps()
   end

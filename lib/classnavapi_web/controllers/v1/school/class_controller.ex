@@ -11,6 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.MinClassView
+  alias Classnavapi.Schools.ClassPeriod
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -18,13 +19,12 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
   @student_role 100
   
   plug :verify_role, %{role: @student_role}
-  plug :verify_member, :school
 
   def index(conn, %{"school_id" => school_id} = params) do
     #TODO: Filter ClassPeriod
     query = from(class in Class)
     classes = query
-    |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     #|> date_filter(params, date)
     |> where([class, period], period.school_id == ^school_id)
@@ -41,7 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
     # date = DateTime.utc_now()
     query = from(class in Class)
     classes = query
-    |> join(:inner, [class], period in Classnavapi.ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [class], prof in Classnavapi.Professor, class.professor_id == prof.id)
     #|> where([class, period], period.start_date <= ^date and period.end_date >= ^date)
     |> where([class, period], period.school_id == ^school_id)

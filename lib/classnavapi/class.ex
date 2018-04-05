@@ -19,6 +19,7 @@ defmodule Classnavapi.Class do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class
+  alias Classnavapi.Schools.ClassPeriod
 
   schema "classes" do
     field :credits, :string
@@ -49,7 +50,7 @@ defmodule Classnavapi.Class do
     field :is_new_class, :boolean, default: false
     has_many :docs, Classnavapi.Class.Doc
     belongs_to :professor, Classnavapi.Professor, define_field: false
-    belongs_to :class_period, Classnavapi.ClassPeriod, define_field: false
+    belongs_to :class_period, ClassPeriod, define_field: false
     has_many :weights, Class.Weight
     belongs_to :class_status, Classnavapi.Class.Status, define_field: false
     has_one :school, through: [:class_period, :school]

@@ -6,9 +6,9 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   alias Classnavapi.Class.Lock
   alias Classnavapi.Class
   alias Classnavapi.Class.Doc
-  alias Classnavapi.ClassPeriod
-  alias Classnavapi.Class.StudentClass
-  alias Classnavapi.School
+  alias Classnavapi.Schools.ClassPeriod
+  alias Classnavapi.Schools.School
+  alias Classnavapi.Students
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -106,7 +106,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
 
   defp get_oldest_enrolled(school_id, _conn, status, type) do
     t = from(class in Class)
-    |> join(:inner, [class], sc in subquery(enrolled_subquery()), sc.class_id == class.id)
+    |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_subquery()), sc.class_id == class.id)
     |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, sc, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
     |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
@@ -168,7 +168,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   defp get_enrolled_ratios(_conn, status) do
     t = from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sc in subquery(enrolled_subquery()), class.id == sc.class_id)
+    |> join(:inner, [class, period], sc in subquery(Students.get_enrolled_classes_subquery()), class.id == sc.class_id)
     |> join(:inner, [class, period, sc], sch in School, sch.id == period.school_id)
     |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false and class.is_syllabus == true)
     |> where([class, period, sc, sch], sch.is_auto_syllabus == true)
@@ -180,12 +180,6 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
     Logger.info("get_enrolled_ratios")
     Logger.info(inspect(t))
     t
-  end
-
-  defp enrolled_subquery() do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> distinct([sc], sc.class_id)
   end
 
   #select count(p.school_id), p.school_id from public.class_locks l inner join public.classes c 

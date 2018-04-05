@@ -13,8 +13,8 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.Users.User
   alias Classnavapi.Class.Doc
   alias Classnavapi.UserRole
-  alias Classnavapi.School
-  alias Classnavapi.ClassPeriod
+  alias Classnavapi.Schools.School
+  alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentClass
@@ -66,7 +66,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                 password_hash: pass.password_hash,
                                 student: %Student{name_first: "Tyler",
                                    name_last: "Witt",
-                                   school_id: school.id,
                                    phone: "2067189446",
                                    birthday: bday,
                                    gender: "Male",
@@ -77,7 +76,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                    password_hash: pass.password_hash,
                                    student: %Student{name_first: "Tyler",
                                       name_last: "Witt",
-                                      school_id: school.id,
                                       phone: "2067189446",
                                       birthday: bday,
                                       gender: "Male",
@@ -88,7 +86,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                       password_hash: pass.password_hash,
                                       student: %Student{name_first: "Tyler",
                                          name_last: "Witt",
-                                         school_id: school.id,
                                          phone: "2067189446",
                                          birthday: bday,
                                          gender: "Male",
@@ -99,7 +96,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                          password_hash: pass.password_hash,
                                          student: %Student{name_first: "Tyler",
                                             name_last: "Witt",
-                                            school_id: school.id,
                                             phone: "2067189446",
                                             birthday: bday,
                                             gender: "Male",
@@ -110,7 +106,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                 password_hash: pass.password_hash,
                                 student: %Student{name_first: "Tyler",
                                     name_last: "Witt",
-                                    school_id: school.id,
                                     phone: "2067189446",
                                     birthday: bday,
                                     gender: "Male",
@@ -121,7 +116,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                     password_hash: pass.password_hash,
                                     student: %Student{name_first: "Tyler",
                                       name_last: "Witt",
-                                      school_id: school.id,
                                       phone: "2067189446",
                                       birthday: bday,
                                       gender: "Male",
@@ -168,6 +162,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   is_editable: true,
                   is_syllabus: false,
                   grade_scale: "A,90|B,80|C,70|D,60",
+                  grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
                   class_period_id: period.id,
                   class_status_id: 700,
                   is_ghost: false
@@ -183,6 +178,7 @@ defmodule Mix.Tasks.Seed.Dev do
         is_editable: true,
         is_syllabus: false,
         grade_scale: "A,90|B,80|C,70|D,60",
+        grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
         class_period_id: period.id,
         class_status_id: 300,
         is_ghost: false
@@ -198,6 +194,7 @@ defmodule Mix.Tasks.Seed.Dev do
       is_editable: true,
       is_syllabus: false,
       grade_scale: "A,90|B,80|C,70|D,60",
+      grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
       class_period_id: period2.id,
       class_status_id: 300,
       is_ghost: false
@@ -213,6 +210,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_editable: true,
     is_syllabus: false,
     grade_scale: "A,90|B,80|C,70|D,60",
+    grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
     class_status_id: 300,
     is_ghost: false
@@ -228,6 +226,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_editable: true,
     is_syllabus: false,
     grade_scale: "A,90|B,80|C,70|D,60",
+    grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
     class_status_id: 400,
     is_ghost: false
@@ -243,6 +242,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_editable: true,
     is_syllabus: false,
     grade_scale: "A,90|B,80|C,70|D,60",
+    grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
     class_status_id: 400,
     is_ghost: false
@@ -258,6 +258,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_editable: true,
     is_syllabus: false,
     grade_scale: "A,90|B,80|C,70|D,60",
+    grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
     class_status_id: 300,
     is_ghost: false
@@ -273,6 +274,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_editable: true,
     is_syllabus: false,
     grade_scale: "A,90|B,80|C,70|D,60",
+    grade_scale_map: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
     class_status_id: 400,
     is_ghost: false

@@ -1,13 +1,11 @@
 defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.School
-  alias Classnavapi.Class
-  alias Classnavapi.ClassPeriod
-  alias Classnavapi.Class.Status
-  alias Classnavapi.Student
+  alias Classnavapi.Schools.School
+  alias Classnavapi.Classes
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Admin.SchoolView
+  alias Classnavapi.Students
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug
@@ -43,16 +41,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
   end
 
   def hub(conn, _) do
-    student_subquery = from(student in Student)
-    student_subquery = student_subquery
-              |> group_by([student], student.school_id)
-              |> select([student], %{school_id: student.school_id, count: count(student.id)})
-
-    query = from(school in School)
-    schools = query
-              |> join(:left, [school], student in subquery(student_subquery), student.school_id == school.id)
-              |> select([school, student], %{school: school, students: student.count})
-              |> Repo.all()
+    schools = Students.get_schools_with_enrollment()
               |> Enum.map(&put_class_statuses(&1))
     
     render(conn, SchoolView, "index.json", schools: schools)
@@ -86,17 +75,6 @@ defmodule ClassnavapiWeb.Api.V1.Admin.SchoolController do
 
   defp put_class_statuses(%{school: %School{} = school} = params) do
     params
-    |> Map.put(:classes, get_class_statuses(school.id))
-  end
-
-  defp get_class_statuses(school_id) do
-    query = from(class in Class)
-    query
-        |> join(:inner, [class], prd in ClassPeriod, class.class_period_id == prd.id)
-        |> join(:full, [class, prd], status in Status, class.class_status_id == status.id)
-        |> where([class, prd], prd.school_id == ^school_id)
-        |> group_by([class, prd, status], [status.name])
-        |> select([class, prd, status], %{status: status.name, count: count(class.id)})
-        |> Repo.all()
+    |> Map.put(:classes, Classes.get_status_counts(school.id))
   end
 end
