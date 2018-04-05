@@ -122,6 +122,16 @@ defmodule Classnavapi.Students do
     |> where([sc], sc.is_dropped == false)
   end
 
+  @doc """
+  Returns a subquery that provides a list of `Classnavapi.Class`
+
+  """
+  def get_enrolled_classes_subquery() do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+    |> distinct([sc], sc.class_id)
+  end
+
   defp get_school_enrollment_subquery() do
     from(s in subquery(get_schools_for_student_subquery()))
     |> select([s], %{school_id: s.school_id, count: count(s.student_id)})
