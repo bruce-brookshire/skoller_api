@@ -35,7 +35,7 @@ defmodule ClassnavapiWeb.StudentView do
       future_reminder_notification_time: student.future_reminder_notification_time,
       organization: student.organization,
       bio: student.bio,
-      school: render_many(student.schools, SchoolView, "school.json"),
+      schools: render_many(student.schools, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }
   end
