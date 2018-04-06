@@ -88,7 +88,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
   defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
     class = Repo.get!(Class, class_id)
-    Class.changeset(class, %{"grade_scale" => val})
+    Class.university_changeset(class, %{"grade_scale" => val})
     |> Repo.update()
   end
 

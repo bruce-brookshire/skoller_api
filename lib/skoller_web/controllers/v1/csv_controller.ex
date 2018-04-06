@@ -84,7 +84,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   defp update_class(class, old_class) do
-    changeset = Class.changeset(old_class, class)
+    changeset = Class.university_changeset(old_class, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
     Repo.update(changeset)
   end
@@ -98,7 +98,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp insert_class(class) do
     class = class 
       |> Map.put(:grade_scale, @default_grade_scale)
-    changeset = Class.changeset(%Class{}, class)
+    changeset = Class.university_changeset(%Class{}, class)
     changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key, class_status_id: @syllabus_status})
     Repo.insert(changeset)
   end

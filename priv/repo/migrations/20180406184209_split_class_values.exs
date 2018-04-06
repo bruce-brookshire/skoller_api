@@ -7,6 +7,7 @@ defmodule Skoller.Repo.Migrations.SplitClassValues do
     alter table(:classes) do
       add :section, :string
       add :subject, :string
+      remove :is_enrollable
     end
     create unique_index(:classes, [:class_period_id, 
                                     :professor_id,

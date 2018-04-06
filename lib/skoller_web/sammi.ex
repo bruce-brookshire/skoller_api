@@ -58,7 +58,7 @@ defmodule SkollerWeb.Sammi do
     |> String.trim()
     |> String.trim("|")
     class = Repo.get!(Class, class_id)
-    Class.changeset(class, %{"grade_scale" => val})
+    Class.university_changeset(class, %{"grade_scale" => val})
     |> Repo.update()
   end
 

@@ -51,7 +51,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
             |> put_grade_scale()
             |> Map.put("class_period_id", period_id)
 
-    changeset = Class.changeset(%Class{}, params)
+    changeset = Class.university_changeset(%Class{}, params)
     |> add_student_created_class_fields(conn)
 
     multi = Ecto.Multi.new()
@@ -139,7 +139,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   def update(conn, %{"id" => id} = params) do
     class_old = Repo.get!(Class, id)
 
-    changeset = Class.changeset(class_old, params)
+    changeset = Class.university_changeset(class_old, params)
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:class, changeset)
