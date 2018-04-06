@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Helpers.NotificationHelper do
   alias Classnavapi.Assignment.Mod
   alias Classnavapi.Users.User
   alias Classnavapi.User.Device
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
   alias Classnavapi.Chat.Comment.Star, as: CommentStar

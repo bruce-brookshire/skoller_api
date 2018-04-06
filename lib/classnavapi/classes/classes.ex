@@ -1,14 +1,14 @@
 defmodule Classnavapi.Classes do
 
   alias Classnavapi.Repo
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Status
 
   import Ecto.Query
 
   @doc """
-  Returns a count of `Classnavapi.Class` using the id of `Classnavapi.Schools.ClassPeriod`
+  Returns a count of `Classnavapi.Universities.Class` using the id of `Classnavapi.Schools.ClassPeriod`
 
   ## Examples
 
@@ -24,7 +24,7 @@ defmodule Classnavapi.Classes do
   end
 
   @doc """
-  Returns the `Classnavapi.Class.Status` name and a count of `Classnavapi.Class` in the status
+  Returns the `Classnavapi.Class.Status` name and a count of `Classnavapi.Universities.Class` in the status
 
   ## Examples
 

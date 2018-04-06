@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Helpers.StatusHelper do
 
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentRequest
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.ChangeRequest
 
   import Ecto.Query

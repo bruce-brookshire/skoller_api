@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.GradeController do
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Class.StudentAssignmentView
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   import ClassnavapiWeb.Helpers.AuthPlug
   import Ecto.Query

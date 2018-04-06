@@ -5,7 +5,7 @@ defmodule Classnavapi.Students do
   
   alias Classnavapi.Repo
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.School
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Student
@@ -123,7 +123,7 @@ defmodule Classnavapi.Students do
   end
 
   @doc """
-  Returns a subquery that provides a list of `Classnavapi.Class`
+  Returns a subquery that provides a list of `Classnavapi.Universities.Class`
 
   """
   def get_enrolled_classes_subquery() do

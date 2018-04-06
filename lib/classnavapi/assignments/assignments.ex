@@ -7,7 +7,7 @@ defmodule Classnavapi.Assignments do
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   import Ecto.Query
 

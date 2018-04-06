@@ -6,7 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Class.ChangeRequestController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.StatusHelper
   alias Classnavapi.Class.ChangeRequest
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Mailer
 
   import ClassnavapiWeb.Helpers.AuthPlug

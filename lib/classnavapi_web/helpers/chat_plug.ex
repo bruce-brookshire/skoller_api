@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Helpers.ChatPlug do
   """
 
   alias Classnavapi.Repo
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.School
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Assignment

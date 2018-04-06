@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.CSVView do
   alias ClassnavapiWeb.ChangesetView
   alias Classnavapi.School.FieldOfStudy
   alias ClassnavapiWeb.School.FieldOfStudyView
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias ClassnavapiWeb.ClassView
 
   def render("index.json", %{csv: csv}) do

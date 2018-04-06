@@ -6,7 +6,7 @@ defmodule ClassnavapiWeb.Api.V1.Admin.Student.ClassController do
   alias ClassnavapiWeb.Class.StudentClassView
   alias ClassnavapiWeb.Helpers.ClassCalcs
   alias ClassnavapiWeb.Helpers.ModHelper
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.ClassPeriod
 
   import Ecto.Query

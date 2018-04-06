@@ -2,13 +2,14 @@ defmodule Classnavapi.Repo.Migrations.ConvertGradeScaleToBlob do
   use Ecto.Migration
 
   alias Classnavapi.Repo
+  alias Classnavapi.Universities.Class
 
   def up do
     alter table(:classes) do
       add :grade_scale_map, :map
     end
     flush()
-    Classnavapi.Class
+    Class
     |> Repo.all()
     |> Enum.map(&Ecto.Changeset.change(&1, %{grade_scale_map: convert_gs_to_map(&1.grade_scale)}))
     |> Enum.each(&Repo.update!(&1))

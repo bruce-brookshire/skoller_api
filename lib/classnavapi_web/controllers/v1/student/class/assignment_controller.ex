@@ -11,7 +11,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.Class.AssignmentController do
   alias ClassnavapiWeb.Helpers.ModHelper
   alias Classnavapi.Class.Weight
   alias ClassnavapiWeb.Helpers.NotificationHelper
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Status
 
   import Ecto.Query

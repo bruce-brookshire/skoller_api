@@ -9,7 +9,7 @@ defmodule ClassnavapiWeb.Api.V1.Student.ModController do
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.ModHelper
   alias ClassnavapiWeb.Assignment.ModView
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Assignments.Mods
 
   import ClassnavapiWeb.Helpers.AuthPlug

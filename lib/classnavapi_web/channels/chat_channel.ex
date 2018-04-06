@@ -6,7 +6,7 @@ defmodule ClassnavapiWeb.ChatChannel do
   alias Classnavapi.Chat.Post
   alias Classnavapi.Chat.Comment
   alias Classnavapi.Chat.Reply
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools
 
   def join("chat:" <> class_id, _params, socket) do

@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Sammi do
 
   alias Classnavapi.Professor
   alias Classnavapi.Repo
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   alias Ecto.UUID
 

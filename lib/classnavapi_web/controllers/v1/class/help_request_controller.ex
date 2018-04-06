@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.Class.HelpRequestController do
   use ClassnavapiWeb, :controller
   
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.HelpRequest
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView

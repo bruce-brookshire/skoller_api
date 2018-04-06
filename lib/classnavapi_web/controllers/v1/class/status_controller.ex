@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Api.V1.Class.StatusController do
     use ClassnavapiWeb, :controller
 
     alias Classnavapi.Class.Status
-    alias Classnavapi.Class
+    alias Classnavapi.Universities.Class
     alias Classnavapi.Repo
     alias ClassnavapiWeb.Class.StatusView
     alias Classnavapi.Schools.School

@@ -10,7 +10,7 @@ defmodule ClassnavapiWeb.Helpers.LockPlug do
   alias Classnavapi.Class.Lock
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.Assignment
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   import Plug.Conn
   import Ecto.Query

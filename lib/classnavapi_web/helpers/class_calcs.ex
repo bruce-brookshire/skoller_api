@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Helpers.ClassCalcs do
   
   alias Classnavapi.Repo
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Assignment
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentAssignment

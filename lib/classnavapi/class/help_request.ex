@@ -10,7 +10,7 @@ defmodule Classnavapi.Class.HelpRequest do
   import Ecto.Changeset
   alias Classnavapi.Class.HelpRequest
   alias Classnavapi.Users.User
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Help.Type
 
   schema "class_help_requests" do

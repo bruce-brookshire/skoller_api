@@ -9,7 +9,7 @@ defmodule Classnavapi.Class.Assignment do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Assignment
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.Weight
 

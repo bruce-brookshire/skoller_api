@@ -10,7 +10,7 @@ defmodule Classnavapi.Class.Weight do
   import Ecto.Changeset
 
   alias Classnavapi.Class.Weight
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   schema "class_weights" do
     field :name, :string

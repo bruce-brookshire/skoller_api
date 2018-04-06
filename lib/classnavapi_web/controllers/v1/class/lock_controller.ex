@@ -6,12 +6,11 @@ defmodule ClassnavapiWeb.Api.V1.Class.LockController do
   alias Classnavapi.Class.Lock.Section
   alias Classnavapi.Repo
   alias ClassnavapiWeb.Helpers.StatusHelper
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias ClassnavapiWeb.Helpers.RepoHelper
   alias ClassnavapiWeb.Helpers.NotificationHelper
   alias Classnavapi.Users.User
   alias ClassnavapiWeb.Class.LockView
-  alias Classnavapi.Class
 
   import Ecto.Query
   import ClassnavapiWeb.Helpers.AuthPlug

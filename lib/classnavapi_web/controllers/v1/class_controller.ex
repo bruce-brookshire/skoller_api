@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
 
   """
   
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.Class.SearchView
@@ -35,7 +35,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   plug :verify_class_is_editable, :id
 
   @doc """
-   Creates a new `Classnavapi.Class` for a `Classnavapi.Schools.ClassPeriod`
+   Creates a new `Classnavapi.Universities.Class` for a `Classnavapi.Schools.ClassPeriod`
 
   ## Behavior:
    If there is no grade scale provided, a default is used: 
@@ -68,7 +68,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Shows all `Classnavapi.Class`. Can be used as a search with multiple filters.
+   Shows all `Classnavapi.Universities.Class`. Can be used as a search with multiple filters.
 
   ## Behavior:
    Only searches the current `Classnavapi.Schools.ClassPeriod`
@@ -82,11 +82,11 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
     * `Classnavapi.Class.Status` :id
     * For ghost classes, use 0.
   * class.name
-    * `Classnavapi.Class` :name
+    * `Classnavapi.Universities.Class` :name
   * class.number
-    * `Classnavapi.Class` :number
+    * `Classnavapi.Universities.Class` :number
   * class.meet_days
-    * `Classnavapi.Class` :meet_days
+    * `Classnavapi.Universities.Class` :meet_days
   * class.length
     * 1st Half
     * 2nd Half
@@ -125,7 +125,7 @@ defmodule ClassnavapiWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Updates a `Classnavapi.Class`.
+   Updates a `Classnavapi.Universities.Class`.
 
   ## Behavior:
    If valid `Classnavapi.Class.Weight` are provided, the `Classnavapi.Class.Status` will be checked.

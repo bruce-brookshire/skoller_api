@@ -7,7 +7,7 @@ defmodule Classnavapi.Chats do
   alias Classnavapi.Chat.Comment.Star, as: CStar
   alias Classnavapi.Chat.Reply
   alias Classnavapi.Students
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Schools.School
 

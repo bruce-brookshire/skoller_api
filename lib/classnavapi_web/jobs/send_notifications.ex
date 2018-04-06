@@ -4,7 +4,7 @@ defmodule ClassnavapiWeb.Jobs.SendNotifications do
   alias Classnavapi.Users.User
   alias Classnavapi.User.Device
   alias Classnavapi.Student
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.StudentAssignment
   alias ClassnavapiWeb.Notification

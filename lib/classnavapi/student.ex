@@ -11,7 +11,7 @@ defmodule Classnavapi.Student do
   alias Classnavapi.Student
   alias Classnavapi.Users.User
   alias Classnavapi.School.FieldOfStudy
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.StudentClass
 
   schema "students" do

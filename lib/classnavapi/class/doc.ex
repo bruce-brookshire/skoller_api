@@ -9,7 +9,7 @@ defmodule Classnavapi.Class.Doc do
   use Ecto.Schema
   import Ecto.Changeset
   alias Classnavapi.Class.Doc
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Users.User
 
   schema "docs" do

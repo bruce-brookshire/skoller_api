@@ -15,7 +15,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Classnavapi.UserRole
   alias Classnavapi.Schools.School
   alias Classnavapi.Schools.ClassPeriod
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Weight
   alias Classnavapi.Class.StudentClass
   alias Classnavapi.Class.StudentAssignment

@@ -10,6 +10,8 @@ defmodule Classnavapi.Class.StudentClass do
   import Ecto.Changeset
   alias Classnavapi.Class.StudentAssignment
   alias Classnavapi.Class.StudentClass
+  alias Classnavapi.Universities.Class
+  alias Classnavapi.Student
 
   schema "student_classes" do
     field :student_id, :id
@@ -17,8 +19,8 @@ defmodule Classnavapi.Class.StudentClass do
     field :color, :string
     field :is_notifications, :boolean, default: true
     field :is_dropped, :boolean, default: false
-    belongs_to :class, Classnavapi.Class, define_field: false
-    belongs_to :student, Classnavapi.Student, define_field: false
+    belongs_to :class, Class, define_field: false
+    belongs_to :student, Student, define_field: false
     has_many :student_assignments, StudentAssignment
 
     timestamps()

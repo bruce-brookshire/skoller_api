@@ -8,7 +8,7 @@ defmodule ClassnavapiWeb.Helpers.AuthPlug do
 
   alias Classnavapi.Repo
   alias Classnavapi.Users.User
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Assignment
 
   import Plug.Conn

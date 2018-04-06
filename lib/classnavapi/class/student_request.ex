@@ -5,7 +5,7 @@ defmodule Classnavapi.Class.StudentRequest do
   alias Classnavapi.Users.User
   alias Classnavapi.Class.StudentRequest.Type
   alias Classnavapi.Class.StudentRequest.Doc
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
 
   schema "class_student_requests" do
     field :is_completed, :boolean, default: false

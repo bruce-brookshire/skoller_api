@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.School.ClassController do
 
   """
   
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
   alias ClassnavapiWeb.MinClassView

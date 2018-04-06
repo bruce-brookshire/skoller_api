@@ -4,7 +4,7 @@ defmodule ClassnavapiWeb.Api.V1.SyllabusWorkerController do
   alias ClassnavapiWeb.ClassView
   alias Classnavapi.Repo
   alias Classnavapi.Class.Lock
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Doc
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Schools.School

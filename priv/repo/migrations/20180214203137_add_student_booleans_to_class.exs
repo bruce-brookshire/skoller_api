@@ -3,20 +3,24 @@ defmodule Classnavapi.Repo.Migrations.AddStudentBooleansToClass do
 
   import Ecto.Query
 
+  alias Classnavapi.Repo
+  alias Classnavapi.Universities.Class
+  alias Classnavapi.Class.Status
+
   def change do
     alter table(:classes) do
       add :is_student_created, :boolean, default: false, null: false
       add :is_new_class, :boolean, default: false, null: false
     end
     flush()
-    from(c in Classnavapi.Class)
+    from(c in Class)
     |> update([c], set: [class_status_id: 200, is_new_class: true, is_student_created: true])
     |> where([c], c.class_status_id == 100)
-    |> Classnavapi.Repo.update_all([])
+    |> Repo.update_all([])
   
-    case Classnavapi.Repo.get(Classnavapi.Class.Status, 100) do
+    case Repo.get(Status, 100) do
       nil -> nil
-      item -> Classnavapi.Repo.delete!(item)
+      item -> Repo.delete!(item)
     end
   end
 end

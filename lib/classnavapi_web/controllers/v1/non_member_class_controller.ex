@@ -7,7 +7,7 @@ defmodule ClassnavapiWeb.Api.V1.NonMemberClassController do
 
   """
   
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Repo
   alias ClassnavapiWeb.ClassView
 
@@ -21,7 +21,7 @@ defmodule ClassnavapiWeb.Api.V1.NonMemberClassController do
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
 
   @doc """
-   Shows a single `Classnavapi.Class`.
+   Shows a single `Classnavapi.Universities.Class`.
 
   ## Returns:
   * 422 `ClassnavapiWeb.ChangesetView`

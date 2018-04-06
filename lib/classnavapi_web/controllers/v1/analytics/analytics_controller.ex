@@ -2,7 +2,7 @@ defmodule ClassnavapiWeb.Api.V1.Analytics.AnalyticsController do
   use ClassnavapiWeb, :controller
 
   alias Classnavapi.Repo
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.ClassPeriod
   alias ClassnavapiWeb.AnalyticsView
   alias Classnavapi.Class.Lock

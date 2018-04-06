@@ -1,7 +1,7 @@
 defmodule ClassnavapiWeb.Api.V1.Admin.Class.ScriptDocController do
   use ClassnavapiWeb, :controller
 
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Schools.ClassPeriod
   alias Classnavapi.Class.Doc
   alias Classnavapi.Professor

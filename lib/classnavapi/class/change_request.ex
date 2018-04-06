@@ -3,7 +3,7 @@ defmodule Classnavapi.Class.ChangeRequest do
   import Ecto.Changeset
 
   alias Classnavapi.Class.ChangeRequest
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.Class.Change.Type
   alias Classnavapi.Users.User
 

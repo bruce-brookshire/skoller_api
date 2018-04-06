@@ -5,7 +5,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   alias Classnavapi.School.FieldOfStudy
   alias ClassnavapiWeb.CSVView
   alias Classnavapi.Professor
-  alias Classnavapi.Class
+  alias Classnavapi.Universities.Class
   alias Classnavapi.CSVUpload  
   
   import ClassnavapiWeb.Helpers.AuthPlug
