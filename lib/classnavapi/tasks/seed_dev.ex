@@ -44,23 +44,26 @@ defmodule Mix.Tasks.Seed.Dev do
     school = Repo.insert!(%School{name: "Hard Knocks University",
                                     timezone: "CST",
                                     adr_zip: "37201",
-                                    adr_state: "TN",
+                                    adr_region: "TN",
                                     adr_line_1: "530 Church St",
-                                    adr_city: "Nashville"})
+                                    adr_locality: "Nashville",
+                                    adr_country: "us"})
 
     school2 = Repo.insert!(%School{name: "Skoller University",
                                     timezone: "CST",
                                     adr_zip: "37201",
-                                    adr_state: "TN",
+                                    adr_region: "TN",
                                     adr_line_1: "530 Church St",
-                                    adr_city: "Nashville"})
+                                    adr_locality: "Nashville",
+                                    adr_country: "us"})
     
     school3 = Repo.insert!(%School{name: "Classo University",
                                     timezone: "CST",
                                     adr_zip: "37201",
-                                    adr_state: "TN",
+                                    adr_region: "TN",
                                     adr_line_1: "530 Church St",
-                                    adr_city: "Nashville"})
+                                    adr_locality: "Nashville",
+                                    adr_country: "us"})
     {:ok, bday} = Date.new(2017, 10, 12)
     student = Repo.insert!(%User{email: "tyler@fortyau.com", 
                                 password_hash: pass.password_hash,
