@@ -57,13 +57,8 @@ defmodule Classnavapi.Schools.School do
   end
 
   defp readonly(changeset, false), do: changeset
+  defp readonly(%{changes: %{is_readonly: true}} = changeset, true), do: changeset
   defp readonly(changeset, true) do
-    changeset
-    |> fresh_readonly(get_change(changeset, :is_readonly))
-  end
-
-  defp fresh_readonly(changeset, true), do: changeset
-  defp fresh_readonly(changeset, _) do
     changeset
     |> add_error(:is_readonly, "School is read only.")
   end
