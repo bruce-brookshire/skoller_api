@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddAutoUpdateStorage do
+defmodule Skoller.Repo.Migrations.AddAutoUpdateStorage do
   use Ecto.Migration
 
   def change do

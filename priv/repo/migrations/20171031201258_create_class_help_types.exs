@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassHelpTypes do
+defmodule Skoller.Repo.Migrations.CreateClassHelpTypes do
 
   @moduledoc """
 

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateUserDevices do
+defmodule Skoller.Repo.Migrations.CreateUserDevices do
   use Ecto.Migration
 
   def change do

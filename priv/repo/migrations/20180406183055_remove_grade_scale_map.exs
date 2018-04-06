@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.RemoveGradeScaleMap do
+defmodule Skoller.Repo.Migrations.RemoveGradeScaleMap do
   use Ecto.Migration
 
   def change do

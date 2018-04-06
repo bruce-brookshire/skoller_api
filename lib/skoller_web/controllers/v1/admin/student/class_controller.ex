@@ -1,0 +1,45 @@
+defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
+  use SkollerWeb, :controller
+
+  alias Skoller.Class.StudentClass
+  alias Skoller.Repo
+  alias SkollerWeb.Class.StudentClassView
+  alias SkollerWeb.Helpers.ClassCalcs
+  alias SkollerWeb.Helpers.ModHelper
+  alias Skoller.Schools.Class
+  alias Skoller.Schools.ClassPeriod
+
+  import Ecto.Query
+  import SkollerWeb.Helpers.AuthPlug
+  
+  @student_role 100
+  @admin_role 200
+  
+  plug :verify_role, %{roles: [@student_role, @admin_role]}
+  plug :verify_member, :student
+  plug :verify_member, %{of: :class, using: :id}
+  plug :verify_class_is_editable, :class_id
+
+  def index(conn, %{"student_id" => student_id}) do
+    #TODO: Filter ClassPeriod
+    # date = DateTime.utc_now
+    query = from(classes in StudentClass)
+    student_classes = query
+                      |> join(:inner, [classes], cl in Class, cl.id == classes.class_id)
+                      |> join(:inner, [classes, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
+                      |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
+                      #|> where([classes, cl, cp], cp.end_date >= ^date)
+                      |> Repo.all()
+                      |> Repo.preload(:class)
+                      |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
+                      |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
+                      |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
+                      |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
+
+    render(conn, StudentClassView, "index.json", student_classes: student_classes)
+  end
+
+  defp get_new_class_assignments(%StudentClass{} = student_class) do
+    student_class |> ModHelper.get_new_assignment_mods()
+  end
+end

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddTimeToStudentAssignments do
+defmodule Skoller.Repo.Migrations.AddTimeToStudentAssignments do
   use Ecto.Migration
 
   def up do

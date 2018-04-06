@@ -1,4 +1,4 @@
-# Classnavapi
+# Skoller
 
 To start your Phoenix server:
 

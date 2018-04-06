@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddTimeToDates do
+defmodule Skoller.Repo.Migrations.AddTimeToDates do
   use Ecto.Migration
 
   def up do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.RemoveStudentFromSchool do
+defmodule Skoller.Repo.Migrations.RemoveStudentFromSchool do
   use Ecto.Migration
 
   def change do

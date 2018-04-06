@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateEmailDomains do
+defmodule Skoller.Repo.Migrations.CreateEmailDomains do
   use Ecto.Migration
 
   def change do

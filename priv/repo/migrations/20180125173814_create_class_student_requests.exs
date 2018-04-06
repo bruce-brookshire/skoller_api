@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassStudentRequests do
+defmodule Skoller.Repo.Migrations.CreateClassStudentRequests do
   use Ecto.Migration
 
   def change do

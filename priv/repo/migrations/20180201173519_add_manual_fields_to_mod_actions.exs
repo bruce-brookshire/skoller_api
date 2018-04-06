@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddManualFieldsToModActions do
+defmodule Skoller.Repo.Migrations.AddManualFieldsToModActions do
   use Ecto.Migration
 
   def change do

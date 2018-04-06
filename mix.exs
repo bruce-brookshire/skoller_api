@@ -1,9 +1,9 @@
-defmodule Classnavapi.Mixfile do
+defmodule Skoller.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :classnavapi,
+      app: :skoller,
       version: "1.6.3",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
@@ -19,7 +19,7 @@ defmodule Classnavapi.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Classnavapi.Application, []},
+      mod: {Skoller.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end

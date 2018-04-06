@@ -1,8 +1,8 @@
-defmodule Classnavapi.Repo.Migrations.ConvertGradeScaleToBlob do
+defmodule Skoller.Repo.Migrations.ConvertGradeScaleToBlob do
   use Ecto.Migration
 
-  alias Classnavapi.Repo
-  alias Classnavapi.Universities.Class
+  alias Skoller.Repo
+  alias Skoller.Schools.Class
 
   def up do
     alter table(:classes) do

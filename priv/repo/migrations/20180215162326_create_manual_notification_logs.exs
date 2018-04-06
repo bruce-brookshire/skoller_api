@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateManualNotificationLogs do
+defmodule Skoller.Repo.Migrations.CreateManualNotificationLogs do
   use Ecto.Migration
 
   def change do

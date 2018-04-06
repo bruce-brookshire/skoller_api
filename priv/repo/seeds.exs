@@ -5,45 +5,45 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     Classnavapi.Repo.insert!(%Classnavapi.SomeSchema{})
+#     Skoller.Repo.insert!(%Skoller.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-Classnavapi.Repo.insert!(%Classnavapi.Role{id: 100, name: "Student"})
-Classnavapi.Repo.insert!(%Classnavapi.Role{id: 200, name: "Admin"})
-Classnavapi.Repo.insert!(%Classnavapi.Role{id: 300, name: "Syllabus Worker"})
-Classnavapi.Repo.insert!(%Classnavapi.Role{id: 400, name: "Change Requests"})
+Skoller.Repo.insert!(%Skoller.Role{id: 100, name: "Student"})
+Skoller.Repo.insert!(%Skoller.Role{id: 200, name: "Admin"})
+Skoller.Repo.insert!(%Skoller.Role{id: 300, name: "Syllabus Worker"})
+Skoller.Repo.insert!(%Skoller.Role{id: 400, name: "Change Requests"})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 200, name: "Needs Syllabus", is_complete: false})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 300, name: "Weights", is_complete: false})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 400, name: "Assignments", is_complete: false})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 500, name: "Review", is_complete: false})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 600, name: "Help", is_complete: false})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 700, name: "Complete", is_complete: true})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Status{id: 800, name: "Change", is_complete: true})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 200, name: "Needs Syllabus", is_complete: false})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 300, name: "Weights", is_complete: false})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 400, name: "Assignments", is_complete: false})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 500, name: "Review", is_complete: false})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 600, name: "Help", is_complete: false})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 700, name: "Complete", is_complete: true})
+Skoller.Repo.insert!(%Skoller.Class.Status{id: 800, name: "Change", is_complete: true})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 100, name: "This is the wrong syllabus"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 200, name: "This syllabus is confusing"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 300, name: "Issues viewing the file"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Help.Type{id: 400, name: "Other"})
+Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 100, name: "This is the wrong syllabus"})
+Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 200, name: "This syllabus is confusing"})
+Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 300, name: "Issues viewing the file"})
+Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 400, name: "Other"})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 100, name: "Grade Scale"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 200, name: "Weights"})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Change.Type{id: 300, name: "Professor Info"})
+Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 100, name: "Grade Scale"})
+Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 200, name: "Weights"})
+Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 300, name: "Professor Info"})
 
-Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 100, name: "Name"})
-Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 200, name: "Weight Category"})
-Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 300, name: "Due Date"})
-Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 400, name: "New Assignment"})
-Classnavapi.Repo.insert!(%Classnavapi.Assignment.Mod.Type{id: 500, name: "Delete Assignment"})
+Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 100, name: "Name"})
+Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 200, name: "Weight Category"})
+Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 300, name: "Due Date"})
+Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 400, name: "New Assignment"})
+Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 500, name: "Delete Assignment"})
 
-Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 100, name: "Weights", is_diy: true})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 200, name: "Assignments", is_diy: true})
-Classnavapi.Repo.insert!(%Classnavapi.Class.Lock.Section{id: 300, name: "Review", is_diy: false})
+Skoller.Repo.insert!(%Skoller.Class.Lock.Section{id: 100, name: "Weights", is_diy: true})
+Skoller.Repo.insert!(%Skoller.Class.Lock.Section{id: 200, name: "Assignments", is_diy: true})
+Skoller.Repo.insert!(%Skoller.Class.Lock.Section{id: 300, name: "Review", is_diy: false})
 
 pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
-user = Classnavapi.Repo.insert!(%Classnavapi.Users.User{email: "dev_admin@skoller.co", 
+user = Skoller.Repo.insert!(%Skoller.Users.User{email: "dev_admin@skoller.co", 
                               password_hash: pass.password_hash})
-Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 200})
-Classnavapi.Repo.insert!(%Classnavapi.UserRole{user_id: user.id, role_id: 300})
+Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 200})
+Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 300})

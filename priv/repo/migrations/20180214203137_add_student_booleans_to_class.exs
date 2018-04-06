@@ -1,11 +1,11 @@
-defmodule Classnavapi.Repo.Migrations.AddStudentBooleansToClass do
+defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
   use Ecto.Migration
 
   import Ecto.Query
 
-  alias Classnavapi.Repo
-  alias Classnavapi.Universities.Class
-  alias Classnavapi.Class.Status
+  alias Skoller.Repo
+  alias Skoller.Schools.Class
+  alias Skoller.Class.Status
 
   def change do
     alter table(:classes) do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddClassUploadKey do
+defmodule Skoller.Repo.Migrations.AddClassUploadKey do
   use Ecto.Migration
 
   def change do

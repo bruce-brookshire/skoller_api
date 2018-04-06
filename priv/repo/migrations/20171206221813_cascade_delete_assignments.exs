@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CascadeDeleteAssignments do
+defmodule Skoller.Repo.Migrations.CascadeDeleteAssignments do
   use Ecto.Migration
 
   def change do

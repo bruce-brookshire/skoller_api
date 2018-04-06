@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.RemoveMajor do
+defmodule Skoller.Repo.Migrations.RemoveMajor do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassLocks do
+defmodule Skoller.Repo.Migrations.CreateClassLocks do
   use Ecto.Migration
 
   def change do

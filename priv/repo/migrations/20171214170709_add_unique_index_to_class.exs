@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddUniqueIndexToClass do
+defmodule Skoller.Repo.Migrations.AddUniqueIndexToClass do
   use Ecto.Migration
 
   def change do

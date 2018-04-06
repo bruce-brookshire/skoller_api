@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddWeightPoints do
+defmodule Skoller.Repo.Migrations.AddWeightPoints do
   use Ecto.Migration
 
   def change do

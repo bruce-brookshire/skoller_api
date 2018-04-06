@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateRoles do
+defmodule Skoller.Repo.Migrations.CreateRoles do
   
   @moduledoc """
 

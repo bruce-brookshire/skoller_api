@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateCsvUploads do
+defmodule Skoller.Repo.Migrations.CreateCsvUploads do
   use Ecto.Migration
 
   def change do

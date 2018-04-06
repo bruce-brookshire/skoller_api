@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddCampusColumn do
+defmodule Skoller.Repo.Migrations.AddCampusColumn do
   use Ecto.Migration
 
   def change do

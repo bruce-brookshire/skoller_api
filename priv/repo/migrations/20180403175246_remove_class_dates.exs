@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.RemoveClassDates do
+defmodule Skoller.Repo.Migrations.RemoveClassDates do
   use Ecto.Migration
 
   def up do

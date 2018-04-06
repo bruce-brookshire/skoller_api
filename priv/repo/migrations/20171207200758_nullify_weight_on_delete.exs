@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.NullifyWeightOnDelete do
+defmodule Skoller.Repo.Migrations.NullifyWeightOnDelete do
   use Ecto.Migration
 
   def change do

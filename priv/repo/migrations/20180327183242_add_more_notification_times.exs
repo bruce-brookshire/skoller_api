@@ -1,14 +1,14 @@
-defmodule Classnavapi.Repo.Migrations.AddMoreNotificaitonTimes do
+defmodule Skoller.Repo.Migrations.AddMoreNotificaitonTimes do
   use Ecto.Migration
 
-  alias Classnavapi.Repo
+  alias Skoller.Repo
 
   def up do
     alter table(:students) do
       add :future_reminder_notification_time, :time
     end
     flush()
-    Classnavapi.Student
+    Skoller.Student
     |> Repo.all()
     |> Enum.map(&Ecto.Changeset.change(&1, %{future_reminder_notification_time: &1.notification_time}))
     |> Enum.each(&Repo.update!(&1))
