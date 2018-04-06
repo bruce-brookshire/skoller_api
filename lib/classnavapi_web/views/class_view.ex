@@ -86,8 +86,7 @@ defmodule ClassnavapiWeb.ClassView do
             id: class.id,
             credits: class.credits,
             crn: class.crn,
-            grade_scale: convert_gs_to_string(class.grade_scale_map),
-            grade_scale_map: class.grade_scale_map,
+            grade_scale: class.grade_scale,
             location: class.location,
             meet_days: class.meet_days,
             meet_end_time: class.meet_end_time,
@@ -106,18 +105,6 @@ defmodule ClassnavapiWeb.ClassView do
             campus: class.campus,
             class_period_id: class.class_period_id
         }
-    end
-
-    defp convert_gs_to_string(gs) do
-        gs 
-        |> Enum.reduce("", & &2 <> Kernel.elem(&1, 0) <> "," <> get_grade_string(Kernel.elem(&1, 1)) <> "|")
-        |> String.trim_trailing("|")
-    end
-
-    defp get_grade_string(grade) when is_binary(grade), do: grade
-    defp get_grade_string(grade) when is_integer(grade), do: to_string(grade)
-    defp get_grade_string(grade) do
-        grade |> Decimal.to_string()
     end
 
     defp get_class_enrollment(class) do

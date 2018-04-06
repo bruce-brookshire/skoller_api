@@ -50,8 +50,7 @@ defmodule Classnavapi.Universities.Class do
       field :professor_id, :id
       field :class_period_id, :id
       field :class_status_id, :id
-      field :grade_scale, :string
-      field :grade_scale_map, :map
+      field :grade_scale, :map
       field :class_type, :string
       field :campus, :string, default: ""
       field :class_upload_key, :string
@@ -74,17 +73,13 @@ defmodule Classnavapi.Universities.Class do
   
     @req_fields [:name, :number, :is_editable, :class_period_id, :is_syllabus, 
                   :is_chat_enabled, :is_assignment_posts_enabled,
-                  :is_enrollable, :grade_scale_map]
+                  :is_enrollable, :grade_scale]
     @opt_fields [:crn, :credits, :location, :professor_id, :class_type, :is_points,
                   :meet_start_time, :meet_end_time, :campus, :meet_days, :seat_count]
     @all_fields @req_fields ++ @opt_fields
   
     @doc false
     def changeset(%Class{} = class, attrs) do
-      attrs = attrs 
-      |> Map.delete("grade_scale_map")
-      |> Map.delete(:grade_scale_map)
-      |> put_grade_scale()
       class
       |> cast(attrs, @all_fields)
       |> validate_required(@req_fields)
@@ -108,29 +103,6 @@ defmodule Classnavapi.Universities.Class do
         string in ["ii", "iii", "iv", "vi", "viii", "ix"] -> string |> String.upcase
         true -> String.capitalize(string)
       end
-    end
-  
-    defp put_grade_scale(%{"grade_scale" => grade_scale} = attrs) when is_map(grade_scale) do
-      attrs |> Map.put("grade_scale_map", grade_scale)
-    end
-    defp put_grade_scale(%{"grade_scale" => grade_scale} = attrs) do
-      attrs |> Map.put("grade_scale_map", convert_grade_scale(grade_scale))
-    end
-    defp put_grade_scale(%{grade_scale: grade_scale} = attrs) when is_map(grade_scale) do
-      attrs |> Map.put(:grade_scale_map, grade_scale)
-    end
-    defp put_grade_scale(%{grade_scale: grade_scale} = attrs) do
-      attrs |> Map.put(:grade_scale_map, convert_grade_scale(grade_scale))
-    end
-    defp put_grade_scale(attrs), do: attrs
-  
-    defp convert_grade_scale(gs) do
-      gs
-      |> String.trim_trailing("|")
-      |> String.split("|")
-      |> Enum.map(&String.split(&1, ","))
-      |> Enum.sort(&List.last(&1) >= List.last(&2))
-      |> Enum.reduce(%{}, &Map.put(&2, List.first(&1), List.last(&1)))
     end
   end
   
