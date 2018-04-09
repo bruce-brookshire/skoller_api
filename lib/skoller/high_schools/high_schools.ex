@@ -3,8 +3,8 @@ defmodule Skoller.HighSchools do
     alias Skoller.Repo
     alias Skoller.Schools.Class
   
-    def create_class_changeset(params) do
-      Class.hs_changeset(%Class{}, params)
+    def get_changeset(old_class \\ %Class{}, params) do
+      Class.hs_changeset(old_class, params)
     end
   
     def update_class(%Class{} = class, params) do

@@ -64,17 +64,26 @@ defmodule Skoller.Classes do
   """
   def create_class(%{"class_period_id" => class_period_id} = params, user) do
     params = params |> put_grade_scale()
-    changeset = case Schools.get_school_from_period(class_period_id) do
-      %{is_university: true} ->
-        Universities.create_class_changeset(params)
-      %{is_university: false} ->
-        HighSchools.create_class_changeset(params)
-    end
+
+    changeset = class_period_id
+    |> Schools.get_school_from_period()
+    |> get_create_changeset(params)
     |> add_student_created_class_fields(user)
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:class, changeset)
     |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
+    |> Repo.transaction()
+  end
+
+  def update_class(class_old, params) do
+    changeset = class_old.class_period_id
+    |> Schools.get_school_from_period()
+    |> get_update_changeset(class_old, params)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:class, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
     |> Repo.transaction()
   end
 
@@ -194,6 +203,19 @@ defmodule Skoller.Classes do
     |> where([c, cs, l, u, r], r.role_id == @student_role)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
+  end
+
+  defp get_create_changeset(%{is_university: true}, params) do
+    Universities.get_changeset(params)
+  end
+  defp get_create_changeset(%{is_university: false}, params) do
+    HighSchools.get_changeset(params)
+  end
+  defp get_update_changeset(%{is_university: true}, params, old_class) do
+    Universities.get_changeset(old_class, params)
+  end
+  defp get_update_changeset(%{is_university: false}, params, old_class) do
+    HighSchools.get_changeset(old_class, params)
   end
 
   defp add_student_created_class_fields(changeset, %{student: nil}), do: changeset

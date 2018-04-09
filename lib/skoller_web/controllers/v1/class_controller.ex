@@ -7,11 +7,8 @@ defmodule SkollerWeb.Api.V1.ClassController do
 
   """
   
-  alias Skoller.Schools.Class
-  alias Skoller.Repo
   alias SkollerWeb.ClassView
   alias SkollerWeb.Class.SearchView
-  alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
   alias Skoller.Students
@@ -87,9 +84,6 @@ defmodule SkollerWeb.Api.V1.ClassController do
   @doc """
    Updates a `Skoller.Schools.Class`.
 
-  ## Behavior:
-   If valid `Skoller.Class.Weight` are provided, the `Skoller.Class.Status` will be checked.
-
   ## Returns:
   * 422 `SkollerWeb.ChangesetView`
   * 404
@@ -97,15 +91,9 @@ defmodule SkollerWeb.Api.V1.ClassController do
   * 200 `SkollerWeb.ClassView`
   """
   def update(conn, %{"id" => id} = params) do
-    class_old = Repo.get!(Class, id)
+    class_old = Classes.get_class_by_id!(id)
 
-    changeset = Class.university_changeset(class_old, params)
-
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.update(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, nil))
-
-    case Repo.transaction(multi) do
+    case Classes.update_class(class_old, params) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
