@@ -8,6 +8,19 @@ defmodule Skoller.Classes do
   import Ecto.Query
 
   @doc """
+  Gets a `Skoller.Schools.Class` by id
+
+  ## Examples
+
+      iex> Skoller.Classes.get_class_by_id(1)
+      %Skoller.Schools.Class{}
+
+  """
+  def get_class_by_id(id) do
+    Repo.get(Class, id)
+  end
+
+  @doc """
   Returns a count of `Skoller.Schools.Class` using the id of `Skoller.Schools.ClassPeriod`
 
   ## Examples

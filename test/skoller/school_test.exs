@@ -3,14 +3,15 @@ defmodule Skoller.SchoolTest do
 
   alias Skoller.Schools.School
 
-  @valid_attrs %{adr_city: "Nashville",
+  @valid_attrs %{adr_locality: "Nashville",
                 adr_line_1: "530 Church St", 
                 adr_line_2: "Suite 405", 
-                adr_state: "TN", 
+                adr_region: "TN", 
                 adr_zip: "6158675309",
                 is_readonly: true,
                 name: "HKU",
-                timezone: "-8"}
+                timezone: "-8",
+                adr_country: "us"}
 
   test "school insert with valid attributes" do
     changeset = School.changeset_insert(%School{}, @valid_attrs)
@@ -27,24 +28,24 @@ defmodule Skoller.SchoolTest do
     assert changeset.valid?
   end
 
-  test "school insert with no city" do
+  test "school insert without optional city" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :adr_city))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
-  test "school insert with no adr line 1" do
+  test "school insert without optional adr line 1" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :adr_line_1))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
-  test "school insert with no state" do
+  test "school insert without optional state" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :adr_state))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
-  test "school insert with no zip code" do
+  test "school insert without optional zip code" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :adr_zip))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
   test "school insert with no name" do

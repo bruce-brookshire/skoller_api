@@ -1,9 +1,6 @@
 defmodule Skoller.Repo.Migrations.ConvertGradeScaleToBlob do
   use Ecto.Migration
 
-  alias Skoller.Repo
-  alias Skoller.Schools.Class
-
   def up do
     alter table(:classes) do
       add :grade_scale_map, :map
