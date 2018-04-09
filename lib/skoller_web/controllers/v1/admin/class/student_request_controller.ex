@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StudentRequestController do
   alias SkollerWeb.Class.StudentRequestView
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.StatusHelper
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -21,7 +21,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StudentRequestController do
 
     changeset = StudentRequest.changeset(student_request_old, %{is_completed: true})
 
-    class = Repo.get(Class, student_request_old.class_id)
+    class = Classes.get_class_by_id(student_request_old.class_id)
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:student_request, changeset)

@@ -15,6 +15,23 @@ defmodule Skoller.Students do
   import Ecto.Query
 
   @doc """
+  Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Student` currently has.
+
+  ## Examples
+
+      iex> val = Skoller.Students.get_enrolled_classes_by_student_id(1)
+      [%Skoller.Class.StudentClass{class: %Skoller.Schools.Class{}}]
+
+  """
+  def get_enrolled_classes_by_student_id(student_id) do
+    #TODO: Filter ClassPeriod
+    from(classes in StudentClass)
+    |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
+    |> Repo.all()
+    |> Repo.preload(:class)
+  end
+
+  @doc """
   Returns the count of students in a given `Skoller.Schools.ClassPeriod`.
 
   ## Examples

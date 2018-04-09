@@ -2,14 +2,11 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   use SkollerWeb, :controller
 
   alias Skoller.Class.StudentClass
-  alias Skoller.Repo
   alias SkollerWeb.Class.StudentClassView
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Students
 
-  import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
   
   @student_role 100
@@ -21,20 +18,11 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   plug :verify_class_is_editable, :class_id
 
   def index(conn, %{"student_id" => student_id}) do
-    #TODO: Filter ClassPeriod
-    # date = DateTime.utc_now
-    query = from(classes in StudentClass)
-    student_classes = query
-                      |> join(:inner, [classes], cl in Class, cl.id == classes.class_id)
-                      |> join(:inner, [classes, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
-                      |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
-                      #|> where([classes, cl, cp], cp.end_date >= ^date)
-                      |> Repo.all()
-                      |> Repo.preload(:class)
-                      |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
-                      |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
-                      |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
-                      |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
+    student_classes = Students.get_enrolled_classes_by_student_id(student_id)
+    |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
+    |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
+    |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
+    |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
 
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
