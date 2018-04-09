@@ -18,6 +18,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   alias Skoller.Class.Status
   alias Skoller.Class.StudentClass
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Classes
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -26,7 +27,6 @@ defmodule SkollerWeb.Api.V1.ClassController do
   @admin_role 200
   @syllabus_worker_role 300
   @change_req_role 400
-  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
   
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
   plug :verify_member, :class
@@ -48,17 +48,9 @@ defmodule SkollerWeb.Api.V1.ClassController do
   """
   def create(conn, %{"period_id" => period_id} = params) do
     params = params
-            |> put_grade_scale()
-            |> Map.put("class_period_id", period_id)
+    |> Map.put("class_period_id", period_id)
 
-    changeset = Class.university_changeset(%Class{}, params)
-    |> add_student_created_class_fields(conn)
-
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.insert(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
-
-    case Repo.transaction(multi) do
+    case Classes.create_class(params, conn.assigns[:user]) do
       {:ok, %{class_status: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
@@ -152,17 +144,6 @@ defmodule SkollerWeb.Api.V1.ClassController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
-  end
-
-  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: nil}}}), do: changeset
-  defp add_student_created_class_fields(changeset, %{assigns: %{user: %{student: _}}}) do
-    changeset |> Ecto.Changeset.change(%{is_new_class: true, is_student_created: true})
-  end
-  defp add_student_created_class_fields(changeset, _conn), do: changeset
-
-  defp put_grade_scale(%{"grade_scale" => _} = params), do: params
-  defp put_grade_scale(%{} = params) do
-    params |> Map.put("grade_scale", @default_grade_scale)
   end
 
   defp filter(%{} = params) do

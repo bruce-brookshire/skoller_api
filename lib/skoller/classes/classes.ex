@@ -8,6 +8,10 @@ defmodule Skoller.Classes do
   alias Skoller.Class.Lock
   alias Skoller.Users.User
   alias Skoller.UserRole
+  alias Skoller.Schools
+  alias Skoller.Universities
+  alias Skoller.HighSchools
+  alias SkollerWeb.Helpers.StatusHelper
 
   import Ecto.Query
 
@@ -17,6 +21,8 @@ defmodule Skoller.Classes do
   @completed_status 700
 
   @diy_complete_lock 200
+
+  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
 
   @doc """
   Gets a `Skoller.Schools.Class` by id.
@@ -42,6 +48,31 @@ defmodule Skoller.Classes do
   """
   def get_class_by_id!(id) do
     Repo.get!(Class, id)
+  end
+
+  @doc """
+  Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+
+  ## Examples
+
+      iex> Skoller.Classes.get_class_by_id!(1)
+      %Skoller.Schools.Class{}
+
+  """
+  def create_class(%{"class_period_id" => class_period_id} = params, user) do
+    params = params |> put_grade_scale()
+    changeset = case Schools.get_school_from_period(class_period_id) do
+      %{is_university: true} ->
+        Universities.create_class_changeset(params)
+      %{is_university: false} ->
+        HighSchools.create_class_changeset(params)
+    end
+    |> add_student_created_class_fields(user)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:class, changeset)
+    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(&1.class, %{params: params}))
+    |> Repo.transaction()
   end
 
   @doc """
@@ -160,5 +191,16 @@ defmodule Skoller.Classes do
     |> where([c, cs, l, u, r], r.role_id == @student_role)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
+  end
+
+  defp add_student_created_class_fields(changeset, %{student: nil}), do: changeset
+  defp add_student_created_class_fields(changeset, %{student: _}) do
+    changeset |> Ecto.Changeset.change(%{is_student_created: true})
+  end
+  defp add_student_created_class_fields(changeset, _user), do: changeset
+
+  defp put_grade_scale(%{"grade_scale" => _} = params), do: params
+  defp put_grade_scale(%{} = params) do
+    params |> Map.put("grade_scale", @default_grade_scale)
   end
 end
