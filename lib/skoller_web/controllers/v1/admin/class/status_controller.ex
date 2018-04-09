@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     use SkollerWeb, :controller
 
-    alias Skoller.Schools.Class
     alias Skoller.Class.Status
     alias Skoller.Repo
     alias SkollerWeb.ClassView
@@ -11,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     alias Skoller.Mailer
     alias Skoller.Users.User
     alias Skoller.Class.StudentClass
+    alias Skoller.Classes
 
     import SkollerWeb.Helpers.AuthPlug
     import Ecto.Query
@@ -30,17 +30,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     @review_lock 300
 
     @from_email "support@skoller.co"
-    @deny_subj " has been denied"
     @syllabus_subj "Wrong Syllabus?"
     @syllabus_greeting "Hi there,"
-    @greeting "Hi "
-    @comma ","
-    @ending "Thank you"
-
-    @your_request "Your request to create a new class, "
-    @has_been_denied " has been denied. "
-    @reason "The reason is because that class already exists at your school or the request is illegitimate. Please contact us at support@skoller.co for further assistance."
-
+ 
     @wrong_syllabus_submitted "Our team has noticed that the wrong syllabus was submitted for "
     @no_biggie ". No biggie, we all goof up every now and then!"
     @we_deleted_it " We deleted the wrong syllabus."
@@ -51,32 +43,8 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     
     plug :verify_role, %{roles: [@admin_role, @help_role]}
 
-    def approve(conn, %{"class_id" => class_id}) do
-      class = Class
-      |> Repo.get!(class_id)
-
-      changeset = class
-      |> Ecto.Changeset.change(%{is_new_class: false})
-
-      case Repo.update(changeset) do
-        {:ok, class} ->
-          render(conn, ClassView, "show.json", class: class)
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-      end
-    end
-
-    def deny(conn, %{"class_id" => class_id}) do
-      class = Class
-      |> Repo.get!(class_id)
-
-      conn |> deny_class(class)
-    end
-
     def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
-      old_class = Repo.get!(Class, class_id)
+      old_class = Classes.get_class_by_id!(class_id)
       |> Repo.preload(:class_status)
 
       status = Repo.get!(Status, id)
@@ -119,54 +87,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
       |> html_body(syllabus_html_body(class))
       |> text_body(syllabus_text_body(class))
       |> Mailer.deliver_later
-    end
-
-    defp deny_class(conn, %Class{is_new_class: true} = class) do
-      users = from(u in User)
-      |> join(:inner, [u], sc in StudentClass, sc.student_id == u.student_id)
-      |> where([u, sc], sc.class_id == ^class.id and sc.is_dropped == false)
-      |> Repo.all()
-
-      case Repo.delete(class) do
-        {:ok, _struct} ->
-          users |> Enum.each(&send_deny_email(&1, class))
-          conn
-          |> send_resp(200, "")
-        {:error, changeset} ->
-          conn
-          |> put_status(:unprocessable_entity)
-          |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-      end
-    end
-    defp deny_class(conn, _class), do: conn |> send_resp(422, "")
-
-    defp send_deny_email(user, class) do
-      user = user |> Repo.preload(:student)
-      new_email()
-      |> to(user.email)
-      |> Bamboo.Email.from(@from_email)
-      |> subject(class.name <> @deny_subj)
-      |> html_body(deny_html_body(class, user))
-      |> text_body(deny_text_body(class, user))
-      |> Mailer.deliver_later
-    end
-
-    defp deny_html_body(class, user) do
-      "<p>" <> @greeting <> user.student.name_first <> @comma <>  "<br />" <>
-      "<br />" <>
-      @your_request <> class.name <> @has_been_denied <> @reason <> "<br />" <>
-      "<br />" <>
-      @ending <> "</p>" <> 
-      Mailer.signature()
-    end
-
-    defp deny_text_body(class, user) do
-      @greeting <> user.student.name_first <> @comma <>  "\n" <>
-      "\n" <>
-      @your_request <> class.name <> @has_been_denied <> @reason <> "\n" <>
-      "\n" <>
-      @ending <> "\n" <> "\n" <>
-      Mailer.text_signature()
     end
 
     defp syllabus_html_body(class) do
