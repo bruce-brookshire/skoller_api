@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.DocController do
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.Class
   alias Skoller.Class.Doc
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
@@ -9,6 +8,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.ClassDocUpload
   alias SkollerWeb.Sammi
+  alias Skoller.Classes
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -33,7 +33,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
 
     changeset = Doc.changeset(%Doc{}, params)
 
-    class = Repo.get!(Class, class_id)
+    class = Classes.get_class_by_id!(class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)

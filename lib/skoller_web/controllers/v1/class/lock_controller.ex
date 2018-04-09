@@ -11,6 +11,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Users.User
   alias SkollerWeb.Class.LockView
+  alias Skoller.Classes
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -55,7 +56,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   end
 
   def unlock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
-    class = Repo.get(Class, params["class_id"])
+    class = Classes.get_class_by_id(params["class_id"])
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_full_class(user, params, &1))
@@ -76,7 +77,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id} = params) do
     lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id, is_completed: false)
 
-    class = Repo.get(Class, params["class_id"])
+    class = Classes.get_class_by_id(params["class_id"])
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_lock(lock_old, params, &1))
@@ -108,7 +109,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   defp lock_diy(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
     params = params |> Map.put("user_id", user.id)
     
-    class = Repo.get!(Class, class_id)
+    class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:school)
 
     case class.school.is_diy_enabled do

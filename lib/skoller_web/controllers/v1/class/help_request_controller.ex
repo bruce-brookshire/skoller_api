@@ -1,12 +1,12 @@
 defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   use SkollerWeb, :controller
   
-  alias Skoller.Schools.Class
   alias Skoller.Class.HelpRequest
   alias Skoller.Repo
   alias SkollerWeb.ClassView
   alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Classes
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -19,7 +19,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
 
   def create(conn, %{"class_id" => class_id} = params) do
 
-    class = Repo.get!(Class, class_id)
+    class = Classes.get_class_by_id!(class_id)
     class = class |> Repo.preload(:class_status)
 
     params = params |> Map.put("user_id", conn.assigns[:user].id)

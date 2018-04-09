@@ -27,7 +27,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   plug :verify_class_is_editable, :id
 
   @doc """
-   Creates a new `Skoller.Schools.Class` for a `Skoller.Schools.ClassPeriod`
+   Creates a new class through `Skoller.Classes`
 
   ## Returns:
   * 422 `SkollerWeb.ChangesetView`
@@ -48,27 +48,19 @@ defmodule SkollerWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Shows all `Skoller.Schools.Class`. Can be used as a search with multiple filters.
+   Shows all classes through `Skoller.Students`. Can be used as a search with multiple filters.
 
    ## Filters:
   * school
     * `Skoller.Schools.School` :id
-  * professor.name
+  * professor_name
     * `Skoller.Professor` :name
-  * class.status
+  * class_status
     * `Skoller.Class.Status` :id
     * For ghost classes, use 0.
-  * class.name
-    * `Skoller.Schools.Class` :name
-  * class.number
-    * `Skoller.Schools.Class` :number
-  * class.meet_days
-    * `Skoller.Schools.Class` :meet_days
-  * class.length
-    * 1st Half
-    * 2nd Half
-    * Full Term
-    * Custom
+  * class_name
+  * class_number
+  * class_meet_days
 
   ## Returns:
   * 422 `SkollerWeb.ChangesetView`
@@ -82,7 +74,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Updates a `Skoller.Schools.Class`.
+   Updates a class through `Skoller.Classes`.
 
   ## Returns:
   * 422 `SkollerWeb.ChangesetView`
