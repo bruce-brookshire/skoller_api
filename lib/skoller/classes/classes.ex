@@ -7,6 +7,9 @@ defmodule Skoller.Classes do
 
   import Ecto.Query
 
+  @in_review_status 300
+  @completed_status 700
+
   @doc """
   Gets a `Skoller.Schools.Class` by id.
 
@@ -89,9 +92,39 @@ defmodule Skoller.Classes do
   Gets class_id and school_id
 
   """
-  def get_school_from_class_subquery() do
+  def get_school_from_class_subquery(_params \\ %{})
+  def get_school_from_class_subquery(%{"school_id" => school_id}) do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> where([c, p], p.school_id == ^school_id)
+    |> select([c, p], %{class_id: c.id, school_id: p.school_id})
+  end
+  def get_school_from_class_subquery(_params) do
     from(c in Class)
     |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
     |> select([c, p], %{class_id: c.id, school_id: p.school_id})
+  end
+
+  def get_class_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_completed_class_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.class_status_id == @completed_status)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_class_in_review_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
+    |> Repo.aggregate(:count, :id)
   end
 end

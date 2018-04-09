@@ -10,6 +10,7 @@ defmodule Skoller.Chats do
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Schools.School
+  alias Skoller.Classes
 
   import Ecto.Query
 
@@ -47,6 +48,28 @@ defmodule Skoller.Chats do
     |> Repo.all()
   
     posts ++ comments
+  end
+
+  def get_max_chat_activity(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), cp.class_id == c.id)
+    |> select([c, cp], %{class: c, count: cp.count})
+    |> Repo.one()
+  end
+
+  defp get_max_chat_activity_subquery(dates, params) do
+    from(cp in subquery(get_chat_activity_subquery(dates, params)))
+    |> group_by([cp], cp.class_id)
+    |> select([cp], %{class_id: cp.class_id, count: max(cp.count)})
+    |> limit(1)
+  end
+
+  defp get_chat_activity_subquery(dates, params) do
+    from(cp in Post)
+    |> join(:inner, [cp], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
+    |> group_by([cp], cp.class_id)
+    |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})
   end
 
   defp distinct_post_id(student_id) do

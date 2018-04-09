@@ -7,10 +7,10 @@ defmodule Skoller.Students do
   alias Skoller.Class.StudentClass
   alias Skoller.Schools.Class
   alias Skoller.Schools.School
-  alias Skoller.Schools.ClassPeriod
   alias Skoller.Student
   alias Skoller.School.FieldOfStudy
   alias Skoller.School.StudentField
+  alias Skoller.Classes
 
   import Ecto.Query
 
@@ -90,10 +90,9 @@ defmodule Skoller.Students do
   def get_schools_for_student_subquery() do
     from(student in Student)
     |> join(:inner, [student], sc in subquery(get_enrolled_student_classes_subquery()), sc.student_id == student.id)
-    |> join(:inner, [student, sc], class in Class, sc.class_id == class.id)
-    |> join(:inner, [student, sc, class], cp in ClassPeriod, cp.id == class.class_period_id)
-    |> distinct([student, sc, class, cp], [student.id, cp.school_id])
-    |> select([student, sc, class, cp], %{student_id: student.id, school_id: cp.school_id})
+    |> join(:inner, [student, sc], class in subquery(Classes.get_school_from_class_subquery()), sc.class_id == class.class_id)
+    |> distinct([student, sc, class], [student.id, class.school_id])
+    |> select([student, sc, class], %{student_id: student.id, school_id: class.school_id})
   end
 
   def get_student_subquery(_params \\ %{})
@@ -101,12 +100,10 @@ defmodule Skoller.Students do
   Returns a subquery that provides a list of `Skoller.Student` by `Skoller.Schools.School`
 
   """
-  def get_student_subquery(%{"school_id" => school_id}) do
+  def get_student_subquery(%{"school_id" => _school_id} = params) do
     from(s in Student)
     |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [s, sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([s, sc, c, p], p.school_id == ^school_id)
+    |> join(:inner, [s, sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([s, sc], sc.is_dropped == false)
     |> distinct([s], s.id)
   end
@@ -118,24 +115,13 @@ defmodule Skoller.Students do
     from(s in Student)
   end
 
-  def get_enrolled_student_classes_subquery(_params \\ %{})
   @doc """
   Returns a subquery that provides a list of `Skoller.Class.StudentClass` where the classes are not dropped by `Skoller.Schools.School`
 
   """
-  def get_enrolled_student_classes_subquery(%{"school_id" => school_id}) do
+  def get_enrolled_student_classes_subquery(params \\ %{}) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([sc, c, p], p.school_id == ^school_id)
-    |> where([sc], sc.is_dropped == false)
-  end
-  @doc """
-  Returns a subquery that provides a list of `Skoller.Class.StudentClass` where the classes are not dropped
-
-  """
-  def get_enrolled_student_classes_subquery(_params) do
-    from(sc in StudentClass)
+    |> join(:inner, [sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([sc], sc.is_dropped == false)
   end
 
