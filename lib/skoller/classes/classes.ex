@@ -5,11 +5,18 @@ defmodule Skoller.Classes do
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Status
   alias Skoller.Class.Doc
+  alias Skoller.Class.Lock
+  alias Skoller.Users.User
+  alias Skoller.UserRole
 
   import Ecto.Query
 
+  @student_role 100
+
   @in_review_status 300
   @completed_status 700
+
+  @diy_complete_lock 200
 
   @doc """
   Gets a `Skoller.Schools.Class` by id.
@@ -142,5 +149,16 @@ defmodule Skoller.Classes do
     |> where([d], d.is_syllabus == true)
     |> distinct([d], d.class_id)
     |> order_by([d], asc: d.inserted_at)
+  end
+
+  def classes_completed_by_diy_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c, cs], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
+    |> join(:inner, [c, cs, l], u in User, u.id == l.user_id)
+    |> join(:inner, [c, cs, l, u], r in UserRole, r.user_id == u.id)
+    |> where([c, cs, l, u, r], r.role_id == @student_role)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
   end
 end

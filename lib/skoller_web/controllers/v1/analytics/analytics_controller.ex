@@ -2,12 +2,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
   alias SkollerWeb.AnalyticsView
-  alias Skoller.Class.Lock
-  alias Skoller.Users.User
-  alias Skoller.UserRole
   alias Skoller.Class.Doc
   alias Skoller.Student
   alias Skoller.Class.Assignment
@@ -26,10 +21,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
   
-  @student_role 100
   @admin_role 200
-
-  @diy_complete_lock 200
 
   @community_enrollment 2
 
@@ -49,7 +41,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
             |> Map.put(:date_end, end_date)
 
     completed_classes = Classes.get_completed_class_count(dates, params)
-    completed_by_diy = completed_by_diy(dates, params)
+    completed_by_diy = Classes.classes_completed_by_diy_count(dates, params)
     avg_classes = avg_classes(dates, params)
     avg_days_out = get_avg_days_out(params) |> convert_to_float()
     notifications_enabled = get_notifications_enabled(params)
@@ -360,42 +352,9 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> Repo.one
   end
 
-  defp completed_by_diy(dates, %{"school_id" => school_id}) do
-    from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [c, p], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
-    |> join(:inner, [c, p, l], u in User, u.id == l.user_id)
-    |> join(:inner, [c, p, l, u], r in UserRole, r.user_id == u.id)
-    |> where([c, p, l, u, r], r.role_id == @student_role)
-    |> where([c, p], p.school_id == ^school_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp completed_by_diy(dates, _params) do
-    from(c in Class)
-    |> join(:inner, [c], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
-    |> join(:inner, [c, l], u in User, u.id == l.user_id)
-    |> join(:inner, [c, l, u], r in UserRole, r.user_id == u.id)
-    |> where([c, l, u, r], r.role_id == @student_role)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp classes_multiple_files(dates, %{"school_id" => school_id}) do
+  defp classes_multiple_files(dates, params) do
     from(d in Doc)
-    |> join(:inner, [d], c in Class, c.id == d.class_id)
-    |> join(:inner, [d, c], p in ClassPeriod, p.id == c.class_period_id)
-    |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
-    |> where([d, c, p], p.school_id == ^school_id)
-    |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
-    |> group_by([d], d.class_id)
-    |> having([d], count(d.class_id) > 1)
-    |> select([d], count(d.class_id, :distinct))
-    |> Repo.all()
-    |> Enum.count()
-  end
-  defp classes_multiple_files(dates, _params) do
-    from(d in Doc)
+    |> join(:inner, [d], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == d.class_id)
     |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
     |> group_by([d], d.class_id)
@@ -419,64 +378,32 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> select([s, sc], %{count: count(sc.student_id)})
   end
 
-  defp assign_count(dates, %{"school_id" => school_id}) do
+  defp assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in Class, a.class_id == c.id)
-    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([a, c, p], p.school_id == ^school_id)
-    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp assign_count(dates, _params) do
-    from(a in Assignment)
+    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp skoller_assign_count(dates, %{"school_id" => school_id}) do
+  defp skoller_assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in Class, a.class_id == c.id)
-    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([a, c, p], p.school_id == ^school_id)
-    |> where([a], a.from_mod == false)
-    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp skoller_assign_count(dates, _params) do
-    from(a in Assignment)
+    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp student_assign_count(dates, %{"school_id" => school_id}) do
+  defp student_assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in Class, a.class_id == c.id)
-    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([a, c, p], p.school_id == ^school_id)
-    |> where([a], a.from_mod == true)
-    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp student_assign_count(dates, _params) do
-    from(a in Assignment)
+    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == true)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
-  defp assign_due_date_count(dates, %{"school_id" => school_id}) do
+  defp assign_due_date_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in Class, a.class_id == c.id)
-    |> join(:inner, [a, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([a, c, p], p.school_id == ^school_id)
-    |> where([a], a.from_mod == false)
-    |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
-    |> where([a], not(is_nil(a.due)))
-    |> Repo.aggregate(:count, :id)
-  end
-  defp assign_due_date_count(dates, _params) do
-    from(a in Assignment)
+    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> where([a], not(is_nil(a.due)))
