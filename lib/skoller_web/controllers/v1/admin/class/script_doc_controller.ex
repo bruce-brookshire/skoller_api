@@ -1,8 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Doc
   alias Skoller.Professor
   alias Skoller.Repo
@@ -11,8 +9,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   alias Ecto.UUID
   alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Classes
+  alias Skoller.Universities
 
-  import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
 
   require Logger
@@ -78,22 +77,18 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   end
 
   defp get_class_from_hash(%{"class_hash" => class_hash, "period_id" => period_id}) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> where([class, period], period.id == ^period_id)
-    |> where([class], class.class_upload_key == ^class_hash)
-    |> Repo.all()
+    Classes.get_class_from_hash(class_hash, period_id)
   end
 
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
   defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
-    class = Repo.get!(Class, class_id)
-    Class.university_changeset(class, %{"grade_scale" => val})
-    |> Repo.update()
+    changes = %{"grade_scale" => val}
+    Classes.get_class_by_id!(class_id)
+    |> Universities.update_class(changes)
   end
 
   defp sammi(_class, %{"sammi" => ""}), do: nil
-  defp sammi(%Class{id: id}, %{"sammi" => sammi}) do
+  defp sammi(%{id: id}, %{"sammi" => sammi}) do
     Logger.info(inspect(sammi))
     
     sammi = sammi
@@ -109,7 +104,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   defp sammi(_class, _params), do: nil
 
   defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
-    class = Repo.get!(Class, class_id)
+    class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:professor)
     case class.professor do
       nil -> nil

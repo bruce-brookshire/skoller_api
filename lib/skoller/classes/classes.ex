@@ -8,16 +8,29 @@ defmodule Skoller.Classes do
   import Ecto.Query
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id
+  Gets a `Skoller.Schools.Class` by id.
 
   ## Examples
 
       iex> Skoller.Classes.get_class_by_id(1)
-      %Skoller.Schools.Class{}
+      {:ok, %Skoller.Schools.Class{}
 
   """
   def get_class_by_id(id) do
     Repo.get(Class, id)
+  end
+
+  @doc """
+  Gets a `Skoller.Schools.Class` by id
+
+  ## Examples
+
+      iex> Skoller.Classes.get_class_by_id!(1)
+      %Skoller.Schools.Class{}
+
+  """
+  def get_class_by_id!(id) do
+    Repo.get!(Class, id)
   end
 
   @doc """
@@ -52,6 +65,23 @@ defmodule Skoller.Classes do
     |> where([class, prd], prd.school_id == ^school_id)
     |> group_by([class, prd, status], [status.name])
     |> select([class, prd, status], %{status: status.name, count: count(class.id)})
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets all `Skoller.Schools.Class` in a period that share a hash (hashed from syllabus url)
+
+  ## Examples
+
+      iex> Skoller.Classes.get_class_from_hash!("123dadqwdvsdfscxsz", 1)
+      [%Skoller.Schools.Class{}]
+
+  """
+  def get_class_from_hash(class_hash, period_id) do
+    from(class in Class)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> where([class, period], period.id == ^period_id)
+    |> where([class], class.class_upload_key == ^class_hash)
     |> Repo.all()
   end
 end

@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.StatusHelper
   alias Skoller.Class.ChangeRequest
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
   alias Skoller.Mailer
 
   import SkollerWeb.Helpers.AuthPlug
@@ -27,7 +27,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
 
     changeset = ChangeRequest.changeset(change_request_old, %{is_completed: true})
 
-    class = Repo.get!(Class, change_request_old.class_id)
+    class = Classes.get_class_by_id!(change_request_old.class_id)
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)

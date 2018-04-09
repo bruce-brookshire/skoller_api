@@ -6,7 +6,7 @@ defmodule SkollerWeb.ChatChannel do
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
   alias Skoller.Schools
 
   def join("chat:" <> class_id, _params, socket) do
@@ -62,7 +62,7 @@ defmodule SkollerWeb.ChatChannel do
   end
 
   defp get_class({:ok, map}, class_id) do
-    case Repo.get(Class, class_id) do
+    case Classes.get_class_by_id(class_id) do
       %{is_chat_enabled: true} = class -> 
         {:ok, map |> Map.put(:class, class)}
       _ -> {:error, map}
