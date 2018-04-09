@@ -150,9 +150,6 @@ defmodule Skoller.Students do
   @doc """
    Shows all `Skoller.Schools.Class`. Can be used as a search with multiple filters.
 
-  ## Behavior:
-   Only searches the current `Skoller.Schools.ClassPeriod`
-
   ## Filters:
   * school
     * `Skoller.Schools.School` :id
@@ -173,10 +170,6 @@ defmodule Skoller.Students do
     * Full Term
     * Custom
 
-  ## Returns:
-  * 422 `SkollerWeb.ChangesetView`
-  * 401
-  * 200 `SkollerWeb.Class.SearchView`
   """
   def get_classes_with_enrollment(params) do
     #TODO: Filter ClassPeriod

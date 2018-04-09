@@ -53,6 +53,9 @@ defmodule Skoller.Classes do
   @doc """
   Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
 
+  ## Behavior:
+   If there is no grade scale provided, a default is used: 
+
   ## Examples
 
       iex> Skoller.Classes.get_class_by_id!(1)
