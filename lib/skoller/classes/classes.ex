@@ -4,6 +4,7 @@ defmodule Skoller.Classes do
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Status
+  alias Skoller.Class.Doc
 
   import Ecto.Query
 
@@ -126,5 +127,20 @@ defmodule Skoller.Classes do
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
     |> Repo.aggregate(:count, :id)
+  end
+
+  def student_created_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], c.is_student_created == true)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def classes_with_syllabus_subquery() do
+    from(d in Doc)
+    |> where([d], d.is_syllabus == true)
+    |> distinct([d], d.class_id)
+    |> order_by([d], asc: d.inserted_at)
   end
 end

@@ -63,9 +63,9 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:class_in_review, Classes.get_class_in_review_count(dates, params))
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
-    |> Map.put(:enrolled_class_syllabus_count, enroll_syllabus_count(dates, params))
+    |> Map.put(:enrolled_class_syllabus_count, Students.get_enrolled_class_with_syllabus_count(dates, params))
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
-    |> Map.put(:student_created_classes, student_created_count(dates, params))
+    |> Map.put(:student_created_classes, Classes.student_created_count(dates, params))
     |> Map.put(:avg_classes, avg_classes)
 
     assignment = Map.new()
@@ -358,45 +358,6 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> select([sc, c, p], count(sc.class_id, :distinct))
     |> Repo.one
-  end
-
-  defp student_created_count(dates, %{"school_id" => school_id}) do
-    from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([c, p], p.school_id == ^school_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
-    |> where([c], c.is_student_created == true)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp student_created_count(dates, _params) do
-    from(c in Class)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
-    |> where([c], c.is_student_created == true)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp enroll_syllabus_count(dates, %{"school_id" => school_id}) do
-    from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [c, p], d in subquery(syllabus_subquery()), d.class_id == c.id)
-    |> where([c, p], p.school_id == ^school_id)
-    |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
-    |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-  defp enroll_syllabus_count(dates, _params) do
-    from(c in Class)
-    |> join(:inner, [c], d in subquery(syllabus_subquery()), d.class_id == c.id)
-    |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
-    |> where([c, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp syllabus_subquery() do
-    from(d in Doc)
-    |> where([d], d.is_syllabus == true)
-    |> distinct([d], d.class_id)
-    |> order_by([d], asc: d.inserted_at)
   end
 
   defp completed_by_diy(dates, %{"school_id" => school_id}) do

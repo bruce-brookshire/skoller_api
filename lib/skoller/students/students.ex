@@ -135,6 +135,15 @@ defmodule Skoller.Students do
     |> distinct([sc], sc.class_id)
   end
 
+  def get_enrolled_class_with_syllabus_count(dates, params) do
+    from(c in Class)
+    |> join(:inner, [c], cs in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == cs.class_id)
+    |> join(:inner, [c, cs], d in subquery(Classes.classes_with_syllabus_subquery()), d.class_id == c.id)
+    |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
+    |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> Repo.aggregate(:count, :id)
+  end
+
   defp get_school_enrollment_subquery() do
     from(s in subquery(get_schools_for_student_subquery()))
     |> group_by([s], s.school_id)
