@@ -16,5 +16,4 @@ defmodule Skoller.Schools do
     |> select([cp, s], s)
     |> Repo.one()
   end
-
 end

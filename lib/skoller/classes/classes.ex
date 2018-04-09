@@ -73,7 +73,7 @@ defmodule Skoller.Classes do
 
   ## Examples
 
-      iex> Skoller.Classes.get_class_from_hash!("123dadqwdvsdfscxsz", 1)
+      iex> Skoller.Classes.get_class_from_hash("123dadqwdvsdfscxsz", 1)
       [%Skoller.Schools.Class{}]
 
   """
@@ -83,5 +83,15 @@ defmodule Skoller.Classes do
     |> where([class, period], period.id == ^period_id)
     |> where([class], class.class_upload_key == ^class_hash)
     |> Repo.all()
+  end
+
+  @doc """
+  Gets class_id and school_id
+
+  """
+  def get_school_from_class_subquery() do
+    from(c in Class)
+    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> select([c, p], %{class_id: c.id, school_id: p.school_id})
   end
 end

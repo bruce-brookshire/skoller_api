@@ -20,6 +20,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Schools.School
   alias Skoller.Class.StudentAssignment
   alias Skoller.Students
+  alias Skoller.Classes
 
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -140,11 +141,10 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   defp get_common_times(params) do
     from(s in Student)
     |> join(:inner, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in Class, c.id == sc.class_id)
-    |> join(:inner, [s, sc, c], p in ClassPeriod, c.class_period_id == p.id)
-    |> join(:inner, [s, sc, c, p], sch in School, sch.id == p.school_id)
-    |> group_by([s, sc, c, p, sch], [s.notification_time, sch.timezone])
-    |> select([s, sc, c, p, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
+    |> join(:inner, [s, sc], sfc in subquery(Classes.get_school_from_class_subquery()), sfc.class_id == sc.class_id)
+    |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
+    |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
+    |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], @num_notificaiton_time)
     |> Repo.all()
