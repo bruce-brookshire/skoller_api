@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     alias SkollerWeb.ClassView
     alias Skoller.Class.Lock
     alias SkollerWeb.Helpers.RepoHelper
-    alias SkollerWeb.Helpers.NotificationHelper 
     alias Skoller.Mailer
     alias Skoller.Users.User
     alias Skoller.Class.StudentClass
@@ -23,7 +22,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     @assignment_status 400
     @review_status 500
     @help_status 600
-    @complete_status 700
 
     @weight_lock 100
     @assignment_lock 200
@@ -58,11 +56,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
       |> Ecto.Multi.run(:class_locks, &reset_locks(&1.class, status))
 
       case Repo.transaction(multi) do
-        {:ok, %{class: %{class_status_id: @complete_status} = class}} ->
-          if old_class.class_status.is_complete == false do
-            Task.start(NotificationHelper, :send_class_complete_notification, [class])
-          end
-          render(conn, ClassView, "show.json", class: class)
         {:ok, %{class: %{class_status_id: @syllabus_status} = class}} ->
           from(u in User)
           |> join(:inner, [u], sc in StudentClass, sc.student_id == u.student_id)
@@ -71,6 +64,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
           |> Enum.each(&send_need_syllabus_email(&1, class))
           render(conn, ClassView, "show.json", class: class)
         {:ok, %{class: class}} ->
+          Classes.evaluate_class_completion(old_class, class)
           render(conn, ClassView, "show.json", class: class)
         {:error, _, failed_value, _} ->
           conn

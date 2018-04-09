@@ -12,6 +12,7 @@ defmodule Skoller.Classes do
   alias Skoller.Universities
   alias Skoller.HighSchools
   alias SkollerWeb.Helpers.StatusHelper
+  alias SkollerWeb.Helpers.NotificationHelper
 
   import Ecto.Query
 
@@ -204,6 +205,12 @@ defmodule Skoller.Classes do
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
+
+  def evaluate_class_completion(%Class{class_status_id: @completed_status}, %Class{class_status_id: @completed_status}), do: nil
+  def evaluate_class_completion(%Class{class_status_id: _old_status}, %Class{class_status_id: @completed_status} = class) do
+    Task.start(NotificationHelper, :send_class_complete_notification, [class])
+  end
+  def evaluate_class_completion(_old_class, _class), do: nil
 
   defp get_create_changeset(%{is_university: true}, params) do
     Universities.get_changeset(params)

@@ -6,9 +6,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Class.Lock.Section
   alias Skoller.Repo
   alias SkollerWeb.Helpers.StatusHelper
-  alias Skoller.Schools.Class
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Users.User
   alias SkollerWeb.Class.LockView
   alias Skoller.Classes
@@ -19,8 +17,6 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
-
-  @complete_status 700
   
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, :class
@@ -56,17 +52,15 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   end
 
   def unlock(%{assigns: %{user: user}} = conn, %{"is_class" => true} = params) do
-    class = Classes.get_class_by_id(params["class_id"])
+    old_class = Classes.get_class_by_id(params["class_id"])
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_full_class(user, params, &1))
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(old_class, &1))
 
     case Repo.transaction(multi) do
-      {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
-        Task.start(NotificationHelper, :send_class_complete_notification, [class])
-        conn |> send_resp(204, "")
-      {:ok, _lock} -> 
+      {:ok, %{status: class}} -> 
+        Classes.evaluate_class_completion(old_class, class)
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn
@@ -77,17 +71,15 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id, "class_lock_section_id" => section_id} = params) do
     lock_old = Repo.get_by!(Lock, user_id: user.id, class_id: class_id, class_lock_section_id: section_id, is_completed: false)
 
-    class = Classes.get_class_by_id(params["class_id"])
+    old_class = Classes.get_class_by_id(params["class_id"])
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_lock(lock_old, params, &1))
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &StatusHelper.check_status(old_class, &1))
 
     case Repo.transaction(multi) do
-      {:ok, %{status: %Class{class_status_id: @complete_status} = class}} -> 
-        Task.start(NotificationHelper, :send_class_complete_notification, [class])
-        conn |> send_resp(204, "")
-      {:ok, _lock} -> 
+      {:ok, %{status: class}} -> 
+        Classes.evaluate_class_completion(old_class, class)
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn
