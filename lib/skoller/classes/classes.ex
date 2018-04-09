@@ -13,13 +13,17 @@ defmodule Skoller.Classes do
   alias Skoller.HighSchools
   alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.NotificationHelper
+  alias Skoller.Schools.School
 
   import Ecto.Query
 
   @student_role 100
 
+  @needs_syllabus_status 200
   @in_review_status 300
   @completed_status 700
+  @maint_status 999
+  @maint_name "Under Maintenance"
 
   @diy_complete_lock 200
 
@@ -211,6 +215,24 @@ defmodule Skoller.Classes do
     Task.start(NotificationHelper, :send_class_complete_notification, [class])
   end
   def evaluate_class_completion(_old_class, _class), do: nil
+
+  def get_class_status_counts() do
+    from(status in Status)
+    |> join(:left, [status], class in Class, status.id == class.class_status_id)
+    |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
+    |> where([status], status.id not in [@needs_syllabus_status, @complete_status])
+    |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
+    |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
+    |> Repo.all()
+
+    maint = from(class in Class)
+    |> where([class], class.is_editable == false)
+    |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
+    |> Repo.all()
+
+    statuses = statuses ++ maint
+  end
 
   defp get_create_changeset(%{is_university: true}, params) do
     Universities.get_changeset(params)
