@@ -4,16 +4,6 @@ defmodule Skoller.Schools.Class do
   
   Changeset and schema for classes.
 
-  Weights are validated for summing to 100.
-
-  Weights can only be added through editing the class initially. Weights are edited individually after.
-
-  Required fields: name, number, meet_days, meet_start_time, meet_end_time,
-                seat_count, grade_scale,
-                is_editable, class_period_id, is_syllabus
-
-  Optional fields: crn, credits, location, professor_id, class_type, is_points
-
   """
 
   use Ecto.Schema
