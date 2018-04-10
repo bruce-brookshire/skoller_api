@@ -101,7 +101,6 @@ defmodule SkollerWeb.ClassView do
             is_editable: class.is_editable,
             is_syllabus: class.is_syllabus,
             is_points: class.is_points,
-            is_new_class: class.is_new_class,
             is_chat_enabled: class.is_chat_enabled,
             is_assignment_posts_enabled: class.is_assignment_posts_enabled,
             type: class.class_type,

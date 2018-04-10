@@ -25,7 +25,6 @@ defmodule SkollerWeb.Class.SearchView do
                     id: school.id,
                     name: school.name
                 },
-                is_new_class: class.is_new_class,
                 status: Classes.get_class_status(class_status),
                 period_name: class_period.name
         }
