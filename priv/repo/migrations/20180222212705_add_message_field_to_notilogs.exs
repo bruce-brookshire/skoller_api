@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddMessageFieldToNotilogs do
+defmodule Skoller.Repo.Migrations.AddMessageFieldToNotilogs do
   use Ecto.Migration
 
   def change do

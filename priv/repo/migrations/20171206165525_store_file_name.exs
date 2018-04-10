@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.StoreFileName do
+defmodule Skoller.Repo.Migrations.StoreFileName do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddChatEnabledToggles do
+defmodule Skoller.Repo.Migrations.AddChatEnabledToggles do
   use Ecto.Migration
 
   def change do

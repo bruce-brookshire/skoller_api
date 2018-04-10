@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.NotificationToggles do
+defmodule Skoller.Repo.Migrations.NotificationToggles do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddTaskCompletion do
+defmodule Skoller.Repo.Migrations.AddTaskCompletion do
   use Ecto.Migration
 
   def change do

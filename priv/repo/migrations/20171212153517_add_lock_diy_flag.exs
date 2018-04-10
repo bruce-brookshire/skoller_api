@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddLockDiyFlag do
+defmodule Skoller.Repo.Migrations.AddLockDiyFlag do
   use Ecto.Migration
 
   def change do

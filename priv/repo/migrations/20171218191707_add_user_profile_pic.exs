@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddUserProfilePic do
+defmodule Skoller.Repo.Migrations.AddUserProfilePic do
   use Ecto.Migration
 
   def change do

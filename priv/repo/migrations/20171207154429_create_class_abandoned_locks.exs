@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassAbandonedLocks do
+defmodule Skoller.Repo.Migrations.CreateClassAbandonedLocks do
   use Ecto.Migration
 
   def change do

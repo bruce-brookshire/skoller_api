@@ -6,15 +6,15 @@
 use Mix.Config
 
 # General application configuration
-config :classnavapi,
-  ecto_repos: [Classnavapi.Repo]
+config :skoller,
+  ecto_repos: [Skoller.Repo]
 
 # Configures the endpoint
-config :classnavapi, ClassnavapiWeb.Endpoint,
+config :skoller, SkollerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
-  render_errors: [view: ClassnavapiWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Classnavapi.PubSub,
+  render_errors: [view: SkollerWeb.ErrorView, accepts: ~w(json)],
+  pubsub: [name: Skoller.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
@@ -36,12 +36,12 @@ config :ex_twilio,
 
 config :pigeon, :apns,
   apns_default: %{
-    cert: {:classnavapi, "apns/cert.pem"},
-    key: {:classnavapi, "apns/key_unencrypted.pem"},
+    cert: {:skoller, "apns/cert.pem"},
+    key: {:skoller, "apns/key_unencrypted.pem"},
     mode: :dev
   }
 
-config :classnavapi, Classnavapi.Mailer,
+config :skoller, Skoller.Mailer,
   adapter: Bamboo.LocalAdapter
 
 # Import environment specific config. This must remain at the bottom

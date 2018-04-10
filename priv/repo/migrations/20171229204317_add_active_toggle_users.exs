@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddActiveToggleUsers do
+defmodule Skoller.Repo.Migrations.AddActiveToggleUsers do
   use Ecto.Migration
 
   def change do

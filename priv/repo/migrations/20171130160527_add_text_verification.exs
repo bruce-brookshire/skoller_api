@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddTextVerification do
+defmodule Skoller.Repo.Migrations.AddTextVerification do
   use Ecto.Migration
 
   def change do

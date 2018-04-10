@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateAssignmentModTypes do
+defmodule Skoller.Repo.Migrations.CreateAssignmentModTypes do
   use Ecto.Migration
 
   def change do

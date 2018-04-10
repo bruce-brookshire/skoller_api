@@ -1,4 +1,4 @@
-defmodule Classnavapi.DataCase do
+defmodule Skoller.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -16,20 +16,20 @@ defmodule Classnavapi.DataCase do
 
   using do
     quote do
-      alias Classnavapi.Repo
+      alias Skoller.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Classnavapi.DataCase
+      import Skoller.DataCase
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Classnavapi.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Skoller.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Classnavapi.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Skoller.Repo, {:shared, self()})
     end
 
     :ok

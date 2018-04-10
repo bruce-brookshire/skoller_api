@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddColorToStudentClasses do
+defmodule Skoller.Repo.Migrations.AddColorToStudentClasses do
   use Ecto.Migration
 
   def change do

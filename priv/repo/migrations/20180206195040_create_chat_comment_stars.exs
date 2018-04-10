@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateChatCommentStars do
+defmodule Skoller.Repo.Migrations.CreateChatCommentStars do
   use Ecto.Migration
 
   def change do

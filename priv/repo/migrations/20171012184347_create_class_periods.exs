@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassPeriods do
+defmodule Skoller.Repo.Migrations.CreateClassPeriods do
   use Ecto.Migration
 
   def change do

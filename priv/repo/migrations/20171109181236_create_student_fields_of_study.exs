@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateStudentFieldsOfStudy do
+defmodule Skoller.Repo.Migrations.CreateStudentFieldsOfStudy do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddStudentBio do
+defmodule Skoller.Repo.Migrations.AddStudentBio do
   use Ecto.Migration
 
   def change do

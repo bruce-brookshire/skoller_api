@@ -1,7 +1,11 @@
-defmodule Classnavapi.Repo.Migrations.AddStudentBooleansToClass do
+defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
   use Ecto.Migration
 
   import Ecto.Query
+
+  alias Skoller.Repo
+  alias Skoller.Schools.Class
+  alias Skoller.Class.Status
 
   def change do
     alter table(:classes) do
@@ -9,14 +13,14 @@ defmodule Classnavapi.Repo.Migrations.AddStudentBooleansToClass do
       add :is_new_class, :boolean, default: false, null: false
     end
     flush()
-    from(c in Classnavapi.Class)
+    from(c in Class)
     |> update([c], set: [class_status_id: 200, is_new_class: true, is_student_created: true])
     |> where([c], c.class_status_id == 100)
-    |> Classnavapi.Repo.update_all([])
+    |> Repo.update_all([])
   
-    case Classnavapi.Repo.get(Classnavapi.Class.Status, 100) do
+    case Repo.get(Status, 100) do
       nil -> nil
-      item -> Classnavapi.Repo.delete!(item)
+      item -> Repo.delete!(item)
     end
   end
 end

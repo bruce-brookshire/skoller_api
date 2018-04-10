@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddNotesToStudentAssignments do
+defmodule Skoller.Repo.Migrations.AddNotesToStudentAssignments do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.ChangeClassStartAndEndTimesToString do
+defmodule Skoller.Repo.Migrations.ChangeClassStartAndEndTimesToString do
   use Ecto.Migration
 
   def change do

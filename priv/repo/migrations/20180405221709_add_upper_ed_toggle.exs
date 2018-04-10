@@ -1,7 +1,7 @@
-defmodule Classnavapi.Repo.Migrations.AddUpperEdToggle do
+defmodule Skoller.Repo.Migrations.AddUpperEdToggle do
   use Ecto.Migration
 
-  alias Classnavapi.Repo
+  alias Skoller.Repo
 
   def up do
     rename table("schools"), :adr_city, to: :adr_locality
@@ -12,7 +12,7 @@ defmodule Classnavapi.Repo.Migrations.AddUpperEdToggle do
       add :adr_country, :string
     end
     flush()
-    Classnavapi.Schools.School
+    Skoller.Schools.School
     |> Repo.all()
     |> Enum.map(&Ecto.Changeset.change(&1, %{adr_country: "us"}))
     |> Enum.each(&Repo.update!(&1))

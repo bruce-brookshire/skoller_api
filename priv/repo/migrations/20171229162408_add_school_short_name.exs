@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddSchoolShortName do
+defmodule Skoller.Repo.Migrations.AddSchoolShortName do
   use Ecto.Migration
 
   def change do

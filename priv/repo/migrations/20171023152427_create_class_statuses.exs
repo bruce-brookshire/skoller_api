@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateClassStatuses do
+defmodule Skoller.Repo.Migrations.CreateClassStatuses do
 
   @moduledoc """
 

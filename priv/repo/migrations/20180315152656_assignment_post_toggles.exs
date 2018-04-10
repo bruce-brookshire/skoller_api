@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AssignmentPostToggles do
+defmodule Skoller.Repo.Migrations.AssignmentPostToggles do
   use Ecto.Migration
 
   def change do

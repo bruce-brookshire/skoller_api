@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.AddUniqueIndexToClass do
+defmodule Skoller.Repo.Migrations.AddUniqueIndexToClass do
   use Ecto.Migration
 
   def change do
@@ -8,8 +8,6 @@ defmodule Classnavapi.Repo.Migrations.AddUniqueIndexToClass do
                                     :name,
                                     :number,
                                     :meet_days,
-                                    :class_start,
-                                    :class_end,
                                     :meet_end_time,
                                     :meet_start_time], name: :unique_class_index)
   end

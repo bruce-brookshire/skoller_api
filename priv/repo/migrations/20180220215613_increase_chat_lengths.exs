@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.IncreaseChatLengths do
+defmodule Skoller.Repo.Migrations.IncreaseChatLengths do
   use Ecto.Migration
 
   def change do
