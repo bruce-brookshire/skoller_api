@@ -5,10 +5,9 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   alias Skoller.Repo
   alias Skoller.Class.Lock
   alias Skoller.Schools.Class
-  alias Skoller.Class.Doc
   alias Skoller.Schools.ClassPeriod
-  alias Skoller.Schools.School
-  alias Skoller.Students
+  alias Skoller.Classes
+  alias Skoller.Locks
 
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -58,7 +57,7 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
         class = workers |> get_class(conn, lock_type, status_type)
         class |> lock_class(conn, lock_type)
         class
-      list -> Repo.get!(Class, List.first(list).class_id)
+      list -> Classes.get_class_by_id!(List.first(list).class_id)
     end
   end
 
@@ -89,43 +88,17 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   defp lock_class(class, _conn, _type), do: class
 
   defp get_oldest(school_id, _conn, status, type) do
-    t = from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
-    |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
-    |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    |> where([class, period], period.school_id == ^school_id)
-    |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-    |> order_by([class, period, doc, lock], asc: doc.inserted_at)
-    |> Repo.all()
-    |> List.first()
+    t = Locks.get_oldest_class_by_school(type, status, school_id)
     Logger.info("Get oldest")
     Logger.info(inspect(t))
     t
   end
 
   defp get_oldest_enrolled(school_id, _conn, status, type) do
-    t = from(class in Class)
-    |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_subquery()), sc.class_id == class.id)
-    |> join(:inner, [class, sc], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, sc, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
-    |> join(:left, [class, sc, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^type)
-    |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false)
-    |> where([class, sc, period], period.school_id == ^school_id)
-    |> where([class, sc, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-    |> order_by([class, sc, period, doc, lock], asc: doc.inserted_at)
-    |> Repo.all()
-    |> List.first()
+    t = Locks.get_oldest_class_by_school(type, status, school_id, [enrolled: true])
     Logger.info("Get oldest enrolled")
     Logger.info(inspect(t))
     t
-  end
-
-  defp doc_subquery() do
-    from(d in Doc)
-    # |> where([d], d.is_syllabus == true)
-    |> group_by([d], d.class_id)
-    |> select([d], %{inserted_at: min(d.inserted_at), class_id: d.class_id})
   end
 
   # needed structure is [%{count: 544, ratio: 1.0, school_id: 1}] or similar.
@@ -150,15 +123,7 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   # c.class_period_id = p.id inner join schools s on s.id = p.school_id where 
   # c.class_status_id = 300 and s.is_auto_syllabus = true group by p.school_id;
   defp get_ratios(_conn, status) do
-    t = from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
-    |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false and class.is_syllabus == true)
-    |> where([class, period, sch], sch.is_auto_syllabus == true)
-    |> where([class, period, sc, sch], fragment("exists (select 1 from docs where class_id = ?)", class.id))
-    |> group_by([class, period, sch], period.school_id)
-    |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
-    |> Repo.all()
+    t = Locks.get_processable_classes_by_status(status)
     |> get_enum_ratio()
     Logger.info("get ratios")
     Logger.info(inspect(t))
@@ -166,16 +131,7 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   end
 
   defp get_enrolled_ratios(_conn, status) do
-    t = from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sc in subquery(Students.get_enrolled_classes_subquery()), class.id == sc.class_id)
-    |> join(:inner, [class, period, sc], sch in School, sch.id == period.school_id)
-    |> where([class], class.class_status_id == ^status and class.is_editable == true and class.is_new_class == false and class.is_syllabus == true)
-    |> where([class, period, sc, sch], sch.is_auto_syllabus == true)
-    |> where([class, period, sc, sch], fragment("exists (select 1 from docs where class_id = ?)", class.id))
-    |> group_by([class, period, sc, sch], period.school_id)
-    |> select([class, period, sc, sch], %{count: count(period.school_id), school: period.school_id})
-    |> Repo.all()
+    t = Locks.get_processable_classes_by_status(status, [enrolled: true])
     |> get_enum_ratio()
     Logger.info("get_enrolled_ratios")
     Logger.info(inspect(t))

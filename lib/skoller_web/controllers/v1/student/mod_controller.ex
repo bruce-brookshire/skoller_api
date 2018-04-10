@@ -9,11 +9,10 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Assignment.ModView
-  alias Skoller.Schools.Class
   alias Skoller.Assignments.Mods
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
-  import Ecto.Query
   
   @student_role 100
 
@@ -25,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     |> Repo.get!(id)
     |> Repo.preload(:assignment)
 
-    case get_student_class(mod.assignment.class_id, student_id) do
+    case Students.get_student_class(mod.assignment.class_id, student_id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -39,14 +38,6 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     mods = Mods.get_student_mods(student_id)
 
     conn |> render(ModView, "index.json", mods: mods)
-  end
-
-  defp get_student_class(class_id, student_id) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
-    |> where([sc], sc.class_id == ^class_id and sc.student_id == ^student_id and sc.is_dropped == false)
-    |> where([sc, class], class.is_editable == true)
-    |> Repo.one()
   end
 
   defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do

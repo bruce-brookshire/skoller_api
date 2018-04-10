@@ -20,6 +20,14 @@ defmodule Skoller.Students do
 
   import Ecto.Query
 
+  def get_student_class(class_id, student_id) do
+    from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
+    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+    |> where([sc], sc.class_id == ^class_id)
+    |> where([sc, class], class.is_editable == true)
+    |> Repo.one()
+  end
+
   @doc """
   Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Student` currently has.
 
