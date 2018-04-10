@@ -7,13 +7,11 @@ defmodule SkollerWeb.Helpers.ChatPlug do
   """
 
   alias Skoller.Repo
-  alias Skoller.Schools.School
-  alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Assignment
   alias Skoller.Classes
+  alias Skoller.Schools
 
   import Plug.Conn
-  import Ecto.Query
 
   @admin_role 200
 
@@ -70,17 +68,9 @@ defmodule SkollerWeb.Helpers.ChatPlug do
     end
   end
 
-  defp get_school(class_period_id) do
-    from(cp in ClassPeriod)
-    |> join(:inner, [cp], s in School, s.id == cp.school_id)
-    |> where([cp], cp.id == ^class_period_id)
-    |> select([cp, s], s)
-    |> Repo.one()
-  end
-
   defp get_school_enabled({:error, _nil} = map), do: map
   defp get_school_enabled({:ok, %{class: %{class_period_id: class_period_id}} = map}) do
-    case class_period_id |> get_school() do
+    case class_period_id |> Schools.get_school_from_period() do
       %{is_chat_enabled: true} = school -> 
         {:ok, map |> Map.put(:school, school)}
       _ -> 
@@ -89,7 +79,7 @@ defmodule SkollerWeb.Helpers.ChatPlug do
   end
   defp get_school_enabled({:error, _nil} = map, _atom), do: map
   defp get_school_enabled({:ok, %{class: %{class_period_id: class_period_id}} = map}, :assignment) do
-    case class_period_id |> get_school() do
+    case class_period_id |> Schools.get_school_from_period() do
       %{is_assignment_posts_enabled: true} = school -> 
         {:ok, map |> Map.put(:school, school)}
       _ -> 
