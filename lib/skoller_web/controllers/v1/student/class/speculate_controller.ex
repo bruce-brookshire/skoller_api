@@ -78,19 +78,14 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   end
 
   defp get_grade_min(%{class: %{grade_scale: grade_scale}}, grade) do
-    grade_scale
-    |> String.split("|")
-    |> Enum.map(&String.split(&1, ","))
-    |> Enum.find("0", &List.first(&1) == grade)
-    |> List.last()
-    |> Decimal.new()
+    grade = grade_scale
+    |> Enum.map(&Map.new(grade: Kernel.elem(&1, 0), min: Decimal.new(Kernel.elem(&1, 1))))
+    |> Enum.find(& &1.grade == grade)
+    grade.min
   end
 
   defp get_grade_min(%{class: %{grade_scale: grade_scale}}) do
     grade_scale
-    |> String.trim_trailing("|")
-    |> String.split("|")
-    |> Enum.map(&String.split(&1, ","))
-    |> Enum.map(&Map.new(grade: List.first(&1), min: Decimal.new(List.last(&1))))
+    |> Enum.map(&Map.new(grade: Kernel.elem(&1, 0), min: Decimal.new(Kernel.elem(&1, 1))))
   end
 end
