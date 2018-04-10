@@ -25,6 +25,7 @@ defmodule Skoller.Classes do
   @completed_status 700
   @maint_status 999
   @maint_name "Under Maintenance"
+  @ghost_name "Ghost"
 
   @diy_complete_lock 200
 
@@ -259,6 +260,17 @@ defmodule Skoller.Classes do
     |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
     |> Repo.all()
   end
+
+  def get_class_status(%Class{} = class) do
+    class = class |> Repo.preload(:class_status)
+    get_status(class)
+  end
+  def get_class_status(%Status{} = class_status) do
+    get_status(%{class_status: class_status})
+  end
+
+  defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_name
+  defp get_status(%{class_status: status}), do: status.name
 
   defp filter(nil), do: true
   defp filter(%{} = params) do

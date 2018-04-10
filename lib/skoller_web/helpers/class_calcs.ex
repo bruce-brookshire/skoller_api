@@ -1,17 +1,13 @@
 defmodule SkollerWeb.Helpers.ClassCalcs do
   
   alias Skoller.Repo
-  alias Skoller.Schools.Class
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
   alias Skoller.Class.StudentAssignment
   alias Skoller.Class.StudentClass
-  alias Skoller.Class.Status
   alias SkollerWeb.Helpers.AssignmentHelper
 
   import Ecto.Query
-
-  @ghost_status "Ghost"
 
   @moduledoc """
   
@@ -56,14 +52,6 @@ defmodule SkollerWeb.Helpers.ClassCalcs do
     extract_name(class.professor, is_nil(class.professor))
   end
 
-  def get_class_status(%Class{} = class) do
-    class = class |> Repo.preload(:class_status)
-    get_status(class)
-  end
-  def get_class_status(%Status{} = class_status) do
-    get_status(%{class_status: class_status})
-  end
-
   defp get_relative_weight(%{class_id: class_id} = params) do #good
     assign_count_subq = params
                   |> relative_weight_subquery()
@@ -100,9 +88,6 @@ defmodule SkollerWeb.Helpers.ClassCalcs do
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
     |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id})
   end
-
-  defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_status
-  defp get_status(%{class_status: status}), do: status.name
 
   defp extract_name(_, true), do: "None"
   defp extract_name(professor, false) do
