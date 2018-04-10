@@ -288,7 +288,7 @@ defmodule Skoller.Classes do
 
   def need_syllabus_status_class_subquery() do
     from(c in Class)
-    |> where([u, s, sc, c], c.class_status_id == @needs_syllabus_status)
+    |> where([c], c.class_status_id == @needs_syllabus_status)
   end
 
   # A new class has been added, and it is a class that will never have a syllabus.
