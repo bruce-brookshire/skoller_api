@@ -4,7 +4,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
   alias Skoller.Repo
   alias SkollerWeb.Class.ChangeRequestView
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.StatusHelper
   alias Skoller.Class.ChangeRequest
   alias Skoller.Classes
   alias Skoller.Mailer
@@ -31,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:class_status, &Classes.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{change_request: %{user_id: nil} = change_request}} ->

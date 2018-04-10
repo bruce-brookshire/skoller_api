@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StudentRequestController do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentRequestView
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.StatusHelper
   alias Skoller.Classes
 
   import SkollerWeb.Helpers.AuthPlug
@@ -25,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StudentRequestController do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:student_request, changeset)
-    |> Ecto.Multi.run(:class_status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:class_status, &Classes.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_request: student_request}} ->

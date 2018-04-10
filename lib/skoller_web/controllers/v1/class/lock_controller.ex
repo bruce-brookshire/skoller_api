@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Class.AbandonedLock
   alias Skoller.Class.Lock.Section
   alias Skoller.Repo
-  alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Users.User
   alias SkollerWeb.Class.LockView
@@ -56,7 +55,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_full_class(user, params, &1))
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(old_class, &1))
+    |> Ecto.Multi.run(:status, &Classes.check_status(old_class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{status: class}} -> 
@@ -75,7 +74,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_lock(lock_old, params, &1))
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(old_class, &1))
+    |> Ecto.Multi.run(:status, &Classes.check_status(old_class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{status: class}} -> 

@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView
-  alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.ClassDocUpload
   alias SkollerWeb.Sammi
   alias Skoller.Classes
@@ -37,7 +36,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{doc: doc}} ->

@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   alias SkollerWeb.Helpers.ClassDocUpload
   alias Skoller.Class.Doc
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.StatusHelper
   alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
 
@@ -31,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
     |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
-    |> Ecto.Multi.run(:status, &StatusHelper.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{student_request: student_request}} ->
