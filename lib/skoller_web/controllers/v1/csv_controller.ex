@@ -5,17 +5,15 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.School.FieldOfStudy
   alias SkollerWeb.CSVView
   alias Skoller.Professor
-  alias Skoller.Schools.Class
   alias Skoller.CSVUpload  
+  alias Skoller.Classes
+  alias Skoller.Universities
   
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
   
   @admin_role 200
-  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
   @headers [:campus, :class_type, :number, :crn, :meet_days, :meet_end_time, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
-
-  @syllabus_status 200
   
   plug :verify_role, %{role: @admin_role}
 
@@ -74,33 +72,14 @@ defmodule SkollerWeb.Api.V1.CSVController do
           {:ok, prof} -> class |> Map.put(:professor_id, prof.id)
           {:error, _} -> class |> Map.put(:professor_id, nil)
         end
-        case class |> find_class() do
-          nil -> class |> insert_class()
-          existing -> class |> update_class(existing)
+        # TODO: Determine way to find HS classes.
+        case Universities.get_class_by_crn(class.crn, class.class_period_id) do
+          nil -> class |> Classes.create_class()
+          existing -> existing |> Classes.update_class(class)
         end
       {:error, error} ->
         {:error, error}
     end
-  end
-
-  defp update_class(class, old_class) do
-    changeset = Class.university_changeset(old_class, class)
-    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key})
-    Repo.update(changeset)
-  end
-
-  defp find_class(%{crn: nil}), do: nil
-  defp find_class(%{crn: crn} = class) do
-    Repo.get_by(Class, class_period_id: class.class_period_id, 
-                        crn: crn)
-  end
-
-  defp insert_class(class) do
-    class = class 
-      |> Map.put(:grade_scale, @default_grade_scale)
-    changeset = Class.university_changeset(%Class{}, class)
-    changeset = changeset |> Ecto.Changeset.change(%{class_upload_key: class.upload_key, class_status_id: @syllabus_status})
-    Repo.insert(changeset)
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do

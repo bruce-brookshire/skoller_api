@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   alias Skoller.Class.Doc
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.StatusHelper
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
 
   import SkollerWeb.Helpers.AuthPlug
@@ -26,7 +26,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
     
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
 
-    class = Repo.get!(Class, params["class_id"])
+    class = Classes.get_class_by_id!(params["class_id"])
     
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)

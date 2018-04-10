@@ -64,7 +64,7 @@ defmodule Skoller.Schools.Class do
 
   @req_fields [:name, :is_editable, :class_period_id, :is_chat_enabled, :is_assignment_posts_enabled,
     :is_syllabus, :grade_scale, :is_points, :meet_start_time, :meet_days]
-  @opt_fields [:professor_id, :location, :meet_end_time]
+  @opt_fields [:professor_id, :location, :meet_end_time, :class_upload_key]
 
   @req_uni_fields @req_fields ++ [:code, :section, :subject]
   @opt_uni_fields @opt_fields ++ [:crn, :credits, :class_type, :campus, :seat_count]

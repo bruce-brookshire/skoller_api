@@ -63,11 +63,12 @@ defmodule Skoller.Classes do
 
   ## Examples
 
-      iex> Skoller.Classes.get_class_by_id!(1)
+      iex> Skoller.Classes.create_class(%{} = params)
       %Skoller.Schools.Class{}
 
   """
-  def create_class(%{"class_period_id" => class_period_id} = params, user) do
+  def create_class(params, user \\ nil) do
+    class_period_id = params |> Map.get(:class_period_id, Map.get(params, "class_period_id"))
     params = params |> put_grade_scale()
 
     changeset = class_period_id
@@ -81,6 +82,15 @@ defmodule Skoller.Classes do
     |> Repo.transaction()
   end
 
+  @doc """
+  Updates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+
+  ## Examples
+
+      iex> Skoller.Classes.update_class(old_class, %{} = params)
+      %Skoller.Schools.Class{}
+
+  """
   def update_class(class_old, params) do
     changeset = class_old.class_period_id
     |> Schools.get_school_from_period()
