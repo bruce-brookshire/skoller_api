@@ -8,7 +8,7 @@ defmodule SkollerWeb.Helpers.AuthPlug do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
   alias Skoller.Class.Assignment
 
   import Plug.Conn
@@ -75,7 +75,7 @@ defmodule SkollerWeb.Helpers.AuthPlug do
     case conn.path_params |> Map.fetch(to_string(id)) do
       :error -> conn
       {:ok, class_id} ->
-        case Repo.get_by(Class, id: class_id, is_editable: true) do
+        case Classes.get_editable_class_by_id(class_id) do
           nil -> conn |> in_role(@admin_role)
           _ -> conn
         end

@@ -37,6 +37,16 @@ defmodule Skoller.Locks do
     |> Repo.all()
   end
 
+  def get_workers(type) do
+    from(lock in Lock)
+    |> join(:inner, [lock], class in Class, lock.class_id == class.id)
+    |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
+    |> where([lock], lock.class_lock_section_id == ^type and lock.is_completed == false)
+    |> group_by([lock, class, period], period.school_id)
+    |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
+    |> Repo.all()
+  end
+
   defp doc_subquery() do
     from(d in Doc)
     |> group_by([d], d.class_id)

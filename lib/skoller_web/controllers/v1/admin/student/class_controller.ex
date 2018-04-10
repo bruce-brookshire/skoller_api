@@ -21,7 +21,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
     student_classes = Students.get_enrolled_classes_by_student_id(student_id)
     |> Enum.map(&Map.put(&1, :grade, ClassCalcs.get_class_grade(&1.id)))
     |> Enum.map(&Map.put(&1, :completion, ClassCalcs.get_class_completion(&1)))
-    |> Enum.map(&Map.put(&1, :enrollment, ClassCalcs.get_enrollment(&1.class)))
+    |> Enum.map(&Map.put(&1, :enrollment, Students.get_enrollment_by_class_id(&1.class.id)))
     |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
 
     render(conn, StudentClassView, "index.json", student_classes: student_classes)

@@ -13,6 +13,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.Classes
   alias Skoller.Assignments.Mods
+  alias Skoller.Students
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -38,7 +39,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
     student_class = student_class
                     |> Map.put(:grade, ClassCalcs.get_class_grade(student_class.id))
                     |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
-                    |> Map.put(:enrollment, ClassCalcs.get_enrollment(student_class.class))
+                    |> Map.put(:enrollment, Students.get_enrollment_by_class_id(class_id))
                     |> Map.put(:new_assignments, get_new_class_assignments(student_class))
 
     render(conn, StudentClassView, "show.json", student_class: student_class)

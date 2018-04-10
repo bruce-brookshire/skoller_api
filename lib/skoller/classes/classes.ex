@@ -56,6 +56,10 @@ defmodule Skoller.Classes do
     Repo.get!(Class, id)
   end
 
+  def get_editable_class_by_id(id) do
+    Repo.get_by(Class, id: id, is_editable: true)
+  end
+
   @doc """
   Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
 

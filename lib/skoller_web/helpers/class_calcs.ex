@@ -51,12 +51,6 @@ defmodule SkollerWeb.Helpers.ClassCalcs do
     |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
   end
 
-  def get_enrollment(%Class{} = class) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false and sc.class_id == ^class.id)
-    |> Repo.aggregate(:count, :id)
-  end
-
   def professor_name(class) do
     class = class |> Repo.preload(:professor)
     extract_name(class.professor, is_nil(class.professor))

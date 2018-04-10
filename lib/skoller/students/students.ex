@@ -28,6 +28,12 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  def get_enrollment_by_class_id(id) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false and sc.class_id == ^id)
+    |> Repo.aggregate(:count, :id)
+  end
+
   @doc """
   Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Student` currently has.
 

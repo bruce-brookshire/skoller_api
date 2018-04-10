@@ -4,8 +4,6 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   alias SkollerWeb.ClassView
   alias Skoller.Repo
   alias Skoller.Class.Lock
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
   alias Skoller.Classes
   alias Skoller.Locks
 
@@ -142,13 +140,7 @@ defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
   #on l.class_id = c.id inner join public.class_periods p on c.class_period_id = p.id where 
   #l.class_lock_section_id = 100 and l.is_completed = false group by p.school_id;
   defp get_workers(type) do
-    t = from(lock in Lock)
-    |> join(:inner, [lock], class in Class, lock.class_id == class.id)
-    |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
-    |> where([lock], lock.class_lock_section_id == ^type and lock.is_completed == false)
-    |> group_by([lock, class, period], period.school_id)
-    |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
-    |> Repo.all()
+    t = Locks.get_workers(type)
     |> get_enum_ratio()
     Logger.info("get workers")
     Logger.info(inspect(t))

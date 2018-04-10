@@ -7,10 +7,10 @@ defmodule SkollerWeb.Helpers.ChatPlug do
   """
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
   alias Skoller.Schools.School
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Assignment
+  alias Skoller.Classes
 
   import Plug.Conn
   import Ecto.Query
@@ -55,7 +55,7 @@ defmodule SkollerWeb.Helpers.ChatPlug do
 
   defp get_class({:error, _nil} = map, _conn), do: map
   defp get_class({:ok, map}, conn) do
-    case Repo.get(Class, conn.params["class_id"]) do
+    case Classes.get_class_by_id(conn.params["class_id"]) do
       %{is_chat_enabled: true} = class -> 
         {:ok, map |> Map.put(:class, class)}
       _ -> {:error, map}
@@ -63,7 +63,7 @@ defmodule SkollerWeb.Helpers.ChatPlug do
   end
   defp get_class({:ok, map}, conn, :assignment) do
     assign = Repo.get!(Assignment, conn.params["assignment_id"])
-    case Repo.get(Class, assign.class_id) do
+    case Classes.get_class_by_id(assign.class_id) do
       %{is_assignment_posts_enabled: true} = class -> 
         {:ok, map |> Map.put(:class, class)}
       _ -> {:error, map}
