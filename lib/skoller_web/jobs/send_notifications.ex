@@ -4,7 +4,6 @@ defmodule SkollerWeb.Jobs.SendNotifications do
   alias Skoller.Users.User
   alias Skoller.User.Device
   alias Skoller.Student
-  alias Skoller.Schools.Class
   alias Skoller.Class.StudentClass
   alias Skoller.Class.StudentAssignment
   alias SkollerWeb.Notification
@@ -33,16 +32,15 @@ defmodule SkollerWeb.Jobs.SendNotifications do
     from(student in Student)
     |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
     |> join(:inner, [student, sclass], sassign in StudentAssignment, sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true)
-    |> join(:inner, [student, sclass, sassign], class in Class, class.id == sclass.class_id)
-    |> join(:inner, [student, sclass, sassign, class], user in User, user.student_id == student.id)
-    |> join(:inner, [student, sclass, sassign, class, user], device in Device, user.id == device.user_id)
+    |> join(:inner, [student, sclass, sassign], user in User, user.student_id == student.id)
+    |> join(:inner, [student, sclass, sassign, user], device in Device, user.id == device.user_id)
     |> where([student], student.notification_time == ^time)
     |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
     |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
     |> filter_due_date(now, atom)
     |> where([student, sclass], sclass.is_dropped == false)
-    |> group_by([student, sclass, sassign, class, user, device], [device.udid, student.notification_days_notice])
-    |> select([student, sclass, sassign, class, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
+    |> group_by([student, sclass, sassign, user, device], [device.udid, student.notification_days_notice])
+    |> select([student, sclass, sassign, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
     |> Repo.all()
   end
 

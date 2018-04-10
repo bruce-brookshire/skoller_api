@@ -2,7 +2,7 @@ defmodule SkollerWeb.Sammi do
 
   alias Skoller.Professor
   alias Skoller.Repo
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
 
   alias Ecto.UUID
 
@@ -57,13 +57,13 @@ defmodule SkollerWeb.Sammi do
     val = val
     |> String.trim()
     |> String.trim("|")
-    class = Repo.get!(Class, class_id)
-    Class.university_changeset(class, %{"grade_scale" => val})
-    |> Repo.update()
+    class_id
+    |> Classes.get_class_by_id!()
+    |> Classes.update_class(%{"grade_scale" => val})
   end
 
   defp add_professor_info(%{"professor_info" => professor_info}, class_id) do
-    class = Repo.get!(Class, class_id)
+    class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:professor)
     case class.professor do
       nil -> nil
