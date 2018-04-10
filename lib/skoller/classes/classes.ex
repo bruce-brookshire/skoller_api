@@ -108,6 +108,11 @@ defmodule Skoller.Classes do
     |> Repo.transaction()
   end
 
+  def get_editable_classes_subquery() do
+    from(class in Class)
+    |> where([class], class.is_editable == true)
+  end
+
   @doc """
   Returns a count of `Skoller.Schools.Class` using the id of `Skoller.Schools.ClassPeriod`
 
@@ -267,6 +272,11 @@ defmodule Skoller.Classes do
   end
   def get_class_status(%Status{} = class_status) do
     get_status(%{class_status: class_status})
+  end
+
+  def need_syllabus_status_class_subquery() do
+    from(c in Class)
+    |> where([u, s, sc, c], c.class_status_id == @needs_syllabus_status)
   end
 
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_name

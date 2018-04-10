@@ -29,9 +29,13 @@ defmodule Skoller.Students do
   end
 
   def get_enrollment_by_class_id(id) do
+    from(sc in subquery(get_enrollment_by_class_id_subquery(id)))
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_enrollment_by_class_id_subquery(id) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false and sc.class_id == ^id)
-    |> Repo.aggregate(:count, :id)
   end
 
   @doc """

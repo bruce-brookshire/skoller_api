@@ -9,12 +9,15 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Assignment.Mod
   alias Skoller.Users.User
   alias Skoller.User.Device
-  alias Skoller.Schools.Class
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
   alias Skoller.Chat.Comment.Star, as: CommentStar
   alias Skoller.Chat.Post.Star, as: PostStar
   alias Skoller.Chat.Comment
+  alias Skoller.Classes
+  alias Skoller.Students
+  alias Skoller.Assignments.Mods
+  alias Skoller.Notifications
 
   import Ecto.Query
 
@@ -39,8 +42,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @due_assignment_mod 300
   @new_assignment_mod 400
   @delete_assignment_mod 500
-
-  @syllabus_status 200
 
   @a_classmate_has "A classmate has "
   @you_have "You have "
@@ -84,7 +85,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
-    user = get_user_from_student_class(action.student_class_id)
+    user = Notifications.get_user_from_student_class(action.student_class_id)
     devices = user.user |> get_user_devices()
     case devices do
       [] -> :ok
@@ -113,7 +114,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     |> Repo.all
   end
 
-  def send_class_complete_notification(%Class{is_editable: true} = class) do
+  def send_class_complete_notification(%{is_editable: true} = class) do
     users = class 
             |> get_users_from_class()
     devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
@@ -131,7 +132,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def build_auto_update_notification({:ok, action}) do
     mod = Repo.get(Mod, action.assignment_modification_id)
           |> Repo.preload(:assignment)
-    class = mod |> get_class_from_mod()
+    class = Mods.get_class_from_mod_id(mod.id)
     case class.is_editable do
       true -> 
         title = case mod.assignment_mod_type_id do
@@ -158,15 +159,13 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
 
   def send_new_post_notification(post, student_id) do
     student = Repo.get!(Student, student_id)
-    class = Repo.get!(Class, post.class_id)
+    class = Classes.get_class_by_id!(post.class_id)
     from(d in Device)
     |> join(:inner, [d], u in User, d.user_id == u.id)
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [d, u, s, sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
     |> where([d, u, s], s.is_chat_notifications == true and s.is_notifications == true and s.id != ^student_id)
-    |> where([d, u, s, sc], sc.is_dropped == false)
-    |> where([d, u, s, sc, c], c.id == ^post.class_id)
+    |> where([d, u, s, sc], sc.class_id == ^post.class_id)
     |> Repo.all()
     |> Enum.each(&Notification.create_notification(&1.udid, build_chat_post_notification(post, student, class), @class_chat_post))
   end
@@ -225,11 +224,9 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def send_needs_syllabus_notifications() do
     users = from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
-    |> join(:inner, [u, s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [u, s, sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [u, s, sc], c in subquery(Classes.need_syllabus_status_class_subquery()), c.id == sc.class_id)
     |> where([u, s], s.is_notifications == true)
-    |> where([u, s, sc], sc.is_dropped == false)
-    |> where([u, s, sc, c], c.class_status_id == @syllabus_status)
     |> distinct([u], u.id)
     |> Repo.all()
     |> Enum.reduce([], &get_user_devices(&1) ++ &2)
@@ -258,15 +255,14 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def send_assignment_post_notification(post, student_id) do
     student = Repo.get!(Student, student_id)
     assignment = Repo.get!(Assignment, post.assignment_id)
-    class = Repo.get!(Class, assignment.class_id)
+    class = Classes.get_class_by_id!(assignment.class_id)
     from(d in Device)
     |> join(:inner, [d], u in User, u.id == d.user_id)
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
     |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
     |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
     |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
-    |> where([d, u, s, sc], sc.is_dropped == false)
     |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
     |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
     |> Repo.all()
@@ -324,21 +320,20 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     end
   end
 
-  defp get_users_from_class(%Class{} = class) do
-    from(sc in StudentClass)
+  defp get_users_from_class(class) do
+    from(sc in subquery(Students.get_enrollment_by_class_id_subquery(class.id)))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
     |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
-    |> where([sc, user], sc.class_id == ^class.id and sc.is_dropped == false)
     |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all
   end
 
   defp get_users_from_student_class(id) do
-    from(sc in StudentClass)
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
     |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
-    |> where([sc, user], sc.id == ^id and sc.is_dropped == false)
+    |> where([sc, user], sc.id == ^id)
     |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all
@@ -355,7 +350,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
 
   defp one_pending_mod_notification(action) do
     mod = get_mod_from_action(action) |> Repo.preload(:assignment)
-    class = mod |> get_class_from_mod()
+    class = Mods.get_class_from_mod_id(mod.id)
     cond do
       mod.assignment_mod_type_id == @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
       mod.assignment_mod_type_id == @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
@@ -393,13 +388,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   end
 
   defp class_list(%Student{} = student) do
-    from(class in Class)
-    |> join(:inner, [class], sc in StudentClass, sc.class_id == class.id)
-    |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
-    |> where([class, sc, act], is_nil(act.is_accepted))
-    |> where([class, sc, act], sc.student_id == ^student.id)
-    |> select([class, sc, act], class)
-    |> Repo.all
+    Mods.get_classes_with_pending_mod_by_student_id(student.id)
     |> Enum.uniq
     |> format_list
   end
@@ -444,31 +433,10 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     |> List.first
   end
 
-  defp get_user_from_student_class(student_class_id) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
-    |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
-    |> join(:inner, [sc, stu, usr], class in Class, sc.class_id == class.id)
-    |> where([sc, stu, usr], sc.id == ^student_class_id and sc.is_dropped == false)
-    |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
-    |> where([sc, stu, usr, class], class.is_editable == true)
-    |> select([sc, stu, usr], %{user: usr, student: stu})
-    |> Repo.all
-    |> List.first()
-  end
-
   defp get_mod_from_action(%Action{} = action) do
     from(mod in Mod)
     |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id)
     |> where([mod, act], act.id == ^action.id)
-    |> Repo.all
-    |> List.first()
-  end
-
-  defp get_class_from_mod(%Mod{} = mod) do
-    from(class in Class)
-    |> join(:inner, [class], assign in Assignment, class.id == assign.class_id)
-    |> where([class, assign], assign.id == ^mod.assignment_id)
     |> Repo.all
     |> List.first()
   end

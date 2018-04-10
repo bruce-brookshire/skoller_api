@@ -10,7 +10,7 @@ defmodule SkollerWeb.Helpers.LockPlug do
   alias Skoller.Class.Lock
   alias Skoller.Class.Weight
   alias Skoller.Class.Assignment
-  alias Skoller.Schools.Class
+  alias Skoller.Classes
 
   import Plug.Conn
   import Ecto.Query
@@ -90,7 +90,7 @@ defmodule SkollerWeb.Helpers.LockPlug do
   defp check_maintenance(conn, class_id) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id in[@change_req_role, @help_req_role]) do
       true -> 
-        class = Repo.get!(Class, class_id)
+        class = Classes.get_class_by_id!(class_id)
         case class.class_status_id in [@help_status, @change_status] do
           true -> conn
           false -> conn |> unauth()
