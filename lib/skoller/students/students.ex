@@ -14,6 +14,9 @@ defmodule Skoller.Students do
   alias Skoller.Class.Status
   alias Skoller.Professor
   alias Skoller.Schools.ClassPeriod
+  alias SkollerWeb.Helpers.ClassCalcs
+  alias SkollerWeb.Helpers.ModHelper
+  alias Skoller.Class.StudentAssignment
 
   import Ecto.Query
 
@@ -28,10 +31,15 @@ defmodule Skoller.Students do
   """
   def get_enrolled_classes_by_student_id(student_id) do
     #TODO: Filter ClassPeriod
-    from(classes in StudentClass)
-    |> where([classes], classes.student_id == ^student_id and classes.is_dropped == false)
+    from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> Repo.all()
     |> Repo.preload(:class)
+  end
+
+  def get_enrolled_classes_by_student_id_subquery(student_id) do
+    #TODO: Filter ClassPeriod
+    from(sc in StudentClass)
+    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
   end
 
   @doc """
@@ -184,6 +192,77 @@ defmodule Skoller.Students do
     |> Repo.all()
   end
 
+  def get_student_assignments(student_id, filters) do
+    from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
+    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+    |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
+    |> where([sc, class, cs], cs.is_complete == true)
+    |> where_filters(filters)
+    |> Repo.all()
+    |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
+    |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
+    |> get_student_assingment_filter(filters)
+  end
+
+  def get_student_assignment_by_id(id, :weight) do
+    from(sc in subquery(get_enrolled_student_classes_subquery()))
+    |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
+    |> join(:inner, [sc, sa], class in Class, class.id == sc.class_id)
+    |> join(:inner, [sc, sa, class], cs in Status, cs.id == class.class_status_id)
+    |> where([sc, sa], sa.id == ^id)
+    |> where([sc, sa, class, cs], cs.is_complete == true)
+    |> Repo.all()
+    |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
+    |> Enum.filter(& to_string(&1.id) == id)
+    |> List.first()
+  end
+  def get_student_assignment_by_id(id) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
+    |> where([sa], sa.id == ^id)
+    |> where([sa, sc, class], class.is_editable == true)
+    |> Repo.one()
+  end
+
+  defp get_student_assingment_filter(enumerable, params) do
+    enumerable
+    |> date_filter(params)
+    |> completed_filter(params)
+  end
+
+  defp is_pending_mods(assignment) do
+    case ModHelper.pending_mods_for_assignment(assignment) do
+      [] -> false
+      _ -> true
+    end
+  end
+
+  defp date_filter(enumerable, %{"date" => date}) do
+    {:ok, date, _offset} = date |> DateTime.from_iso8601()
+    enumerable
+    |> Enum.filter(&not(is_nil(&1.due)) and DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
+    |> order()
+  end
+  defp date_filter(enumerable, _params), do: enumerable
+
+  defp completed_filter(enumerable, %{"is_complete" => is_complete}) do
+    enumerable
+    |> Enum.filter(& to_string(&1.is_completed) == is_complete)
+  end
+  defp completed_filter(enumerable, _params), do: enumerable
+
+  defp where_filters(query, params) do
+    query
+    |> class_filter(params)
+  end
+
+  defp class_filter(query, %{"class" => id}) do
+    query
+    |> where([sc], sc.class_id == ^id)
+  end
+  defp class_filter(query, _params), do: query
+
   defp filter(%{} = params) do
     dynamic = params["or"] != "true"
 
@@ -302,5 +381,10 @@ defmodule Skoller.Students do
     |> where([c, sc], sc.is_dropped == false)
     |> group_by([c, sc], c.id)
     |> select([c, sc], %{class_id: c.id, count: count(sc.id)})
+  end
+
+  defp order(enumerable) do
+    enumerable
+    |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 end

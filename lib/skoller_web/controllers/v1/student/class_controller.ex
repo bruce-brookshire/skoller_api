@@ -1,8 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.ClassController do
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.Class
-  alias Skoller.Class.Assignment
   alias Skoller.Class.StudentClass
   alias Skoller.Repo
   alias Skoller.Assignment.Mod
@@ -13,6 +11,8 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias SkollerWeb.Helpers.AssignmentHelper
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.ModHelper
+  alias Skoller.Classes
+  alias Skoller.Assignments.Mods
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -77,7 +77,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   defp insert_student_class(conn, class_id, params) do
     changeset = StudentClass.changeset(%StudentClass{}, params)
 
-    class = Repo.get(Class, class_id)
+    class = Classes.get_class_by_id(class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
@@ -105,10 +105,9 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
   defp add_public_mods(%{student_class: student_class}) do
     mods = from(mod in Mod)
-    |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
-    |> join(:inner, [mod, assign], class in Class, class.id == assign.class_id)
+    |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
     |> where([mod], mod.is_private == false)
-    |> where([mod, assign, class], class.id == ^student_class.class_id)
+    |> where([mod, class], class.class_id == ^student_class.class_id)
     |> Repo.all()
     
     status = mods |> Enum.map(&insert_mod_action(student_class, &1))

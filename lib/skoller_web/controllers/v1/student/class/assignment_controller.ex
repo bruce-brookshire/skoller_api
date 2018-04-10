@@ -4,15 +4,13 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Class.StudentClass
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias SkollerWeb.Helpers.ClassCalcs
   alias Skoller.Class.StudentAssignment
   alias Skoller.Class.Assignment
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.Class.Weight
   alias SkollerWeb.Helpers.NotificationHelper
-  alias Skoller.Schools.Class
-  alias Skoller.Class.Status
+  alias Skoller.Students
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -52,30 +50,12 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def index(conn, %{"student_id" => student_id} = params) do
-    student_assignments = from(sc in StudentClass)
-                          |> join(:inner, [sc], class in Class, class.id == sc.class_id)
-                          |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
-                          |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
-                          |> where([sc, class, cs], cs.is_complete == true)
-                          |> where_filters(params)
-                          |> Repo.all()
-                          |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
-                          |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
-                          |> filter(params)
+    student_assignments = Students.get_student_assignments(student_id, params)
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
   def show(conn, %{"id" => id}) do
-    student_assignment = from(sc in StudentClass)
-                          |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
-                          |> join(:inner, [sc, sa], class in Class, class.id == sc.class_id)
-                          |> join(:inner, [sc, sa, class], cs in Status, cs.id == class.class_status_id)
-                          |> where([sc, sa], sa.id == ^id and sc.is_dropped == false)
-                          |> where([sc, sa, class, cs], cs.is_complete == true)
-                          |> Repo.all()
-                          |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
-                          |> Enum.filter(& to_string(&1.id) == id)
-                          |> List.first()
+    student_assignment = Students.get_student_assignment_by_id(id, [:weight])
     
     pending_mods = ModHelper.pending_mods_for_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
@@ -84,7 +64,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    case get_student_assignment(id) do
+    case Students.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -111,7 +91,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def delete(conn, %{"id" => id} = params) do
-    case get_student_assignment(id) do
+    case Students.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -134,51 +114,6 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     end
   end
 
-  defp order(enumerable) do
-    enumerable
-    |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
-  end
-
-  defp get_student_assignment(id) do
-    from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
-    |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
-    |> where([sa], sa.id == ^id)
-    |> where([sa, sc, class], class.is_editable == true)
-    |> Repo.one()
-  end
-
-  defp where_filters(query, params) do
-    query
-    |> class_filter(params)
-  end
-
-  defp filter(enumerable, params) do
-    enumerable
-    |> date_filter(params)
-    |> completed_filter(params)
-  end
-
-  defp class_filter(query, %{"class" => id}) do
-    query
-    |> where([sc], sc.class_id == ^id)
-  end
-  defp class_filter(query, _params), do: query
-
-  defp date_filter(enumerable, %{"date" => date}) do
-    {:ok, date, _offset} = date |> DateTime.from_iso8601()
-    enumerable
-    |> Enum.filter(&not(is_nil(&1.due)) and DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
-    |> order()
-  end
-  defp date_filter(enumerable, _params), do: enumerable
-
-  defp completed_filter(enumerable, %{"is_complete" => is_complete}) do
-    enumerable
-    |> Enum.filter(& to_string(&1.is_completed) == is_complete)
-  end
-  defp completed_filter(enumerable, _params), do: enumerable
-
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
     class_id = changeset |> get_class_id()
@@ -193,13 +128,6 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     case changeset |> Ecto.Changeset.get_field(:student_class_id) do
       nil -> changeset |> Ecto.Changeset.get_field(:class_id)
       val -> Repo.get!(StudentClass, val) |> Map.get(:class_id)
-    end
-  end
-
-  defp is_pending_mods(assignment) do
-    case ModHelper.pending_mods_for_assignment(assignment) do
-      [] -> false
-      _ -> true
     end
   end
 

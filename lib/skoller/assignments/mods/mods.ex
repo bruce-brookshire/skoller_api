@@ -5,6 +5,7 @@ defmodule Skoller.Assignments.Mods do
   alias Skoller.Class.StudentClass
   alias Skoller.Class.StudentAssignment
   alias Skoller.Repo
+  alias Skoller.Class.Assignment
 
   import Ecto.Query
 
@@ -21,6 +22,12 @@ defmodule Skoller.Assignments.Mods do
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
     |> Repo.all()
     |> Enum.filter(&filter_due_date(&1, DateTime.utc_now()))
+  end
+
+  def get_class_from_mod_subquery() do
+    from(mod in Mod)
+    |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
+    |> select([mod, assign], %{class_id: assign.class_id, mod_id: mod.id})
   end
 
   defp filter_due_date(%{mod: %{assignment_mod_type_id: @due_assignment_mod} = mod}, date) do
