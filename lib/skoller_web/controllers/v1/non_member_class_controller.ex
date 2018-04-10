@@ -6,10 +6,9 @@ defmodule SkollerWeb.Api.V1.NonMemberClassController do
   Handles functionality relating to classes.
 
   """
-  
-  alias Skoller.Schools.Class
-  alias Skoller.Repo
+
   alias SkollerWeb.ClassView
+  alias Skoller.Classes
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -21,7 +20,7 @@ defmodule SkollerWeb.Api.V1.NonMemberClassController do
   plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
 
   @doc """
-   Shows a single `Skoller.Schools.Class`.
+   Shows a single class.
 
   ## Returns:
   * 422 `SkollerWeb.ChangesetView`
@@ -30,7 +29,7 @@ defmodule SkollerWeb.Api.V1.NonMemberClassController do
   * 200 `SkollerWeb.ClassView`
   """
   def show(conn, %{"id" => id}) do
-    class = Repo.get!(Class, id)
+    class = Classes.get_class_by_id!(id)
     render(conn, ClassView, "show.json", class: class)
   end
 

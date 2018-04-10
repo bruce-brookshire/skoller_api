@@ -14,6 +14,7 @@ defmodule Skoller.Classes do
   alias SkollerWeb.Helpers.StatusHelper
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Schools.School
+  alias Skoller.Professor
 
   import Ecto.Query
 
@@ -243,6 +244,66 @@ defmodule Skoller.Classes do
 
     statuses ++ maint
   end
+
+  def get_classes_by_school(school_id, filters \\ nil) do
+    #TODO: Filter ClassPeriod
+    from(class in Class)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
+    |> where([class, period], period.school_id == ^school_id)
+    |> where([class, period, prof], ^filter(filters))
+    |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
+    |> Repo.all()
+  end
+
+  defp filter(nil), do: true
+  defp filter(%{} = params) do
+    dynamic = params["or"] != "true"
+
+    dynamic
+    |> prof_filter(params)
+    |> prof_id_filter(params)
+    |> name_filter(params)
+    |> number_filter(params)
+  end
+
+  defp prof_filter(dynamic, %{"professor_name" => filter, "or" => "true"}) do
+    prof_filter = filter <> "%"
+    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter) or ^dynamic)
+  end
+  defp prof_filter(dynamic, %{"professor_name" => filter}) do
+    prof_filter = filter <> "%"
+    dynamic([class, period, prof], (ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter)) and ^dynamic)
+  end
+  defp prof_filter(dynamic, _), do: dynamic
+
+  defp prof_id_filter(dynamic, %{"professor_id" => filter, "or" => "true"}) do
+    dynamic([class, period, prof], prof.id == ^filter or ^dynamic)
+  end
+  defp prof_id_filter(dynamic, %{"professor_id" => filter}) do
+    dynamic([class, period, prof], prof.id == ^filter and ^dynamic)
+  end
+  defp prof_id_filter(dynamic, _), do: dynamic
+
+  defp name_filter(dynamic, %{"class_name" => filter, "or" => "true"}) do
+    name_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.name, ^name_filter) or ^dynamic)
+  end
+  defp name_filter(dynamic, %{"class_name" => filter}) do
+    name_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.name, ^name_filter) and ^dynamic)
+  end
+  defp name_filter(dynamic, _), do: dynamic
+
+  defp number_filter(dynamic, %{"class_number" => filter, "or" => "true"}) do
+    number_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.number, ^number_filter) or ^dynamic)
+  end
+  defp number_filter(dynamic, %{"class_number" => filter}) do
+    number_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.number, ^number_filter) and ^dynamic)
+  end
+  defp number_filter(dynamic, _), do: dynamic
 
   defp get_create_changeset(%{is_university: true}, params) do
     Universities.get_changeset(params)
