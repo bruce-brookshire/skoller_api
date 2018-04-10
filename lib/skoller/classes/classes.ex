@@ -112,7 +112,7 @@ defmodule Skoller.Classes do
   def update_class(class_old, params) do
     changeset = class_old.class_period_id
     |> Schools.get_school_from_period()
-    |> get_update_changeset(class_old, params)
+    |> get_update_changeset(params, class_old)
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:class, changeset)
