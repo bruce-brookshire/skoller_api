@@ -217,11 +217,11 @@ defmodule Skoller.Classes do
   def evaluate_class_completion(_old_class, _class), do: nil
 
   def get_class_status_counts() do
-    from(status in Status)
+    statuses = from(status in Status)
     |> join(:left, [status], class in Class, status.id == class.class_status_id)
     |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
-    |> where([status], status.id not in [@needs_syllabus_status, @complete_status])
+    |> where([status], status.id not in [@needs_syllabus_status, @completed_status])
     |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
     |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
     |> Repo.all()
@@ -231,7 +231,7 @@ defmodule Skoller.Classes do
     |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
     |> Repo.all()
 
-    statuses = statuses ++ maint
+    statuses ++ maint
   end
 
   defp get_create_changeset(%{is_university: true}, params) do
