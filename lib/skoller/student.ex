@@ -32,6 +32,7 @@ defmodule Skoller.Student do
     field :is_assign_post_notifications, :boolean, default: true
     field :organization, :string
     field :bio, :string
+    field :grad_year, :string
     has_many :users, User
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
@@ -46,7 +47,7 @@ defmodule Skoller.Student do
               :notification_time, :notification_days_notice, :is_notifications,
               :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications,
                :is_assign_post_notifications, :future_reminder_notification_time]
-  @opt_fields [:birthday, :gender, :organization, :bio]
+  @opt_fields [:birthday, :gender, :organization, :bio, :grad_year]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
@@ -54,5 +55,6 @@ defmodule Skoller.Student do
     student
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> validate_length(:grad_year, is: 4)
   end
 end

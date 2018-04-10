@@ -35,6 +35,7 @@ defmodule SkollerWeb.StudentView do
       future_reminder_notification_time: student.future_reminder_notification_time,
       organization: student.organization,
       bio: student.bio,
+      grad_year: student.grad_year,
       schools: render_many(student.schools, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }
