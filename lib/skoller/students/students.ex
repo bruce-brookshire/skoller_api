@@ -25,6 +25,8 @@ defmodule Skoller.Students do
 
   import Ecto.Query
 
+  @community_threshold 2
+
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
@@ -291,6 +293,14 @@ defmodule Skoller.Students do
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], ^num)
     |> Repo.all()
+  end
+
+  def get_communities(threshold \\ @community_threshold) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+    |> group_by([sc], sc.class_id)
+    |> having([sc], count(sc.id) >= ^threshold)
+    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 
   defp auto_approve_mods(%{mods: mods}) do
