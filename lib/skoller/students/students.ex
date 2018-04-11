@@ -17,15 +17,53 @@ defmodule Skoller.Students do
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.Class.StudentAssignment
+  alias SkollerWeb.Helpers.AssignmentHelper
+  alias Skoller.Assignment.Mod
+  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Assignments.Mods
+  alias SkollerWeb.Helpers.RepoHelper
 
   import Ecto.Query
 
-  def get_student_class(class_id, student_id) do
+  def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+    |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
-    |> where([sc, class], class.is_editable == true)
     |> Repo.one()
+  end
+
+  def get_enrolled_class_by_ids(class_id, student_id) do
+    Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+  end
+
+  def get_enrolled_class_by_ids!(class_id, student_id) do
+    Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+  end
+
+  def enroll_in_class(class_id, params) do
+    changeset = StudentClass.changeset(%StudentClass{}, params)
+    
+    class = Classes.get_class_by_id(class_id)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
+    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
+    |> Repo.transaction()
+  end
+
+  def update_enrolled_class(old_student_class, params) do
+    old_student_class
+    |> StudentClass.update_changeset(params)
+    |> Repo.update()
+  end
+
+  def drop_enrolled_class(student_class) do
+    student_class
+    |> Ecto.Changeset.change(%{"is_dropped" => true})
+    |> Repo.update()
   end
 
   def get_enrollment_by_class_id(id) do
@@ -253,6 +291,30 @@ defmodule Skoller.Students do
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], ^num)
     |> Repo.all()
+  end
+
+  defp auto_approve_mods(%{mods: mods}) do
+    status = mods
+    |> Enum.map(&ModHelper.process_auto_update(&1))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp auto_approve_mods(_params), do: {:ok, nil}
+
+  defp add_public_mods(%{student_class: student_class}) do
+    mods = from(mod in Mod)
+    |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod, class], class.class_id == ^student_class.class_id)
+    |> Repo.all()
+    
+    status = mods |> Enum.map(&insert_mod_action(student_class, &1))
+    
+    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
+  end
+
+  defp insert_mod_action(student_class, %Mod{} = mod) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
   end
 
   defp get_student_assingment_filter(enumerable, params) do

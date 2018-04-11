@@ -27,10 +27,10 @@ defmodule Skoller.Class.StudentClass do
   end
 
   @req_fields [:student_id, :class_id]
-  @opt_fields [:color, :is_dropped]
+  @opt_fields [:color]
   @all_fields @req_fields ++ @opt_fields
 
-  @upd_req_fields [:is_dropped, :is_notifications]
+  @upd_req_fields [:is_notifications]
   @upd_opt_fields [:color]
   @upd_fields @upd_req_fields ++ @upd_opt_fields
 
