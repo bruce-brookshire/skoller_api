@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   alias Skoller.Repo
   alias Skoller.Chat.Post
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.Class.StudentClass
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -57,14 +57,14 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   end
 
   defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts, class_id) do
-    sc = Repo.get_by!(StudentClass, student_id: id, class_id: class_id, is_dropped: false)
+    sc = Students.get_enrolled_class_by_ids!(class_id, id)
     render(conn, ChatPostView, "index.json", %{chat_posts: %{chat_posts: posts, color: sc.color}, current_student_id: id})
   end
   defp render_index_view(conn, posts, _class_id) do
     render(conn, ChatPostView, "index.json", chat_posts: posts)
   end
   defp render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
-    sc = Repo.get_by!(StudentClass, student_id: id, class_id: post.class_id, is_dropped: false)
+    sc = Students.get_enrolled_class_by_ids!(post.class_id, id)
     render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: id})
   end
   defp render_show_view(conn, post) do

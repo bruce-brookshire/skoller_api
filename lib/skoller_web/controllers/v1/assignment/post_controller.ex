@@ -5,13 +5,11 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias Skoller.Assignment.Post
   alias SkollerWeb.Assignment.PostView
   alias SkollerWeb.Helpers.NotificationHelper
-  alias Skoller.Class.StudentAssignment
-  alias Skoller.Class.StudentClass
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   import SkollerWeb.Helpers.ChatPlug
-  import Ecto.Query
 
   @student_role 100
 
@@ -54,13 +52,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   end
 
   defp un_read_assign(post) do
-    status = from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
-    |> where([sa], sa.assignment_id == ^post.assignment_id)
-    |> where([sa, sc], sc.student_id != ^post.student_id)
-    |> Repo.all()
-    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: false})))
-
+    status = Students.un_read_assignment(post.student_id, post.assignment_id)
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 end

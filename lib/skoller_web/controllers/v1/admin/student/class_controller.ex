@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   use SkollerWeb, :controller
 
-  alias Skoller.Class.StudentClass
   alias SkollerWeb.Class.StudentClassView
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
@@ -27,7 +26,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
 
-  defp get_new_class_assignments(%StudentClass{} = student_class) do
+  defp get_new_class_assignments(%{} = student_class) do
     student_class |> ModHelper.get_new_assignment_mods()
   end
 end
