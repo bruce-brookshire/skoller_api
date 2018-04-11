@@ -1,4 +1,7 @@
 defmodule Skoller.Classes do
+  @moduledoc """
+  The Classes context.
+  """
 
   alias Skoller.Repo
   alias Skoller.Schools.Class

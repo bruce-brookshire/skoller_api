@@ -1,24 +1,19 @@
 defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.School
   alias Skoller.Classes
-  alias Skoller.Repo
   alias SkollerWeb.Admin.SchoolView
   alias Skoller.Students
+  alias Skoller.Schools
 
-  import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
   
   @admin_role 200
   
   plug :verify_role, %{role: @admin_role}
 
-  def create(conn, %{} = params) do
-
-    changeset = School.changeset_insert(%School{}, params)
-
-    case Repo.insert(changeset) do
+  def create(conn, params) do
+    case Schools.create_school(params) do
       {:ok, school} ->
         render(conn, SchoolView, "show.json", school: school)
       {:error, changeset} ->
@@ -29,14 +24,12 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   end
 
   def index(conn, params) do
-    schools = from(school in School)
-    |> filter(params)
-    |> Repo.all()
+    schools = Schools.get_schools(params)
     render(conn, SchoolView, "index.json", schools: schools)
   end
 
   def show(conn, %{"id" => id}) do
-    school = Repo.get!(School, id)
+    school = Schools.get_school_by_id!(id)
     render(conn, SchoolView, "show.json", school: school)
   end
 
@@ -48,11 +41,9 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    school_old = Repo.get!(School, id)
-    
-    changeset = School.changeset_update(school_old, params)
+    school_old = Schools.get_school_by_id!(id)
 
-    case Repo.update(changeset) do
+    case Schools.update_school(school_old, params) do
       {:ok, school} ->
         render(conn, SchoolView, "show.json", school: school)
       {:error, changeset} ->
@@ -62,18 +53,7 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
     end
   end
 
-  defp filter(query, params) do
-    query
-    |> short_name_filter(params)
-  end
-
-  defp short_name_filter(query, %{"short_name" => short_name}) do
-    query
-    |> where([school], school.short_name == ^short_name)
-  end
-  defp short_name_filter(query, _params), do: query
-
-  defp put_class_statuses(%{school: %School{} = school} = params) do
+  defp put_class_statuses(%{school: school} = params) do
     params
     |> Map.put(:classes, Classes.get_status_counts(school.id))
   end
