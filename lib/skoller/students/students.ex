@@ -243,6 +243,18 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  def get_common_notification_times(num, params) do
+    from(s in Student)
+    |> join(:inner, [s], sc in subquery(get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
+    |> join(:inner, [s, sc], sfc in subquery(Classes.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
+    |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
+    |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
+    |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
+    |> order_by([s], desc: count(s.notification_time))
+    |> limit([s], ^num)
+    |> Repo.all()
+  end
+
   defp get_student_assingment_filter(enumerable, params) do
     enumerable
     |> date_filter(params)

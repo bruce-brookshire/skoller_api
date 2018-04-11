@@ -12,7 +12,6 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply
-  alias Skoller.Schools.School
   alias Skoller.Class.StudentAssignment
   alias Skoller.Students
   alias Skoller.Classes
@@ -27,7 +26,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   @semester_days 112
 
-  @num_notificaiton_time 3
+  @num_notification_time 3
   
   plug :verify_role, %{role: @admin_role}
 
@@ -82,7 +81,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
     notifications = Map.new()
     |> Map.put(:avg_days_out, avg_days_out)
-    |> Map.put(:common_times, get_common_times(params))
+    |> Map.put(:common_times, Students.get_common_notification_times(@num_notification_time, params))
     |> Map.put(:notifications_enabled, notifications_enabled)
     |> Map.put(:mod_notifications_enabled, get_mod_notifications_enabled(params))
     |> Map.put(:reminder_notifications_enabled, reminder_notifications_enabled)
@@ -126,18 +125,6 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> join(:inner, [sa], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_common_times(params) do
-    from(s in Student)
-    |> join(:inner, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], sfc in subquery(Classes.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
-    |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
-    |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
-    |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
-    |> order_by([s], desc: count(s.notification_time))
-    |> limit([s], @num_notificaiton_time)
-    |> Repo.all()
   end
 
   defp get_students(params) do

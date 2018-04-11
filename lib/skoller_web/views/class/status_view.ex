@@ -2,11 +2,10 @@ defmodule SkollerWeb.Class.StatusView do
   use SkollerWeb, :view
 
   alias SkollerWeb.Class.StatusView
-  alias Skoller.Schools.School
-  alias Skoller.Repo
+  alias Skoller.Schools
 
   def render("index.json", %{statuses: statuses}) do
-    count = Repo.all(School)
+    count = Schools.get_schools()
     |> Enum.count()
     %{
       schools: count,

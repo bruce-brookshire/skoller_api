@@ -52,11 +52,11 @@ defmodule SkollerWeb.Api.V1.ClassController do
 
    ## Filters:
   * school
-    * `Skoller.Schools.School` :id
+    * school id
   * professor_name
-    * `Skoller.Professor` :name
+    * professor name
   * class_status
-    * `Skoller.Class.Status` :id
+    * class status id
     * For ghost classes, use 0.
   * class_name
   * class_number

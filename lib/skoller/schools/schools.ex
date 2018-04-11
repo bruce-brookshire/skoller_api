@@ -49,7 +49,7 @@ defmodule Skoller.Schools do
       * short_name
         * Gets schools by short_name (for scripting generally).
   """
-  def get_schools(filters) do
+  def get_schools(filters \\ %{}) do
     from(school in School)
     |> filter(filters)
     |> Repo.all()
