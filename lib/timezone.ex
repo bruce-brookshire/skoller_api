@@ -1,7 +1,7 @@
 defmodule Timezone do
   use HTTPoison.Base
   
-  @timezone_url "http://api.timezonedb.com/v2/"
+  @timezone_url "http://vip.timezonedb.com/v2/"
 
   def process_url(url) do
     @timezone_url <> url

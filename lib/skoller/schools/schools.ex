@@ -6,6 +6,7 @@ defmodule Skoller.Schools do
   alias Skoller.Repo
   alias Skoller.Schools.School
   alias Skoller.Schools.ClassPeriod
+  alias Skoller.Timezone
 
   import Ecto.Query
 
@@ -13,8 +14,10 @@ defmodule Skoller.Schools do
     Creates a `Skoller.Schools.School`
   """
   def create_school(params) do
-    %School{}
+    {:ok, timezone} = Timezone.get_timezone(params["adr_locality"], params["adr_country"], params["adr_region"])
+    changeset = %School{}
     |> School.changeset_insert(params)
+    |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.insert()
   end
 
