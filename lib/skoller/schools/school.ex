@@ -36,9 +36,9 @@ defmodule Skoller.Schools.School do
     timestamps()
   end
 
-  @req_fields [:name, :adr_locality, :adr_region, :timezone, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country]
+  @req_fields [:name, :adr_locality, :adr_region, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country]
   @opt_fields [:adr_line_1, :adr_line_2, :adr_zip, :is_readonly, :adr_line_3,
-              :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus, :short_name]
+              :is_diy_enabled, :is_diy_preferred, :is_auto_syllabus, :short_name, :timezone]
   @all_fields @req_fields ++ @opt_fields
   @upd_fields @all_fields
 
