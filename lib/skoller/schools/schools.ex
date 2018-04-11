@@ -15,7 +15,7 @@ defmodule Skoller.Schools do
   """
   def create_school(params) do
     {:ok, timezone} = Timezone.get_timezone(params["adr_locality"], params["adr_country"], params["adr_region"])
-    changeset = %School{}
+    %School{}
     |> School.changeset_insert(params)
     |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.insert()
