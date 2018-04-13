@@ -19,14 +19,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
-    params = params |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
-    changeset = User.changeset_insert(%User{}, params)
-
-    multi = changeset 
-    |> verify_student()
-    |> insert_user(params)
-    
-    case Repo.transaction(multi) do
+    case Users.create_user(params) do
       {:ok, %{user: user}} ->
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
@@ -48,7 +41,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Repo.get!(User, user_id)
     user_old = user_old |> Repo.preload(:student)
-    params = params |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
     changeset = User.changeset_update_admin(user_old, params)
     
     multi = Ecto.Multi.new
@@ -93,18 +85,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   defp add_field_of_study(user, field) do
     Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
-  end
-
-  defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset) do
-    Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :is_verified, true)})
-  end
-  defp verify_student(changeset), do: changeset
-
-  defp insert_user(changeset, params) do
-    Ecto.Multi.new
-    |> Ecto.Multi.insert(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
-    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
   end
 
   defp add_roles(%{user: user}, %{"roles" => roles}) do

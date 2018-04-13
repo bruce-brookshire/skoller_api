@@ -9,7 +9,6 @@ defmodule SkollerWeb.Api.V1.UserController do
   alias Skoller.PicUpload
   alias Skoller.School.StudentField
   alias Ecto.UUID
-  alias Skoller.Users
 
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
@@ -26,7 +25,6 @@ defmodule SkollerWeb.Api.V1.UserController do
     location = params |> upload_pic()
 
     params = params |> Map.put("pic_path", location)
-    |> Map.put("student", params["student"] |> Users.put_future_reminder_notification_time())
     changeset = User.changeset_update(user_old, params)
 
     multi = Ecto.Multi.new

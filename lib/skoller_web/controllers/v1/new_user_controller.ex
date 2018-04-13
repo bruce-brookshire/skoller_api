@@ -10,13 +10,10 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
   alias SkollerWeb.Sms
-  alias Skoller.Users
 
   @student_role 100
 
-  def create(conn, %{"student" => student} = params) do
-    params = params |> Map.put("student", student |> Users.put_future_reminder_notification_time())
-
+  def create(conn, %{"student" => _student} = params) do
     changeset = User.changeset_insert(%User{}, params)
     changeset = changeset 
                 |> verification_code()

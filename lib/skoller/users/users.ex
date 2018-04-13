@@ -3,26 +3,57 @@ defmodule Skoller.Users do
   The Users context.
   """
 
-  @doc """
-  Adds future notification time as notification time for v1 user routes.
+  alias Skoller.Repo
+  alias Skoller.Users.User
+  alias Skoller.School.StudentField
+  alias Skoller.UserRole
+  alias SkollerWeb.Helpers.RepoHelper
 
-  ## Examples
-
-      iex> Skoller.Users.put_future_reminder_notification_time(%{"notification_time" => "10:00:00"})
-      %{"notification_time" => "10:00:00", "future_reminder_notification_time" => "10:00:00"}
-
-      iex> Skoller.Users.put_future_reminder_notification_time(%{"future_reminder_notification_time" => "10:00:00"})
-      %{"future_reminder_notification_time" => "10:00:00"}
-
-      iex> Skoller.Users.put_future_reminder_notification_time(%{"test" => "10:00:00"})
-      %{"test" => "10:00:00"}
-
-  """
-  def put_future_reminder_notification_time(%{"future_reminder_notification_time" => _time} = attrs), do: attrs
-  def put_future_reminder_notification_time(%{"notification_time" => time} = attrs) do
-    attrs
-    |> Map.put("future_reminder_notification_time", time)
+  def create_user(params, opts \\ []) do
+    %User{}
+    |> User.changeset_insert(params)
+    |> verify_student(opts)
+    |> insert_user(params)
+    |> Repo.transaction()
   end
-  def put_future_reminder_notification_time(attrs), do: attrs
+
+  defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
+    case opts |> List.keytake(:admin, 0) |> elem(0) do
+      {:admin, "true"} -> 
+        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :is_verified, true)})
+      _ -> u_changeset
+    end
+  end
+  defp verify_student(changeset, _opts), do: changeset
+
+  defp insert_user(changeset, params) do
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:user, changeset)
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+  end
+
+  defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
+    status = fields |> Enum.map(&add_field_of_study(user, &1))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp add_fields_of_study(_map, _params), do: {:ok, nil}
+
+  defp add_field_of_study(user, field) do
+    Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
+  end
+
+  defp add_roles(%{user: user}, %{"roles" => roles}) do
+    status = roles
+    |> Enum.map(&add_role(user, &1))
+    
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp add_roles(_map, _params), do: {:ok, nil}
+
+  defp add_role(user, role) do
+    Repo.insert!(%UserRole{user_id: user.id, role_id: role})
+  end
 
 end
