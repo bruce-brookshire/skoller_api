@@ -25,7 +25,29 @@ defmodule SkollerWeb.Assignment.ModView do
     render_one(mod, ModView, "mod.json")
   end
 
+  # def render("mod.json", params) do
+  #   require IEx
+  #   IEx.pry
+  # end
+
+  def render("mod.json", %{mod: mod, action: action, student_assignment: student_assignment}) do
+    mod_detail_view(mod, action, student_assignment)
+  end
+
   def render("mod.json", %{mod: %{mod: mod, action: action, student_assignment: student_assignment}}) do
+    mod_detail_view(mod, action, student_assignment)
+  end
+
+  def render("mod.json", %{mod: mod}) do
+    mod = mod |> Repo.preload(:assignment_mod_type)
+    %{
+      id: mod.id,
+      data: mod.data,
+      mod_type: mod.assignment_mod_type.name
+    }
+  end
+
+  defp mod_detail_view(mod, action, student_assignment) do
     mod = mod |> Repo.preload([:assignment_mod_type, :assignment])
     accepted = mod |> get_students_accepted()
     assignment = mod.assignment |> Repo.preload(:class)
@@ -41,15 +63,6 @@ defmodule SkollerWeb.Assignment.ModView do
       mod_created_at: mod |> get_inserted_at(),
       students_accepted_count: accepted |> Enum.count(),
       students_accepted_pics: accepted
-    }
-  end
-
-  def render("mod.json", %{mod: mod}) do
-    mod = mod |> Repo.preload(:assignment_mod_type)
-    %{
-      id: mod.id,
-      data: mod.data,
-      mod_type: mod.assignment_mod_type.name
     }
   end
 
