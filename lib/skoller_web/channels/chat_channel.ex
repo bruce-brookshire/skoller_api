@@ -2,17 +2,17 @@ defmodule SkollerWeb.ChatChannel do
   use Phoenix.Channel
 
   alias Skoller.Repo
-  alias Skoller.Class.StudentClass
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply
   alias Skoller.Classes
   alias Skoller.Schools
+  alias Skoller.Students
 
   def join("chat:" <> class_id, _params, socket) do
     case get_class_enabled(class_id) do
       {:ok, _val} ->
-        case Repo.get_by(StudentClass, student_id: socket.assigns.user.student.id, class_id: class_id, is_dropped: false) do
+        case Students.get_enrolled_class_by_ids(class_id, socket.assigns.user.student.id) do
           nil -> {:reply, %{error: "unauthorized"}}
           _ -> {:ok, socket}
         end

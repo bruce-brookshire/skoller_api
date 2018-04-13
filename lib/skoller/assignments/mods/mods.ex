@@ -48,6 +48,79 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
+  def get_joyriders() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], a.is_accepted == true and a.is_manual == false)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_pending() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], is_nil(a.is_accepted))
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_followers() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], a.is_manual == true and a.is_accepted == true)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_creators() do
+    from(m in Mod)
+    |> join(:inner, [m], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
+    |> join(:inner, [m, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> distinct([m], m.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  def get_responded_mods() do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
+    |> join(:inner, [m, a], sc in subquery(Students.get_communities()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> where([m], m.is_private == false)
+    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
+    |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
+    |> Repo.all()
+  end
+
+  def get_shared_mods() do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
+    |> join(:inner, [m, a], sc in subquery(Students.get_communities()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> where([m], m.is_private == false)
+    |> select([m, a, sc, act], %{mod: m, responses: act.responses, audience: act.audience})
+    |> Repo.all()
+  end
+
+  def get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold) do
+    from(m in Mod)
+    |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
+    |> where([m], m.is_auto_update == false and m.is_private == false)
+    |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
+    |> select([m, act], act)
+    |> Repo.all()
+  end
+
+  defp mod_responses_sub() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> group_by([a], a.assignment_modification_id)
+    |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
+  end
+
   defp filter_due_date(%{mod: %{assignment_mod_type_id: @due_assignment_mod} = mod}, date) do
     {:ok, mod_date, _} = DateTime.from_iso8601(mod.data["due"])
     case DateTime.compare(date, mod_date) do

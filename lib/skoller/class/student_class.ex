@@ -19,6 +19,8 @@ defmodule Skoller.Class.StudentClass do
     field :color, :string
     field :is_notifications, :boolean, default: true
     field :is_dropped, :boolean, default: false
+    field :enrollment_link, :string
+    field :enrolled_by, :id
     belongs_to :class, Class, define_field: false
     belongs_to :student, Student, define_field: false
     has_many :student_assignments, StudentAssignment
@@ -27,10 +29,10 @@ defmodule Skoller.Class.StudentClass do
   end
 
   @req_fields [:student_id, :class_id]
-  @opt_fields [:color, :is_dropped]
+  @opt_fields [:color]
   @all_fields @req_fields ++ @opt_fields
 
-  @upd_req_fields [:is_dropped, :is_notifications]
+  @upd_req_fields [:is_notifications]
   @upd_opt_fields [:color]
   @upd_fields @upd_req_fields ++ @upd_opt_fields
 

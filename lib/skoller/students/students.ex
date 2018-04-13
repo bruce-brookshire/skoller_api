@@ -17,15 +17,73 @@ defmodule Skoller.Students do
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.Class.StudentAssignment
+  alias SkollerWeb.Helpers.AssignmentHelper
+  alias Skoller.Assignment.Mod
+  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Assignments.Mods
+  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Class.Assignment
+  alias Skoller.Class.Weight
 
   import Ecto.Query
 
-  def get_student_class(class_id, student_id) do
+  @community_threshold 2
+  @link_length 5
+
+  def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
+    |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
-    |> where([sc, class], class.is_editable == true)
     |> Repo.one()
+  end
+
+  def get_enrolled_class_by_ids(class_id, student_id) do
+    Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+  end
+
+  def get_enrolled_class_by_ids!(class_id, student_id) do
+    Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+  end
+
+  def get_student_class_by_id(id) do
+    Repo.get(StudentClass, id)
+  end
+
+  def get_student_class_by_id!(id) do
+    Repo.get!(StudentClass, id)
+  end
+
+  def enroll_in_class(class_id, params, opts \\ []) do
+    changeset = StudentClass.changeset(%StudentClass{}, params)
+    |> add_enrolled_by(opts)
+    
+    class = Classes.get_class_by_id(class_id)
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
+    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
+    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
+    
+    case multi |> Repo.transaction() do
+      {:ok, trans} -> 
+        {:ok, get_student_class_by_id(trans.student_class.id)}
+      error -> error
+    end
+  end
+
+  def update_enrolled_class(old_student_class, params) do
+    old_student_class
+    |> StudentClass.update_changeset(params)
+    |> Repo.update()
+  end
+
+  def drop_enrolled_class(student_class) do
+    student_class
+    |> Ecto.Changeset.change(%{"is_dropped" => true})
+    |> Repo.update()
   end
 
   def get_enrollment_by_class_id(id) do
@@ -173,6 +231,15 @@ defmodule Skoller.Students do
     |> Repo.aggregate(:count, :id)
   end
 
+  def un_read_assignment(student_id, assignment_id) do
+    from(sa in StudentAssignment)
+    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> where([sa], sa.assignment_id == ^assignment_id)
+    |> where([sa, sc], sc.student_id != ^student_id)
+    |> Repo.all()
+    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: false})))
+  end
+
   @doc """
    Shows all `Skoller.Schools.Class`. Can be used as a search with multiple filters.
 
@@ -253,6 +320,188 @@ defmodule Skoller.Students do
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], ^num)
     |> Repo.all()
+  end
+
+  def get_communities(threshold \\ @community_threshold) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+    |> group_by([sc], sc.class_id)
+    |> having([sc], count(sc.id) >= ^threshold)
+    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
+  end
+
+  def create_student_assignment(params) do
+    changeset = Assignment.student_changeset(%Assignment{}, params)
+    |> Ecto.Changeset.change(%{from_mod: true})
+    |> validate_class_weight()
+
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:assignment, &insert_or_get_assignment(&1, changeset))
+    |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(&1, params))
+    |> Ecto.Multi.run(:mod, &ModHelper.insert_new_mod(&1, params))
+    |> Repo.transaction()
+  end
+
+  def update_student_assignment(old, params) do
+    changeset = old
+    |> StudentAssignment.changeset_update(params)
+    |> validate_class_weight()
+
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:student_assignment, changeset)
+    |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
+    |> Repo.transaction()
+  end
+
+  def enroll_by_link(link, student_id, params) do
+    student_class_id = link |> String.split_at(@link_length) |> elem(1)
+    
+    sc = Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
+    params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
+    enroll_in_class(sc.class_id, params, [enrolled_by: student_class_id])
+  end
+
+  defp add_enrolled_by(changeset, opts) do
+    case opts |> List.keytake(:enrolled_by, 0) |> elem(0) do
+      {:enrolled_by, val} -> 
+        changeset |> Ecto.Changeset.change(%{enrolled_by: Integer.parse(val) |> elem(0)})
+      _ -> changeset
+    end
+  end
+
+  defp generate_enrollment_link(%StudentClass{id: id} = student_class) do
+    link = @link_length
+    |> :crypto.strong_rand_bytes() 
+    |> Base.url_encode64 
+    |> binary_part(0, @link_length)
+    |> Kernel.<>(to_string(id))
+
+    student_class
+    |> Ecto.Changeset.change(%{enrollment_link: link})
+    |> Repo.update()
+  end
+
+  # 1. Check for existing base Assignment, pass to next multi call.
+  # 2. Check for existing Student Assignment, pass to next multi call. This means that a student has this assignment from a combination of mods.
+  # 3. Create assignment, pass to next multi call.
+  defp insert_or_get_assignment(_, %Ecto.Changeset{valid?: false} = changeset), do: {:error, changeset}
+  defp insert_or_get_assignment(_, changeset) do
+    assign = from(assign in Assignment)
+    |> where([assign], assign.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
+    |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
+    |> compare_weights(changeset)
+    |> compare_dates(changeset)
+    |> Repo.all()
+
+    case assign do
+      [] -> changeset |> check_student_assignment()
+      assign -> {:ok, assign |> List.first}
+    end
+  end
+
+  # Checks to see if an incoming changeset is identical to another student's assignment in the same class.
+  defp check_student_assignment(changeset) do
+    assign = from(assign in StudentAssignment)
+    |> join(:inner, [assign], sc in StudentClass, sc.id == assign.student_class_id)
+    |> where([assign, sc], sc.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
+    |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
+    |> compare_weights(changeset)
+    |> compare_dates(changeset)
+    |> Repo.all()
+
+    case assign do
+      [] -> changeset |> Repo.insert()
+      assign -> {:ok, assign |> List.first}
+    end
+  end
+
+  # 1. Check to see if assignment exists in StudentAssignment for student, if not, insert, else error.
+  defp insert_student_assignment(%{assignment: %Assignment{} = assignment}, params) do
+    params = params |> Map.put("assignment_id", assignment.id)
+    changeset = StudentAssignment.changeset(%StudentAssignment{}, params)
+
+    student_assign = from(assign in StudentAssignment)
+    |> where([assign], assign.student_class_id == ^params["student_class_id"])
+    |> where([assign], assign.assignment_id == ^assignment.id)
+    |> Repo.all()
+
+    case student_assign do
+      [] -> Repo.insert(changeset)
+      _ -> {:error, %{student_assignment: "Assignment is already added."}}
+    end
+  end
+  defp insert_student_assignment(%{assignment: %StudentAssignment{} = student_assignment}, params) do
+    params = params |> Map.put("assignment_id", student_assignment.assignment_id)
+    changeset = StudentAssignment.changeset(%StudentAssignment{}, params)
+
+    student_assign = from(assign in StudentAssignment)
+    |> where([assign], assign.student_class_id == ^params["student_class_id"])
+    |> where([assign], assign.assignment_id == ^student_assignment.assignment_id)
+    |> Repo.all()
+
+    case student_assign do
+      [] -> Repo.insert(changeset)
+      _ -> {:error, %{student_assignment: "Assignment is already added."}}
+    end
+  end
+
+  defp compare_dates(query, changeset) do
+    case Ecto.Changeset.get_field(changeset, :due) do
+      nil -> 
+        query |> where([assign], is_nil(assign.due))
+      due -> 
+        query |> where([assign], ^due == assign.due)
+    end
+  end
+
+  defp compare_weights(query, changeset) do
+    case Ecto.Changeset.get_field(changeset, :weight_id) do
+      nil ->
+        query |> where([assign], is_nil(assign.weight_id))
+      weight_id -> 
+        query |> where([assign], ^weight_id == assign.weight_id)
+    end
+  end
+
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
+    class_id = changeset |> get_class_id_from_student_assignment_changeset()
+    case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
+      nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
+      _ -> changeset
+    end
+  end
+  defp validate_class_weight(changeset), do: changeset
+
+  defp get_class_id_from_student_assignment_changeset(changeset) do
+    case changeset |> Ecto.Changeset.get_field(:student_class_id) do
+      nil -> changeset |> Ecto.Changeset.get_field(:class_id)
+      val -> get_student_class_by_id!(val) |> Map.get(:class_id)
+    end
+  end
+
+  defp auto_approve_mods(%{mods: mods}) do
+    status = mods
+    |> Enum.map(&ModHelper.process_auto_update(&1))
+
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+  defp auto_approve_mods(_params), do: {:ok, nil}
+
+  defp add_public_mods(%{student_class: student_class}) do
+    mods = from(mod in Mod)
+    |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod, class], class.class_id == ^student_class.class_id)
+    |> Repo.all()
+    
+    status = mods |> Enum.map(&insert_mod_action(student_class, &1))
+    
+    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
+  end
+
+  defp insert_mod_action(student_class, %Mod{} = mod) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
   end
 
   defp get_student_assingment_filter(enumerable, params) do

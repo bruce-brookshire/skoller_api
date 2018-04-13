@@ -6,8 +6,8 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Comment.Star, as: CommentStar
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.Class.StudentClass
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   import SkollerWeb.Helpers.ChatPlug
@@ -28,7 +28,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
     case Repo.insert(changeset) do
       {:ok, star} -> 
         star = star |> Repo.preload(:chat_post)
-        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: class_id, is_dropped: false)
+        sc = Students.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: star.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
@@ -42,7 +42,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
     case Repo.delete(star) do
       {:ok, _struct} ->
         star = star |> Repo.preload(:chat_post)
-        sc = Repo.get_by!(StudentClass, student_id: conn.assigns[:user].student_id, class_id: star.chat_post.class_id, is_dropped: false)
+        sc = Students.get_enrolled_class_by_ids!(star.chat_post.class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: star.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn

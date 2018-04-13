@@ -2,10 +2,10 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Class.StudentClass
   alias Skoller.Class.StudentAssignment
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Class.SpeculationView
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   plug :verify_member, :student
 
   def speculate(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
+    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
     
     student_class = student_class |> Repo.preload(:class)
 
@@ -37,7 +37,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
     end
   end
 
-  defp get_class_weighted_grade(%StudentClass{} = params) do
+  defp get_class_weighted_grade(%{} = params) do
     assignments = ClassCalcs.get_assignments_with_relative_weight(params)
 
     assignments

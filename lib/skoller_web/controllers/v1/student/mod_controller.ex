@@ -3,7 +3,6 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
 
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
-  alias Skoller.Class.StudentClass
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Helpers.RepoHelper
@@ -24,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     |> Repo.get!(id)
     |> Repo.preload(:assignment)
 
-    case Students.get_student_class(mod.assignment.class_id, student_id) do
+    case Students.get_active_student_class_by_ids(mod.assignment.class_id, student_id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -40,7 +39,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     conn |> render(ModView, "index.json", mods: mods)
   end
 
-  defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => true}) do
+  defp process_mod(conn, %Mod{} = mod, %{} = student_class, %{"is_accepted" => true}) do
     case Repo.transaction(ModHelper.apply_mod(mod, student_class)) do
       {:ok, %{student_assignment: student_assignment}} ->
         Task.start(ModHelper, :process_auto_update, [mod, :notification])
@@ -52,7 +51,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     end
   end
 
-  defp process_mod(conn, %Mod{} = mod, %StudentClass{} = student_class, %{"is_accepted" => false}) do
+  defp process_mod(conn, %Mod{} = mod, %{} = student_class, %{"is_accepted" => false}) do
     action = Repo.get_by!(Action, assignment_modification_id: mod.id, student_class_id: student_class.id)
 
     case Repo.update(Ecto.Changeset.change(action, %{is_accepted: false, is_manual: true})) do

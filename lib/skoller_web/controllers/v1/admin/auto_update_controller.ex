@@ -4,20 +4,18 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Repo
   alias Skoller.Admin.Settings
   alias SkollerWeb.Admin.SettingView
-  alias Skoller.Class.StudentClass
   alias Skoller.Class.Assignment
   alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
   alias SkollerWeb.Admin.ForecastView
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Assignments.Mods
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   import Ecto.Query
   
   @admin_role 200
-
-  @community 2
   
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
@@ -84,13 +82,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
     settings = Settings.get_auto_update_settings()
     enrollment_threshold = get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
 
-    from(m in Mod)
-    |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
-    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
-    |> where([m], m.is_auto_update == false and m.is_private == false)
-    |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
-    |> select([m, act], act)
-    |> Repo.all()
+    Mods.get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold)
     |> Enum.filter(&compare_shared(&1, settings))
     |> Enum.filter(&compare_responses(&1, settings))
     |> Enum.each(&auto_update_mod(&1))
@@ -146,54 +138,16 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
 
   defp get_people() do
     Map.new()
-    |> Map.put(:creators, get_creators())
-    |> Map.put(:followers, get_followers())
-    |> Map.put(:pending, get_pending())
-    |> Map.put(:joyriders, get_joyriders())
-  end
-
-  defp get_joyriders() do
-    from(a in Action)
-    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
-    |> where([a], a.is_accepted == true and a.is_manual == false)
-    |> where([a, sc], sc.is_dropped == false)
-    |> distinct([a, sc], sc.student_id)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_pending() do
-    from(a in Action)
-    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
-    |> where([a], is_nil(a.is_accepted))
-    |> where([a, sc], sc.is_dropped == false)
-    |> distinct([a, sc], sc.student_id)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_followers() do
-    from(a in Action)
-    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
-    |> where([a], a.is_manual == true and a.is_accepted == true)
-    |> where([a, sc], sc.is_dropped == false)
-    |> distinct([a, sc], sc.student_id)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  defp get_creators() do
-    from(m in Mod)
-    |> join(:inner, [m], sc in StudentClass, sc.student_id == m.student_id)
-    |> join(:inner, [m, sc], cm in subquery(community_sub(@community)), cm.class_id == sc.class_id)
-    |> distinct([m], m.student_id)
-    |> Repo.aggregate(:count, :id)
+    |> Map.put(:creators, Mods.get_creators())
+    |> Map.put(:followers, Mods.get_followers())
+    |> Map.put(:pending, Mods.get_pending())
+    |> Map.put(:joyriders, Mods.get_joyriders())
   end
 
   defp get_metrics(settings) do
-    eligible_communities = get_eligible_communities(@community)
-    shared_mods = get_shared_mods()
-    responded_mods = get_responded_mods()
+    eligible_communities = get_eligible_communities()
+    shared_mods = Mods.get_shared_mods()
+    responded_mods = Mods.get_responded_mods()
 
     approval_threshold = responded_mods |> Enum.filter(&compare_responses(&1, settings))
     response_threshold = shared_mods |> Enum.filter(&compare_shared(&1, settings))
@@ -251,46 +205,15 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
     setting.value
   end
 
-  defp get_responded_mods() do
-    from(m in Mod)
-    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(community_sub(@community)), sc.class_id == a.class_id)
-    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
-    |> where([m], m.is_private == false)
-    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
-    |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
-    |> Repo.all()
-  end
-
-  defp get_shared_mods() do
-    from(m in Mod)
-    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(community_sub(@community)), sc.class_id == a.class_id)
-    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
-    |> where([m], m.is_private == false)
-    |> select([m, a, sc, act], %{mod: m, responses: act.responses, audience: act.audience})
-    |> Repo.all()
-  end
-
   defp get_eligible_communities(threshold) do
-    from(sc in subquery(community_sub(threshold)))
+    from(sc in subquery(Students.get_communities(threshold)))
     |> where([sc], fragment("exists(select 1 from assignment_modifications am inner join assignments a on a.id = am.assignment_id where am.is_private = false and a.class_id = ?)", sc.class_id))
     |> Repo.all()
   end
 
-  defp mod_responses_sub() do
-    from(a in Action)
-    |> join(:inner, [a], sc in StudentClass, sc.id == a.student_class_id)
-    |> where([a, sc], sc.is_dropped == false)
-    |> group_by([a], a.assignment_modification_id)
-    |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
-  end
-
-  defp community_sub(threshold) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= ^threshold)
-    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
+  defp get_eligible_communities() do
+    from(sc in subquery(Students.get_communities()))
+    |> where([sc], fragment("exists(select 1 from assignment_modifications am inner join assignments a on a.id = am.assignment_id where am.is_private = false and a.class_id = ?)", sc.class_id))
+    |> Repo.all()
   end
 end
