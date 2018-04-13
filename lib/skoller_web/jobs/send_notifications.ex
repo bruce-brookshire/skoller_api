@@ -3,7 +3,7 @@ defmodule SkollerWeb.Jobs.SendNotifications do
   alias Skoller.Repo
   alias Skoller.Users.User
   alias Skoller.User.Device
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Class.StudentClass
   alias Skoller.Class.StudentAssignment
   alias SkollerWeb.Notification

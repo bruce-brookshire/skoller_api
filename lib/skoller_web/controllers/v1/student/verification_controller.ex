@@ -2,7 +2,7 @@ defmodule SkollerWeb.Api.V1.Student.VerificationController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias SkollerWeb.Helpers.VerificationHelper
   alias SkollerWeb.Sms
 

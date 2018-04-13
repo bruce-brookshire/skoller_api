@@ -12,6 +12,8 @@ defmodule Skoller.Users.User do
   import Ecto.Changeset
 
   alias Skoller.Users.User
+  alias Skoller.Students.Student
+  alias Skoller.Role
 
   schema "users" do
     field :email, :string
@@ -19,8 +21,8 @@ defmodule Skoller.Users.User do
     field :password_hash, :string
     field :pic_path, :string
     field :is_active, :boolean, default: true
-    belongs_to :student, Skoller.Student
-    many_to_many :roles, Skoller.Role, join_through: "user_roles"
+    belongs_to :student, Student
+    many_to_many :roles, Role, join_through: "user_roles"
     timestamps()
   end
 

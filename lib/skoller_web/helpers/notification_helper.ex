@@ -3,7 +3,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Repo
   alias SkollerWeb.Notification
   alias Skoller.Assignment.Mod.Action
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Class.StudentClass
   alias Skoller.Class.StudentAssignment
   alias Skoller.Assignment.Mod

@@ -5,7 +5,7 @@ defmodule SkollerWeb.Assignment.ModView do
   alias SkollerWeb.ClassView
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Class.StudentClass
   alias Skoller.Assignment.Mod.Action
 

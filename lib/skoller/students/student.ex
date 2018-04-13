@@ -1,4 +1,4 @@
-defmodule Skoller.Student do
+defmodule Skoller.Students.Student do
 
   @moduledoc """
 
@@ -8,7 +8,7 @@ defmodule Skoller.Student do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Users.User
   alias Skoller.School.FieldOfStudy
   alias Skoller.Schools.Class

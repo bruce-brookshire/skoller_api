@@ -1,7 +1,7 @@
 defmodule Skoller.StudentTest do
   use Skoller.DataCase
 
-  alias Skoller.Student
+  alias Skoller.Students.Student
 
   @valid_attrs %{birthday: "2017-10-12T18:51:53Z", 
                 gender: "male", 

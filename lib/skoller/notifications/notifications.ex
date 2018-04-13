@@ -1,7 +1,7 @@
 defmodule Skoller.Notifications do
 
   alias Skoller.Repo
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.User
   alias Skoller.Classes
   alias Skoller.Students

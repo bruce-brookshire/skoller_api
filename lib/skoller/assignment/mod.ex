@@ -9,6 +9,9 @@ defmodule Skoller.Assignment.Mod do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignment.Mod
+  alias Skoller.Students.Student
+  alias Skoller.Class.Assignment
+  alias Skoller.Assignment.Mod.Type
 
   schema "assignment_modifications" do
     field :data, :map
@@ -17,9 +20,9 @@ defmodule Skoller.Assignment.Mod do
     field :assignment_mod_type_id, :id
     field :student_id, :id
     field :is_auto_update, :boolean, default: false
-    belongs_to :assignment, Skoller.Class.Assignment, define_field: false
-    belongs_to :assignment_mod_type, Skoller.Assignment.Mod.Type, define_field: false
-    belongs_to :student, Skoller.Student, define_field: false
+    belongs_to :assignment, Assignment, define_field: false
+    belongs_to :assignment_mod_type, Type, define_field: false
+    belongs_to :student, Student, define_field: false
 
     timestamps()
   end
