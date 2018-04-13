@@ -9,6 +9,8 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Helpers.ClassCalcs
 
+  @enrollment_path "/e/"
+
   def render("index.json", %{student_classes: student_classes}) do
     render_many(student_classes, StudentClassView, "student_class.json")
   end
@@ -41,6 +43,7 @@ defmodule SkollerWeb.Class.StudentClassView do
       is_notifications: student_class.is_notifications,
       assignments: render_many(get_ordered_assignments(student_class), StudentAssignmentView, "student_assignment.json"),
       weights: render_many(class.weights, WeightView, "weight.json"),
+      enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
     } 
     |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
   end

@@ -63,7 +63,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
   defp insert_student_class(conn, class_id, params) do
     case Students.enroll_in_class(class_id, params) do
-      {:ok, %{student_class: student_class}} ->
+      {:ok, student_class} ->
         render(conn, StudentClassView, "show.json", student_class: student_class)
       {:error, _, failed_value, _} ->
         conn

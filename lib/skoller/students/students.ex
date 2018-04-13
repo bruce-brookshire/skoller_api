@@ -28,6 +28,7 @@ defmodule Skoller.Students do
   import Ecto.Query
 
   @community_threshold 2
+  @link_length 5
 
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
@@ -44,6 +45,10 @@ defmodule Skoller.Students do
     Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
   end
 
+  def get_student_class_by_id(id) do
+    Repo.get(StudentClass, id)
+  end
+
   def get_student_class_by_id!(id) do
     Repo.get!(StudentClass, id)
   end
@@ -53,13 +58,19 @@ defmodule Skoller.Students do
     
     class = Classes.get_class_by_id(class_id)
 
-    Ecto.Multi.new
+    multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
     |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
     |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
-    |> Repo.transaction()
+    
+    case multi |> Repo.transaction() do
+      {:ok, trans} -> 
+        {:ok, get_student_class_by_id(trans.student_class.id)}
+      error -> error
+    end
   end
 
   def update_enrolled_class(old_student_class, params) do
@@ -339,6 +350,18 @@ defmodule Skoller.Students do
     |> Ecto.Multi.update(:student_assignment, changeset)
     |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
     |> Repo.transaction()
+  end
+
+  defp generate_enrollment_link(%StudentClass{id: id} = student_class) do
+    link = @link_length
+    |> :crypto.strong_rand_bytes() 
+    |> Base.url_encode64 
+    |> binary_part(0, @link_length)
+    |> Kernel.<>(to_string(id))
+
+    student_class
+    |> Ecto.Changeset.change(%{enrollment_link: link})
+    |> Repo.update()
   end
 
   # 1. Check for existing base Assignment, pass to next multi call.

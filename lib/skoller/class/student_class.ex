@@ -19,6 +19,8 @@ defmodule Skoller.Class.StudentClass do
     field :color, :string
     field :is_notifications, :boolean, default: true
     field :is_dropped, :boolean, default: false
+    field :enrollment_link, :string
+    field :enrolled_by, :id
     belongs_to :class, Class, define_field: false
     belongs_to :student, Student, define_field: false
     has_many :student_assignments, StudentAssignment
