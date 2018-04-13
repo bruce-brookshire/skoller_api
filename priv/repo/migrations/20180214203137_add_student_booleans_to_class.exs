@@ -14,7 +14,7 @@ defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
     end
     flush()
     from(c in Class)
-    |> update([c], set: [class_status_id: 200, is_new_class: true, is_student_created: true])
+    |> update([c], set: [class_status_id: 200, is_student_created: true])
     |> where([c], c.class_status_id == 100)
     |> Repo.update_all([])
   
