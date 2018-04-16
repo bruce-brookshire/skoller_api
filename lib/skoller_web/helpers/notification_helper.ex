@@ -8,7 +8,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Class.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Users.User
-  alias Skoller.Users.Device
+  alias Skoller.Devices.Device
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
   alias Skoller.Chat.Comment.Star, as: CommentStar
@@ -18,6 +18,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Students
   alias Skoller.Assignments.Mods
   alias Skoller.Notifications
+  alias Skoller.Devices
 
   import Ecto.Query
 
@@ -86,7 +87,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = Notifications.get_user_from_student_class(action.student_class_id)
-    devices = user.user |> get_user_devices()
+    devices = user.user.id |> Devices.get_devices_by_user_id()
     case devices do
       [] -> :ok
       _ -> action |> build_notifications(user, devices)
@@ -107,17 +108,10 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     mod.actions |> Enum.each(&send_mod_update_notifications(&1))
   end
 
-  def get_user_devices(%User{} = user) do
-    from(dev in Device)
-    |> join(:inner, [dev], user in User, user.id == dev.user_id)
-    |> where([dev, user], user.id == ^user.id)
-    |> Repo.all
-  end
-
   def send_class_complete_notification(%{is_editable: true} = class) do
     users = class 
             |> get_users_from_class()
-    devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+    devices = users |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
     class = class |> Repo.preload([:assignments])
     msg = class.assignments |> class_complete_msg()
     
@@ -149,7 +143,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
           msg <> (text |> String.slice(1..len))
         end
         users = get_users_from_student_class(action.student_class_id)
-        devices = users |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+        devices = users |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
         devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
       false -> 
         :ok
@@ -229,7 +223,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     |> where([u, s], s.is_notifications == true)
     |> distinct([u], u.id)
     |> Repo.all()
-    |> Enum.reduce([], &get_user_devices(&1) ++ &2)
+    |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
 
     Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
 

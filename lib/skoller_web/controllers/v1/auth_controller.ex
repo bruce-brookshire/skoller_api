@@ -2,9 +2,8 @@ defmodule SkollerWeb.Api.V1.AuthController do
   use SkollerWeb, :controller
 
   alias Skoller.Users
-  alias Skoller.Repo
+  alias Skoller.Devices
   alias SkollerWeb.AuthView
-  alias Skoller.Users.Device
   alias SkollerWeb.Helpers.TokenHelper
   
   import SkollerWeb.Helpers.AuthPlug
@@ -35,10 +34,8 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid, "type" => type}) do
-    Device
-    |> Repo.get_by!(udid: udid, type: type, user_id: user.id)
-    |> Repo.delete!()
-
+    Devices.get_device_by_attributes!(udid, type, user.id)
+    |> Devices.delete_device!()
     conn
   end
   def deregister_devices(conn, _params), do: conn

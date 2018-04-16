@@ -22,7 +22,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Class.Assignment
   alias Skoller.Students.Student
   alias Skoller.School.FieldOfStudy
-  alias Skoller.Users.Device
+  alias Skoller.Devices.Device
 
   def run(_) do
     ensure_started(Repo, [])
