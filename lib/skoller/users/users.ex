@@ -38,13 +38,17 @@ defmodule Skoller.Users do
   def update_user(user_old, params) do
     changeset = User.changeset_update_admin(user_old, params)
     
-    Ecto.Multi.new
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.run(:delete_roles, &delete_roles(&1, params))
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
-    |> Ecto.Multi.run(:delete_fields_of_study, &delete_fields_of_study(&1, params))
-    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
-    |> Repo.transaction()
+    case changeset.changes == %{} do
+      true -> {:ok, %{user: user_old}}
+      false -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.update(:user, changeset)
+        |> Ecto.Multi.run(:delete_roles, &delete_roles(&1, params))
+        |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+        |> Ecto.Multi.run(:delete_fields_of_study, &delete_fields_of_study(&1, params))
+        |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+        |> Repo.transaction()
+    end
   end
 
   def get_user_by_email(email) do
