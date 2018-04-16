@@ -7,6 +7,7 @@ defmodule Skoller.Notifications do
   alias Skoller.Classes
   alias Skoller.Students
   alias Skoller.Class.StudentAssignment
+  alias Skoller.Class.StudentClass
   alias Skoller.Class.Assignment
 
   import Ecto.Query
@@ -53,5 +54,35 @@ defmodule Skoller.Notifications do
     |> where([d, u, s, sc, a], a.id == ^assignment_id)
     |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
     |> Repo.all()
+  end
+
+  def get_assignment_reminders(time, atom) do
+    {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
+    now = DateTime.utc_now() |> DateTime.to_date()
+
+    from(student in Student)
+    |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
+    |> join(:inner, [student, sclass], sassign in StudentAssignment, sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true)
+    |> join(:inner, [student, sclass, sassign], user in User, user.student_id == student.id)
+    |> join(:inner, [student, sclass, sassign, user], device in Device, user.id == device.user_id)
+    |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
+    |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
+    |> filter_due_date(now, atom, time)
+    |> where([student, sclass], sclass.is_dropped == false)
+    |> group_by([student, sclass, sassign, user, device], [device.udid, student.notification_days_notice])
+    |> select([student, sclass, sassign, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
+    |> Repo.all()
+  end
+
+  defp filter_due_date(query, date, :today, time) do
+    query 
+    |> where([student, sclass, sassign], fragment("?::date", sassign.due) == ^date)
+    |> where([student], student.notification_time == ^time)
+  end
+
+  defp filter_due_date(query, date, :future, time) do
+    query 
+    |> where([student, sclass, sassign], fragment("?::date", sassign.due) > ^date and fragment("?::date", sassign.due) <= date_add(^date, student.notification_days_notice, "day"))
+    |> where([student], student.future_reminder_notification_time == ^time)
   end
 end
