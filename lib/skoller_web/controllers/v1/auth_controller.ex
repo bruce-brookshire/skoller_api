@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   alias Skoller.Users
   alias Skoller.Repo
   alias SkollerWeb.AuthView
-  alias Skoller.User.Device
+  alias Skoller.Users.Device
   alias SkollerWeb.Helpers.TokenHelper
   
   import SkollerWeb.Helpers.AuthPlug

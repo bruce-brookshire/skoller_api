@@ -1,7 +1,7 @@
-defmodule Skoller.User.Device do
+defmodule Skoller.Users.Device do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.User.Device
+  alias Skoller.Users.Device
 
   schema "user_devices" do
     field :type, :string

@@ -8,7 +8,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Class.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Users.User
-  alias Skoller.User.Device
+  alias Skoller.Users.Device
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
   alias Skoller.Chat.Comment.Star, as: CommentStar

@@ -2,7 +2,7 @@ defmodule SkollerWeb.Api.V1.DeviceController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.User.Device
+  alias Skoller.Users.Device
   alias SkollerWeb.User.DeviceView
   
   import SkollerWeb.Helpers.AuthPlug
