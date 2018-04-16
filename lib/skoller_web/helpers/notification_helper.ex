@@ -6,10 +6,8 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Students.Student
   alias Skoller.Class.StudentClass
   alias Skoller.Assignment.Mod
-  alias Skoller.Users.User
   alias Skoller.Class.Assignment
   alias Skoller.Classes
-  alias Skoller.Students
   alias Skoller.Assignments.Mods
   alias Skoller.Notifications
   alias Skoller.Devices
@@ -103,9 +101,9 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   end
 
   def send_class_complete_notification(%{is_editable: true} = class) do
-    users = class 
-            |> get_users_from_class()
-    devices = users |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
+    devices = class.id
+            |> Notifications.get_users_from_class()
+            |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
     class = class |> Repo.preload([:assignments])
     msg = class.assignments |> class_complete_msg()
     
@@ -136,9 +134,9 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
           msg = text |> String.slice(0..0) |> String.upcase()
           msg <> (text |> String.slice(1..len))
         end
-        users = get_users_from_student_class(action.student_class_id)
-        devices = users |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
-        devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
+        Notifications.get_users_from_student_class(action.student_class_id)
+        |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
+        |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
       false -> 
         :ok
     end
@@ -183,13 +181,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   end
 
   def send_needs_syllabus_notifications() do
-    users = from(u in User)
-    |> join(:inner, [u], s in Student, s.id == u.student_id)
-    |> join(:inner, [u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [u, s, sc], c in subquery(Classes.need_syllabus_status_class_subquery()), c.id == sc.class_id)
-    |> where([u, s], s.is_notifications == true)
-    |> distinct([u], u.id)
-    |> Repo.all()
+    users = Notifications.get_notification_enabled_needs_syllabus_users()
     |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
 
     Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
@@ -261,25 +253,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
       1 -> @we_created <> " 1 " <> @one_assign_class_complete
       num -> @we_created <> " " <> to_string(num) <> " " <> @multiple_assign_class_complete
     end
-  end
-
-  defp get_users_from_class(class) do
-    from(sc in subquery(Students.get_enrollment_by_class_id_subquery(class.id)))
-    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
-    |> where([sc, user, stu], stu.is_notifications == true)
-    |> select([sc, user], user)
-    |> Repo.all
-  end
-
-  defp get_users_from_student_class(id) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
-    |> where([sc, user], sc.id == ^id)
-    |> where([sc, user, stu], stu.is_notifications == true)
-    |> select([sc, user], user)
-    |> Repo.all
   end
 
   defp build_notifications(%Action{} = action, %{student: student}, devices) do

@@ -110,6 +110,35 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  def get_notification_enabled_needs_syllabus_users() do
+    from(u in User)
+    |> join(:inner, [u], s in Student, s.id == u.student_id)
+    |> join(:inner, [u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [u, s, sc], c in subquery(Classes.need_syllabus_status_class_subquery()), c.id == sc.class_id)
+    |> where([u, s], s.is_notifications == true)
+    |> distinct([u], u.id)
+    |> Repo.all()
+  end
+
+  def get_users_from_class(class_id) do
+    from(sc in subquery(Students.get_enrollment_by_class_id_subquery(class_id)))
+    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
+    |> where([sc, user, stu], stu.is_notifications == true)
+    |> select([sc, user], user)
+    |> Repo.all()
+  end
+  
+  def get_users_from_student_class(id) do
+    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
+    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
+    |> where([sc, user], sc.id == ^id)
+    |> where([sc, user, stu], stu.is_notifications == true)
+    |> select([sc, user], user)
+    |> Repo.all
+  end
+
   defp filter_due_date(query, date, :today, time) do
     query 
     |> where([student, sclass, sassign], fragment("?::date", sassign.due) == ^date)
