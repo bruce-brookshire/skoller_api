@@ -2,7 +2,6 @@ defmodule SkollerWeb.UserView do
   use SkollerWeb, :view
 
   alias SkollerWeb.UserView
-  alias Skoller.Repo
 
   def render("index.json", %{users: users}) do
     render_many(users, UserView, "user.json")
@@ -22,7 +21,6 @@ defmodule SkollerWeb.UserView do
   end
 
   def render("user_detail.json", %{user: user}) do
-    user = user |> Repo.preload([:student, :roles])
     user
     |> render_one(UserView, "user.json")
     |> Map.merge(

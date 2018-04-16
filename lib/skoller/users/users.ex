@@ -18,12 +18,12 @@ defmodule Skoller.Users do
 
   def get_user_by_id!(id) do
     Repo.get!(User, id)
-    |> Repo.preload(:student)
+    |> Repo.preload([:roles, :student])
   end
 
   def get_user_by_id(id) do
     Repo.get(User, id)
-    |> Repo.preload(:student)
+    |> Repo.preload([:roles, :student])
   end
 
   def create_user(params, opts \\ []) do
