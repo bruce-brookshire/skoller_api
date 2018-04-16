@@ -7,9 +7,8 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     alias Skoller.Class.Lock
     alias SkollerWeb.Helpers.RepoHelper
     alias Skoller.Mailer
-    alias Skoller.Users.User
     alias Skoller.Classes
-    alias Skoller.Students
+    alias Skoller.Users
 
     import SkollerWeb.Helpers.AuthPlug
     import Ecto.Query
@@ -57,10 +56,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
 
       case Repo.transaction(multi) do
         {:ok, %{class: %{class_status_id: @syllabus_status} = class}} ->
-          from(u in User)
-          |> join(:inner, [u], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == u.student_id)
-          |> where([u, sc], sc.class_id == ^class.id)
-          |> Repo.all()
+          Users.get_users_in_class(class.id)
           |> Enum.each(&send_need_syllabus_email(&1, class))
           render(conn, ClassView, "show.json", class: class)
         {:ok, %{class: class}} ->
