@@ -128,16 +128,22 @@ defmodule Skoller.Users do
     Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
   end
 
-  defp add_roles(%{user: %{student: _student} = user}, _params) do
+  defp add_roles(%{user: user}, params) do
+    user 
+    |> Repo.preload(:student)
+    |> add_roles_preloaded(params)
+  end
+
+  defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
     Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
   end
-  defp add_roles(%{user: user}, %{"roles" => roles}) do
+  defp add_roles_preloaded(user, %{"roles" => roles}) do
     status = roles
     |> Enum.map(&add_role(user, &1))
     
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
-  defp add_roles(_map, _params), do: {:ok, nil}
+  defp add_roles_preloaded(_map, _params), do: {:ok, nil}
 
   defp add_role(user, role) do
     Repo.insert!(%UserRole{user_id: user.id, role_id: role})
