@@ -1,9 +1,9 @@
 defmodule SkollerWeb.Api.V1.AuthController do
   use SkollerWeb, :controller
 
+  alias Skoller.Users
   alias Skoller.Repo
   alias SkollerWeb.AuthView
-  alias Skoller.Users.User
   alias Skoller.User.Device
   alias SkollerWeb.Helpers.TokenHelper
   
@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   plug :verify_user_exists
 
   def login(conn, %{"email" => email, "password" => password}) do
-    user = Repo.get_by(User, email: String.downcase(email))
+    user = Users.get_user_by_email(email)
 
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
         {:ok, token} = TokenHelper.login(user)

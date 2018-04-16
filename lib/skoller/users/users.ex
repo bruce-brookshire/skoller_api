@@ -8,6 +8,7 @@ defmodule Skoller.Users do
   alias Skoller.School.StudentField
   alias Skoller.UserRole
   alias Skoller.Students
+  alias Skoller.Class.Lock
   alias SkollerWeb.Helpers.RepoHelper
 
   import Ecto.Query
@@ -42,10 +43,28 @@ defmodule Skoller.Users do
     |> Repo.transaction()
   end
 
+  def get_user_by_email(email) do
+    Repo.get_by(User, email: String.downcase(email))
+  end
+
+  def change_password(user_old, password) do
+    user_old
+    |> User.changeset_update(%{"password" => password})
+    |> Repo.update()
+  end
+
   def get_users_in_class(id) do
     from(u in User)
     |> join(:inner, [u], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == u.student_id)
     |> where([u, sc], sc.class_id == ^id)
+    |> Repo.all()
+  end
+
+  def get_user_locks_by_class(class_id) do
+    from(l in Lock)
+    |> join(:inner, [l], u in User, l.user_id == u.id)
+    |> where([l], l.class_id == ^class_id)
+    |> select([l, u], %{lock: l, user: u})
     |> Repo.all()
   end
 

@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Api.V1.ForgotEmailController do
   use SkollerWeb, :controller
 
-  alias Skoller.Users.User
+  alias Skoller.Users
   alias Skoller.Repo
   alias Skoller.Mailer
   alias SkollerWeb.Helpers.TokenHelper
@@ -17,7 +17,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   @this_link "this link"
 
   def forgot(conn, %{"email" => email}) do
-    case Repo.get_by(User, email: email) do
+    case Users.get_user_by_email(email) do
       nil -> conn |> send_resp(204, "")
       user -> user |> send_forgot_pass_email()
     end
@@ -25,8 +25,9 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   end
 
   def reset(conn, %{"password" => password}) do
-    changeset = User.changeset_update(conn.assigns[:user], %{"password" => password})
-    multi = changeset |> update_user()
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.run(:user, Users.change_password(conn.assigns[:user], password))
+    |> Ecto.Multi.run(:token, &TokenHelper.login(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{} = auth} ->
@@ -37,7 +38,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
     end
   end
 
-  defp send_forgot_pass_email(%User{} = user) do
+  defp send_forgot_pass_email(user) do
     {:ok, token} = user |> TokenHelper.short_token()
     user 
     |> forgot_pass_email(token)
@@ -51,11 +52,5 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
     |> subject("Forgot Password")
     |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Mailer.signature())
     |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Mailer.text_signature())
-  end
-
-  defp update_user(changeset) do
-    Ecto.Multi.new
-    |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.run(:token, &TokenHelper.login(&1))
   end
 end
