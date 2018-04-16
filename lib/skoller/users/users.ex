@@ -10,8 +10,11 @@ defmodule Skoller.Users do
   alias Skoller.Students
   alias Skoller.Class.Lock
   alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Helpers.VerificationHelper
 
   import Ecto.Query
+
+  @student_role 100
 
   def get_user_by_id!(id) do
     Repo.get!(User, id)
@@ -27,6 +30,7 @@ defmodule Skoller.Users do
     %User{}
     |> User.changeset_insert(params)
     |> verify_student(opts)
+    |> verification_code(opts)
     |> insert_user(params)
     |> Repo.transaction()
   end
@@ -68,6 +72,15 @@ defmodule Skoller.Users do
     |> Repo.all()
   end
 
+  defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
+    case opts |> List.keytake(:admin, 0) |> elem(0) do
+      {:admin, "true"} -> u_changeset
+      _ ->
+        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, VerificationHelper.generate_verify_code)})
+    end
+  end
+  defp verification_code(changeset, _opts), do: changeset
+
   defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
     case opts |> List.keytake(:admin, 0) |> elem(0) do
       {:admin, "true"} -> 
@@ -95,6 +108,9 @@ defmodule Skoller.Users do
     Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
   end
 
+  defp add_roles(%{user: %{student: _student} = user}, _params) do
+    Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+  end
   defp add_roles(%{user: user}, %{"roles" => roles}) do
     status = roles
     |> Enum.map(&add_role(user, &1))
