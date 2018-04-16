@@ -9,6 +9,9 @@ defmodule Skoller.Notifications do
   alias Skoller.Class.StudentAssignment
   alias Skoller.Class.StudentClass
   alias Skoller.Class.Assignment
+  alias Skoller.Chat.Post.Star, as: PostStar
+  alias Skoller.Chat.Comment.Star, as: CommentStar
+  alias Skoller.Chat.Comment
 
   import Ecto.Query
 
@@ -71,6 +74,39 @@ defmodule Skoller.Notifications do
     |> where([student, sclass], sclass.is_dropped == false)
     |> group_by([student, sclass, sassign, user, device], [device.udid, student.notification_days_notice])
     |> select([student, sclass, sassign, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
+    |> Repo.all()
+  end
+
+  def get_notification_enabled_chat_post_users(student_id, chat_post_id) do
+    from(s in PostStar)
+    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.chat_post_id == ^chat_post_id and s.student_id != ^student_id)
+    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> select([s, stu, u], u)
+    |> Repo.all()
+  end
+
+  def get_notification_enabled_chat_comment_users(student_id, chat_comment_id) do
+    from(s in CommentStar)
+    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.student_id != ^student_id)
+    |> where([s], s.chat_comment_id == ^chat_comment_id)
+    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> select([s, stu, u], u)
+    |> Repo.all()
+  end
+
+  def get_notification_enabled_chat_post_users_by_comment(student_id, chat_comment_id) do
+    from(s in PostStar)
+    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
+    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
+    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
+    |> where([s], s.student_id != ^student_id)
+    |> where([s, c], c.id == ^chat_comment_id)
+    |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
+    |> select([s, c, stu, u], u)
     |> Repo.all()
   end
 

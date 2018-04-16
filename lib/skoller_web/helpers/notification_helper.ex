@@ -8,10 +8,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Assignment.Mod
   alias Skoller.Users.User
   alias Skoller.Class.Assignment
-  alias Skoller.Class.Weight
-  alias Skoller.Chat.Comment.Star, as: CommentStar
-  alias Skoller.Chat.Post.Star, as: PostStar
-  alias Skoller.Chat.Comment
   alias Skoller.Classes
   alias Skoller.Students
   alias Skoller.Assignments.Mods
@@ -159,13 +155,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def send_new_comment_notification(comment, student_id) do
     comment = comment |> Repo.preload([:student, :chat_post])
 
-    users = from(s in PostStar)
-    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.chat_post_id == ^comment.chat_post_id and s.student_id != ^student_id)
-    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
-    |> select([s, stu, u], u)
-    |> Repo.all()
+    users = Notifications.get_notification_enabled_chat_post_users(student_id, comment.chat_post_id)
     |> Enum.map(&Map.put(&1, :msg, get_chat_message(&1, comment)))
 
     users 
@@ -176,28 +166,13 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def send_new_reply_notification(reply, student_id) do
     reply = reply |> Repo.preload([:student, :chat_comment])
 
-    comment_users = from(s in CommentStar)
-    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.student_id != ^student_id)
-    |> where([s], s.chat_comment_id == ^reply.chat_comment_id)
-    |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
-    |> select([s, stu, u], u)
-    |> Repo.all()
+    comment_users = Notifications.get_notification_enabled_chat_comment_users(student_id, reply.chat_comment_id)
     |> Enum.map(&Map.put(&1, :msg, get_chat_reply_msg(&1, reply)))
 
     user_ids = comment_users |> List.foldl([], &List.wrap(&1.id) ++ &2)
 
-    post_users = from(s in PostStar)
-    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
-    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
-    |> where([s], s.student_id != ^student_id)
-    |> where([s, c], c.id == ^reply.chat_comment_id)
-    |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
-    |> where([s, c, stu, u], u.id not in ^user_ids)
-    |> select([s, c, stu, u], u)
-    |> Repo.all()
+    post_users = Notifications.get_notification_enabled_chat_post_users_by_comment(student_id, reply.chat_comment_id)
+    |> Enum.filter(& &1.id not in user_ids)
     |> Enum.map(&Map.put(&1, :msg, reply.student.name_first <> " " <> reply.student.name_last <> @replied_post))
 
     users = post_users ++ comment_users
