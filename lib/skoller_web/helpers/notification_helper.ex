@@ -5,10 +5,8 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Students.Student
   alias Skoller.Class.StudentClass
-  alias Skoller.Class.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Users.User
-  alias Skoller.Devices.Device
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
   alias Skoller.Chat.Comment.Star, as: CommentStar
@@ -154,13 +152,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   def send_new_post_notification(post, student_id) do
     student = Repo.get!(Student, student_id)
     class = Classes.get_class_by_id!(post.class_id)
-    from(d in Device)
-    |> join(:inner, [d], u in User, d.user_id == u.id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> where([d, u, s], s.is_chat_notifications == true and s.is_notifications == true and s.id != ^student_id)
-    |> where([d, u, s, sc], sc.class_id == ^post.class_id)
-    |> Repo.all()
+    Notifications.get_class_chat_devices_by_class_id(student_id, post.class_id)
     |> Enum.each(&Notification.create_notification(&1.udid, build_chat_post_notification(post, student, class), @class_chat_post))
   end
 
@@ -232,17 +224,11 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   end
 
   def send_custom_notification(msg) do
-    users = from(u in User)
-    |> join(:inner, [u], s in Student, s.id == u.student_id)
-    |> join(:inner, [u, s], d in Device, d.user_id == u.id)
-    |> where([u, s], s.is_notifications == true)
-    |> distinct([u, s, d], d.udid)
-    |> select([u, s, d], d)
-    |> Repo.all()
+    devices = Notifications.get_notification_enabled_devices()
 
-    Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_custom_category, msg: msg})
+    Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(devices), notification_category: @manual_custom_category, msg: msg})
   
-    users
+    devices
     |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
   end
 
@@ -250,16 +236,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     student = Repo.get!(Student, student_id)
     assignment = Repo.get!(Assignment, post.assignment_id)
     class = Classes.get_class_by_id!(assignment.class_id)
-    from(d in Device)
-    |> join(:inner, [d], u in User, u.id == d.user_id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
-    |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
-    |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
-    |> where([d, u, s, sc, a], a.id == ^post.assignment_id)
-    |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
-    |> Repo.all()
+    Notifications.get_assignment_post_devices_by_assignment(student_id, post.assignment_id)
     |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
   end
 
@@ -299,10 +276,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   end
 
   defp put_user_devices(user) do
-    from(dev in Device)
-    |> join(:inner, [dev], user in User, user.id == dev.user_id)
-    |> where([dev, user], user.id == ^user.id)
-    |> Repo.all()
+    Devices.get_devices_by_user_id(user.id)
     |> Enum.map(&Map.put(&1, :msg, user.msg))
   end
 
