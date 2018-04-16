@@ -27,12 +27,17 @@ defmodule Skoller.Users do
   end
 
   def create_user(params, opts \\ []) do
-    params
+    multi = params
     |> get_changeset()
     |> verify_student(opts)
     |> verification_code(opts)
     |> insert_user(params)
-    |> Repo.transaction()
+    
+    case multi |> Repo.transaction() do
+      {:error, _, failed_val, _} ->
+        {:error, failed_val}
+      {:ok, items} -> {:ok, items}
+    end
   end
 
   def update_user(user_old, params) do

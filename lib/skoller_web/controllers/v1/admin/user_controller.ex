@@ -17,7 +17,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     case Users.create_user(params) do
       {:ok, %{user: user}} ->
         render(conn, UserView, "show.json", user: user)
-      {:error, _, failed_value, _} ->
+      {:error, failed_value} ->
         conn
         |> RepoHelper.multi_error(failed_value)
     end

@@ -10,9 +10,9 @@ defmodule SkollerWeb.Api.V1.NewUserController do
 
   def create(conn, params) do
     multi = Ecto.Multi.new
-    |> Ecto.Multi.run(:user, Users.create_user(params))
+    |> Ecto.Multi.run(:user, &create_user(params, &1))
     |> Ecto.Multi.run(:token, &TokenHelper.login(&1.user))
-    
+
     case Repo.transaction(multi) do
       {:ok, %{user: %{student: student}} = auth} ->
         student.phone |> Sms.verify_phone(student.verification_code)
@@ -23,5 +23,9 @@ defmodule SkollerWeb.Api.V1.NewUserController do
         conn
         |> RepoHelper.multi_error(failed_value)
     end
+  end
+
+  defp create_user(params, _) do
+    Users.create_user(params)
   end
 end
