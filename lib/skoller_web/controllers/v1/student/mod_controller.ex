@@ -33,9 +33,13 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     end
   end
 
-  def index(conn, %{"student_id" => student_id}) do
-    mods = Mods.get_student_mods(student_id)
+  def show(conn, %{"student_id" => student_id, "id" => id}) do
+    mod = Mods.get_student_mod_by_id(student_id, id)
+    conn |> render(ModView, "show.json", mod: mod)
+  end
 
+  def index(conn, %{"student_id" => student_id} = params) do
+    mods = Mods.get_student_mods(student_id, params)
     conn |> render(ModView, "index.json", mods: mods)
   end
 
