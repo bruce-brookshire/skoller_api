@@ -14,9 +14,9 @@ defmodule SkollerWeb.Api.V1.NewUserController do
     |> Ecto.Multi.run(:token, &TokenHelper.login(&1.user))
 
     case Repo.transaction(multi) do
-      {:ok, %{user: %{student: student}} = auth} ->
+      {:ok, %{user: %{user: %{student: student} = user}, token: token}} ->
         student.phone |> Sms.verify_phone(student.verification_code)
-        render(conn, AuthView, "show.json", auth: auth)
+        render(conn, AuthView, "show.json", [user: user, token: token])
       {:ok, %{} = auth} ->
         render(conn, AuthView, "show.json", auth: auth)
       {:error, _, failed_value, _} ->

@@ -91,8 +91,9 @@ defmodule Skoller.Users do
   end
 
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case opts |> List.keytake(:admin, 0) |> elem(0) do
-      {:admin, "true"} -> u_changeset
+    case get_opt(opts, :admin) do
+      "true" -> 
+        u_changeset
       _ ->
         Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, VerificationHelper.generate_verify_code)})
     end
@@ -100,10 +101,11 @@ defmodule Skoller.Users do
   defp verification_code(changeset, _opts), do: changeset
 
   defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case opts |> List.keytake(:admin, 0) |> elem(0) do
-      {:admin, "true"} -> 
+    case get_opt(opts, :admin) do
+      "true" -> 
         Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :is_verified, true)})
-      _ -> u_changeset
+      _ -> 
+        u_changeset
     end
   end
   defp verify_student(changeset, _opts), do: changeset
@@ -157,4 +159,11 @@ defmodule Skoller.Users do
     {:ok, nil}
   end
   defp delete_fields_of_study(%{user: %{student: _student}}, _params), do: {:ok, nil}
+
+  defp get_opt(opts, atom) do
+    case opts |> List.keytake(atom, 0) do
+      nil -> nil
+      val -> val |> elem(0) |> elem(1)
+    end
+  end
 end
