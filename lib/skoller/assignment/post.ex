@@ -2,14 +2,15 @@ defmodule Skoller.Assignment.Post do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignment.Post
-
+  alias Skoller.Students.Student
+  alias Skoller.Class.Assignment
 
   schema "assignment_posts" do
     field :post, :string
     field :assignment_id, :id
     field :student_id, :id
-    belongs_to :student, Skoller.Student, define_field: false
-    belongs_to :assignment, Skoller.Class.Assignment, define_field: false
+    belongs_to :student, Student, define_field: false
+    belongs_to :assignment, Assignment, define_field: false
 
     timestamps()
   end

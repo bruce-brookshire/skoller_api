@@ -12,6 +12,8 @@ defmodule Skoller.Users.User do
   import Ecto.Changeset
 
   alias Skoller.Users.User
+  alias Skoller.Students.Student
+  alias Skoller.Role
 
   schema "users" do
     field :email, :string
@@ -19,8 +21,8 @@ defmodule Skoller.Users.User do
     field :password_hash, :string
     field :pic_path, :string
     field :is_active, :boolean, default: true
-    belongs_to :student, Skoller.Student
-    many_to_many :roles, Skoller.Role, join_through: "user_roles"
+    belongs_to :student, Student
+    many_to_many :roles, Role, join_through: "user_roles"
     timestamps()
   end
 
@@ -46,6 +48,19 @@ defmodule Skoller.Users.User do
     |> put_pass_hash()
   end
 
+  @doc false
+  def changeset_insert_university(%User{} = user, attrs) do
+    user
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
+    |> update_change(:email, &String.downcase(&1))
+    |> unique_constraint(:email)
+    |> cast_assoc(:student)
+    |> validate_format(:email, ~r/@.+\.edu$/)
+    |> put_pass_hash()
+  end
+
+  @doc false
   def changeset_update(%User{} = user, attrs) do
     user
     |> cast(attrs, @upd_fields)
@@ -54,6 +69,7 @@ defmodule Skoller.Users.User do
     |> put_pass_hash()
   end
 
+  @doc false
   def changeset_update_admin(%User{} = user, attrs) do
     user
     |> cast(attrs, @adm_upd_fields)

@@ -4,7 +4,7 @@ defmodule Skoller.Chat.Post do
   alias Skoller.Chat.Post
   alias Skoller.Schools.Class
   alias Skoller.Chat.Comment
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Chat.Post.Like
 
   schema "chat_posts" do

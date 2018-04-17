@@ -7,7 +7,7 @@ defmodule Skoller.Students do
   alias Skoller.Class.StudentClass
   alias Skoller.Schools.Class
   alias Skoller.Schools.School
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.School.FieldOfStudy
   alias Skoller.School.StudentField
   alias Skoller.Classes
@@ -97,7 +97,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Student` currently has.
+  Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Students.Student` currently has.
 
   ## Examples
 
@@ -137,7 +137,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns the `Skoller.Schools.School` and a count of `Skoller.Student`
+  Returns the `Skoller.Schools.School` and a count of `Skoller.Students.Student`
 
   ## Examples
 
@@ -153,7 +153,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns the `Skoller.School.FieldOfStudy` and a count of `Skoller.Student`
+  Returns the `Skoller.School.FieldOfStudy` and a count of `Skoller.Students.Student`
 
   ## Examples
 
@@ -171,7 +171,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns a subquery that provides a unique list of `Skoller.Schools.School` ids and `Skoller.Student` ids
+  Returns a subquery that provides a unique list of `Skoller.Schools.School` ids and `Skoller.Students.Student` ids
 
   """
   def get_schools_for_student_subquery() do
@@ -184,7 +184,7 @@ defmodule Skoller.Students do
 
   def get_student_subquery(_params \\ %{})
   @doc """
-  Returns a subquery that provides a list of `Skoller.Student` by `Skoller.Schools.School`
+  Returns a subquery that provides a list of `Skoller.Students.Student` by `Skoller.Schools.School`
 
   """
   def get_student_subquery(%{"school_id" => _school_id} = params) do
@@ -195,7 +195,7 @@ defmodule Skoller.Students do
     |> distinct([s], s.id)
   end
   @doc """
-  Returns a subquery that provides a list of `Skoller.Student`
+  Returns a subquery that provides a list of `Skoller.Students.Student`
 
   """
   def get_student_subquery(_params) do

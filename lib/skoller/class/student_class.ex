@@ -11,7 +11,7 @@ defmodule Skoller.Class.StudentClass do
   alias Skoller.Class.StudentAssignment
   alias Skoller.Class.StudentClass
   alias Skoller.Schools.Class
-  alias Skoller.Student
+  alias Skoller.Students.Student
 
   schema "student_classes" do
     field :student_id, :id

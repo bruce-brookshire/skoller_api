@@ -6,9 +6,9 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Class.Lock.Section
   alias Skoller.Repo
   alias SkollerWeb.Helpers.RepoHelper
-  alias Skoller.Users.User
   alias SkollerWeb.Class.LockView
   alias Skoller.Classes
+  alias Skoller.Users
 
   import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
@@ -21,11 +21,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   plug :verify_member, :class
 
   def index(conn, %{"class_id" => class_id}) do
-    locks = from(l in Lock)
-    |> join(:inner, [l], u in User, l.user_id == u.id)
-    |> where([l], l.class_id == ^class_id)
-    |> select([l, u], %{lock: l, user: u})
-    |> Repo.all()
+    locks = Users.get_user_locks_by_class(class_id)
 
     render(conn, LockView, "index.json", locks: locks)
   end

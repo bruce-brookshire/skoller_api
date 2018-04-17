@@ -1,18 +1,15 @@
 defmodule SkollerWeb.Api.V1.DeviceController do
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
-  alias Skoller.User.Device
+  alias Skoller.Devices
   alias SkollerWeb.User.DeviceView
   
   import SkollerWeb.Helpers.AuthPlug
 
   plug :verify_user
 
-  def register(conn, %{} = params) do
-    changeset = Device.changeset(%Device{}, params)
-
-    case Repo.insert(changeset) do
+  def register(conn, params) do
+    case Devices.create_device(params) do
       {:ok, user_device} ->
         conn |> render(DeviceView, "device.json", device: user_device)
       {:error, changeset} ->

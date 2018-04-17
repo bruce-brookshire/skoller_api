@@ -1,4 +1,4 @@
-defmodule Skoller.Student do
+defmodule Skoller.Students.Student do
 
   @moduledoc """
 
@@ -8,7 +8,7 @@ defmodule Skoller.Student do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Student
+  alias Skoller.Students.Student
   alias Skoller.Users.User
   alias Skoller.School.FieldOfStudy
   alias Skoller.Schools.Class
@@ -30,6 +30,7 @@ defmodule Skoller.Student do
     field :is_reminder_notifications, :boolean, default: true
     field :is_chat_notifications, :boolean, default: true
     field :is_assign_post_notifications, :boolean, default: true
+    field :is_university, :boolean, default: true
     field :organization, :string
     field :bio, :string
     field :grad_year, :string
@@ -46,7 +47,7 @@ defmodule Skoller.Student do
   @req_fields [:name_first, :name_last, :phone,
               :notification_time, :notification_days_notice, :is_notifications,
               :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications,
-               :is_assign_post_notifications, :future_reminder_notification_time]
+               :is_assign_post_notifications, :future_reminder_notification_time, :is_university]
   @opt_fields [:birthday, :gender, :organization, :bio, :grad_year]
   @all_fields @req_fields ++ @opt_fields
 

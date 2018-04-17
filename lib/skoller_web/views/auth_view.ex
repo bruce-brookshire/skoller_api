@@ -8,6 +8,13 @@ defmodule SkollerWeb.AuthView do
     render_one(auth, AuthView, "auth.json")
   end
 
+  def render("show.json", %{token: token, user: user}) do
+    auth = Map.new()
+    |> Map.put(:token, token)
+    |> Map.put(:user, user)
+    render_one(auth, AuthView, "auth.json")
+  end
+
   def render("auth.json", %{auth: %{token: token} = auth}) do
     %{token: token}
     |> Map.merge(%{

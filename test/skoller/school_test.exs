@@ -55,6 +55,6 @@ defmodule Skoller.SchoolTest do
 
   test "school insert with no timezone" do
     changeset = School.changeset_insert(%School{}, Map.delete(@valid_attrs, :timezone))
-    refute changeset.valid?
+    assert changeset.valid?
   end
 end

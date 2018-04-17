@@ -8,6 +8,8 @@ defmodule Skoller.Assignments.Mods do
   alias Skoller.Class.Assignment
   alias Skoller.Students
   alias Skoller.Schools.Class
+  alias Skoller.Users.User
+  alias Skoller.Students.Student
 
   import Ecto.Query
 
@@ -104,6 +106,17 @@ defmodule Skoller.Assignments.Mods do
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
+    |> Repo.all()
+  end
+
+  def get_student_pic_by_mod_acceptance(mod_id) do
+    from(user in User)
+    |> join(:inner, [user], stu in Student, user.student_id == stu.id)
+    |> join(:inner, [user, stu], sc in StudentClass, sc.student_id == stu.id)
+    |> join(:inner, [user, stu, sc], act in Action, act.student_class_id == sc.id)
+    |> where([user, stu, sc, act], act.assignment_modification_id == ^mod_id)
+    |> where([user, stu, sc, act], act.is_accepted == true)
+    |> select([user, stu, sc, act], user.pic_path)
     |> Repo.all()
   end
 

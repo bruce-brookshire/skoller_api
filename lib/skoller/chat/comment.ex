@@ -2,16 +2,19 @@ defmodule Skoller.Chat.Comment do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Comment
-
+  alias Skoller.Students.Student
+  alias Skoller.Chat.Reply
+  alias Skoller.Chat.Comment.Like
+  alias Skoller.Chat.Post
 
   schema "chat_comments" do
     field :comment, :string
     field :student_id, :id
     field :chat_post_id, :id
-    has_many :chat_replies, Skoller.Chat.Reply, foreign_key: :chat_comment_id
-    belongs_to :student, Skoller.Student, define_field: false
-    has_many :likes, Skoller.Chat.Comment.Like, foreign_key: :chat_comment_id
-    belongs_to :chat_post, Skoller.Chat.Post, define_field: false
+    has_many :chat_replies, Reply, foreign_key: :chat_comment_id
+    belongs_to :student, Student, define_field: false
+    has_many :likes, Like, foreign_key: :chat_comment_id
+    belongs_to :chat_post, Post, define_field: false
 
     timestamps()
   end

@@ -7,14 +7,14 @@ defmodule Skoller.Admin.Users do
   alias Skoller.Users.User
   alias Skoller.UserRole
   alias Skoller.Students
-  alias Skoller.Student
+  alias Skoller.Students.Student
 
   import Ecto.Query
 
   @student_role "100"
 
   @doc """
-  Returns a list of `Skoller.Users.User` and `Skoller.Student` based on filters.
+  Returns a list of `Skoller.Users.User` and `Skoller.Students.Student` based on filters.
 
   ## Filters
     * or :boolean
@@ -33,7 +33,7 @@ defmodule Skoller.Admin.Users do
   ## Examples
 
       iex> Skoller.Admin.Users.get_users(%{})
-      [{user: %Skoller.Users.User{}, student: %Skoller.Student{}]
+      [{user: %Skoller.Users.User{}, student: %Skoller.Students.Student{}]
 
   """
   def get_users(params \\ %{}) do

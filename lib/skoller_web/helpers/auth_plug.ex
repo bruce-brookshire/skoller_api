@@ -7,7 +7,7 @@ defmodule SkollerWeb.Helpers.AuthPlug do
   """
 
   alias Skoller.Repo
-  alias Skoller.Users.User
+  alias Skoller.Users
   alias Skoller.Classes
   alias Skoller.Class.Assignment
 
@@ -25,22 +25,18 @@ defmodule SkollerWeb.Helpers.AuthPlug do
   end
 
   def get_auth_obj(%Phoenix.Socket{} = socket) do
-    case Repo.get(User, Guardian.Phoenix.Socket.current_resource(socket)) do
-      %User{is_active: false} -> {:error, :inactive}
-      %User{} = user ->
-        user = user |> Repo.preload([:roles, :student])
-        {:ok, user}
+    case Users.get_user_by_id(Guardian.Phoenix.Socket.current_resource(socket)) do
+      %{is_active: false} -> {:error, :inactive}
       nil -> {:error, :no_user}
+      %{} = user -> {:ok, user}
     end
   end 
 
   def get_auth_obj(conn) do
-    case Repo.get(User, Guardian.Plug.current_resource(conn)) do
-      %User{is_active: false} -> {:error, :inactive}
-      %User{} = user ->
-        user = user |> Repo.preload([:roles, :student])
-        {:ok, user}
+    case Users.get_user_by_id(Guardian.Plug.current_resource(conn)) do
+      %{is_active: false} -> {:error, :inactive}
       nil -> {:error, :no_user}
+      %{} = user -> {:ok, user}
     end
   end 
 
@@ -119,7 +115,7 @@ defmodule SkollerWeb.Helpers.AuthPlug do
   end
   
   def verify_user_exists(%{params: %{"email" => email}} = conn, _) do
-    case Repo.get_by(User, email: String.downcase(email)) do
+    case Users.get_user_by_email(email) do
       nil -> conn |> unauth
       _ -> conn
     end

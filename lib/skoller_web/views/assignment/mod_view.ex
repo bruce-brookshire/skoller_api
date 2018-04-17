@@ -4,12 +4,7 @@ defmodule SkollerWeb.Assignment.ModView do
   alias SkollerWeb.Assignment.ModView
   alias SkollerWeb.ClassView
   alias Skoller.Repo
-  alias Skoller.Users.User
-  alias Skoller.Student
-  alias Skoller.Class.StudentClass
-  alias Skoller.Assignment.Mod.Action
-
-  import Ecto.Query
+  alias Skoller.Assignments.Mods
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -24,12 +19,7 @@ defmodule SkollerWeb.Assignment.ModView do
   def render("show.json", %{mod: mod}) do
     render_one(mod, ModView, "mod.json")
   end
-
-  # def render("mod.json", params) do
-  #   require IEx
-  #   IEx.pry
-  # end
-
+  
   def render("mod.json", %{mod: mod, action: action, student_assignment: student_assignment}) do
     mod_detail_view(mod, action, student_assignment)
   end
@@ -49,7 +39,7 @@ defmodule SkollerWeb.Assignment.ModView do
 
   defp mod_detail_view(mod, action, student_assignment) do
     mod = mod |> Repo.preload([:assignment_mod_type, :assignment])
-    accepted = mod |> get_students_accepted()
+    accepted = mod.id |> Mods.get_student_pic_by_mod_acceptance()
     assignment = mod.assignment |> Repo.preload(:class)
     %{
       id: mod.id,
@@ -80,17 +70,6 @@ defmodule SkollerWeb.Assignment.ModView do
     |> DateTime.to_iso8601()
   end
   defp get_acted_on(_action), do: nil
-
-  defp get_students_accepted(mod) do
-    from(user in User)
-    |> join(:inner, [user], stu in Student, user.student_id == stu.id)
-    |> join(:inner, [user, stu], sc in StudentClass, sc.student_id == stu.id)
-    |> join(:inner, [user, stu, sc], act in Action, act.student_class_id == sc.id)
-    |> where([user, stu, sc, act], act.assignment_modification_id == ^mod.id)
-    |> where([user, stu, sc, act], act.is_accepted == true)
-    |> select([user, stu, sc, act], user.pic_path)
-    |> Repo.all()
-  end
 
   defp get_student_assignment_id(nil), do: nil
   defp get_student_assignment_id(student_assignment), do: student_assignment.id
