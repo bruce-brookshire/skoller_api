@@ -81,7 +81,7 @@ defmodule Skoller.Users do
     |> Repo.all()
   end
 
-  defp get_changeset(%{"student" => %{"is_univeristy" => "true"}} = params) do
+  defp get_changeset(%{"student" => %{"is_university" => true}} = params) do
     %User{}
     |> User.changeset_insert_university(params)
   end
