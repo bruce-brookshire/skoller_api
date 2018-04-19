@@ -12,7 +12,7 @@ defmodule ClassnavapiWeb.Api.V1.CSVController do
   import Ecto.Query
   
   @admin_role 200
-  @default_grade_scale "A,90|B,80|C,70|D,60"
+  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
 
   @syllabus_status 200
   
