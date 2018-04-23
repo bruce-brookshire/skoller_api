@@ -401,32 +401,38 @@ defmodule Mix.Tasks.Seed.Dev do
 
     sc = Repo.insert!(%StudentClass{
       student_id: student.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC1"
     })
 
     sc1 = Repo.insert!(%StudentClass{
       student_id: student1.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC2"
     })
 
     sc2 = Repo.insert!(%StudentClass{
       student_id: student2.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC3"
     })
 
     sc3 = Repo.insert!(%StudentClass{
       student_id: student3.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC4"
     })
 
     sc4 = Repo.insert!(%StudentClass{
       student_id: student4.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC5"
     })
 
     sc5 = Repo.insert!(%StudentClass{
       student_id: student5.student.id,
-      class_id: class.id
+      class_id: class.id,
+      enrollment_link: "SC6"
     })
 
     Repo.insert!(%StudentAssignment{
