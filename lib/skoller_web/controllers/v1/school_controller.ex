@@ -4,8 +4,8 @@ defmodule SkollerWeb.Api.V1.SchoolController do
   alias SkollerWeb.SchoolView
   alias Skoller.Schools
 
-  def index(conn, _params) do
-    schools = Schools.get_schools()
+  def index(conn, params) do
+    schools = Schools.get_schools(params)
     render(conn, SchoolView, "index.json", schools: schools)
   end
 end

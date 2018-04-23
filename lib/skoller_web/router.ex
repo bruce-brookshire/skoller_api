@@ -76,6 +76,7 @@ defmodule SkollerWeb.Router do
 
       # School routes
       get "/schools/hub", Admin.SchoolController, :hub
+      get "/school/list", SchoolController, :index      
       resources "/schools", Admin.SchoolController, only: [:create, :update, :show, :index] do
 
         get "/classes", School.ClassController, :index
@@ -245,7 +246,6 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
-      get "/school/list", SchoolController, :index
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index

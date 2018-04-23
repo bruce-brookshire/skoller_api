@@ -61,7 +61,15 @@ defmodule Skoller.Schools do
   defp filter(query, params) do
     query
     |> short_name_filter(params)
+    |> name_filter(params)
   end
+
+  defp name_filter(query, %{"name" => name}) do
+    name_filter = name <> "%"
+    query
+    |> where([school], ilike(school.name, ^name_filter))
+  end
+  defp name_filter(query, _params), do: query
 
   defp short_name_filter(query, %{"short_name" => short_name}) do
     query
