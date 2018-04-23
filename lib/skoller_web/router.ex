@@ -49,7 +49,6 @@ defmodule SkollerWeb.Router do
 
       # Login/out routes
       post "/logout", AuthController, :logout
-      post "/users/token-login", AuthController, :token
       post "/reset", ForgotEmailController, :reset
 
       # Auto Update Routes
@@ -235,6 +234,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
       post "/users/:user_id/register", DeviceController, :register
+      post "/users/token-login", AuthController, :token
     end
     
   end
