@@ -59,6 +59,9 @@ defmodule SkollerWeb.Router do
       # Min Ver Routes
       put "/min-version", Admin.MinVerController, :update
 
+      # Location Routes
+      get "/locations", LocationController, :index
+
       # Analytics routes
       get "/analytics", Analytics.AnalyticsController, :index
 
