@@ -22,7 +22,9 @@ defmodule SkollerWeb.SchoolView do
       is_diy_enabled: school.is_diy_enabled,
       is_diy_preferred: school.is_diy_preferred,
       is_auto_syllabus: school.is_auto_syllabus,
-      timezone: school.timezone
+      timezone: school.timezone,
+      adr_region: school.adr_region,
+      adr_locality: school.adr_locality
     }
   end
 end
