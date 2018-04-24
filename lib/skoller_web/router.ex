@@ -79,8 +79,9 @@ defmodule SkollerWeb.Router do
 
       # School routes
       get "/schools/hub", Admin.SchoolController, :hub
-      get "/school/list", SchoolController, :index      
-      resources "/schools", Admin.SchoolController, only: [:create, :update, :show, :index] do
+      get "/school/list", SchoolController, :index
+      resources "/schools", SchoolController, only: [:create]
+      resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
 
         get "/classes", School.ClassController, :index
         get "/classes/min", School.ClassController, :index_min

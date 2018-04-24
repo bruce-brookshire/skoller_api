@@ -12,17 +12,6 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   
   plug :verify_role, %{role: @admin_role}
 
-  def create(conn, params) do
-    case Schools.create_school(params) do
-      {:ok, school} ->
-        render(conn, SchoolView, "show.json", school: school)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
-
   def index(conn, params) do
     schools = Schools.get_schools(params)
     render(conn, SchoolView, "index.json", schools: schools)
