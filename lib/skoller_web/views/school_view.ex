@@ -24,7 +24,8 @@ defmodule SkollerWeb.SchoolView do
       is_auto_syllabus: school.is_auto_syllabus,
       timezone: school.timezone,
       adr_region: school.adr_region,
-      adr_locality: school.adr_locality
+      adr_locality: school.adr_locality,
+      is_university: school.is_university
     }
   end
 end

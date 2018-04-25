@@ -95,7 +95,7 @@ defmodule SkollerWeb.Router do
       end
 
       # Class Period routes
-      resources "/periods", PeriodController, only: [:update, :show] do
+      resources "/periods", Admin.PeriodController, only: [:update, :show] do
         
         # Class Period Professor routes
         resources "/professors", ProfessorController, only: [:create, :index]
