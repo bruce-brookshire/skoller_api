@@ -10,6 +10,7 @@ defmodule SkollerWeb.ClassView do
     alias SkollerWeb.SchoolView
     alias SkollerWeb.Class.StudentRequestView
     alias Skoller.Class.StudentClass
+    alias SkollerWeb.PeriodView
 
     import Ecto.Query
 
@@ -25,8 +26,8 @@ defmodule SkollerWeb.ClassView do
         base_class_view(class)
         |> Map.merge(
             %{
-                class_period_name: class_period.name,
-                professor: render_one(professor, ProfessorView, "professor.json"),
+                class_period: render_one(class_period, PeriodView, "period.json"),
+                professor: render_one(professor, ProfessorView, "professor.json")
             }
         )
     end
@@ -36,7 +37,7 @@ defmodule SkollerWeb.ClassView do
         base_class_view(class)
         |> Map.merge(
             %{
-                class_period_name: class.class_period.name,
+                class_period: render_one(class.class_period, PeriodView, "period.json"),
                 professor: render_one(professor, ProfessorView, "professor.json")
             }
         )
@@ -47,7 +48,7 @@ defmodule SkollerWeb.ClassView do
         base_class_view(class)
         |> Map.merge(
             %{
-                class_period_name: class.class_period.name,
+                class_period: render_one(class.class_period, PeriodView, "period.json"),
                 professor: render_one(class.professor, ProfessorView, "professor.json"),
                 status: render_one(class.class_status, StatusView, "status.json")
             }
@@ -104,8 +105,7 @@ defmodule SkollerWeb.ClassView do
             is_chat_enabled: class.is_chat_enabled,
             is_assignment_posts_enabled: class.is_assignment_posts_enabled,
             type: class.class_type,
-            campus: class.campus,
-            class_period_id: class.class_period_id
+            campus: class.campus
         }
     end
 
