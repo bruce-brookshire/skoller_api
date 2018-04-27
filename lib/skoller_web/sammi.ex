@@ -70,7 +70,6 @@ defmodule SkollerWeb.Sammi do
       professor -> 
         professor_info 
         |> extract_professor_details(professor)
-        |> Map.put("class_period_id", class.class_period_id)
         |> update_professor(professor)
     end
   end

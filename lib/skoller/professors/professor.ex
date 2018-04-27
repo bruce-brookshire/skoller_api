@@ -9,7 +9,7 @@ defmodule Skoller.Professors.Professor do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Professors.Professor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Schools.School
 
   schema "professors" do
     field :email, :string
@@ -18,13 +18,13 @@ defmodule Skoller.Professors.Professor do
     field :office_availability, :string
     field :office_location, :string
     field :phone, :string
-    field :class_period_id, :id
-    belongs_to :class_period, ClassPeriod, define_field: false
+    field :school_id, :id
+    belongs_to :school, School, define_field: false
 
     timestamps()
   end
 
-  @req_fields [:name_last, :class_period_id]
+  @req_fields [:name_last, :school_id]
   @opt_fields [:name_first, :email, :phone, :office_location,
               :office_availability]
   @all_fields @req_fields ++ @opt_fields
@@ -38,7 +38,7 @@ defmodule Skoller.Professors.Professor do
     |> validate_required(@req_fields)
     |> validate_format(:email, ~r/@/)
     |> validate_format(:phone, ~r/^([0-9]{3}-)?[0-9]{3}-[0-9]{4}$/)
-    |> foreign_key_constraint(:class_period_id)
+    |> foreign_key_constraint(:school_id)
   end
 
   def changeset_update(%Professor{} = professor, attrs) do

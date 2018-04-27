@@ -19,18 +19,18 @@ defmodule Skoller.Professors do
     Repo.get!(Professor, id)
   end
 
-  def get_professors(class_period_id, params \\ %{}) do
+  def get_professors(school_id, params \\ %{}) do
     from(p in Professor)
-    |> where([p], p.class_period_id == ^class_period_id)
+    |> where([p], p.school_id == ^school_id)
     |> filters(params)
     |> Repo.all()
   end
 
-  def get_professor_by_name(name_first, name_last, class_period_id) do
+  def get_professor_by_name(name_first, name_last, school_id) do
     name_first = name_first |> String.trim()
     name_last = name_last |> String.trim()
     from(p in Professor)
-    |> where([p], p.name_first == ^name_first and p.name_last == ^name_last and p.class_period_id == ^class_period_id)
+    |> where([p], p.name_first == ^name_first and p.name_last == ^name_last and p.school_id == ^school_id)
     |> limit(1)
     |> Repo.one()
   end

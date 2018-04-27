@@ -110,7 +110,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
       professor -> 
         professor_info 
         |> extract_professor_details()
-        |> Map.put("class_period_id", class.class_period_id)
         |> update_professor(professor)
     end
   end

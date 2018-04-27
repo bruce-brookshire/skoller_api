@@ -23,6 +23,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Students.Student
   alias Skoller.School.FieldOfStudy
   alias Skoller.Devices.Device
+  alias Skoller.Professors.OldProfessor
 
   def run(_) do
     ensure_started(Repo, [])
@@ -762,6 +763,12 @@ defmodule Mix.Tasks.Seed.Dev do
     Repo.insert!(%FieldOfStudy{
       field: "Computer Science",
       school_id: school.id
+    })
+
+    Repo.insert!(%OldProfessor{
+      name_first: "Jimothee",
+      name_last: "Aaron",
+      class_period_id: period.id
     })
   end
 end

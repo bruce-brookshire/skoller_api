@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Classes
   alias Skoller.Universities
   alias Skoller.Professors
+  alias Skoller.Schools
   
   import SkollerWeb.Helpers.AuthPlug
   
@@ -82,9 +83,10 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
-    case Professors.get_professor_by_name(name_first, name_last, class_period_id) do
+    school_id = Schools.get_school_from_period(class_period_id)
+    case Professors.get_professor_by_name(name_first, name_last, school_id) do
       nil -> 
-        Professors.create_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
+        Professors.create_professor(%{name_first: name_first, name_last: name_last, school_id: school_id})
       prof ->
         {:ok, prof}
     end
