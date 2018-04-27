@@ -1,7 +1,7 @@
 defmodule Skoller.ProfessorTest do
   use Skoller.DataCase
 
-  alias Skoller.Professor
+  alias Skoller.Professors.Professor
 
   @valid_attrs %{email: "prof@email.edu",
                 name_first: "Professor", 
@@ -9,7 +9,7 @@ defmodule Skoller.ProfessorTest do
                 office_availability: "Never", 
                 office_location: "Earth",
                 phone: "615-867-5309",
-                class_period_id: 1}
+                school_id: 1}
 
   test "professor insert with valid attributes" do
     changeset = Professor.changeset_insert(%Professor{}, @valid_attrs)
@@ -51,8 +51,8 @@ defmodule Skoller.ProfessorTest do
     refute changeset.valid?
   end
 
-  test "professor insert no class period" do
-    changeset = Professor.changeset_insert(%Professor{}, Map.delete(@valid_attrs, :class_period_id))
+  test "professor insert no school" do
+    changeset = Professor.changeset_insert(%Professor{}, Map.delete(@valid_attrs, :school_id))
     refute changeset.valid?
   end
 end

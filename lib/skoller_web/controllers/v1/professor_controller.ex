@@ -1,11 +1,9 @@
 defmodule SkollerWeb.Api.V1.ProfessorController do
   use SkollerWeb, :controller
 
-  alias Skoller.Professor
-  alias Skoller.Repo
+  alias Skoller.Professors
   alias SkollerWeb.ProfessorView
 
-  import Ecto.Query
   import SkollerWeb.Helpers.AuthPlug
   
   @student_role 100
@@ -13,12 +11,8 @@ defmodule SkollerWeb.Api.V1.ProfessorController do
 
   plug :verify_role, %{roles: [@admin_role, @student_role]}
 
-  def create(conn, %{"period_id" => class_period_id} = params) do
-    params = params |> Map.put("class_period_id", class_period_id)
-
-    changeset = Professor.changeset_insert(%Professor{}, params)
-
-    case Repo.insert(changeset) do
+  def create(conn, params) do
+    case Professors.create_professor(params) do
       {:ok, professor} ->
         render(conn, ProfessorView, "show.json", professor: professor)
       {:error, changeset} ->
@@ -28,28 +22,13 @@ defmodule SkollerWeb.Api.V1.ProfessorController do
     end
   end
 
-  def index(conn, %{"period_id" => class_period_id} = params) do
-    professors = from(p in Professor)
-                |> where([p], p.class_period_id == ^class_period_id)
-                |> filters(params)
-                |> Repo.all()
+  def index(conn, %{"school_id" => school_id} = params) do
+    professors = Professors.get_professors(school_id, params)
     render(conn, ProfessorView, "index.json", professors: professors)
   end
 
   def show(conn, %{"id" => id}) do
-    professor = Repo.get!(Professor, id)
+    professor = Professors.get_professor_by_id!(id)
     render(conn, ProfessorView, "show.json", professor: professor)
   end
-
-  defp filters(query, params) do
-    query
-    |> name_filter(params)
-  end
-
-  defp name_filter(query, %{"professor.name" => professor_name}) do
-    prof_filter = professor_name <> "%"
-    query
-    |> where([p], ilike(p.name_first, ^prof_filter) or ilike(p.name_last, ^prof_filter))
-  end
-  defp name_filter(query, _params), do: query
 end

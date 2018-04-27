@@ -83,6 +83,9 @@ defmodule SkollerWeb.Router do
       resources "/schools", SchoolController, only: [:create]
       resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
 
+        # School Professor routes
+        resources "/professors", ProfessorController, only: [:create, :index]
+
         get "/classes", School.ClassController, :index
         get "/classes/min", School.ClassController, :index_min
 
@@ -96,10 +99,6 @@ defmodule SkollerWeb.Router do
 
       # Class Period routes
       resources "/periods", Admin.PeriodController, only: [:update, :show] do
-        
-        # Class Period Professor routes
-        resources "/professors", ProfessorController, only: [:create, :index]
-
         # Class Period Class routes
         resources "/classes", ClassController, only: [:create]
         post "/classes/csv", CSVController, :class
