@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Sammi do
 
-  alias Skoller.Professor
+  alias Skoller.Professors
   alias Skoller.Repo
   alias Skoller.Classes
 
@@ -117,11 +117,7 @@ defmodule SkollerWeb.Sammi do
   end
   defp get_email(map, _params, %{email: _val}), do: map
 
-  defp update_professor(params, professor) when params == %{} do
-    {:ok, professor}
-  end
   defp update_professor(params, professor) do
-    Professor.changeset_update(professor, params)
-    |> Repo.update()
+    Professors.update_professor(professor, params)
   end
 end

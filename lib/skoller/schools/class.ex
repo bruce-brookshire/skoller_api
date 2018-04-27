@@ -11,7 +11,7 @@ defmodule Skoller.Schools.Class do
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Class.Doc
-  alias Skoller.Professor
+  alias Skoller.Professors.Professor
   alias Skoller.Class.Weight
   alias Skoller.Class.Status
   alias Skoller.Students.Student

@@ -1,8 +1,7 @@
 defmodule SkollerWeb.Api.V1.Admin.ProfessorController do
   use SkollerWeb, :controller
 
-  alias Skoller.Professor
-  alias Skoller.Repo
+  alias Skoller.Professors
   alias SkollerWeb.ProfessorView
 
   import SkollerWeb.Helpers.AuthPlug
@@ -13,10 +12,9 @@ defmodule SkollerWeb.Api.V1.Admin.ProfessorController do
   plug :verify_role, %{roles: [@admin_role, @change_req_role]}
 
   def update(conn, %{"id" => id} = params) do
-    professor_old = Repo.get!(Professor, id)
-    changeset = Professor.changeset_update(professor_old, params)
+    professor_old = Professors.get_professor_by_id!(id)
 
-    case Repo.update(changeset) do
+    case Professors.update_professor(professor_old, params) do
       {:ok, professor} ->
         render(conn, ProfessorView, "show.json", professor: professor)
       {:error, changeset} ->

@@ -12,7 +12,7 @@ defmodule Skoller.Students do
   alias Skoller.School.StudentField
   alias Skoller.Classes
   alias Skoller.Class.Status
-  alias Skoller.Professor
+  alias Skoller.Professors.Professor
   alias Skoller.Schools.ClassPeriod
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
@@ -247,7 +247,7 @@ defmodule Skoller.Students do
   * school
     * `Skoller.Schools.School` :id
   * professor.name
-    * `Skoller.Professor` :name
+    * `Skoller.Professors.Professor` :name
   * class.status
     * `Skoller.Class.Status` :id
     * For ghost classes, use 0.

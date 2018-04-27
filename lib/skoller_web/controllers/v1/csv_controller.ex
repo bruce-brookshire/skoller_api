@@ -4,13 +4,12 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Repo
   alias Skoller.School.FieldOfStudy
   alias SkollerWeb.CSVView
-  alias Skoller.Professor
   alias Skoller.CSVUpload  
   alias Skoller.Classes
   alias Skoller.Universities
+  alias Skoller.Professors
   
   import SkollerWeb.Helpers.AuthPlug
-  import Ecto.Query
   
   @admin_role 200
   @headers [:campus, :class_type, :number, :crn, :meet_days, :meet_end_time, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
@@ -83,23 +82,12 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
-    name_first = name_first |> String.trim()
-    name_last = name_last |> String.trim()
-    prof = from(p in Professor)
-    |> where([p], p.name_first == ^name_first and p.name_last == ^name_last and p.class_period_id == ^class_period_id)
-    |> Repo.all
-    case prof do
-      [] -> 
-        insert_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
-      prof -> 
-        prof = prof |> List.first()
+    case Professors.get_professor_by_name(name_first, name_last, class_period_id) do
+      nil -> 
+        Professors.create_professor(%{name_first: name_first, name_last: name_last, class_period_id: class_period_id})
+      prof ->
         {:ok, prof}
     end
-  end
-
-  defp insert_professor(params) do
-    changeset = Professor.changeset_insert(%Professor{}, params)
-    Repo.insert(changeset)
   end
 
   defp process_fos_row(fos, school_id) do

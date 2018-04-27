@@ -2,7 +2,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   use SkollerWeb, :controller
 
   alias Skoller.Class.Doc
-  alias Skoller.Professor
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias Skoller.DocUpload
@@ -10,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
   alias Skoller.Universities
+  alias Skoller.Professors
 
   import SkollerWeb.Helpers.AuthPlug
 
@@ -118,8 +118,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   defp update_professor(params, professor) do
     params = params |> Map.delete("name_first")
     |> Map.delete("name_last")
-    Professor.changeset_update(professor, params)
-    |> Repo.update()
+    Professors.update_professor(professor, params)
   end
 
   defp extract_professor_details(professor_info) do

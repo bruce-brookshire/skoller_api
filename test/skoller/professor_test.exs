@@ -1,7 +1,7 @@
 defmodule Skoller.ProfessorTest do
   use Skoller.DataCase
 
-  alias Skoller.Professor
+  alias Skoller.Professors.Professor
 
   @valid_attrs %{email: "prof@email.edu",
                 name_first: "Professor", 
