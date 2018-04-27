@@ -362,10 +362,14 @@ defmodule Skoller.Students do
   end
 
   defp add_enrolled_by(changeset, opts) do
-    case opts |> List.keytake(:enrolled_by, 0) |> elem(0) do
-      {:enrolled_by, val} -> 
+    case opts |> List.keytake(:enrolled_by, 0) do
+      nil -> changeset
+      val -> 
+        val = val 
+        |> elem(0) 
+        |> elem(1)
+
         changeset |> Ecto.Changeset.change(%{enrolled_by: Integer.parse(val) |> elem(0)})
-      _ -> changeset
     end
   end
 
