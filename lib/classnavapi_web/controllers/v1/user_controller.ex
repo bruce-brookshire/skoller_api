@@ -47,6 +47,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     end
   end
 
+  defp upload_pic(%{"file" => ""}, user), do: ""
   defp upload_pic(%{"file" => file}, user) do
     scope = %{"id" => UUID.generate()} 
     case PicUpload.store({file, scope}) do
