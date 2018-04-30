@@ -45,7 +45,8 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
 
-      post "/enrollment-link/:token", Student.ClassController, :link
+      post "/enrollment-link/:token", Student.Class.LinkController, :create
+      get "/enrollment-link/:token", Student.Class.LinkController, :show
 
       # Login/out routes
       post "/logout", AuthController, :logout
