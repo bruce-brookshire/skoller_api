@@ -22,9 +22,10 @@ defmodule ClassnavapiWeb.Api.V2.UserController do
   def update(conn, %{"user_id" => id} = params) do
     user_old = Repo.get!(User, id)
     user_old = Repo.preload user_old, :student
-    location = params |> upload_pic()
-
-    params = params |> Map.put("pic_path", location)
+    params = case params |> upload_pic() do
+      nil -> params
+      location -> params |> Map.put("pic_path", location)
+    end
     changeset = User.changeset_update(user_old, params)
 
     multi = Ecto.Multi.new
