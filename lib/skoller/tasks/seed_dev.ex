@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Students.Student
   alias Skoller.School.FieldOfStudy
   alias Skoller.Devices.Device
-  alias Skoller.Professors.OldProfessor
+  alias Skoller.Professors.Professor
 
   def run(_) do
     ensure_started(Repo, [])
@@ -765,10 +765,10 @@ defmodule Mix.Tasks.Seed.Dev do
       school_id: school.id
     })
 
-    Repo.insert!(%OldProfessor{
+    Repo.insert!(%Professor{
       name_first: "Jimothee",
       name_last: "Aaron",
-      class_period_id: period.id
+      school_id: school.id
     })
   end
 end
