@@ -47,7 +47,6 @@ defmodule ClassnavapiWeb.Api.V2.UserController do
     scope = %{"id" => UUID.generate()} 
     case PicUpload.store({file, scope}) do
       {:ok, inserted} ->
-        spawn(fn -> PicUpload.delete({user.pic_path, %{"id" => String.split(".", user.pic_path) |> List.first()}}) end)
         PicUpload.url({inserted, scope}, :thumb)
       _ ->
         nil
