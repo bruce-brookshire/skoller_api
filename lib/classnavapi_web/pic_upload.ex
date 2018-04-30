@@ -19,7 +19,7 @@ defmodule Classnavapi.PicUpload do
   end
 
   def transform(:thumb, _) do
-    {:convert, "-thumbnail 150x150^ -gravity center -extent 150x150 -format png", :png}
+    {:convert, "-thumbnail 200x200^ -gravity center -extent 200x200 -format png", :png}
   end
 
   # Override the persisted filenames:
