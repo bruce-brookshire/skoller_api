@@ -43,7 +43,8 @@ defmodule ClassnavapiWeb.Api.V2.UserController do
     end
   end
 
-  defp upload_pic(%{"file" => file}, user) do
+  defp upload_pic(%{"file" => ""}), do: ""
+  defp upload_pic(%{"file" => file}) do
     scope = %{"id" => UUID.generate()} 
     case PicUpload.store({file, scope}) do
       {:ok, inserted} ->
@@ -52,7 +53,7 @@ defmodule ClassnavapiWeb.Api.V2.UserController do
         nil
     end
   end
-  defp upload_pic(_params, _user), do: nil
+  defp upload_pic(_params), do: nil
 
   defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
   defp delete_fields_of_study(%{user: %{student: _student}}, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}

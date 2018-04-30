@@ -23,7 +23,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
   def update(conn, %{"user_id" => id} = params) do
     user_old = Repo.get!(User, id)
     user_old = Repo.preload user_old, :student
-    params = case params |> upload_pic(user_old) do
+    params = case params |> upload_pic() do
       nil -> params
       location -> 
         params |> Map.put("pic_path", location)
@@ -47,8 +47,8 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
     end
   end
 
-  defp upload_pic(%{"file" => ""}, user), do: ""
-  defp upload_pic(%{"file" => file}, user) do
+  defp upload_pic(%{"file" => ""}), do: ""
+  defp upload_pic(%{"file" => file}) do
     scope = %{"id" => UUID.generate()} 
     case PicUpload.store({file, scope}) do
       {:ok, inserted} ->
@@ -57,7 +57,7 @@ defmodule ClassnavapiWeb.Api.V1.UserController do
         nil
     end
   end
-  defp upload_pic(_params, _user), do: nil
+  defp upload_pic(_params), do: nil
 
   defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
   defp delete_fields_of_study(%{user: %{student: _student}}, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
