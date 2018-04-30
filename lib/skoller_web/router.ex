@@ -45,8 +45,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
 
-      post "/enrollment-link/:token", Student.Class.LinkController, :create
-      get "/enrollment-link/:token", Student.Class.LinkController, :show
+      post "/enrollment-link/:token", Student.ClassController, :link
 
       # Login/out routes
       post "/logout", AuthController, :logout
@@ -253,6 +252,7 @@ defmodule SkollerWeb.Router do
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
+      get "/enrollment-link/:token", Student.Class.LinkController, :show
     end
   end
 end

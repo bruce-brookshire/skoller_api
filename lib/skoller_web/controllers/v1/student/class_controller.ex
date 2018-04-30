@@ -23,6 +23,17 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
     end
   end
 
+  def link(conn, %{"token" => token} = params) do
+    case Students.enroll_by_link(token, conn.assigns[:user].student.id, params) do
+      {:ok, student_class} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
+    end
+  end
+
+
   def show(conn, %{"student_id" => student_id, "class_id" => class_id}) do
     student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
 
