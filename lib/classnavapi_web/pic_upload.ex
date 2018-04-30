@@ -8,7 +8,7 @@ defmodule Classnavapi.PicUpload do
   use Arc.Definition
   use Arc.Ecto.Definition
 
-  @versions [:original, :thumb]
+  @versions [:thumb]
   @extensions ~w(.jpg .png .jpeg .gif)
   @acl :public_read
 
