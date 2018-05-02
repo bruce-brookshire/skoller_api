@@ -373,7 +373,7 @@ defmodule Skoller.Students do
         |> elem(0) 
         |> elem(1)
 
-        changeset |> Ecto.Changeset.change(%{enrolled_by: Integer.parse(val) |> elem(0)})
+        changeset |> Ecto.Changeset.change(%{enrolled_by: val})
     end
   end
 
