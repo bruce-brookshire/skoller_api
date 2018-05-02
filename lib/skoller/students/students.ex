@@ -352,13 +352,17 @@ defmodule Skoller.Students do
     |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
     |> Repo.transaction()
   end
+  
+  def get_student_class_by_enrollment_link(link) do
+    student_class_id = link |> String.split_at(@link_length) |> elem(1)
+    Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
+    |> Repo.preload([:student, :class])
+  end
 
   def enroll_by_link(link, student_id, params) do
-    student_class_id = link |> String.split_at(@link_length) |> elem(1)
-    
-    sc = Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
+    sc = get_student_class_by_enrollment_link(link)
     params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
-    enroll_in_class(sc.class_id, params, [enrolled_by: student_class_id])
+    enroll_in_class(sc.class_id, params, [enrolled_by: sc.id])
   end
 
   defp add_enrolled_by(changeset, opts) do
@@ -369,7 +373,7 @@ defmodule Skoller.Students do
         |> elem(0) 
         |> elem(1)
 
-        changeset |> Ecto.Changeset.change(%{enrolled_by: Integer.parse(val) |> elem(0)})
+        changeset |> Ecto.Changeset.change(%{enrolled_by: val})
     end
   end
 

@@ -252,6 +252,7 @@ defmodule SkollerWeb.Router do
       resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
+      get "/enrollment-link/:token", Student.Class.LinkController, :show
     end
   end
 end
