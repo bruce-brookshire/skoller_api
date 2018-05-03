@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
     use SkollerWeb, :controller
 
-    alias Skoller.Class.Status
     alias Skoller.Repo
     alias SkollerWeb.ClassView
     alias Skoller.Class.Lock
@@ -44,7 +43,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
       old_class = Classes.get_class_by_id!(class_id)
       |> Repo.preload(:class_status)
 
-      status = Repo.get!(Status, id)
+      status = Classes.get_status_by_id!(id)
 
       changeset = old_class
       |> Ecto.Changeset.change(%{class_status_id: id})
