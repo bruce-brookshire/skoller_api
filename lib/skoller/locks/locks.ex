@@ -31,10 +31,8 @@ defmodule Skoller.Locks do
     |> Repo.all()
     |> Enum.map(&unlock_lock(&1, params))
   end
-  def unlock_locks(lock) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^lock.class_id and l.user_id == ^lock.user_id and l.is_completed == false)
-    |> Repo.all()
+  def unlock_locks(locks) do
+    locks
     |> Enum.map(&unlock_lock(&1, %{}))
   end
 
