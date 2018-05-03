@@ -219,9 +219,10 @@ defmodule SkollerWeb.Router do
       resources "/fields-of-study", School.FieldController, only: [:show]
 
       #Syllabus Worker routes
-      post "/syllabus-workers/weights", SyllabusWorkerController, :weights
-      post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
-      post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
+      # post "/syllabus-workers/weights", SyllabusWorkerController, :weights
+      # post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
+      # post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
+      post "/syllabus-workers", SyllabusWorkerController, :class
 
       post "/notifications/syllabus-needed", NotificationController, :syllabus
       post "/notifications/custom", NotificationController, :custom

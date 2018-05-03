@@ -5,7 +5,7 @@ defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
 
   alias Skoller.Repo
   alias Skoller.Schools.Class
-  alias Skoller.Class.Status
+  alias Skoller.Classes.Status
 
   def change do
     alter table(:classes) do

@@ -1,4 +1,4 @@
-defmodule Skoller.Class.Status do
+defmodule Skoller.Classes.Status do
 
   @moduledoc """
   
@@ -18,17 +18,18 @@ defmodule Skoller.Class.Status do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Status
+  alias Skoller.Classes.Status
 
   @primary_key {:id, :id, []}
   schema "class_statuses" do
-    field :is_complete, :boolean
+    field :is_complete, :boolean, default: false
     field :name, :string
+    field :is_maintenance, :boolean, default: false
 
     timestamps()
   end
 
-  @req_fields [:id, :name, :is_editable, :is_complete]
+  @req_fields [:id, :name, :is_maintenance, :is_complete]
   @all_fields @req_fields
 
   @doc false

@@ -6,9 +6,9 @@ defmodule Skoller.Classes do
   alias Skoller.Repo
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
-  alias Skoller.Class.Status
+  alias Skoller.Classes.Status
   alias Skoller.Class.Doc
-  alias Skoller.Class.Lock
+  alias Skoller.Locks.Lock
   alias Skoller.Users.User
   alias Skoller.UserRole
   alias Skoller.Schools
@@ -123,6 +123,14 @@ defmodule Skoller.Classes do
     |> Repo.transaction()
   end
 
+  def get_status_by_id!(id) do
+    Repo.get!(Status, id)
+  end
+
+  def get_statuses() do
+    Repo.all(Status)
+  end
+
   def get_editable_classes_subquery() do
     from(class in Class)
     |> where([class], class.is_editable == true)
@@ -145,7 +153,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Returns the `Skoller.Class.Status` name and a count of `Skoller.Schools.Class` in the status
+  Returns the `Skoller.Classes.Status` name and a count of `Skoller.Schools.Class` in the status
 
   ## Examples
 

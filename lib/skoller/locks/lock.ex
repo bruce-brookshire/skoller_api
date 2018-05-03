@@ -1,4 +1,4 @@
-defmodule Skoller.Class.Lock do
+defmodule Skoller.Locks.Lock do
 
   # @weight_lock 100
   # @assignment_lock 200
@@ -6,14 +6,15 @@ defmodule Skoller.Class.Lock do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Lock
+  alias Skoller.Locks.Lock
+  alias Skoller.Locks.Section
 
   schema "class_locks" do
     field :is_completed, :boolean, default: false
     field :class_lock_section_id, :id
     field :class_id, :id
     field :user_id, :id
-    belongs_to :class_lock_section, Skoller.Class.Lock.Section, define_field: false
+    belongs_to :class_lock_section, Section, define_field: false
 
     timestamps()
   end

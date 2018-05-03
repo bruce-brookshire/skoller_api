@@ -8,7 +8,7 @@ defmodule Skoller.Users do
   alias Skoller.School.StudentField
   alias Skoller.UserRole
   alias Skoller.Students
-  alias Skoller.Class.Lock
+  alias Skoller.Locks.Lock
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
 

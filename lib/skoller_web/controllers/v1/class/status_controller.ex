@@ -1,8 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.StatusController do
   use SkollerWeb, :controller
 
-  alias Skoller.Class.Status
-  alias Skoller.Repo
   alias SkollerWeb.Class.StatusView
   alias Skoller.Classes
 
@@ -14,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Class.StatusController do
   plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
 
   def index(conn, %{}) do
-    statuses = Repo.all(Status)
+    statuses = Classes.get_statuses()
     render(conn, StatusView, "index.json", statuses: statuses)
   end
 

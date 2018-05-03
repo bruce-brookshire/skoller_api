@@ -1,7 +1,7 @@
-defmodule Skoller.Class.Lock.Section do
+defmodule Skoller.Locks.Section do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Lock.Section
+  alias Skoller.Locks.Section
 
   @primary_key {:id, :id, []}
   schema "class_lock_sections" do
