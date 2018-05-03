@@ -2,7 +2,7 @@ defmodule Skoller.Repo.Migrations.SplitClassValues do
   use Ecto.Migration
 
   def change do
-    drop index("classes", [], name: :unique_class_index)
+    drop_if_exists index("classes", [], name: :unique_class_index)
     rename table("classes"), :number, to: :code
     alter table(:classes) do
       add :section, :string
