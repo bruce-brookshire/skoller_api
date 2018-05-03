@@ -1,64 +1,94 @@
 defmodule Skoller.Locks do
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
-  alias Skoller.Class.Lock
-  alias Skoller.Class.Doc
-  alias Skoller.Schools.School
-  alias Skoller.Students
+  alias Skoller.Locks.Lock
+  alias Skoller.Locks.Section
+  alias Skoller.Class.AbandonedLock
 
   import Ecto.Query
 
-  def get_oldest_class_by_school(lock_type, class_status, school_id, opts \\ []) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
-    |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^lock_type)
-    |> enrolled_classes(opts)
-    |> where([class], class.class_status_id == ^class_status and class.is_editable == true)
-    |> where([class, period], period.school_id == ^school_id)
-    |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
-    |> order_by([class, period, doc, lock], asc: doc.inserted_at)
+  def find_lock(class_id, lock, user_id) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
+    |> where([l], l.class_lock_section_id in [^lock])
     |> Repo.all()
     |> List.first()
   end
 
-  def get_processable_classes_by_status(status_id, opts \\ []) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
-    |> enrolled_classes(opts)
-    |> where([class], class.class_status_id == ^status_id and class.is_editable == true and class.is_syllabus == true)
-    |> where([class, period, sch], sch.is_auto_syllabus == true)
-    |> where([class, period, sc, sch], fragment("exists (select 1 from docs where class_id = ?)", class.id))
-    |> group_by([class, period, sch], period.school_id)
-    |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
+  def lock_class(class_id, user_id) do
+    sections = from(sect in Section)
+    |> where([sect], sect.is_diy == true)
     |> Repo.all()
+
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:sections, &lock_sections(sections, class_id, user_id, &1))
+    |> Repo.transaction()
   end
 
-  def get_workers(type) do
+  def unlock_locks(class_id, user_id, params) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
+    |> Repo.all()
+    |> Enum.map(&unlock_lock(&1, params))
+  end
+  def unlock_locks(lock) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^lock.class_id and l.user_id == ^lock.user_id and l.is_completed == false)
+    |> Repo.all()
+    |> Enum.map(&unlock_lock(&1, %{}))
+  end
+
+  def delete_locks(_class, %{is_complete: true}), do: {:ok, nil}
+  def delete_locks(_class, %{is_maintenance: true}), do: {:ok, nil}
+  def delete_locks(class, _status) do
+    {:ok, delete_class_locks(class)}
+  end
+
+  def get_incomplete_locks(min) do
     from(lock in Lock)
-    |> join(:inner, [lock], class in Class, lock.class_id == class.id)
-    |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
-    |> where([lock], lock.class_lock_section_id == ^type and lock.is_completed == false)
-    |> group_by([lock, class, period], period.school_id)
-    |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
+    |> where([lock], lock.is_completed == false)
+    |> where([lock], lock.inserted_at < ago(^min, "minute"))
     |> Repo.all()
   end
 
-  defp doc_subquery() do
-    from(d in Doc)
-    |> group_by([d], d.class_id)
-    |> select([d], %{inserted_at: min(d.inserted_at), class_id: d.class_id})
+  defp lock_sections(sections, class_id, user_id, _) do
+    sections
+    |> Enum.map(&lock_section(class_id, user_id, &1.id))
   end
 
-  defp enrolled_classes(query, []), do: query
-  defp enrolled_classes(query, opts) do
-    case opts |> List.keytake(:enrolled, 0) |> elem(0) do
-      {:enrolled, true} ->
-        query |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_subquery()), sc.class_id == class.id)
-      _ -> query
+  defp lock_section(class_id, user_id, class_lock_section_id) do
+    case Repo.get_by(Lock, class_id: class_id, 
+                            class_lock_section_id: class_lock_section_id, 
+                            user_id: user_id,
+                            is_completed: false) do
+      nil ->           
+        changeset = Lock.changeset(%Lock{}, %{
+          class_id: class_id, 
+          class_lock_section_id: class_lock_section_id, 
+          user_id: user_id
+        }) 
+        Repo.insert(changeset)
+      lock -> {:ok, lock} 
     end
+  end
+  
+  defp unlock_lock(lock_old, %{"is_completed" => true}) do
+    changeset = Lock.changeset(lock_old, %{is_completed: true})
+    Repo.update(changeset)
+  end
+
+  defp unlock_lock(lock_old, %{}) do
+    Repo.insert!(%AbandonedLock{
+      class_lock_section_id: lock_old.class_lock_section_id,
+      class_id: lock_old.class_id,
+      user_id: lock_old.user_id
+    })
+    Repo.delete(lock_old)
+  end
+
+  defp delete_class_locks(class) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class.id)
+    |> Repo.delete_all()
   end
 end

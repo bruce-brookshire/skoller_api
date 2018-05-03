@@ -8,7 +8,7 @@ defmodule Skoller.Classes do
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Classes.Status
   alias Skoller.Class.Doc
-  alias Skoller.Class.Lock
+  alias Skoller.Locks.Lock
   alias Skoller.Users.User
   alias Skoller.UserRole
   alias Skoller.Schools

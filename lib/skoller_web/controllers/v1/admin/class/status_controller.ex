@@ -3,27 +3,19 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
 
     alias Skoller.Repo
     alias SkollerWeb.ClassView
-    alias Skoller.Class.Lock
     alias SkollerWeb.Helpers.RepoHelper
     alias Skoller.Mailer
     alias Skoller.Classes
     alias Skoller.Users
+    alias Skoller.Locks
 
     import SkollerWeb.Helpers.AuthPlug
-    import Ecto.Query
     import Bamboo.Email
     
     @admin_role 200
     @help_role 500
 
     @syllabus_status 200
-    @assignment_status 400
-    @review_status 500
-    @help_status 600
-
-    @weight_lock 100
-    @assignment_lock 200
-    @review_lock 300
 
     @from_email "support@skoller.co"
     @syllabus_subj "Wrong Syllabus?"
@@ -51,7 +43,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
 
       multi = Ecto.Multi.new()
       |> Ecto.Multi.update(:class, changeset)
-      |> Ecto.Multi.run(:class_locks, &reset_locks(&1.class, status))
+      |> Ecto.Multi.run(:class_locks, &Locks.delete_locks(&1.class, status))
 
       case Repo.transaction(multi) do
         {:ok, %{class: %{class_status_id: @syllabus_status} = class}} ->
@@ -97,25 +89,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
       @syllabus_ending <> "\n" <>
       "\n" <>
       Mailer.text_signature()
-    end
-
-    defp reset_locks(_class, %{is_complete: true}), do: {:ok, nil}
-    defp reset_locks(%{class_status_id: @help_status}, _status), do: {:ok, nil}
-    defp reset_locks(class, _status) do
-      case class.class_status_id do
-        @review_status -> 
-          {:ok, delete_locks(class, @review_lock)}
-        @assignment_status ->
-          {:ok, delete_locks(class, @assignment_lock)}
-        _ ->
-          {:ok, delete_locks(class, @weight_lock)}
-      end
-    end
-
-    defp delete_locks(class, lock_type_min) do
-      from(l in Lock)
-      |> where([l], l.class_id == ^class.id and l.class_lock_section_id >= ^lock_type_min)
-      |> Repo.delete_all()
     end
 
     defp compare_class_status_completion(changeset, true, false) do
