@@ -65,7 +65,6 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
   defp lock_full_class(conn, user, params) do
     status = Locks.lock_class(params["class_id"], user.id)
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
     case status do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, _error} ->

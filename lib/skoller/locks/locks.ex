@@ -4,6 +4,7 @@ defmodule Skoller.Locks do
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
   alias Skoller.Class.AbandonedLock
+  alias SkollerWeb.Helpers.RepoHelper
 
   import Ecto.Query
 
@@ -52,6 +53,7 @@ defmodule Skoller.Locks do
   defp lock_sections(sections, class_id, user_id, _) do
     sections
     |> Enum.map(&lock_section(class_id, user_id, &1.id))
+    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
   defp lock_section(class_id, user_id, class_lock_section_id) do
