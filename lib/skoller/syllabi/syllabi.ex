@@ -46,7 +46,7 @@ defmodule Skoller.Syllabi do
 
   defp get_oldest(school_id, status, type, opts) do
     t = get_oldest_class_by_school(type, status, school_id, opts)
-    Logger.info("Get oldest enrolled")
+    Logger.info("Get oldest")
     Logger.info(inspect(t))
     t
   end
@@ -81,7 +81,7 @@ defmodule Skoller.Syllabi do
     |> enrolled_classes(opts)
     |> where([class], class.is_editable == true and class.is_syllabus == true)
     |> where([class, period, sch], sch.is_auto_syllabus == true)
-    |> where([class, period, sc, sch], fragment("exists (select 1 from docs where class_id = ?)", class.id))
+    |> where([class], fragment("exists (select 1 from docs where class_id = ?)", class.id))
     |> where_processable_status(status_id)
     |> group_by([class, period, sch], period.school_id)
     |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
@@ -156,11 +156,11 @@ defmodule Skoller.Syllabi do
 
   defp where_processable_status(query, nil) do
     query
-    |> where([class, period, sc, sch, s], s.is_maintenance == false and s.is_complete == false)
+    |> where([class, period, sch, s], s.is_maintenance == false and s.is_complete == false)
   end
   defp where_processable_status(query, status_id) do
     query
-    |> where([class, period, sc, sch, s], s.id == ^status_id)
+    |> where([class, period, sch, s], s.id == ^status_id)
   end
 
   defp where_lock_type(query, nil), do: query

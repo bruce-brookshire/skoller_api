@@ -5,7 +5,9 @@ defmodule SkollerWeb.Jobs.ClearLocks do
   @open_lock_mins 60
 
   def run() do
-    Locks.get_incomplete_locks(@open_lock_mins)
-    |> Locks.unlock_locks()
+    case Locks.get_incomplete_locks(@open_lock_mins) do
+      nil -> {:ok, nil}
+      locks -> locks |> Locks.unlock_locks()
+    end
   end
 end
