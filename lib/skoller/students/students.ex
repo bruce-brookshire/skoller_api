@@ -377,7 +377,7 @@ defmodule Skoller.Students do
     end
   end
 
-  defp generate_enrollment_link(%StudentClass{id: id} = student_class) do
+  def generate_enrollment_link(%StudentClass{id: id} = student_class) do
     link = @link_length
     |> :crypto.strong_rand_bytes() 
     |> Base.url_encode64 
