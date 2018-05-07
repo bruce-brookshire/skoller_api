@@ -38,11 +38,11 @@ defmodule Skoller.Students do
   end
 
   def get_enrolled_class_by_ids(class_id, student_id) do
-    Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+    Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
   def get_enrolled_class_by_ids!(class_id, student_id) do
-    Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: true)
+    Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
   def get_student_class_by_id(id) do
