@@ -18,8 +18,11 @@ defmodule SkollerWeb.Api.V1.UserController do
   def update(conn, %{"user_id" => id} = params) do
     user_old = Users.get_user_by_id!(id)
 
-    location = params |> upload_pic()
-    params = params |> Map.put("pic_path", location)
+    params = case params |> upload_pic() do
+      nil -> params
+      location -> 
+        params |> Map.put("pic_path", location)
+    end
 
     case Users.update_user(user_old, params) do
       {:ok, %{user: user}} ->
@@ -30,6 +33,7 @@ defmodule SkollerWeb.Api.V1.UserController do
     end
   end
 
+  defp upload_pic(%{"file" => ""}), do: ""
   defp upload_pic(%{"file" => file}) do
     scope = %{"id" => UUID.generate()} 
     case PicUpload.store({file, scope}) do

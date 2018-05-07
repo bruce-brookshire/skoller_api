@@ -8,7 +8,7 @@ defmodule Skoller.PicUpload do
   use Arc.Definition
   use Arc.Ecto.Definition
 
-  @versions [:original, :thumb]
+  @versions [:thumb]
   @extensions ~w(.jpg .png .jpeg .gif)
   @acl :public_read
 
@@ -19,7 +19,7 @@ defmodule Skoller.PicUpload do
   end
 
   def transform(:thumb, _) do
-    {:convert, "-thumbnail 100x100^ -gravity center -extent 100x100 -format png", :png}
+    {:convert, "-thumbnail 200x200^ -gravity center -extent 200x200 -format png", :png}
   end
 
   # Override the persisted filenames:
