@@ -403,5 +403,5 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp convert_to_float(nil), do: 0.0
-  defp convert_to_float(val), do: val |> Decimal.to_float()
+  defp convert_to_float(val), do: val |> Decimal.round(2) |> Decimal.to_float()
 end

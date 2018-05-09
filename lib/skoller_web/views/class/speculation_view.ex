@@ -14,7 +14,7 @@ defmodule SkollerWeb.Class.SpeculationView do
   def render("speculation.json", %{speculation: speculation}) do
     %{
       grade: speculation.grade,
-      speculation: Decimal.to_float(speculation.speculation)
+      speculation: Decimal.to_float(Decimal.round(speculation.speculation, 2))
     }
   end
 end

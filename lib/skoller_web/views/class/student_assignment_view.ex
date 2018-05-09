@@ -43,7 +43,7 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
   defp get_pending_mods(%{}), do: %{}
 
   defp get_grade(%{grade: nil}), do: nil
-  defp get_grade(%{grade: grade}), do: Decimal.to_float(grade)
+  defp get_grade(%{grade: grade}), do: Decimal.to_float(Decimal.round(grade, 2))
 
   defp is_completed(nil), do: false
   defp is_completed(val), do: val
