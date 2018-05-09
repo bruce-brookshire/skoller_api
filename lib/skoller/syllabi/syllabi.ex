@@ -9,6 +9,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.Schools.School
   alias Skoller.Students
   alias Skoller.Classes.Status
+  alias Skoller.Locks
 
   import Ecto.Query
 
@@ -25,6 +26,9 @@ defmodule Skoller.Syllabi do
     end
   end
 
+  defp lock_class(%{id: id}, user, nil) do
+    Locks.lock_class(id, user.id)
+  end
   defp lock_class(%{id: id}, user, type) do
     Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: id, is_completed: false})
   end

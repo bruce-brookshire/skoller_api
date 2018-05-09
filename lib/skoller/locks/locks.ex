@@ -51,9 +51,11 @@ defmodule Skoller.Locks do
   end
 
   defp lock_sections(sections, class_id, user_id, _) do
-    sections
+    status = sections
     |> Enum.map(&lock_section(class_id, user_id, &1.id))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
+
+    status
+    |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
   defp lock_section(class_id, user_id, class_lock_section_id) do
