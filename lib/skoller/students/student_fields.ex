@@ -1,4 +1,4 @@
-defmodule Skoller.School.StudentField do
+defmodule Skoller.Students.FieldOfStudy do
 
   @moduledoc """
   
@@ -8,9 +8,9 @@ defmodule Skoller.School.StudentField do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.School.StudentField
+  alias Skoller.Students.FieldOfStudy
   alias Skoller.Students.Student
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy
 
   schema "student_fields_of_study" do
     field :field_of_study_id, :id
@@ -25,7 +25,7 @@ defmodule Skoller.School.StudentField do
   @all_fields @req_fields
 
   @doc false
-  def changeset(%StudentField{} = student_fields, attrs) do
+  def changeset(%FieldOfStudy{} = student_fields, attrs) do
     student_fields
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)

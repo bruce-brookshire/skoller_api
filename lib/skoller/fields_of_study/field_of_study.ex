@@ -1,4 +1,4 @@
-defmodule Skoller.School.FieldOfStudy do
+defmodule Skoller.FieldsOfStudy.FieldOfStudy do
 
   @moduledoc """
   
@@ -8,7 +8,7 @@ defmodule Skoller.School.FieldOfStudy do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy
 
   schema "fields_of_study" do
     field :field, :string

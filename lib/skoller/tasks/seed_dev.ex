@@ -21,7 +21,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Class.StudentAssignment
   alias Skoller.Class.Assignment
   alias Skoller.Students.Student
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Devices.Device
   alias Skoller.Professors.Professor
 
@@ -761,8 +761,7 @@ defmodule Mix.Tasks.Seed.Dev do
     })
 
     Repo.insert!(%FieldOfStudy{
-      field: "Computer Science",
-      school_id: school.id
+      field: "Computer Science"
     })
 
     Repo.insert!(%Professor{

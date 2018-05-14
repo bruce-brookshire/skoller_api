@@ -1,10 +1,9 @@
-defmodule SkollerWeb.Api.V1.Admin.School.FieldController do
+defmodule SkollerWeb.Api.V1.Admin.FieldController do
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
   alias SkollerWeb.School.FieldOfStudyView
+  alias Skoller.FieldsOfStudy
   alias Skoller.Students
-  alias Skoller.School.FieldOfStudy
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -13,10 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.School.FieldController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
-
-    changeset = FieldOfStudy.changeset(%FieldOfStudy{}, params)
-
-    case Repo.insert(changeset) do
+    case FieldsOfStudy.create_field_of_study(params) do
       {:ok, field} ->
         render(conn, FieldOfStudyView, "show.json", field: field)
       {:error, changeset} ->
@@ -26,16 +22,15 @@ defmodule SkollerWeb.Api.V1.Admin.School.FieldController do
     end
   end
 
-  def index(conn, %{"school_id" => school_id}) do
-    fields = Students.get_field_of_study_count_by_school_id(school_id)
+  def index(conn, _params) do
+    fields = Students.get_field_of_study_count()
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 
   def update(conn, %{"id" => id} = params) do
-    field_old = Repo.get!(FieldOfStudy, id)
-    changeset = FieldOfStudy.changeset(field_old, params)
+    field_old = FieldsOfStudy.get_field_of_study!(id)
 
-    case Repo.update(changeset) do
+    case FieldsOfStudy.update_field_of_study(field_old, params) do
       {:ok, field} ->
         render(conn, FieldOfStudyView, "show.json", field: field)
       {:error, changeset} ->

@@ -10,7 +10,7 @@ defmodule Skoller.Students.Student do
   import Ecto.Changeset
   alias Skoller.Students.Student
   alias Skoller.Users.User
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Schools.Class
   alias Skoller.Class.StudentClass
 
