@@ -1,6 +1,5 @@
 defmodule Skoller.FieldsOfStudy do
   alias Skoller.FieldsOfStudy.FieldOfStudy
-  alias Skoller.School.StudentField
   alias Skoller.Repo
 
   import Ecto.Query
@@ -23,24 +22,6 @@ defmodule Skoller.FieldsOfStudy do
     from(fs in FieldOfStudy)
     |> where([fs], fs.school_id == ^school_id)
     |> filter(params)
-    |> Repo.all()
-  end
-
-  @doc """
-  Returns the `Skoller.FieldsOfStudy.FieldOfStudy` and a count of `Skoller.Students.Student`
-
-  ## Examples
-
-      iex> Skoller.Students.get_field_of_study_count_by_school_id()
-      [{field: %Skoller.School.FieldsOfStudy, count: num}]
-
-  """
-  def get_field_of_study_count_by_school_id(school_id) do
-    (from fs in FieldOfStudy)
-    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
-    |> where([fs], fs.school_id == ^school_id)
-    |> group_by([fs, st], [fs.field, fs.id])
-    |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
   end
 

@@ -3,6 +3,7 @@ defmodule SkollerWeb.Api.V1.Admin.School.FieldController do
 
   alias SkollerWeb.School.FieldOfStudyView
   alias Skoller.FieldsOfStudy
+  alias Skoller.Students
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -22,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Admin.School.FieldController do
   end
 
   def index(conn, %{"school_id" => school_id}) do
-    fields = FieldsOfStudy.get_field_of_study_count_by_school_id(school_id)
+    fields = Students.get_field_of_study_count_by_school_id(school_id)
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 

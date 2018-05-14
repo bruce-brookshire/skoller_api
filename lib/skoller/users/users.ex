@@ -5,7 +5,6 @@ defmodule Skoller.Users do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.School.StudentField
   alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Locks.Lock
@@ -125,7 +124,8 @@ defmodule Skoller.Users do
   defp add_fields_of_study(_map, _params), do: {:ok, nil}
 
   defp add_field_of_study(user, field) do
-    Repo.insert!(%StudentField{field_of_study_id: field, student_id: user.student.id})
+    params = %{field_of_study_id: field, student_id: user.student.id}
+    Students.add_field_of_study(params)
   end
 
   defp add_roles(%{user: user}, params) do
@@ -159,9 +159,7 @@ defmodule Skoller.Users do
   defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
   defp delete_fields_of_study(%{user: %{student: _student}}, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
   defp delete_fields_of_study(%{user: %{student: student}}, %{"student" => %{"fields_of_study" => _fields}}) do
-    from(sf in StudentField)
-    |> where([sf], sf.student_id == ^student.id)
-    |> Repo.delete_all()
+    Students.delete_fields_of_study_by_student_id(student.id)
     {:ok, nil}
   end
   defp delete_fields_of_study(%{user: %{student: _student}}, _params), do: {:ok, nil}

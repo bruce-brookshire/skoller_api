@@ -22,6 +22,8 @@ defmodule Skoller.Students do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
+  alias Skoller.Students.FieldOfStudy, as: StudentField
+  alias Skoller.FieldsOfStudy.FieldOfStudy
 
   import Ecto.Query
 
@@ -345,6 +347,26 @@ defmodule Skoller.Students do
     enroll_in_class(sc.class_id, params, [enrolled_by: sc.id])
   end
 
+  def add_field_of_study(params) do
+    FieldOfStudy.changeset(%FieldOfStudy{}, params)
+    |> Repo.insert()
+    |> Repo.preload(:student)
+  end
+
+  def get_field_of_study_by_id!(student_id, field_of_study_id) do
+    Repo.get_by!(FieldOfStudy, student_id: student_id, field_of_study_id: field_of_study_id)
+  end
+
+  def delete_field_of_study(field) do
+    Repo.delete(field)
+  end
+
+  def delete_fields_of_study_by_student_id(student_id) do
+    from(sf in FieldOfStudy)
+    |> where([sf], sf.student_id == ^student_id)
+    |> Repo.delete_all()
+  end
+
   defp add_enrolled_by(changeset, opts) do
     case opts |> List.keytake(:enrolled_by, 0) do
       nil -> changeset
@@ -367,6 +389,24 @@ defmodule Skoller.Students do
     student_class
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
+  end
+
+  @doc """
+  Returns the `Skoller.FieldsOfStudy.FieldOfStudy` and a count of `Skoller.Students.Student`
+
+  ## Examples
+
+      iex> Skoller.Students.get_field_of_study_count_by_school_id()
+      [{field: %Skoller.School.FieldsOfStudy, count: num}]
+
+  """
+  def get_field_of_study_count_by_school_id(school_id) do
+    (from fs in FieldOfStudy)
+    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
+    |> where([fs], fs.school_id == ^school_id)
+    |> group_by([fs, st], [fs.field, fs.id])
+    |> select([fs, st], %{field: fs, count: count(st.id)})
+    |> Repo.all()
   end
 
   # 1. Check for existing base Assignment, pass to next multi call.
