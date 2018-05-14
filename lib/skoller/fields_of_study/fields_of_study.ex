@@ -18,9 +18,8 @@ defmodule Skoller.FieldsOfStudy do
     |> Repo.update()
   end
 
-  def get_fields_of_study_by_school(school_id, params) do
+  def get_fields_of_study_with_filter(params) do
     from(fs in FieldOfStudy)
-    |> where([fs], fs.school_id == ^school_id)
     |> filter(params)
     |> Repo.all()
   end

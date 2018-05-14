@@ -1,11 +1,11 @@
-defmodule SkollerWeb.Api.V1.School.FieldController do
+defmodule SkollerWeb.Api.V1.FieldController do
   use SkollerWeb, :controller
 
   alias Skoller.FieldsOfStudy
   alias SkollerWeb.School.FieldOfStudyView
 
-  def index(conn, %{"school_id" => school_id} = params) do
-    fields = FieldsOfStudy.get_fields_of_study_by_school(school_id, params)
+  def index(conn, params) do
+    fields = FieldsOfStudy.get_fields_of_study_with_filter(params)
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 

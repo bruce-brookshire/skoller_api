@@ -91,10 +91,6 @@ defmodule SkollerWeb.Router do
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
-
-        # School Field of Study routes
-        resources "/fields-of-study", Admin.School.FieldController, only: [:create, :index]
-        post "/fields-of-study/csv", CSVController, :fos
       end
 
       # Class Period routes
@@ -215,8 +211,9 @@ defmodule SkollerWeb.Router do
       resources "/professors", Admin.ProfessorController, only: [:update]
 
       # Field of Study routes
-      resources "/fields-of-study", Admin.School.FieldController, only: [:update]
-      resources "/fields-of-study", School.FieldController, only: [:show]
+      resources "/fields-of-study", Admin.FieldController, only: [:update, :create, :index]
+      resources "/fields-of-study", FieldController, only: [:show]
+      post "/fields-of-study/csv", CSVController, :fos
 
       #Syllabus Worker routes
       # post "/syllabus-workers/weights", SyllabusWorkerController, :weights
@@ -250,7 +247,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
-      resources "/schools/:school_id/fields-of-study/list", School.FieldController, only: [:index]
+      resources "/fields-of-study/list", FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
       get "/enrollment-link/:token", Student.Class.LinkController, :show

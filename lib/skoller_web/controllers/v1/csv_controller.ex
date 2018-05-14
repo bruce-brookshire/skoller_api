@@ -17,15 +17,14 @@ defmodule SkollerWeb.Api.V1.CSVController do
   
   plug :verify_role, %{role: @admin_role}
 
-  def fos(conn, %{"file" => file, "school_id" => school_id}) do
+  def fos(conn, %{"file" => file}) do
     changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
     case Repo.insert(changeset) do
       {:ok, _} ->
-        school_id = school_id |> String.to_integer
         uploads = file.path 
         |> File.stream!()
         |> CSV.decode(headers: [:field])
-        |> Enum.map(&process_fos_row(&1, school_id))
+        |> Enum.map(&process_fos_row(&1))
 
         conn |> render(CSVView, "index.json", csv: uploads)
       {:error, changeset} ->
@@ -92,11 +91,10 @@ defmodule SkollerWeb.Api.V1.CSVController do
     end
   end
 
-  defp process_fos_row(fos, school_id) do
+  defp process_fos_row(fos) do
     case fos do
       {:ok, field} ->
         field 
-        |> Map.put(:school_id, school_id)
         |> FieldsOfStudy.create_field_of_study()
       {:error, error} ->
         {:error, error}

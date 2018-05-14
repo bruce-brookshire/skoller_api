@@ -397,13 +397,12 @@ defmodule Skoller.Students do
   ## Examples
 
       iex> Skoller.Students.get_field_of_study_count_by_school_id()
-      [{field: %Skoller.School.FieldsOfStudy, count: num}]
+      [{field: %Skoller.FieldsOfStudy.FieldOfStudy, count: num}]
 
   """
-  def get_field_of_study_count_by_school_id(school_id) do
+  def get_field_of_study_count() do
     (from fs in FieldOfStudy)
     |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
-    |> where([fs], fs.school_id == ^school_id)
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
