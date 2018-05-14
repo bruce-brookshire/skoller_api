@@ -761,8 +761,7 @@ defmodule Mix.Tasks.Seed.Dev do
     })
 
     Repo.insert!(%FieldOfStudy{
-      field: "Computer Science",
-      school_id: school.id
+      field: "Computer Science"
     })
 
     Repo.insert!(%Professor{
