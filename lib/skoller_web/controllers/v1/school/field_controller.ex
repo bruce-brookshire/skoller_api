@@ -1,35 +1,16 @@
 defmodule SkollerWeb.Api.V1.School.FieldController do
   use SkollerWeb, :controller
 
-  alias Skoller.School.FieldOfStudy
-  alias Skoller.Repo
+  alias Skoller.FieldsOfStudy
   alias SkollerWeb.School.FieldOfStudyView
 
-  import Ecto.Query
-
   def index(conn, %{"school_id" => school_id} = params) do
-    query = (from fs in FieldOfStudy)
-    fields = query
-            |> where([fs], fs.school_id == ^school_id)
-            |> filter(params)
-            |> Repo.all()
+    fields = FieldsOfStudy.get_fields_of_study_by_school(school_id, params)
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 
   def show(conn, %{"id" => id}) do
-    field = Repo.get!(FieldOfStudy, id)
+    field = FieldsOfStudy.get_field_of_study!(id)
     render(conn, FieldOfStudyView, "show.json", field: field)
   end
-
-  defp filter(query, %{} = params) do
-    query
-    |> name_filter(params)
-  end
-
-  defp name_filter(query, %{"field_name" => filter}) do
-    filter = "%" <> filter <> "%"
-    query
-    |> where([fs], ilike(fs.field, ^filter))
-  end
-  defp name_filter(query, _), do: query
 end

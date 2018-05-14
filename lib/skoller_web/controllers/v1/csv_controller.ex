@@ -2,7 +2,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy
   alias SkollerWeb.CSVView
   alias Skoller.CSVUpload  
   alias Skoller.Classes
@@ -95,9 +95,9 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp process_fos_row(fos, school_id) do
     case fos do
       {:ok, field} ->
-        field = field |> Map.put(:school_id, school_id)
-        changeset = FieldOfStudy.changeset(%FieldOfStudy{}, field)
-        Repo.insert(changeset)
+        field 
+        |> Map.put(:school_id, school_id)
+        |> FieldsOfStudy.create_field_of_study()
       {:error, error} ->
         {:error, error}
     end

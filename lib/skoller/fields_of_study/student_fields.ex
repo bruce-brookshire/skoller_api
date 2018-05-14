@@ -10,7 +10,7 @@ defmodule Skoller.School.StudentField do
   import Ecto.Changeset
   alias Skoller.School.StudentField
   alias Skoller.Students.Student
-  alias Skoller.School.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy
 
   schema "student_fields_of_study" do
     field :field_of_study_id, :id

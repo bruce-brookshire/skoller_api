@@ -8,8 +8,6 @@ defmodule Skoller.Students do
   alias Skoller.Schools.Class
   alias Skoller.Schools.School
   alias Skoller.Students.Student
-  alias Skoller.School.FieldOfStudy
-  alias Skoller.School.StudentField
   alias Skoller.Classes
   alias Skoller.Classes.Status
   alias Skoller.Professors.Professor
@@ -149,24 +147,6 @@ defmodule Skoller.Students do
     from(school in School)
     |> join(:left, [school], student in subquery(get_school_enrollment_subquery()), student.school_id == school.id)
     |> select([school, student], %{school: school, students: fragment("coalesce(?, 0)", student.count)})
-    |> Repo.all()
-  end
-
-  @doc """
-  Returns the `Skoller.School.FieldOfStudy` and a count of `Skoller.Students.Student`
-
-  ## Examples
-
-      iex> Skoller.Students.get_field_of_study_count_by_school_id()
-      [{field: %Skoller.School.FieldOfStudy, count: num}]
-
-  """
-  def get_field_of_study_count_by_school_id(school_id) do
-    (from fs in FieldOfStudy)
-    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
-    |> where([fs], fs.school_id == ^school_id)
-    |> group_by([fs, st], [fs.field, fs.id])
-    |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
   end
 
