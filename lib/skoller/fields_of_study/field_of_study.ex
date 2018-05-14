@@ -12,12 +12,11 @@ defmodule Skoller.FieldsOfStudy.FieldOfStudy do
 
   schema "fields_of_study" do
     field :field, :string
-    field :school_id, :id
 
     timestamps()
   end
 
-  @req_fields [:field, :school_id]
+  @req_fields [:field]
   @all_fields @req_fields
 
   @doc false
@@ -25,7 +24,6 @@ defmodule Skoller.FieldsOfStudy.FieldOfStudy do
     field_of_study
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> foreign_key_constraint(:school_id)
-    |> unique_constraint(:school_field, name: :fields_of_study_field_school_id_index)
+    |> unique_constraint(:field_name, name: :fields_of_study_field_index)
   end
 end
