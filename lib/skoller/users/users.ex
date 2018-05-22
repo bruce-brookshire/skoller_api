@@ -130,6 +130,7 @@ defmodule Skoller.Users do
   end
 
   defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
+    user = user |> Repo.preload(:roles)
     case user.roles |> Enum.any?(& &1.id == @student_role) do
       false -> Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
       true -> {:ok, nil}
