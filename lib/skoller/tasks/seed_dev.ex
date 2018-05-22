@@ -74,7 +74,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                    birthday: bday,
                                    gender: "Male",
                                    is_verified: true,
-                                   notification_time: time1}})
+                                   notification_time: time1,
+                                   future_reminder_notification_time: time1}})
 
     student1 = Repo.insert!(%User{email: "tyler1@fortyau.com", 
                                    password_hash: pass.password_hash,
@@ -84,7 +85,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                       birthday: bday,
                                       gender: "Male",
                                       is_verified: true,
-                                      notification_time: time1}})
+                                      notification_time: time1,
+                                      future_reminder_notification_time: time1}})
                                     
     student2 = Repo.insert!(%User{email: "tyler2@fortyau.com", 
                                       password_hash: pass.password_hash,
@@ -94,7 +96,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                          birthday: bday,
                                          gender: "Male",
                                          is_verified: true,
-                                         notification_time: time1}})
+                                         notification_time: time1,
+                                         future_reminder_notification_time: time1}})
       
     student3 = Repo.insert!(%User{email: "tyler3@fortyau.com", 
                                          password_hash: pass.password_hash,
@@ -104,7 +107,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                             birthday: bday,
                                             gender: "Male",
                                             is_verified: true,
-                                            notification_time: time1}})
+                                            notification_time: time1,
+                                            future_reminder_notification_time: time1}})
 
     student4 = Repo.insert!(%User{email: "tyler4@fortyau.com", 
                                 password_hash: pass.password_hash,
@@ -114,7 +118,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                     birthday: bday,
                                     gender: "Male",
                                     is_verified: true,
-                                    notification_time: time1}})
+                                    notification_time: time1,
+                                    future_reminder_notification_time: time1}})
 
     student5 = Repo.insert!(%User{email: "tyler5@fortyau.com", 
                                     password_hash: pass.password_hash,
@@ -124,7 +129,8 @@ defmodule Mix.Tasks.Seed.Dev do
                                       birthday: bday,
                                       gender: "Male",
                                       is_verified: true,
-                                      notification_time: time1}})
+                                      notification_time: time1,
+                                      future_reminder_notification_time: time1}})
 
     Repo.insert!(%Device{type: "ios", udid: "Test", user_id: student5.id})
     Repo.insert!(%Device{type: "ios", udid: "Test1", user_id: student4.id})
