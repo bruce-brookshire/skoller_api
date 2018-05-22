@@ -354,13 +354,13 @@ defmodule Skoller.Students do
   end
 
   def add_field_of_study(params) do
-    FieldOfStudy.changeset(%FieldOfStudy{}, params)
+    StudentField.changeset(%StudentField{}, params)
     |> Repo.insert()
     |> Repo.preload(:student)
   end
 
   def get_field_of_study_by_id!(student_id, field_of_study_id) do
-    Repo.get_by!(FieldOfStudy, student_id: student_id, field_of_study_id: field_of_study_id)
+    Repo.get_by!(StudentField, student_id: student_id, field_of_study_id: field_of_study_id)
   end
 
   def delete_field_of_study(field) do
@@ -368,7 +368,7 @@ defmodule Skoller.Students do
   end
 
   def delete_fields_of_study_by_student_id(student_id) do
-    from(sf in FieldOfStudy)
+    from(sf in StudentField)
     |> where([sf], sf.student_id == ^student_id)
     |> Repo.delete_all()
   end
