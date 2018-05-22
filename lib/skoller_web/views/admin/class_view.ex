@@ -3,7 +3,7 @@ defmodule SkollerWeb.Admin.ClassView do
 
   alias SkollerWeb.Admin.ClassView, as: AdminClassView
   alias SkollerWeb.ClassView, as: ClassView
-  alias SkollerWeb.Class.StudentClassView
+  alias SkollerWeb.Admin.StudentClassView
   
   def render("show.json", %{class: class}) do
     render_one(class, AdminClassView, "class.json")
@@ -11,6 +11,6 @@ defmodule SkollerWeb.Admin.ClassView do
 
   def render("class.json", %{class: class}) do
     render_one(class, ClassView, "show.json")
-    |> Map.put(:students, render_many(class.students, StudentClassView, "student_class-admin.json"))
+    |> Map.put(:students, render_many(class.students, StudentClassView, "student_class.json"))
   end
 end
