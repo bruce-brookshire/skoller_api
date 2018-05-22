@@ -354,9 +354,11 @@ defmodule Skoller.Students do
   end
 
   def add_field_of_study(params) do
-    StudentField.changeset(%StudentField{}, params)
-    |> Repo.insert()
-    |> Repo.preload(:student)
+    changeset = StudentField.changeset(%StudentField{}, params)
+    case changeset |> Repo.insert() do
+      {:ok, results} -> results |> Repo.preload(:student)
+      error -> error
+    end
   end
 
   def get_field_of_study_by_id!(student_id, field_of_study_id) do

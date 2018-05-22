@@ -8,9 +8,9 @@ defmodule Skoller.Students.FieldOfStudy do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Students.FieldOfStudy
+  alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.Students.Student
-  alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias Skoller.FieldsOfStudy.FieldOfStudy, as: FieldOfStudy
 
   schema "student_fields_of_study" do
     field :field_of_study_id, :id
@@ -25,7 +25,7 @@ defmodule Skoller.Students.FieldOfStudy do
   @all_fields @req_fields
 
   @doc false
-  def changeset(%FieldOfStudy{} = student_fields, attrs) do
+  def changeset(%StudentField{} = student_fields, attrs) do
     student_fields
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)

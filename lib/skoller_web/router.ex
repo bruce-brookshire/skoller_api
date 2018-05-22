@@ -213,7 +213,6 @@ defmodule SkollerWeb.Router do
 
       # Field of Study routes
       resources "/fields-of-study", Admin.FieldController, only: [:update, :create, :index]
-      resources "/fields-of-study", FieldController, only: [:show]
       post "/fields-of-study/csv", CSVController, :fos
 
       #Syllabus Worker routes
