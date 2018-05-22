@@ -105,6 +105,7 @@ defmodule SkollerWeb.Router do
       get "/class-statuses/hub", Class.StatusController, :hub
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
+      get "/classes/:id/admin", Admin.ClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
 
