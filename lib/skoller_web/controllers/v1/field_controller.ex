@@ -8,9 +8,4 @@ defmodule SkollerWeb.Api.V1.FieldController do
     fields = FieldsOfStudy.get_fields_of_study_with_filter(params)
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
-
-  def show(conn, %{"id" => id}) do
-    field = FieldsOfStudy.get_field_of_study!(id)
-    render(conn, FieldOfStudyView, "show.json", field: field)
-  end
 end

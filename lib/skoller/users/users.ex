@@ -41,18 +41,11 @@ defmodule Skoller.Users do
 
   def update_user(user_old, params) do
     changeset = User.changeset_update_admin(user_old, params)
-    
-    case changeset.changes == %{} do
-      true -> {:ok, %{user: user_old}}
-      false -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.update(:user, changeset)
-        |> Ecto.Multi.run(:delete_roles, &delete_roles(&1, params))
-        |> Ecto.Multi.run(:roles, &add_roles(&1, params))
-        |> Ecto.Multi.run(:delete_fields_of_study, &delete_fields_of_study(&1, params))
-        |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
-        |> Repo.transaction()
-    end
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+    |> Repo.transaction()
   end
 
   def get_user_by_email(email) do
@@ -116,7 +109,9 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
   end
 
+  defp add_fields_of_study(_map, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
+    delete_fields_of_study(user.student.id)
     status = fields |> Enum.map(&add_field_of_study(user, &1))
 
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
@@ -135,9 +130,14 @@ defmodule Skoller.Users do
   end
 
   defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
-    Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+    user = user |> Repo.preload(:roles)
+    case user.roles |> Enum.any?(& &1.id == @student_role) do
+      false -> Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+      true -> {:ok, nil}
+    end
   end
   defp add_roles_preloaded(user, %{"roles" => roles}) do
+    delete_roles(user.id)
     status = roles
     |> Enum.map(&add_role(user, &1))
     
@@ -149,20 +149,15 @@ defmodule Skoller.Users do
     Repo.insert!(%UserRole{user_id: user.id, role_id: role})
   end
 
-  defp delete_roles(%{user: user}, _params) do
+  defp delete_roles(id) do
     from(role in UserRole)
-    |> where([role], role.user_id == ^user.id)
+    |> where([role], role.user_id == ^id)
     |> Repo.delete_all()
-    {:ok, nil}
   end
 
-  defp delete_fields_of_study(%{user: %{student: nil}}, _params), do: {:ok, nil}
-  defp delete_fields_of_study(%{user: %{student: _student}}, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
-  defp delete_fields_of_study(%{user: %{student: student}}, %{"student" => %{"fields_of_study" => _fields}}) do
-    Students.delete_fields_of_study_by_student_id(student.id)
-    {:ok, nil}
+  defp delete_fields_of_study(id) do
+    Students.delete_fields_of_study_by_student_id(id)
   end
-  defp delete_fields_of_study(%{user: %{student: _student}}, _params), do: {:ok, nil}
 
   defp get_opt(opts, atom) do
     case opts |> List.keytake(atom, 0) do

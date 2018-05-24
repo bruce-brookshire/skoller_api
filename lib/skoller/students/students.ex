@@ -30,6 +30,12 @@ defmodule Skoller.Students do
   @community_threshold 2
   @link_length 5
 
+  def get_students_by_class(class_id) do
+    from(sc in StudentClass)
+    |> where([sc], sc.class_id == ^class_id)
+    |> Repo.all()
+  end
+
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
@@ -348,13 +354,15 @@ defmodule Skoller.Students do
   end
 
   def add_field_of_study(params) do
-    FieldOfStudy.changeset(%FieldOfStudy{}, params)
-    |> Repo.insert()
-    |> Repo.preload(:student)
+    changeset = StudentField.changeset(%StudentField{}, params)
+    case changeset |> Repo.insert() do
+      {:ok, results} -> results |> Repo.preload(:student)
+      error -> error
+    end
   end
 
   def get_field_of_study_by_id!(student_id, field_of_study_id) do
-    Repo.get_by!(FieldOfStudy, student_id: student_id, field_of_study_id: field_of_study_id)
+    Repo.get_by!(StudentField, student_id: student_id, field_of_study_id: field_of_study_id)
   end
 
   def delete_field_of_study(field) do
@@ -362,7 +370,7 @@ defmodule Skoller.Students do
   end
 
   def delete_fields_of_study_by_student_id(student_id) do
-    from(sf in FieldOfStudy)
+    from(sf in StudentField)
     |> where([sf], sf.student_id == ^student_id)
     |> Repo.delete_all()
   end

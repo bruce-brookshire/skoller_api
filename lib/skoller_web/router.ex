@@ -105,6 +105,7 @@ defmodule SkollerWeb.Router do
       get "/class-statuses/hub", Class.StatusController, :hub
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
+      get "/classes/:id/admin", Admin.ClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
         put "/statuses", Admin.Class.StatusController, :update
 
@@ -212,7 +213,6 @@ defmodule SkollerWeb.Router do
 
       # Field of Study routes
       resources "/fields-of-study", Admin.FieldController, only: [:update, :create, :index]
-      resources "/fields-of-study", FieldController, only: [:show]
       post "/fields-of-study/csv", CSVController, :fos
 
       #Syllabus Worker routes
