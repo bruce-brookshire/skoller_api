@@ -4,6 +4,8 @@ defmodule SkollerWeb.Admin.ClassView do
   alias SkollerWeb.Admin.ClassView, as: AdminClassView
   alias SkollerWeb.ClassView, as: ClassView
   alias SkollerWeb.Admin.StudentClassView
+  alias SkollerWeb.Class.WeightView
+  alias SkollerWeb.AssignmentView
   
   def render("show.json", %{class: class}) do
     render_one(class, AdminClassView, "class.json")
@@ -12,5 +14,7 @@ defmodule SkollerWeb.Admin.ClassView do
   def render("class.json", %{class: class}) do
     render_one(class, ClassView, "show.json")
     |> Map.put(:students, render_many(class.students, StudentClassView, "student_class.json"))
+    |> Map.put(:weights, render_many(class.weights, WeightView, "weight.json"))
+    |> Map.put(:assignments, render_many(class.assignments, AssignmentView, "assignment.json"))
   end
 end

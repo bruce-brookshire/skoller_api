@@ -72,6 +72,16 @@ defmodule Skoller.Classes do
     Repo.get!(Class, id)
   end
 
+  @doc """
+  Gets a preloaded `Skoller.Schools.Class` by id
+
+  """
+
+  def get_full_class_by_id!(id) do
+    Repo.get!(Class, id)
+    |> Repo.preload([:weights, :assignments])
+  end
+
   def get_editable_class_by_id(id) do
     Repo.get_by(Class, id: id, is_editable: true)
   end

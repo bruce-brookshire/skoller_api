@@ -28,7 +28,7 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   * 200 `SkollerWeb.ClassView`
   """
   def show(conn, %{"id" => id}) do
-    class = Classes.get_class_by_id!(id)
+    class = Classes.get_full_class_by_id!(id)
     |> Map.put(:students, Students.get_students_by_class(id))
     render(conn, ClassView, "show.json", class: class)
   end
