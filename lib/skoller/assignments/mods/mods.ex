@@ -16,6 +16,13 @@ defmodule Skoller.Assignments.Mods do
   @due_assignment_mod 300
   @new_assignment_mod 400
 
+  def get_mods_by_assignment(assignment_id) do
+    from(m in Mod)
+    |> where([m], m.assignment_id == ^assignment_id)
+    |> Repo.all()
+    |> Repo.preload(:actions)
+  end
+
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
