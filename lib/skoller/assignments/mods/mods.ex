@@ -20,7 +20,7 @@ defmodule Skoller.Assignments.Mods do
     from(m in Mod)
     |> where([m], m.assignment_id == ^assignment_id)
     |> Repo.all()
-    |> Repo.preload(:actions)
+    |> Enum.map(&Map.put(&1, :action, add_action_details(&1.id)))
   end
 
   def get_student_mods(student_id, params \\ %{}) do
@@ -173,6 +173,16 @@ defmodule Skoller.Assignments.Mods do
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
+  end
+
+  defp add_action_details(mod_id) do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
+    |> join(:inner, [a, sc], s in Student, s.id == sc.student_id)
+    |> join(:inner, [a, sc, s], u in User, u.student_id == s.id)
+    |> where([a], a.assignment_modification_id == ^mod_id)
+    |> select([a, sc, s, u], %{action: a, student: s, user: u})
+    |> Repo.all()
   end
 
   defp filter_due_date(%{mod: %{assignment_mod_type_id: @due_assignment_mod} = mod}, date) do
