@@ -5,7 +5,7 @@ defmodule SkollerWeb.Admin.ClassView do
   alias SkollerWeb.ClassView, as: ClassView
   alias SkollerWeb.Admin.StudentClassView
   alias SkollerWeb.Class.WeightView
-  alias SkollerWeb.AssignmentView
+  alias SkollerWeb.Admin.AssignmentView
   
   def render("show.json", %{class: class}) do
     render_one(class, AdminClassView, "class.json")

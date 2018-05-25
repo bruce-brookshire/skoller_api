@@ -79,7 +79,7 @@ defmodule Skoller.Classes do
 
   def get_full_class_by_id!(id) do
     Repo.get!(Class, id)
-    |> Repo.preload([:weights, :assignments])
+    |> Repo.preload([:weights])
   end
 
   def get_editable_class_by_id(id) do

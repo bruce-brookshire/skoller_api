@@ -41,6 +41,16 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.one()
   end
 
+  def get_mod_assignments_by_class(id) do
+    from(a in Assignment)
+    |> join(:left, [a], m in Mod, m.assignment_id == a.id)
+    |> join(:left, [a], s in StudentAssignment, s.assignment_id == a.id)
+    |> where([a], a.class_id == ^id)
+    |> group_by([a], a.id)
+    |> select([a, m, s], %{assignment: %{assignment: a, mod_count: count(m.id), student_count: count(s.id)}})
+    |> Repo.all()
+  end
+
   def get_class_from_mod_id(id) do
     from(class in Class)
     |> join(:inner, [class], assign in Assignment, class.id == assign.class_id)
