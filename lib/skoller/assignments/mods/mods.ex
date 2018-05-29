@@ -181,7 +181,7 @@ defmodule Skoller.Assignments.Mods do
     |> join(:inner, [a, sc], s in Student, s.id == sc.student_id)
     |> join(:inner, [a, sc, s], u in User, u.student_id == s.id)
     |> where([a], a.assignment_modification_id == ^mod_id)
-    |> select([a, sc, s, u], %{action: a, student: s, user: u})
+    |> select([a, sc, s, u], %{action: a, user: u})
     |> Repo.all()
   end
 
