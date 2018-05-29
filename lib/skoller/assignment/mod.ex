@@ -12,6 +12,7 @@ defmodule Skoller.Assignment.Mod do
   alias Skoller.Students.Student
   alias Skoller.Class.Assignment
   alias Skoller.Assignment.Mod.Type
+  alias Skoller.Assignment.Mod.Action
 
   schema "assignment_modifications" do
     field :data, :map
@@ -23,6 +24,7 @@ defmodule Skoller.Assignment.Mod do
     belongs_to :assignment, Assignment, define_field: false
     belongs_to :assignment_mod_type, Type, define_field: false
     belongs_to :student, Student, define_field: false
+    has_many :actions, Action, foreign_key: :assignment_modification_id
 
     timestamps()
   end

@@ -202,6 +202,9 @@ defmodule SkollerWeb.Router do
         # Assignment Grade routes
         resources "/grades", Student.Class.GradeController, only: [:create]
         put "/grades", Student.Class.GradeController, :create
+
+        # Class Mod routes
+        get "/mods", Assignment.ModController, :index
       end
 
       # Weight routes
