@@ -387,12 +387,17 @@ defmodule Skoller.Students do
     end
   end
 
+  def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
+    link = generate_link(id)
+    
+    student
+    |> Ecto.Changeset.change(%{enrollment_link: link})
+    |> Repo.update()
+  end
+  def generate_student_link(_student), do: {:ok, nil}
+
   def generate_enrollment_link(%StudentClass{id: id} = student_class) do
-    link = @link_length
-    |> :crypto.strong_rand_bytes() 
-    |> Base.url_encode64 
-    |> binary_part(0, @link_length)
-    |> Kernel.<>(to_string(id))
+    link = generate_link(id)
 
     student_class
     |> Ecto.Changeset.change(%{enrollment_link: link})
@@ -414,6 +419,14 @@ defmodule Skoller.Students do
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
+  end
+
+  defp generate_link(id) do
+    @link_length
+    |> :crypto.strong_rand_bytes() 
+    |> Base.url_encode64 
+    |> binary_part(0, @link_length)
+    |> Kernel.<>(to_string(id))
   end
 
   # 1. Check for existing base Assignment, pass to next multi call.

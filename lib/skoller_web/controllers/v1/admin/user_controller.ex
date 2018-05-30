@@ -6,6 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
+  alias Skoller.Repo
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -16,6 +17,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def create(conn, %{} = params) do
     case Users.create_user(params) do
       {:ok, %{user: user}} ->
+        user = user |> Repo.preload(:student, force: true)
         render(conn, UserView, "show.json", user: user)
       {:error, failed_value} ->
         conn
@@ -38,6 +40,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
     case Users.update_user(user_old, params) do
       {:ok, %{user: user}} ->
+        user = user |> Repo.preload(:student, force: true)
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn

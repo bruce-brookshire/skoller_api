@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
 
     case multi do
       {:ok, %{user: %{user: user}, token: token}} ->
-        user = user |> Repo.preload(:student)
+        user = user |> Repo.preload(:student, force: true)
         user.student |> send_verification_text()
         render(conn, AuthView, "show.json", [user: user, token: token])
       {:error, _, failed_value, _} ->

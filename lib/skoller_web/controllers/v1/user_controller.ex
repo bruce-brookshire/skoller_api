@@ -5,6 +5,7 @@ defmodule SkollerWeb.Api.V1.UserController do
   alias SkollerWeb.UserView
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.PicUpload
+  alias Skoller.Repo
   alias Ecto.UUID
 
   import SkollerWeb.Helpers.AuthPlug
@@ -26,6 +27,7 @@ defmodule SkollerWeb.Api.V1.UserController do
 
     case Users.update_user(user_old, params) do
       {:ok, %{user: user}} ->
+        user = user |> Repo.preload(:student, force: true)
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn

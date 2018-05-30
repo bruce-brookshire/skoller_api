@@ -8,6 +8,7 @@ defmodule Skoller.Users do
   alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Locks.Lock
+  alias Skoller.Students.Student
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
 
@@ -30,12 +31,15 @@ defmodule Skoller.Users do
     |> get_changeset()
     |> verify_student(opts)
     |> verification_code(opts)
+    |> get_enrolled_by(params)
     |> insert_user(params)
+    |> Ecto.Multi.run(:link, &get_link(&1.user))
     
     case multi |> Repo.transaction() do
       {:error, _, failed_val, _} ->
         {:error, failed_val}
-      {:ok, items} -> {:ok, items}
+      {:ok, items} ->
+        {:ok, items}
     end
   end
 
@@ -45,6 +49,7 @@ defmodule Skoller.Users do
     |> Ecto.Multi.update(:user, changeset)
     |> Ecto.Multi.run(:roles, &add_roles(&1, params))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+    |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Repo.transaction()
   end
 
@@ -102,12 +107,23 @@ defmodule Skoller.Users do
   end
   defp verify_student(changeset, _opts), do: changeset
 
+  defp get_enrolled_by(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, %{"student" => %{"link" => link}}) do
+    enrolled_by_id = Repo.get_by(Student, enrollment_link: link).id
+    Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by_id)})
+  end
+  defp get_enrolled_by(changeset, _params), do: changeset
+
   defp insert_user(changeset, params) do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:user, changeset)
     |> Ecto.Multi.run(:roles, &add_roles(&1, params))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
   end
+
+  defp get_link(%User{student: %Student{} = student}) do
+    Students.generate_student_link(student)
+  end
+  defp get_link(_user), do: {:ok, nil}
 
   defp add_fields_of_study(_map, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
