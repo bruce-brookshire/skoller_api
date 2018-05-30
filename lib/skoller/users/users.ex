@@ -31,6 +31,7 @@ defmodule Skoller.Users do
     |> get_changeset()
     |> verify_student(opts)
     |> verification_code(opts)
+    |> get_enrolled_by(params)
     |> insert_user(params)
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     
@@ -105,6 +106,12 @@ defmodule Skoller.Users do
     end
   end
   defp verify_student(changeset, _opts), do: changeset
+
+  defp get_enrolled_by(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, %{"student" => %{"link" => link}}) do
+    enrolled_by_id = Repo.get_by(Student, enrollment_link: link).id
+    Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by_id)})
+  end
+  defp get_enrolled_by(changeset, _params), do: changeset
 
   defp insert_user(changeset, params) do
     Ecto.Multi.new
