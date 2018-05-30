@@ -34,6 +34,8 @@ defmodule Skoller.Students.Student do
     field :organization, :string
     field :bio, :string
     field :grad_year, :string
+    field :enrollment_link, :string
+    field :enrolled_by, :id
     has_many :users, User
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
