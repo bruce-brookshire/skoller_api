@@ -120,6 +120,7 @@ defmodule Skoller.Users do
   defp get_link(%User{student: %Student{} = student}) do
     Students.generate_student_link(student)
   end
+  defp get_link(_user), do: {:ok, nil}
 
   defp add_fields_of_study(_map, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
