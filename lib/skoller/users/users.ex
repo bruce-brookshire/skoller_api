@@ -8,6 +8,7 @@ defmodule Skoller.Users do
   alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Locks.Lock
+  alias Skoller.Students.Student
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
 
@@ -31,11 +32,13 @@ defmodule Skoller.Users do
     |> verify_student(opts)
     |> verification_code(opts)
     |> insert_user(params)
+    |> add_student_link()
     
     case multi |> Repo.transaction() do
       {:error, _, failed_val, _} ->
         {:error, failed_val}
-      {:ok, items} -> {:ok, items}
+      {:ok, items} ->
+        {:ok, items}
     end
   end
 
@@ -107,6 +110,15 @@ defmodule Skoller.Users do
     |> Ecto.Multi.insert(:user, changeset)
     |> Ecto.Multi.run(:roles, &add_roles(&1, params))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+  end
+
+  defp add_student_link(multi) do
+    multi
+    |> Ecto.Multi.run(:link, &get_link(&1.user))
+  end
+
+  defp get_link(%User{student: %Student{} = student}) do
+    Students.generate_student_link(student)
   end
 
   defp add_fields_of_study(_map, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
