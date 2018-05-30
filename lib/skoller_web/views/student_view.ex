@@ -7,6 +7,8 @@ defmodule SkollerWeb.StudentView do
   alias SkollerWeb.SchoolView
   alias SkollerWeb.UserView
 
+  @enrollment_path "/s/"
+
   def render("index.json", %{students: students}) do
     render_many(students, StudentView, "student.json")
   end
@@ -36,6 +38,7 @@ defmodule SkollerWeb.StudentView do
       organization: student.organization,
       bio: student.bio,
       grad_year: student.grad_year,
+      enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student.enrollment_link,
       schools: render_many(student.schools, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field)
     }
