@@ -387,13 +387,14 @@ defmodule Skoller.Students do
     end
   end
 
-  def generate_student_link(%Student{id: id} = student) do
+  def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
     link = generate_link(id)
     
     student
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
   end
+  def generate_student_link(_student), do: {:ok, nil}
 
   def generate_enrollment_link(%StudentClass{id: id} = student_class) do
     link = generate_link(id)
