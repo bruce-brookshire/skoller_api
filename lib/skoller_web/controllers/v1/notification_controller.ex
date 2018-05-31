@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
 
   def syllabus(conn, _params) do
     Task.start(NotificationHelper, :send_needs_syllabus_notifications, [])
-    conn |> send_resp(200, "")
+    conn |> send_resp(204, "")
   end
 
   def custom(conn, %{"message" => msg, "password" => password}) do
@@ -24,7 +24,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
         |> send_resp(422, "")
       else
         Task.start(NotificationHelper, :send_custom_notification, [msg])
-        conn |> send_resp(200, "")
+        conn |> send_resp(204, "")
       end
     else
       conn
