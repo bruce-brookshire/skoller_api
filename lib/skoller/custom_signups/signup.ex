@@ -22,5 +22,7 @@ defmodule Skoller.CustomSignups.Signup do
     enroll
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> foreign_key_constraint(:student_id)
+    |> foreign_key_constraint(:custom_signup_link_id)
   end
 end
