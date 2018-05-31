@@ -3,6 +3,8 @@ defmodule SkollerWeb.LinkView do
 
   alias SkollerWeb.LinkView
 
+  @custom_signup_path "/c/"
+
   def render("index.json", %{links: links}) do
     render_many(links, LinkView, "link.json")
   end
@@ -15,7 +17,7 @@ defmodule SkollerWeb.LinkView do
     %{
       id: link.id,
       name: link.name,
-      link: link.link,
+      link: System.get_env("WEB_URL") <> @custom_signup_path <> link.link,
       start_date: link.start,
       end_date: link.end
     }

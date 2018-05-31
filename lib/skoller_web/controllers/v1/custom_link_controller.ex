@@ -15,4 +15,9 @@ defmodule SkollerWeb.Api.V1.CustomLinkController do
     end
   end
 
+  def index(conn, _params) do
+    links = CustomSignups.get_links()
+    render(conn, LinkView, "index.json", links: links)
+  end
+
 end

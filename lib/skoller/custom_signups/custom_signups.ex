@@ -7,4 +7,8 @@ defmodule Skoller.CustomSignups do
     |> Link.changeset(params)
     |> Repo.insert()
   end
+
+  def get_links() do
+    Repo.all(Link)
+  end
 end
