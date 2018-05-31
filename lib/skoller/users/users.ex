@@ -11,6 +11,7 @@ defmodule Skoller.Users do
   alias Skoller.Students.Student
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
+  alias Skoller.CustomSignups
 
   import Ecto.Query
 
@@ -33,6 +34,7 @@ defmodule Skoller.Users do
     |> verification_code(opts)
     |> get_enrolled_by(params)
     |> insert_user(params)
+    |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     
     case multi |> Repo.transaction() do
@@ -124,6 +126,14 @@ defmodule Skoller.Users do
     Students.generate_student_link(student)
   end
   defp get_link(_user), do: {:ok, nil}
+
+  defp custom_link_signup(%User{student: %Student{} = student}, %{"student" => %{"custom_link" => link}}) do
+    case CustomSignups.get_link_by_link(link) do
+      nil -> {:ok, nil}
+      link -> CustomSignups.track_signup(student.id, link.id)
+    end
+  end
+  defp custom_link_signup(_user, _params), do: {:ok, nil}
 
   defp add_fields_of_study(_map, %{"student" => %{"fields_of_study" => nil}}), do: {:ok, nil}
   defp add_fields_of_study(%{user: user}, %{"student" => %{"fields_of_study" => fields}}) do
