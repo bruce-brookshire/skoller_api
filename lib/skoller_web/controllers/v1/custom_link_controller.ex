@@ -38,4 +38,8 @@ defmodule SkollerWeb.Api.V1.CustomLinkController do
     end
   end
 
+  def show(conn, %{"id" => id}) do
+    link = CustomSignups.get_link_by_id(id)
+    render(conn, LinkView, "show.json", link: link)
+  end
 end
