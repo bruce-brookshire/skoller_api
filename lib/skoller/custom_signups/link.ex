@@ -1,9 +1,9 @@
-defmodule Skoller.CustomEnrollments.Link do
+defmodule Skoller.CustomSignups.Link do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.CustomEnrollments.Link
+  alias Skoller.CustomSignups.Link
 
-  schema "custom_enrollment_links" do
+  schema "custom_signup_links" do
     field :end, :date
     field :link, :string
     field :name, :string
@@ -21,6 +21,6 @@ defmodule Skoller.CustomEnrollments.Link do
     link
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> unique_constraint(:link, name: :unique_enrollment_link_index)
+    |> unique_constraint(:link, name: :unique_signup_link_index)
   end
 end
