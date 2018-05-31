@@ -2,12 +2,15 @@ defmodule Skoller.CustomSignups.Link do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.CustomSignups.Link
+  alias Skoller.CustomSignups.Signup
 
   schema "custom_signup_links" do
     field :end, :utc_datetime
     field :link, :string
     field :name, :string
     field :start, :utc_datetime
+    has_many :signups, Signup, foreign_key: :custom_signup_link_id
+    has_many :students, through: [:signups, :student]
 
     timestamps()
   end

@@ -2,6 +2,8 @@ defmodule SkollerWeb.LinkView do
   use SkollerWeb, :view
 
   alias SkollerWeb.LinkView
+  alias Skoller.Repo
+  alias SkollerWeb.StudentView
 
   @custom_signup_path "/c/"
 
@@ -25,12 +27,14 @@ defmodule SkollerWeb.LinkView do
   end
 
   def render("link_detail.json", %{link: link}) do
+    link = link |> Repo.preload(:students)
     %{
       id: link.id,
       name: link.name,
       link: System.get_env("WEB_URL") <> @custom_signup_path <> link.link,
       start_date: link.start,
-      end_date: link.end
+      end_date: link.end,
+      students: render_many(link.students, StudentView, "student-short.json")
     }
   end
 end
