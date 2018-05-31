@@ -5,8 +5,8 @@ defmodule Skoller.Repo.Migrations.CreateCustomSignupLinks do
     create table(:custom_signup_links) do
       add :name, :string
       add :link, :string
-      add :start, :date
-      add :end, :date
+      add :start, :utc_datetime
+      add :end, :utc_datetime
 
       timestamps()
     end

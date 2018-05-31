@@ -4,10 +4,10 @@ defmodule Skoller.CustomSignups.Link do
   alias Skoller.CustomSignups.Link
 
   schema "custom_signup_links" do
-    field :end, :date
+    field :end, :utc_datetime
     field :link, :string
     field :name, :string
-    field :start, :date
+    field :start, :utc_datetime
 
     timestamps()
   end
