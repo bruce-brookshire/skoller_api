@@ -231,7 +231,7 @@ defmodule SkollerWeb.Router do
       resources "/reminder-messages", Assignment.ReminderController, only: [:create, :index, :delete]
       resources "/reminder-messages/topics", Assignment.Reminder.TopicController, only: [:index]
 
-      resources "/custom-links", CustomLinkController, only: [:create, :index]
+      resources "/custom-links", CustomLinkController, only: [:create, :index, :update]
     end
   end
 
