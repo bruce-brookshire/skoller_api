@@ -14,6 +14,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Users.User
   alias Skoller.Students.Student
   alias Skoller.Role
+  alias Skoller.Users.Report
 
   schema "users" do
     field :email, :string
@@ -23,6 +24,8 @@ defmodule Skoller.Users.User do
     field :is_active, :boolean, default: true
     belongs_to :student, Student
     many_to_many :roles, Role, join_through: "user_roles"
+    has_many :reports, Report
+
     timestamps()
   end
 
