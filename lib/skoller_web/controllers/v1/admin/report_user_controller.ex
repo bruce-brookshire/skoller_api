@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   use SkollerWeb, :controller
 
-  alias Skoller.AdminUsers
+  alias Skoller.Admin.Users
   alias SkollerWeb.ReportView
 
   import SkollerWeb.Helpers.AuthPlug
@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   plug :verify_role, %{role: @admin_role}
 
   def complete(conn, %{"id" => id}) do
-    case AdminUsers.complete_report(id) do
+    case Users.complete_report(id) do
       {:ok, report} ->
         render(conn, ReportView, "show.json", report: report)
       {:error, changeset} ->

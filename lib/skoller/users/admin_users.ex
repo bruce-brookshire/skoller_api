@@ -8,6 +8,7 @@ defmodule Skoller.Admin.Users do
   alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Students.Student
+  alias Skoller.Users.Report
 
   import Ecto.Query
 
@@ -51,6 +52,12 @@ defmodule Skoller.Admin.Users do
   def get_user_by_id!(id) do
     Repo.get!(User, id)
     |> Repo.preload([:roles, :student, :reports])
+  end
+
+  def complete_report(id) do
+    Repo.get!(Report, id)
+    |> Ecto.Changeset.change(%{is_complete: true})
+    |> Repo.update()
   end
 
   defp filters(params) when params == %{}, do: true
