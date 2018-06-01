@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.ReportUserController do
   plug :verify_role, %{role: @student_role}
 
   def create(conn, params) do
+    params = params |> Map.put("reported_by", conn.assigns[:user].id)
     case Users.report_user(params) do
       {:ok, _} ->
         conn |> send_resp(204, "")

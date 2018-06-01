@@ -75,6 +75,9 @@ defmodule SkollerWeb.Router do
         post "/report", ReportUserController, :create
       end
 
+      post "/report/:id/complete", Admin.ReportUserController, :complete
+      get "/report", Admin.ReportUserController, :index
+
       # Role routes
       resources "/roles", RoleController, only: [:show, :index]
 
