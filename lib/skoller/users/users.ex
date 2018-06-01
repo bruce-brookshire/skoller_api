@@ -12,10 +12,17 @@ defmodule Skoller.Users do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
   alias Skoller.CustomSignups
+  alias Skoller.Users.Report
 
   import Ecto.Query
 
   @student_role 100
+
+  def report_user(params) do
+    %Report{}
+    |> Report.changeset(params)
+    |> Repo.insert()
+  end
 
   def get_user_by_id!(id) do
     Repo.get!(User, id)
