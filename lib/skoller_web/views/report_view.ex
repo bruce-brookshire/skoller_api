@@ -20,7 +20,8 @@ defmodule SkollerWeb.ReportView do
       context: report.context,
       note: report.note,
       is_complete: report.is_complete,
-      reported_by: render_one(report.reporter, UserView, "user.json")
+      reported_by: render_one(report.reporter, UserView, "user.json"),
+      user_id: report.user_id
     }
   end
 end

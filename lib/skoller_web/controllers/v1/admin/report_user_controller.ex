@@ -20,4 +20,9 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def index(conn, _params) do
+    reports = Users.get_incomplete_reports()
+    render(conn, ReportView, "index.json", reports: reports)
+  end
 end

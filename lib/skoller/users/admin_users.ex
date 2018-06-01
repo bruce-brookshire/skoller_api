@@ -60,6 +60,12 @@ defmodule Skoller.Admin.Users do
     |> Repo.update()
   end
 
+  def get_incomplete_reports() do
+    from(r in Report)
+    |> where([r], r.is_complete == false)
+    |> Repo.all()
+  end
+
   defp filters(params) when params == %{}, do: true
   defp filters(params) do
     dynamic = params["or"] != "true"
