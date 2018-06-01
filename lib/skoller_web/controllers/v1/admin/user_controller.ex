@@ -1,8 +1,7 @@
 defmodule SkollerWeb.Api.V1.Admin.UserController do
   use SkollerWeb, :controller
 
-  alias SkollerWeb.UserView
-  alias SkollerWeb.UserListView
+  alias SkollerWeb.Admin.UserView
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
@@ -27,11 +26,11 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   def index(conn, params) do
     users = AdminUsers.get_users(params)
-    render(conn, UserListView, "index.json", users: users)
+    render(conn, UserView, "index.json", users: users)
   end
 
   def show(conn, %{"id" => id}) do
-    user = Users.get_user_by_id!(id)
+    user = AdminUsers.get_user_by_id!(id)
     render(conn, UserView, "show.json", user: user)
   end
 

@@ -72,6 +72,7 @@ defmodule SkollerWeb.Router do
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
+        post "/report", ReportUserController, :create
       end
 
       # Role routes
@@ -243,7 +244,6 @@ defmodule SkollerWeb.Router do
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
     end
-    
   end
 
   scope "/api", SkollerWeb.Api do

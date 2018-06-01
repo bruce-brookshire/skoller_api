@@ -45,6 +45,12 @@ defmodule Skoller.Admin.Users do
     |> distinct([user], user.id)
     |> select([user, role, student], %{user: user, student: student})
     |> Repo.all()
+    |> Enum.map(&Map.put(&1, :user, &1.user |> Repo.preload([:roles])))
+  end
+  
+  def get_user_by_id!(id) do
+    Repo.get!(User, id)
+    |> Repo.preload([:roles, :student, :reports])
   end
 
   defp filters(params) when params == %{}, do: true
