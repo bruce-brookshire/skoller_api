@@ -30,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Users.get_user_by_id!(id)
+    user = AdminUsers.get_user_by_id!(id)
     render(conn, UserView, "show.json", user: user)
   end
 
