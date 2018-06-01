@@ -11,6 +11,7 @@ defmodule Skoller.Users.Report do
     field :is_complete, :boolean, default: false
     field :reported_by, :id
     belongs_to :reporter, User, define_field: false, foreign_key: :reported_by
+    belongs_to :user, User, define_field: false
 
     timestamps()
   end

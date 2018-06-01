@@ -14,14 +14,14 @@ defmodule SkollerWeb.ReportView do
   end
 
   def render("report.json", %{report: report}) do
-    report = report |> Repo.preload(:reporter)
+    report = report |> Repo.preload([:reporter, :user])
     %{
       id: report.id,
       context: report.context,
       note: report.note,
       is_complete: report.is_complete,
       reported_by: render_one(report.reporter, UserView, "user.json"),
-      user_id: report.user_id
+      user: render_one(report.user, UserView, "user.json")
     }
   end
 end
