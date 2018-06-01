@@ -1,6 +1,7 @@
 defmodule Skoller.Users.Report do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Skoller.Users.User
   alias Skoller.Users.Report
 
   schema "user_reports" do
@@ -9,6 +10,7 @@ defmodule Skoller.Users.Report do
     field :user_id, :id
     field :is_complete, :boolean, default: false
     field :reported_by, :id
+    belongs_to :reporter, User, define_field: false, foreign_key: :reported_by
 
     timestamps()
   end
