@@ -13,6 +13,7 @@ defmodule Skoller.Students.Student do
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Schools.Class
   alias Skoller.Class.StudentClass
+  alias Skoller.Repo
 
   schema "students" do
     field :birthday, :date
@@ -59,5 +60,14 @@ defmodule Skoller.Students.Student do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> validate_length(:grad_year, is: 4)
+    |> check_phone()
   end
+
+  def check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
+    case Repo.get_by(Student, phone: phone) do
+      nil -> changeset
+      _phone -> changeset |> add_error(:phone, "Phone exists.")
+    end
+  end
+  def check_phone(changeset), do: changeset
 end
