@@ -4,53 +4,22 @@ defmodule Skoller.Sammi do
   alias Skoller.Repo
   alias Skoller.Classes
 
-  alias Ecto.UUID
-
   require Logger
 
   def sammi(_params, nil), do: nil
   def sammi(%{"is_syllabus" => "true", "class_id" => class_id} = params, file) do
-
-    %HTTPoison.Response{body: body} = HTTPoison.get!(file)
-
-    uuid = UUID.generate()
-    path = Path.join(System.get_env("TMPDIR"), to_string(uuid) <> ".pdf")
-
-    File.write!(path, body)
-
-    {sammi, _code} = get_sammi_data(params, path)
-
-    Logger.info(sammi)
-    
-    sammi = sammi
-    |> String.replace("'", ~s("))
-    |> Poison.decode
-
-    case sammi do
-      {:ok, decoded_sammi} ->
-        decoded_sammi |> add_grade_scale(class_id)
-        decoded_sammi |> add_professor_info(class_id)
+    case Sammi.Api.extract(file) do
+      {:ok, sammi} ->
+        Logger.info(sammi)
+        sammi |> add_grade_scale(class_id)
+        sammi |> add_professor_info(class_id)
       {:error, val} ->
         val
         |> inspect()
         |> Logger.error()
-      {:error, val1, val2} ->
-        val1
-        |> inspect()
-        |> Logger.error()
-        val2
-        |> inspect()
-        |> Logger.error()
     end
-
-    File.rm(path)
   end
   def sammi(_params, _file), do: nil
-
-  defp get_sammi_data(%{"is_syllabus" => "true"}, file) do
-    System.cmd("python3", ["./classifiers/sammi/main.py", "extract", file], cd: "./priv/sammi")
-  end
-  defp get_sammi_data(_params, _file), do: nil
 
   defp add_grade_scale(%{"grade_scale" => %{"value" => ""}}, _class_id), do: nil
   defp add_grade_scale(%{"grade_scale" => %{"value" => val}}, class_id) do
