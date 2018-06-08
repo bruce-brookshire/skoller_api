@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView
   alias SkollerWeb.Helpers.ClassDocUpload
-  alias SkollerWeb.Sammi
+  alias Skoller.Sammi
   alias Skoller.Classes
 
   import Ecto.Query

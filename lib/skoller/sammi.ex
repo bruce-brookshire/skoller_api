@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Sammi do
+defmodule Skoller.Sammi do
 
   alias Skoller.Professors
   alias Skoller.Repo
