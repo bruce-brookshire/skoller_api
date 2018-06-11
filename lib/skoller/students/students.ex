@@ -693,14 +693,16 @@ defmodule Skoller.Students do
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 
-  defp check_enrollment_limit(%Ecto.Changeset{valid?: true, changes: %{is_dropped: false}} = changeset, student_id) do
-    require IEx
-    IEx.pry
+  defp check_enrollment_limit(%Ecto.Changeset{valid?: true} = changeset, student_id) do
+    class_count = from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
+    |> Repo.aggregate(:count, :id)
+
+    case class_count < @enrollment_limit do
+      true -> changeset
+      false -> changeset |> Ecto.Changeset.add_error(:student_class, "Enrollment limit reached")
+    end
   end
-  defp check_enrollment_limit(changeset, _student_id) do
-    require IEx
-    IEx.pry
-  end
+  defp check_enrollment_limit(changeset, _student_id), do: changeset
 
   defp get_student_class_by_id(id) do
     Repo.get(StudentClass, id)
@@ -711,8 +713,6 @@ defmodule Skoller.Students do
   end
 
   defp enroll(student_id, class_id, params, opts \\ []) do
-    require IEx
-    IEx.pry
     changeset = StudentClass.changeset(%StudentClass{}, params)
     |> add_enrolled_by(opts)
     |> check_enrollment_limit(student_id)
