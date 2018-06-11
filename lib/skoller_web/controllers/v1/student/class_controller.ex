@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.ClassController do
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
   alias SkollerWeb.Class.StudentClassView
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.RepoHelper
@@ -17,9 +16,12 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
-    case Students.get_enrolled_class_by_ids(class_id, student_id) do
-      nil -> conn |> insert_student_class(class_id, params)
-      item -> conn |> update_student_class(item)
+    case Students.enroll_in_class(student_id, class_id, params) do
+      {:ok, student_class} ->
+        render(conn, StudentClassView, "show.json", student_class: student_class)
+      {:error, _, failed_value, _} ->
+        conn
+        |> RepoHelper.multi_error(failed_value)
     end
   end
 
@@ -65,27 +67,6 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
     case Students.drop_enrolled_class(student_class) do
       {:ok, _student_class} ->
         conn |> send_resp(204, "")
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
-
-  defp insert_student_class(conn, class_id, params) do
-    case Students.enroll_in_class(class_id, params) do
-      {:ok, student_class} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
-      {:error, _, failed_value, _} ->
-        conn
-        |> RepoHelper.multi_error(failed_value)
-    end
-  end
-
-  defp update_student_class(conn, item) do
-    case Repo.update(Ecto.Changeset.change(item, %{is_dropped: false})) do
-      {:ok, student_class} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

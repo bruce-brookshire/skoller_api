@@ -29,6 +29,7 @@ defmodule Skoller.Students do
 
   @community_threshold 2
   @link_length 5
+  @enrollment_limit 3
 
   def get_students_by_class(class_id) do
     from(sc in StudentClass)
@@ -51,32 +52,14 @@ defmodule Skoller.Students do
     Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
-  def get_student_class_by_id(id) do
-    Repo.get(StudentClass, id)
-  end
-
-  def get_student_class_by_id!(id) do
-    Repo.get!(StudentClass, id)
-  end
-
-  def enroll_in_class(class_id, params, opts \\ []) do
-    changeset = StudentClass.changeset(%StudentClass{}, params)
-    |> add_enrolled_by(opts)
-    
-    class = Classes.get_class_by_id(class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:student_class, changeset)
-    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
-    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
-    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
-    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
-    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
-    
-    case multi |> Repo.transaction() do
-      {:ok, trans} -> 
-        {:ok, get_student_class_by_id(trans.student_class.id)}
-      error -> error
+  def enroll_in_class(student_id, class_id, params) do
+    case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id) do
+      nil ->
+        enroll(student_id, class_id, params)
+      %{is_dropped: true} = sc ->
+        enroll_in_dropped_class(sc)
+      _sc ->
+        {:error, nil, %{student_class: "class taken"}, nil}
     end
   end
 
@@ -88,7 +71,7 @@ defmodule Skoller.Students do
 
   def drop_enrolled_class(student_class) do
     student_class
-    |> Ecto.Changeset.change(%{"is_dropped" => true})
+    |> Ecto.Changeset.change(%{is_dropped: true})
     |> Repo.update()
   end
 
@@ -350,7 +333,7 @@ defmodule Skoller.Students do
   def enroll_by_link(link, student_id, params) do
     sc = get_student_class_by_enrollment_link(link)
     params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
-    enroll_in_class(sc.class_id, params, [enrolled_by: sc.id])
+    enroll(student_id, sc.class_id, params, [enrolled_by: sc.id])
   end
 
   def add_field_of_study(params) do
@@ -375,7 +358,7 @@ defmodule Skoller.Students do
     |> Repo.delete_all()
   end
 
-  defp add_enrolled_by(changeset, opts) do
+  defp add_enrolled_by(%Ecto.Changeset{valid?: true} = changeset, opts) do
     case opts |> List.keytake(:enrolled_by, 0) do
       nil -> changeset
       val -> 
@@ -386,6 +369,7 @@ defmodule Skoller.Students do
         changeset |> Ecto.Changeset.change(%{enrolled_by: val})
     end
   end
+  defp add_enrolled_by(changeset, _opts), do: changeset
 
   def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
     link = generate_link(id)
@@ -707,5 +691,53 @@ defmodule Skoller.Students do
   defp order(enumerable) do
     enumerable
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
+  end
+
+  defp check_enrollment_limit(%Ecto.Changeset{valid?: true, changes: %{is_dropped: false}} = changeset, student_id) do
+    require IEx
+    IEx.pry
+  end
+  defp check_enrollment_limit(changeset, _student_id) do
+    require IEx
+    IEx.pry
+  end
+
+  defp get_student_class_by_id(id) do
+    Repo.get(StudentClass, id)
+  end
+
+  defp get_student_class_by_id!(id) do
+    Repo.get!(StudentClass, id)
+  end
+
+  defp enroll(student_id, class_id, params, opts \\ []) do
+    require IEx
+    IEx.pry
+    changeset = StudentClass.changeset(%StudentClass{}, params)
+    |> add_enrolled_by(opts)
+    |> check_enrollment_limit(student_id)
+    
+    class = Classes.get_class_by_id(class_id)
+
+    multi = Ecto.Multi.new
+    |> Ecto.Multi.insert(:student_class, changeset)
+    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
+    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
+    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
+    
+    case multi |> Repo.transaction() do
+      {:ok, trans} -> 
+        {:ok, get_student_class_by_id(trans.student_class.id)}
+      error -> error
+    end
+  end
+
+  defp enroll_in_dropped_class(item) do
+    item
+    |> Ecto.Changeset.change(%{is_dropped: false})
+    |> check_enrollment_limit(item.student_id)
+    |> Repo.update()
   end
 end
