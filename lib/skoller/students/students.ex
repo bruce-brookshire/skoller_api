@@ -29,7 +29,7 @@ defmodule Skoller.Students do
 
   @community_threshold 2
   @link_length 5
-  @enrollment_limit 3
+  @enrollment_limit 15
 
   def get_students_by_class(class_id) do
     from(sc in StudentClass)
