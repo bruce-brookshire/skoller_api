@@ -14,6 +14,7 @@ defmodule Skoller.Students.Student do
   alias Skoller.Schools.Class
   alias Skoller.Class.StudentClass
   alias Skoller.Repo
+  import Ecto.Query
 
   schema "students" do
     field :birthday, :date
@@ -64,8 +65,10 @@ defmodule Skoller.Students.Student do
   end
 
   def check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
-    case Repo.get_by(Student, phone: phone) do
-      nil -> changeset
+    q = from s in Student,
+      where: s.phone == ^phone
+    case Repo.all(q) do
+      [] -> changeset
       _phone -> changeset |> add_error(:phone, "Phone exists.")
     end
   end
