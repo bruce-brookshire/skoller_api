@@ -12,7 +12,7 @@ defmodule SkollerWeb.CSVView do
     render_many(csv, CSVView, "csv.json")
   end
 
-  def render("csv.json", %{csv: {:ok, %Class{} = class}}) do
+  def render("csv.json", %{csv: {:ok, %{class: %Class{} = class}}}) do
     render_one(class, ClassView, "class.json")
   end
 

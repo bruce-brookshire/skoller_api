@@ -533,7 +533,10 @@ defmodule Skoller.Classes do
   defp add_student_created_class_fields(changeset, _user), do: changeset
 
   defp put_grade_scale(%{"grade_scale" => _} = params), do: params
-  defp put_grade_scale(%{} = params) do
+  defp put_grade_scale(%{"name" => _name} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)
+  end
+  defp put_grade_scale(%{name: _name} = params) do
+    params |> Map.put(:grade_scale, @default_grade_scale)
   end
 end

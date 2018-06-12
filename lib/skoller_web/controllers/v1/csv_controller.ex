@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   import SkollerWeb.Helpers.AuthPlug
   
   @admin_role 200
-  @headers [:campus, :class_type, :number, :crn, :meet_days, :meet_end_time, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
+  @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
   
   plug :verify_role, %{role: @admin_role}
 
@@ -82,10 +82,10 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
-    school_id = Schools.get_school_from_period(class_period_id)
-    case Professors.get_professor_by_name(name_first, name_last, school_id) do
+    school = Schools.get_school_from_period(class_period_id)
+    case Professors.get_professor_by_name(name_first, name_last, school.id) do
       nil -> 
-        Professors.create_professor(%{name_first: name_first, name_last: name_last, school_id: school_id})
+        Professors.create_professor(%{name_first: name_first, name_last: name_last, school_id: school.id})
       prof ->
         {:ok, prof}
     end
