@@ -3,6 +3,7 @@ defmodule Skoller.FourDoor do
   alias Skoller.Repo
   alias Skoller.FourDoor.FourDoorOverride
   alias Skoller.Admin.Settings
+  alias SkollerWeb.Helpers.RepoHelper
 
   def get_four_door_by_school(school_id) do
     case get_school_override(school_id) do
@@ -24,6 +25,27 @@ defmodule Skoller.FourDoor do
     |> Enum.reduce(%{}, &Map.put(&2, String.to_atom(&1.name), strip_bool(&1.value)))
   end
 
+  def delete_override(school_id) do
+    school_id
+    |> get_school_override!()
+    |> Repo.delete()
+  end
+
+  def update_four_door_defaults(params) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:settings, &update_four_door_defaults(params, &1))
+    |> Repo.transaction()
+  end
+  defp update_four_door_defaults(params, _) do
+    status = params |> Enum.map(&update_setting(&1))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  defp update_setting(item) do
+    settings_old = Settings.get_setting_by_name!(elem(item, 0))
+    Settings.update_setting(settings_old, %{value: to_string(elem(item, 1))})
+  end
+
   defp insert_override(params) do
     %FourDoorOverride{}
     |> FourDoorOverride.changeset(params)
@@ -38,6 +60,10 @@ defmodule Skoller.FourDoor do
 
   defp get_school_override(school_id) do
     Repo.get_by(FourDoorOverride, school_id: school_id)
+  end
+
+  defp get_school_override!(school_id) do
+    Repo.get_by!(FourDoorOverride, school_id: school_id)
   end
 
   defp strip_bool("true") do
