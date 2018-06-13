@@ -7,6 +7,7 @@ defmodule Skoller.Admin.Settings do
 
   @auto_upd_topic "AutoUpdate"
   @min_ver_topic "MinVersions"
+  @four_door_topic "FourDoor"
 
   def get_auto_update_settings() do
     from(s in Setting)
@@ -17,6 +18,12 @@ defmodule Skoller.Admin.Settings do
   def get_min_ver_settings() do
     from(s in Setting)
     |> where([s], s.topic == @min_ver_topic)
+    |> Repo.all()
+  end
+
+  def get_four_door_settings() do
+    from(s in Setting)
+    |> where([s], s.topic == @four_door_topic)
     |> Repo.all()
   end
 
