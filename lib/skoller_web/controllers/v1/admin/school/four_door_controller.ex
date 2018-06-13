@@ -4,8 +4,6 @@ defmodule SkollerWeb.Api.V1.Admin.School.FourDoorController do
   alias Skoller.FourDoor
   alias Skoller.Schools
   alias SkollerWeb.Admin.SchoolView
-  alias SkollerWeb.AllView
-  alias SkollerWeb.Helpers.RepoHelper
 
   import SkollerWeb.Helpers.AuthPlug
   

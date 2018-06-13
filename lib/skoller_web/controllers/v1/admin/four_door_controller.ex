@@ -2,8 +2,6 @@ defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
   use SkollerWeb, :controller
 
   alias Skoller.FourDoor
-  alias Skoller.Schools
-  alias SkollerWeb.Admin.SchoolView
   alias SkollerWeb.AllView
   alias SkollerWeb.Helpers.RepoHelper
 
