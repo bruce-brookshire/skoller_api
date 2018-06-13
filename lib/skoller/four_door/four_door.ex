@@ -8,8 +8,7 @@ defmodule Skoller.FourDoor do
     case get_school_override(school_id) do
       nil -> get_default_four_door()
       override ->
-        require IEx
-        IEx.pry
+        override |> Map.take(get_default_four_door() |> Map.keys())
     end
   end
 

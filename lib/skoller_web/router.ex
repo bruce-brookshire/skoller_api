@@ -89,6 +89,8 @@ defmodule SkollerWeb.Router do
       resources "/schools", SchoolController, only: [:create]
       resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
 
+        post "/four-door", Admin.FourDoorController, :school
+
         # School Professor routes
         resources "/professors", ProfessorController, only: [:create, :index]
 

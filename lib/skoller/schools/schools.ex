@@ -63,7 +63,7 @@ defmodule Skoller.Schools do
   end
 
   defp add_four_door({:ok, school}) do
-    FourDoor.get_four_door_by_school(school) |> Map.merge(school)
+    FourDoor.get_four_door_by_school(school.id) |> Map.merge(school)
   end
   defp add_four_door({:error, _school} = response), do: response
 
