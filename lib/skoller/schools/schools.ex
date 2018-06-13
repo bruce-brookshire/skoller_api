@@ -7,6 +7,7 @@ defmodule Skoller.Schools do
   alias Skoller.Schools.School
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Timezone
+  alias Skoller.Admin.Settings
 
   import Ecto.Query
 
@@ -19,19 +20,22 @@ defmodule Skoller.Schools do
     |> School.changeset_insert(params)
     |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.insert()
+    |> add_four_door()
   end
 
   @doc """
     Gets a `Skoller.Schools.School` by id
   """
   def get_school_by_id!(id) do
-    Repo.get!(School, id)
+    school = Repo.get!(School, id)
+    add_four_door({:ok, school})
   end
 
   def update_school(school_old, params) do
     school_old
     |> School.changeset_update(params)
     |> Repo.update()
+    |> add_four_door()
   end
 
   @doc """
@@ -56,6 +60,20 @@ defmodule Skoller.Schools do
     from(school in School)
     |> filter(filters)
     |> Repo.all()
+  end
+
+  defp add_four_door({:ok, school}) do
+    Settings.get_four_door_settings()
+    |> Enum.reduce(%{}, &Map.put(&2, String.to_atom(&1.name), strip_bool(&1.value)))
+    |> Map.merge(school)
+  end
+  defp add_four_door({:error, _school} = response), do: response
+
+  defp strip_bool("true") do
+    true
+  end
+  defp strip_bool("false") do
+    false
   end
 
   defp filter(query, params) do
