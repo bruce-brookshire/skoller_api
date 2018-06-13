@@ -4,6 +4,9 @@ defmodule Skoller.FourDoor do
   alias Skoller.FourDoor.FourDoorOverride
   alias Skoller.Admin.Settings
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Schools.School
+
+  import Ecto.Query
 
   def get_four_door_by_school(school_id) do
     case get_school_override(school_id) do
@@ -11,6 +14,12 @@ defmodule Skoller.FourDoor do
       override ->
         override |> Map.take(get_default_four_door() |> Map.keys())
     end
+  end
+
+  def get_four_door_overrides() do
+    from(s in School)
+    |> join(:inner, [s], fdo in FourDoorOverride, s.id == fdo.school_id)
+    |> Repo.all()
   end
 
   def override_school_four_door(school_id, params) do
