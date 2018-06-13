@@ -10,10 +10,14 @@ defmodule Skoller.Syllabi do
   alias Skoller.Students
   alias Skoller.Classes.Status
   alias Skoller.Locks
+  alias Skoller.Admin.Settings
+  alias Skoller.FourDoor.FourDoorOverride
 
   import Ecto.Query
 
   require Logger
+
+  @syllabus_processing_setting "is_auto_syllabus"
   
   def serve_class(user, lock_type \\ nil, status_type \\ nil) do
     case find_existing_lock(user, lock_type) do
@@ -24,6 +28,32 @@ defmodule Skoller.Syllabi do
         class
       list -> Classes.get_class_by_id!(List.first(list).class_id)
     end
+  end
+
+  def get_servable_classes_subquery() do
+    subq = Settings.get_setting_by_name!(@syllabus_processing_setting).value
+    |> generate_servable_schools_subquery()
+
+    from(class in Class)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class, period], sch in subquery(subq), sch.id == period.school_id)
+  end
+
+  defp generate_servable_schools_subquery("true") do
+    exclude_list = get_syllabus_overrides_subquery(false)
+    |> Repo.all()
+    |> Enum.reduce([], & &2 ++ List.wrap(&1.id))
+
+    from(s in School)
+    |> where([s], s.id not in ^exclude_list)
+  end
+  defp generate_servable_schools_subquery("false") do
+    get_syllabus_overrides_subquery(true)
+  end
+
+  defp get_syllabus_overrides_subquery(val) do
+    from(fdo in FourDoorOverride)
+    |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
   defp lock_class(%{id: id}, user, nil) do

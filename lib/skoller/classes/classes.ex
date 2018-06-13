@@ -15,10 +15,10 @@ defmodule Skoller.Classes do
   alias Skoller.Universities
   alias Skoller.HighSchools
   alias SkollerWeb.Helpers.NotificationHelper
-  alias Skoller.Schools.School
   alias Skoller.Professors.Professor
   alias Skoller.Class.ChangeRequest
   alias Skoller.Class.StudentRequest
+  alias Skoller.Syllabi
 
   import Ecto.Query
 
@@ -272,12 +272,10 @@ defmodule Skoller.Classes do
 
   def get_class_status_counts() do
     statuses = from(status in Status)
-    |> join(:left, [status], class in Class, status.id == class.class_status_id)
-    |> join(:left, [status, class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:left, [status, class, period], sch in School, sch.id == period.school_id and sch.is_auto_syllabus == true)
+    |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
     |> where([status], status.id not in [@needs_syllabus_status, @completed_status])
-    |> group_by([status, class, period, sch], [status.id, status.name, status.is_complete])
-    |> select([status, class, period, sch], %{id: status.id, name: status.name, classes: count(class.id)})
+    |> group_by([status], [status.id, status.name, status.is_complete])
+    |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
     |> Repo.all()
 
     maint = from(class in Class)
