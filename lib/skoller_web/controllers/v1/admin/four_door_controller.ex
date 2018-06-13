@@ -28,4 +28,16 @@ defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  def delete(conn, %{"school_id" => id}) do
+    case FourDoor.delete_override(id) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
 end
