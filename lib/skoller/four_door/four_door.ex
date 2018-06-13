@@ -43,7 +43,7 @@ defmodule Skoller.FourDoor do
 
   defp update_setting(item) do
     settings_old = Settings.get_setting_by_name!(elem(item, 0))
-    Settings.update_setting(settings_old, %{value: elem(item, 1)})
+    Settings.update_setting(settings_old, %{value: to_string(elem(item, 1))})
   end
 
   defp insert_override(params) do
