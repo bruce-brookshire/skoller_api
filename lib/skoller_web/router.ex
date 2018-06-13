@@ -43,6 +43,8 @@ defmodule SkollerWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      get "/four-door", Admin.FourDoorController, :index
+
       get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
 
       post "/enrollment-link/:token", Student.ClassController, :link

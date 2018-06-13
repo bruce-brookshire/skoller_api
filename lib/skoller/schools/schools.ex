@@ -7,7 +7,7 @@ defmodule Skoller.Schools do
   alias Skoller.Schools.School
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Timezone
-  alias Skoller.Admin.Settings
+  alias Skoller.FourDoor
 
   import Ecto.Query
 
@@ -63,18 +63,9 @@ defmodule Skoller.Schools do
   end
 
   defp add_four_door({:ok, school}) do
-    Settings.get_four_door_settings()
-    |> Enum.reduce(%{}, &Map.put(&2, String.to_atom(&1.name), strip_bool(&1.value)))
-    |> Map.merge(school)
+    FourDoor.get_four_door_by_school(school) |> Map.merge(school)
   end
   defp add_four_door({:error, _school} = response), do: response
-
-  defp strip_bool("true") do
-    true
-  end
-  defp strip_bool("false") do
-    false
-  end
 
   defp filter(query, params) do
     query

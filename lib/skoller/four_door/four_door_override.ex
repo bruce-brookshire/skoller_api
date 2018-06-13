@@ -1,8 +1,7 @@
-defmodule Skoller.Schools.FourDoorOverride do
+defmodule Skoller.FourDoor.FourDoorOverride do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Schools.FourDoorOverride
-
+  alias Skoller.FourDoor.FourDoorOverride
 
   schema "four_door_overrides" do
     field :is_auto_syllabus, :boolean, default: false
