@@ -10,7 +10,7 @@ defmodule SkollerWeb.Admin.SchoolView do
   end
 
   def render("show.json", %{school: school}) do
-    render_one(school, SchoolView, "school.json")
+    render_one(school, SchoolView, "school-detail.json")
   end
 
   def render("school.json", %{school: %{school: school, students: students, classes: classes}}) do
@@ -23,6 +23,18 @@ defmodule SkollerWeb.Admin.SchoolView do
   def render("school.json", %{school: school}) do
     school
     |> base_school_view()
+  end
+
+  def render("school-detail.json", %{school: school}) do
+    school
+    |> render_one(SchoolView, "school.json")
+    |> Map.merge(
+      %{
+        is_diy_enabled: school.is_diy_enabled,
+        is_diy_preferred: school.is_diy_preferred,
+        is_auto_syllabus: school.is_auto_syllabus
+      }
+    )
   end
 
   defp base_school_view(school) do
@@ -39,9 +51,6 @@ defmodule SkollerWeb.Admin.SchoolView do
       adr_zip: school.adr_zip,
       timezone: school.timezone,
       is_readonly: school.is_readonly,
-      is_diy_enabled: school.is_diy_enabled,
-      is_diy_preferred: school.is_diy_preferred,
-      is_auto_syllabus: school.is_auto_syllabus,
       is_university: school.is_university,
       short_name: school.short_name,
       class_periods: render_many(school.class_periods, PeriodView, "period.json"),
