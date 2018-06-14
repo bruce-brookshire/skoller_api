@@ -9,12 +9,14 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
+  alias Skoller.Periods
   
   import SkollerWeb.Helpers.AuthPlug
   
   @admin_role 200
   @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
-  
+  @school_headers [:name, :adr_locality, :adr_region, :period_name]
+
   plug :verify_role, %{role: @admin_role}
 
   def fos(conn, %{"file" => file}) do
@@ -59,6 +61,26 @@ defmodule SkollerWeb.Api.V1.CSVController do
         conn
         |> put_status(:unprocessable_entity)
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def school(conn, %{"file" => file}) do
+    uploads = file.path 
+    |> File.stream!()
+    |> CSV.decode(headers: @school_headers)
+    |> Enum.map(&process_school_row(&1))
+
+    conn |> render(CSVView, "index.json", csv: uploads)
+  end
+
+  defp process_school_row(school) do
+    case school do
+      {:ok, school} ->
+        new_school = Schools.create_school(school)
+        Periods.create_period(%{"school_id" => new_school.id, "name" => school.period_name})
+        new_school
+      {:error, error} ->
+        {:error, error}
     end
   end
 

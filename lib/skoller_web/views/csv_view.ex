@@ -7,6 +7,8 @@ defmodule SkollerWeb.CSVView do
   alias SkollerWeb.School.FieldOfStudyView
   alias Skoller.Schools.Class
   alias SkollerWeb.ClassView
+  alias Skoller.Schools.School
+  alias SkollerWeb.SchoolView
 
   def render("index.json", %{csv: csv}) do
     render_many(csv, CSVView, "csv.json")
@@ -18,6 +20,10 @@ defmodule SkollerWeb.CSVView do
 
   def render("csv.json", %{csv: {:ok, %FieldOfStudy{} = fos}}) do
     render_one(fos, FieldOfStudyView, "field.json", as: :field)
+  end
+
+  def render("csv.json", %{csv: %School{} = school}) do
+    render_one(school, SchoolView, "school.json")
   end
 
   def render("csv.json", %{csv: {:error, %Ecto.Changeset{} = changeset}}) do

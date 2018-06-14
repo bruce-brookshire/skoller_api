@@ -1,8 +1,6 @@
 defmodule SkollerWeb.Api.V1.PeriodController do
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.ClassPeriod
-  alias Skoller.Repo
   alias SkollerWeb.PeriodView
   alias Skoller.Periods
 
@@ -14,10 +12,7 @@ defmodule SkollerWeb.Api.V1.PeriodController do
   plug :verify_role, %{roles: [@admin_role, @student_role]}
 
   def create(conn, %{} = params) do
-
-    changeset = ClassPeriod.changeset_insert(%ClassPeriod{}, params)
-
-    case Repo.insert(changeset) do
+    case Periods.create_period(params) do
       {:ok, period} ->
         render(conn, PeriodView, "show.json", period: period)
       {:error, changeset} ->

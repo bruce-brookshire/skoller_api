@@ -43,6 +43,8 @@ defmodule SkollerWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      post "/schools/csv", CSVController, :school
+
       get "/four-door/overrides", Admin.School.FourDoorController, :index
       get "/four-door", Admin.FourDoorController, :index
       put "/four-door", Admin.FourDoorController, :update

@@ -12,6 +12,11 @@ defmodule Skoller.Periods do
     |> Repo.all()
   end
 
+  def create_period(params) do
+    ClassPeriod.changeset_insert(%ClassPeriod{}, params)
+    |> Repo.insert()
+  end
+
   defp filter(query, params) do
     query
     |> filter_name(params)
