@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
+  alias Skoller.Periods
   
   import SkollerWeb.Helpers.AuthPlug
   
@@ -75,7 +76,9 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp process_school_row(school) do
     case school do
       {:ok, school} ->
-        Schools.create_school(school)
+        new_school = Schools.create_school(school)
+        Periods.create_period(%{"school_id" => new_school.id, "name" => school.period_name})
+        new_school
       {:error, error} ->
         {:error, error}
     end
