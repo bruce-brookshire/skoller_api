@@ -15,7 +15,8 @@ defmodule Skoller.Schools do
     Creates a `Skoller.Schools.School`
   """
   def create_school(params) do
-    {:ok, timezone} = Timezone.get_timezone(params["adr_locality"], params["adr_country"], params["adr_region"])
+    params = params |> Map.put(:adr_country, "us")
+    {:ok, timezone} = get_timezone(params)
     %School{}
     |> School.changeset_insert(params)
     |> Ecto.Changeset.change(%{timezone: timezone})
@@ -60,6 +61,18 @@ defmodule Skoller.Schools do
     from(school in School)
     |> filter(filters)
     |> Repo.all()
+  end
+
+  defp get_timezone(%{adr_locality: loc, adr_country: country, adr_region: region}) do
+    call_timezone(loc, country, region)
+  end
+  defp get_timezone(%{"adr_locality" => loc, "adr_country" => country, "adr_region" => region}) do
+    call_timezone(loc, country, region)
+  end
+  defp get_timezone(_params), do: {:ok, nil}
+
+  defp call_timezone(loc, country, region) do
+    Timezone.get_timezone(loc, country, region)
   end
 
   defp add_four_door({:ok, school}) do
