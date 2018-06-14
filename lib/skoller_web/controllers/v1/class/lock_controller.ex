@@ -7,6 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Classes
   alias Skoller.Users
   alias Skoller.Locks
+  alias Skoller.FourDoor
 
   import SkollerWeb.Helpers.AuthPlug
 
@@ -56,8 +57,10 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   defp lock_diy(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
     class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:school)
+    
+    fd = FourDoor.get_four_door_by_school(class.school.id)
 
-    case class.school.is_diy_enabled do
+    case fd.is_diy_enabled do
       true -> conn |> lock_full_class(user, params)
       false -> conn |> send_resp(401, "")
     end
