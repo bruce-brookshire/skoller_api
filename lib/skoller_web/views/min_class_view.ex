@@ -7,7 +7,7 @@ defmodule SkollerWeb.MinClassView do
       render_many(classes, MinClassView, "class.json", as: :class)
   end
 
-  def render("class.json", %{class: %{class: class, professor: nil}}) do
+  def render("class.json", %{class: %{class: class, professor: nil, class_period: period}}) do
     %{
         id: class.id,
         meet_days: class.meet_days,
@@ -17,13 +17,13 @@ defmodule SkollerWeb.MinClassView do
         code: class.code,
         subject: class.subject,
         campus: class.campus,
-        class_period_id: class.class_period_id,
+        period_name: period.name,
         professor_name_first: nil,
         professor_name_last: nil
     }
   end
 
-  def render("class.json", %{class: %{class: class, professor: professor}}) do
+  def render("class.json", %{class: %{class: class, professor: professor, class_period: period}}) do
       %{
           id: class.id,
           meet_days: class.meet_days,
@@ -33,7 +33,7 @@ defmodule SkollerWeb.MinClassView do
           code: class.code,
           subject: class.subject,
           campus: class.campus,
-          class_period_id: class.class_period_id,
+          period_name: period.name,
           professor_name_first: professor.name_first,
           professor_name_last: professor.name_last
       }
