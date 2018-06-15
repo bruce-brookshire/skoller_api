@@ -3,8 +3,8 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
 
   alias Skoller.Classes
   alias SkollerWeb.Admin.SchoolView
-  alias Skoller.Students
   alias Skoller.Schools
+  alias Skoller.EnrolledSchools
 
   import SkollerWeb.Helpers.AuthPlug
   
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   end
 
   def hub(conn, _) do
-    schools = Students.get_schools_with_enrollment()
+    schools = EnrolledSchools.get_schools_with_enrollment()
               |> Enum.map(&put_class_statuses(&1))
     
     render(conn, SchoolView, "index.json", schools: schools)
