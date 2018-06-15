@@ -45,6 +45,7 @@ defmodule Skoller.EnrolledSchools do
   defp filter(query, filter) do
     query
     |> name_filter(filter)
+    |> chat_disabled_filter(filter)
   end
 
   defp name_filter(query, %{"name" => name}) do
@@ -53,4 +54,10 @@ defmodule Skoller.EnrolledSchools do
     |> where([s], ilike(s.name, ^filter))
   end
   defp name_filter(query, _params), do: query
+
+  defp chat_disabled_filter(query, %{"chat_disabled" => "true"}) do
+    query
+    |> where([s], not s.is_chat_enabled)
+  end
+  defp chat_disabled_filter(query, _params), do: query
 end
