@@ -77,12 +77,17 @@ defmodule SkollerWeb.Api.V1.CSVController do
     case school do
       {:ok, school} ->
         new_school = Schools.create_school(school)
-        Periods.create_period(%{"school_id" => new_school.id, "name" => school.period_name})
+        new_school |> create_period(school)
         new_school
       {:error, error} ->
         {:error, error}
     end
   end
+
+  defp create_period({:ok, school}, params) do
+    Periods.create_period(%{"school_id" => school.id, "name" => params.period_name})
+  end
+  defp create_period({:error, _school}, _params), do: {:ok, nil}
 
   defp process_class_row(class, period_id) do
     case class do

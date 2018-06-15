@@ -22,7 +22,7 @@ defmodule SkollerWeb.CSVView do
     render_one(fos, FieldOfStudyView, "field.json", as: :field)
   end
 
-  def render("csv.json", %{csv: %School{} = school}) do
+  def render("csv.json", %{csv: {:ok, %School{} = school}}) do
     render_one(school, SchoolView, "school.json")
   end
 
