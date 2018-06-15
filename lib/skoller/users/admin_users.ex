@@ -6,9 +6,9 @@ defmodule Skoller.Admin.Users do
   alias Skoller.Repo
   alias Skoller.Users.User
   alias Skoller.UserRole
-  alias Skoller.Students
   alias Skoller.Students.Student
   alias Skoller.Users.Report
+  alias Skoller.EnrolledSchools
 
   import Ecto.Query
 
@@ -41,7 +41,7 @@ defmodule Skoller.Admin.Users do
     from(user in User)
     |> join(:inner, [user], role in UserRole, role.user_id == user.id)
     |> join(:left, [user, role], student in Student, student.id == user.student_id)
-    |> join(:left, [user, role, student], ss in subquery(Students.get_schools_for_student_subquery()), ss.student_id == student.id)
+    |> join(:left, [user, role, student], ss in subquery(EnrolledSchools.get_student_schools_subquery()), ss.student_id == student.id)
     |> where([user, role, student, ss], ^filters(params))
     |> distinct([user], user.id)
     |> select([user, role, student], %{user: user, student: student})
