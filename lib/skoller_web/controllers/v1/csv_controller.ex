@@ -76,6 +76,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp process_school_row(school) do
     case school do
       {:ok, school} ->
+        school = school |> Map.put(:adr_country, "us")
         new_school = Schools.create_school(school)
         new_school |> create_period(school)
         new_school

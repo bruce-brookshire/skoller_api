@@ -15,7 +15,6 @@ defmodule Skoller.Schools do
     Creates a `Skoller.Schools.School`
   """
   def create_school(params) do
-    params = params |> Map.put(:adr_country, "us")
     {:ok, timezone} = get_timezone(params)
     %School{}
     |> School.changeset_insert(params)
