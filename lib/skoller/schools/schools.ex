@@ -28,7 +28,8 @@ defmodule Skoller.Schools do
   """
   def get_school_by_id!(id) do
     school = Repo.get!(School, id)
-    add_four_door({:ok, school})
+    {:ok, school} = add_four_door({:ok, school})
+    school
   end
 
   def update_school(school_old, params) do
