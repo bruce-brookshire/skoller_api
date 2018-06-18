@@ -43,11 +43,13 @@ defmodule Skoller.Schools do
     Gets a `Skoller.Schools.School` from a `Skoller.Schools.ClassPeriod`
   """
   def get_school_from_period(class_period_id) do
-    from(cp in ClassPeriod)
+    school = from(cp in ClassPeriod)
     |> join(:inner, [cp], s in School, s.id == cp.school_id)
     |> where([cp], cp.id == ^class_period_id)
     |> select([cp, s], s)
     |> Repo.one()
+    {:ok, school} = add_four_door({:ok, school})
+    school
   end
 
   @doc """

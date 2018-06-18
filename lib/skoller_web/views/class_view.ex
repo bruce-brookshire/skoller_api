@@ -11,6 +11,7 @@ defmodule SkollerWeb.ClassView do
     alias SkollerWeb.Class.StudentRequestView
     alias Skoller.Class.StudentClass
     alias SkollerWeb.PeriodView
+    alias Skoller.Schools
 
     import Ecto.Query
 
@@ -56,12 +57,13 @@ defmodule SkollerWeb.ClassView do
     end
 
     def render("class_detail.json", %{class: class}) do
-        class = class |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests, :school], force: true)
+        class = class |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests], force: true)
+        school = Schools.get_school_from_period(class.class_period_id)
         class
         |> render_one(ClassView, "class.json")
         |> Map.merge(
             %{
-                school: render_one(class.school, SchoolView, "school.json"),
+                school: render_one(school, SchoolView, "school-detail.json"),
                 status: render_one(class.class_status, StatusView, "status.json"),
                 help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json"),
                 change_requests: render_many(class.change_requests, ChangeRequestView, "change_request.json"),
