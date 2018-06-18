@@ -85,7 +85,7 @@ defmodule Skoller.Syllabi do
     t
   end
 
-  def get_oldest_class_by_school(lock_type, class_status, school_id, opts) do
+  defp get_oldest_class_by_school(lock_type, class_status, school_id, opts) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
     |> join(:inner, [class, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
@@ -108,17 +108,15 @@ defmodule Skoller.Syllabi do
   end
 
   defp get_processable_classes(status_id, opts) do
-    from(class in Class)
+    from(class in subquery(get_servable_classes_subquery()))
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sch in School, sch.id == period.school_id)
     |> join(:inner, [class, peroiod, sch], s in Status, class.class_status_id == s.id)
     |> enrolled_classes(opts)
     |> where([class], class.is_editable == true and class.is_syllabus == true)
-    |> where([class, period, sch], sch.is_auto_syllabus == true)
     |> where([class], fragment("exists (select 1 from docs where class_id = ?)", class.id))
     |> where_processable_status(status_id)
-    |> group_by([class, period, sch], period.school_id)
-    |> select([class, period, sch], %{count: count(period.school_id), school: period.school_id})
+    |> group_by([class, period], period.school_id)
+    |> select([class, period], %{count: count(period.school_id), school: period.school_id})
     |> Repo.all()
   end
 
@@ -181,20 +179,20 @@ defmodule Skoller.Syllabi do
 
   defp where_oldest_status(query, nil) do
     query
-    |> where([class, period, sc, sch, s], s.is_maintenance == false and s.is_complete == false)
+    |> where([class, period, doc, lock, s], s.is_maintenance == false and s.is_complete == false)
   end
   defp where_oldest_status(query, status_id) do
     query
-    |> where([class, period, sc, sch, s], s.id == ^status_id)
+    |> where([class, period, doc, lock, s], s.id == ^status_id)
   end
 
   defp where_processable_status(query, nil) do
     query
-    |> where([class, period, sch, s], s.is_maintenance == false and s.is_complete == false)
+    |> where([class, period, s], s.is_maintenance == false and s.is_complete == false)
   end
   defp where_processable_status(query, status_id) do
     query
-    |> where([class, period, sch, s], s.id == ^status_id)
+    |> where([class, period, s], s.id == ^status_id)
   end
 
   defp where_lock_type(query, nil), do: query
