@@ -59,7 +59,7 @@ defmodule Skoller.Users.User do
     |> update_change(:email, &String.downcase(&1))
     |> unique_constraint(:email)
     |> cast_assoc(:student)
-    |> validate_format(:email, ~r/@.+\.edu$/)
+    |> validate_format(:email, ~r/@/)
     |> put_pass_hash()
   end
 

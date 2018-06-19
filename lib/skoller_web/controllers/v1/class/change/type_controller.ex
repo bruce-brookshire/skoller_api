@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Class.Change.TypeController do
     alias Skoller.Repo
     alias SkollerWeb.Class.Change.TypeView
   
-    def index(conn, %{}) do
+    def index(conn, _) do
       types = Repo.all(Type)
       render(conn, TypeView, "index.json", types: types)
     end

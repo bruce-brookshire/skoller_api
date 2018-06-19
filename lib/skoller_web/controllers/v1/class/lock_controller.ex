@@ -20,7 +20,6 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
   def index(conn, %{"class_id" => class_id}) do
     locks = Users.get_user_locks_by_class(class_id)
-
     render(conn, LockView, "index.json", locks: locks)
   end
 
