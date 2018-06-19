@@ -1,8 +1,9 @@
 defmodule Skoller.Assignments.ReminderNotification do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignments.ReminderNotification
-
 
   schema "assignment_reminder_notifications" do
     field :message, :string

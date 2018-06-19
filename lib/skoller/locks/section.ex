@@ -1,4 +1,6 @@
 defmodule Skoller.Locks.Section do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Locks.Section

@@ -1,4 +1,6 @@
 defmodule Skoller.Assignments.ReminderNotification.Topic do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignments.ReminderNotification.Topic

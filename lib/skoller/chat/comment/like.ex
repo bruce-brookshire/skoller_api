@@ -1,8 +1,9 @@
 defmodule Skoller.Chat.Comment.Like do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Comment.Like
-
 
   schema "chat_comment_likes" do
     field :chat_comment_id, :id

@@ -1,4 +1,6 @@
 defmodule Skoller.Assignment.Post do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignment.Post

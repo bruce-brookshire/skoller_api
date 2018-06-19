@@ -1,4 +1,6 @@
 defmodule Skoller.Chat.Comment do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Comment

@@ -1,10 +1,5 @@
 defmodule Skoller.Class.HelpRequest do
-
-  @moduledoc """
-  
-  Defines the schema and changeset for class_help_requests
-
-  """
+  @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset

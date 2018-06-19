@@ -1,10 +1,5 @@
 defmodule Skoller.Application do
-
-  @moduledoc """
-  
-  Skoller startup.
-
-  """
+  @moduledoc false
 
   use Application
 

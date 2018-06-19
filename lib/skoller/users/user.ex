@@ -1,12 +1,5 @@
 defmodule Skoller.Users.User do
-
-  @moduledoc """
-  
-  Defines changeset and schema for users.
-  
-  Email will be validated against school email domains if the user is a student.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

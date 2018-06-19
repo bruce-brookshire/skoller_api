@@ -1,8 +1,9 @@
 defmodule Skoller.Class.StudentRequest.Doc do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Class.StudentRequest.Doc
-
 
   schema "class_student_request_docs" do
     field :class_student_request_id, :id

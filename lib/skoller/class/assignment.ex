@@ -1,10 +1,5 @@
 defmodule Skoller.Class.Assignment do
-
-  @moduledoc """
-  
-  Changeset and schema for assignments
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

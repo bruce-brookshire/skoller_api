@@ -1,10 +1,5 @@
 defmodule Skoller.Schools.Class do
-  
-  @moduledoc """
-  
-  Changeset and schema for classes.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

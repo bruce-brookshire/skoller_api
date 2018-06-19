@@ -1,10 +1,5 @@
 defmodule Skoller.Class.Change.Type do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class change types.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

@@ -75,11 +75,12 @@ adapter: Ecto.Adapters.Postgres,
 url: System.get_env("DATABASE_URL"),
 pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-# Configure Guardian Token Generation
+# Configure Guardian Token Generation (this is for auth tokens)
 config :skoller, Skoller.Auth,
           issuer: System.get_env("API_TOKEN_ISSUER"),
           secret_key: System.get_env("API_TOKEN_KEY")
-  
+
+# This is for apple notifications
 config :pigeon, :apns,
   apns_default: %{
     cert: System.get_env("APNS_CERT"),
@@ -88,6 +89,7 @@ config :pigeon, :apns,
     use_2197: true
   }
 
+# This is for emails
 config :skoller, Skoller.Mailer,
   adapter: Bamboo.SMTPAdapter,
   server: System.get_env("SES_SERVER"),

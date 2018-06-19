@@ -1,10 +1,5 @@
 defmodule Skoller.Schools.School do
-
-  @moduledoc """
-  
-  Defines schema and changeset for school
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

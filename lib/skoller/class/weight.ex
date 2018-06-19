@@ -1,11 +1,6 @@
 defmodule Skoller.Class.Weight do
-
-  @moduledoc """
+  @moduledoc false
   
-  Changeset and schema for class_weights
-
-  """
-
   use Ecto.Schema
   import Ecto.Changeset
 

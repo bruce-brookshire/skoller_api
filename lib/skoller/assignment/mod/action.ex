@@ -1,10 +1,5 @@
 defmodule Skoller.Assignment.Mod.Action do
-
-  @moduledoc """
-  
-  Schema and changeset for mod actions.
-  
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

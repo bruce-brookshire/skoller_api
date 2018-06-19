@@ -1,13 +1,6 @@
 defmodule Skoller.Schools.ClassPeriod do
-
-  @moduledoc """
+  @moduledoc false
   
-  Changeset and schema for class_periods
-
-  Validates that the end date is after the start date
-
-  """
-
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Schools.ClassPeriod

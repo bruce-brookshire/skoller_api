@@ -1,10 +1,5 @@
 defmodule Skoller.Class.Help.Type do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class help types.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

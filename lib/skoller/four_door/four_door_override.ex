@@ -1,4 +1,6 @@
 defmodule Skoller.FourDoor.FourDoorOverride do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.FourDoor.FourDoorOverride

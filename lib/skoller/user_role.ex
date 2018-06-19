@@ -1,10 +1,5 @@
 defmodule Skoller.UserRole do
-
-  @moduledoc """
-
-  Defines schema and changeset for user_roles.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

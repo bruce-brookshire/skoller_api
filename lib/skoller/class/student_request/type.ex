@@ -1,4 +1,6 @@
 defmodule Skoller.Class.StudentRequest.Type do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Class.StudentRequest.Type

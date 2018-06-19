@@ -1,12 +1,5 @@
 defmodule Skoller.Classes.Status do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class_statuses
-
-  The primary key is not seeded.
-
-  """
+  @moduledoc false
 
   # @syllabus_status 200
   # @weight_status 300

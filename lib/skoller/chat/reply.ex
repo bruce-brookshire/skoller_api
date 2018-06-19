@@ -1,4 +1,6 @@
 defmodule Skoller.Chat.Reply do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Reply
