@@ -1,4 +1,7 @@
 defmodule Skoller.Assignments.Mods do
+  @moduledoc """
+  Context module for mods
+  """
 
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
@@ -16,6 +19,11 @@ defmodule Skoller.Assignments.Mods do
   @due_assignment_mod 300
   @new_assignment_mod 400
 
+  @doc """
+  Gets all the mods for an assignment.
+
+  Returns `[Skoller.Assignment.Mod]` with mod action details or `[]`
+  """
   def get_mods_by_assignment(assignment_id) do
     from(m in Mod)
     |> where([m], m.assignment_id == ^assignment_id)
@@ -23,6 +31,16 @@ defmodule Skoller.Assignments.Mods do
     |> Enum.map(&Map.put(&1, :action, add_action_details(&1.id)))
   end
 
+  @doc """
+  Gets all the mods for a student that are due today or in the future.
+
+  ## Params
+   * `%{"is_new_assignments" => "true"}`, :boolean, returns only new assignment mods for a student
+
+  ## Returns
+  `[%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
+  student_assignment: Skoller.Class.StudentAssignment}]` or `[]`
+  """
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
@@ -36,42 +54,76 @@ defmodule Skoller.Assignments.Mods do
     |> Enum.filter(&filter_due_date(&1, DateTime.utc_now()))
   end
 
+  @doc """
+  Gets a mod by student id and mod id.
+
+  Student must still be enrolled in class.
+
+  ## Returns
+  `%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
+  student_assignment: Skoller.Class.StudentAssignment}`, `nil`, or raises if more than one
+  """
   def get_student_mod_by_id(student_id, mod_id) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
-    |> where([mod, action, sc, sa], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> where([mod], mod.id == ^mod_id)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
     |> Repo.one()
   end
 
-  def get_mod_assignments_by_class(id) do
+  @doc """
+  Gets assignments with mod count and student count by class id.
+
+  ## Returns
+  `[%{assignment: %{assignment: Skoller.Class.Assignment, mod_count: Integer, student_count: Integer}}]` or `[]`
+  """
+  def get_mod_assignments_by_class(class_id) do
     from(a in Assignment)
     |> join(:left, [a], m in Mod, m.assignment_id == a.id)
     |> join(:left, [a], s in StudentAssignment, s.assignment_id == a.id)
-    |> where([a], a.class_id == ^id)
+    |> where([a], a.class_id == ^class_id)
     |> group_by([a], a.id)
     |> select([a, m, s], %{assignment: %{assignment: a, mod_count: count(m.id), student_count: count(s.id)}})
     |> Repo.all()
   end
 
-  def get_class_from_mod_id(id) do
+  @doc """
+  Gets the class from a mod id
+
+  ## Returns
+  `Skoller.Schools.Class`, `nil` or raises if more than one.
+  """
+  def get_class_from_mod_id(mod_id) do
     from(class in Class)
     |> join(:inner, [class], assign in Assignment, class.id == assign.class_id)
     |> join(:inner, [class, assign], mod in Mod, mod.assignment_id == assign.id)
-    |> where([class, assign, mod], mod.id == ^id)
+    |> where([class, assign, mod], mod.id == ^mod_id)
     |> Repo.one()
   end
 
+  @doc """
+  Subquery to associate Mods and Classes easily.
+
+  Intended to be used with `Ecto.Query.subquery/1`
+
+  ## Returns
+  `Ecto.Query` with `%{class_id: id, mod_id: id}`
+  """
   def get_class_from_mod_subquery() do
     from(mod in Mod)
     |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
     |> select([mod, assign], %{class_id: assign.class_id, mod_id: mod.id})
   end
 
+  @doc """
+  Gets the enrolled classes that a student has pending mods in.
+
+  ## Returns
+  `[Skoller.Schools.Class]` or `[]`
+  """
   def get_classes_with_pending_mod_by_student_id(student_id) do
     from(class in Class)
     |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
