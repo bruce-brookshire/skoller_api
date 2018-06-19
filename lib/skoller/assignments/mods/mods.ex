@@ -132,6 +132,14 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
+  @doc """
+  Gets the count of joyriders.
+
+  Joyriders are students in communities that have autoupdated mods.
+
+  ## Returns
+  `Integer`
+  """
   def get_joyriders() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
@@ -141,6 +149,14 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Gets the count of pending students.
+
+  Pending students are students in communities with mods that they have not responded to yet.
+
+  ## Returns
+  `Integer`
+  """
   def get_pending() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
@@ -150,6 +166,14 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Gets the count of followers.
+
+  Followers are students in communities with mods that they accepted.
+
+  ## Returns
+  `Integer`
+  """
   def get_followers() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
@@ -159,6 +183,14 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Gets the count of creators.
+
+  Creators are students in communities that creates a mod.
+
+  ## Returns
+  `Integer`
+  """
   def get_creators() do
     from(m in Mod)
     |> join(:inner, [m], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
@@ -167,13 +199,19 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Gets public mods that have at least one response as well as the accepted and response count.
+
+  ## Returns
+  `[%{mod: Skoller.Assignment.Mod, responses: Integer, accepted: Integer}]` or `[]`
+  """
   def get_responded_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
     |> join(:inner, [m, a], sc in subquery(Students.get_communities()), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
-    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id))
+    |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id)) #Get mods with a response that is not from the creator.
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
     |> Repo.all()
   end
