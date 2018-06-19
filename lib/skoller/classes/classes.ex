@@ -477,7 +477,6 @@ defmodule Skoller.Classes do
     |> prof_filter(params)
     |> prof_id_filter(params)
     |> name_filter(params)
-    |> number_filter(params)
   end
 
   defp prof_filter(dynamic, %{"professor_name" => filter, "or" => "true"}) do
