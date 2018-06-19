@@ -273,7 +273,14 @@ defmodule Skoller.Classes do
   def get_class_status_counts() do
     statuses = from(status in Status)
     |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
-    |> where([status], status.id not in [@needs_syllabus_status, @completed_status])
+    |> where([status], status.id in [@weight_status, @assignment_status, @review_status])
+    |> group_by([status], [status.id, status.name, status.is_complete])
+    |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
+    |> Repo.all()
+
+    admin_status = from(status in Status)
+    |> join(:left, [status], class in Class, status.id == class.class_status_id)
+    |> where([status], status.id in [@help_status, @change_status])
     |> group_by([status], [status.id, status.name, status.is_complete])
     |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
     |> Repo.all()
@@ -283,7 +290,7 @@ defmodule Skoller.Classes do
     |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
     |> Repo.all()
 
-    statuses ++ maint
+    statuses ++ admin_status ++ maint
   end
 
   def get_classes_by_school(school_id, filters \\ nil) do
