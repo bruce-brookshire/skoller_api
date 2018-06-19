@@ -508,16 +508,6 @@ defmodule Skoller.Classes do
   end
   defp name_filter(dynamic, _), do: dynamic
 
-  defp number_filter(dynamic, %{"class_number" => filter, "or" => "true"}) do
-    number_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.number, ^number_filter) or ^dynamic)
-  end
-  defp number_filter(dynamic, %{"class_number" => filter}) do
-    number_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.number, ^number_filter) and ^dynamic)
-  end
-  defp number_filter(dynamic, _), do: dynamic
-
   defp get_create_changeset(%{is_university: true}, params) do
     Universities.get_changeset(params)
   end
