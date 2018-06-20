@@ -44,9 +44,8 @@ defmodule Skoller.Assignments.Mods do
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
-    |> where([mod, action, sc, sa], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> filter(params)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})

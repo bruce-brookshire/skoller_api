@@ -1,4 +1,7 @@
 defmodule Skoller.Assignments do
+  @moduledoc """
+  Context module for assignments
+  """
 
   alias Skoller.Repo
   alias Skoller.Assignments.ReminderNotification
@@ -6,8 +9,8 @@ defmodule Skoller.Assignments do
   alias Skoller.Assignment.Post
   alias Skoller.Class.Assignment
   alias Skoller.Class.StudentAssignment
-  alias Skoller.Class.StudentClass
   alias Skoller.Schools.Class
+  alias Skoller.Students
 
   import Ecto.Query
 
@@ -22,19 +25,49 @@ defmodule Skoller.Assignments do
   @default_message_future_single "You have 1 assignment in the next [days] days. Check it out!"
   @default_message_future_mult "You have [num] assignments in the next [days] days. Check them out!"
 
-  def get_student_assignment_posts(student_id) do
+  @doc """
+  Gets all assignment posts for a student.
+
+  ## Notes
+  The student's own posts are excluded.
+
+  ## Returns
+  `[%{post: Skoller.Assignment.Post, assignment: Skoller.Class.Assignment, class: Skoller.Schools.Class, student_assignment: Skoller.Class.StudentAssignment}]`
+  or `[]`
+  """
+  def get_assignment_post_notifications(student_id) do
     from(post in Post)
     |> join(:inner, [post], assign in Assignment, assign.id == post.assignment_id)
     |> join(:inner, [post, assign], sa in StudentAssignment, sa.assignment_id == assign.id)
-    |> join(:inner, [post, assign, sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> join(:inner, [post, assign, sa], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == sa.student_class_id)
     |> join(:inner, [post, assign, sa, sc], class in Class, class.id == assign.class_id)
     |> where([post, assign, sa], sa.is_post_notifications == true)
-    |> where([post, assign, sa, sc], sc.is_dropped == false and sc.student_id == ^student_id)
     |> where([post], post.student_id != ^student_id)
     |> select([post, assign, sa, sc, class], %{post: post, assignment: assign, class: class, student_assignment: sa})
     |> Repo.all()
   end
 
+  @doc """
+  Gets an assignment reminder message based on the number of assignments and the topic.
+
+  ## Topics
+   * Today `100`
+   * Tomorrow `200`
+   * Future `300`
+
+  ## Defaults
+  | Num | Topic    | Message                                                             |
+  | --- | -------- | ------------------------------------------------------------------- |
+  | 1   | Today    | You have 1 assignment due today. Check it out!                      |
+  | > 1 | Today    | You have [num] assignments due today. Check them out!               |
+  | 1   | Tomorrow | You have 1 assignment tomorrow. Check it out!                       |
+  | > 1 | Tomorrow | You have [num] assignments tomorrow. Check them out!                |
+  | 1   | Future   | You have 1 assignment in the next [days] days. Check it out!        |
+  | > 1 | Future   | You have [num] assignments in the next [days] days. Check them out! |
+
+  ## Returns
+  `String`
+  """
   def get_assignment_reminder(num, topic) do
     messages = get_messages(topic, num)
 
