@@ -426,6 +426,12 @@ defmodule Skoller.Classes do
     |> Repo.all()
   end
 
+  @doc """
+  Gets class status name from a class or a status.
+
+  ## Returns
+  `String`
+  """
   def get_class_status(%Class{} = class) do
     class = class |> Repo.preload(:class_status)
     get_status(class)
@@ -434,12 +440,40 @@ defmodule Skoller.Classes do
     get_status(%{class_status: class_status})
   end
 
+  @doc """
+  Subquery that gets all classes that need a syllabus
+  """
   def need_syllabus_status_class_subquery() do
     from(c in Class)
     |> where([c], c.class_status_id == @needs_syllabus_status)
   end
 
+  @doc """
+  Checks if a class should advance status or not.
+
+  ## Checks
+  | Event                      | Params                         |
+  | -------------------------- | ------------------------------ |
+  | Statusless Class           | None                           |
+  | Class with no syllabus     | None                           |
+  | Doc added to class         | Doc object                     |
+  | Change request completed   | Request object                 |
+  | Student request completed  | Request object                 |
+  | Change request created     | Request object                 |
+  | Help request created       | Request object                 |
+  | Student request created    | Request object                 |
+  | Class unlocked             | List of lock objects           |
+  | Class unlocked             | Lock object                    |
+  | Student enrolled           | StudentClass object            |
+
+  ## Returns
+  `{:ok, Skoller.Schools.Class}` or `{:ok, nil}` or `{:error, map}` or `{:error, Ecto.Changeset}`
+
+  """
+  #TODO: Internalize class status updates (remove from SkollerWeb).
+  #TODO: Standardize return objects
   # A new class has been added, and it is a class that will never have a syllabus.
+  def check_status(class, params)
   def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
     class |> set_status(@completed_status)
   end
