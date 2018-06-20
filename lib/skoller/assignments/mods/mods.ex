@@ -199,12 +199,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.aggregate(:count, :id)
   end
 
-  # @doc """
-  # Gets public mods that have at least one response as well as the accepted and response count.
+  @doc """
+  Gets public mods that have at least one response as well as the accepted and response count.
 
-  # ## Returns
-  # `[%{mod: Skoller.Assignment.Mod, responses: Integer, accepted: Integer}]` or `[]`
-  # """
+  ## Returns
+  `[%{mod: Skoller.Assignment.Mod, responses: Integer, accepted: Integer}]` or `[]`
+  """
   def get_responded_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
@@ -233,12 +233,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
-  # @doc """
-  # Gets public mods that have at least one response as well as the accepted and response count.
+  @doc """
+  Gets public mods audience and response count.
 
-  # ## Returns
-  # `[%{mod: Skoller.Assignment.Mod, responses: Integer, audience: Integer}]` or `[]`
-  # """
+  ## Returns
+  `[%{mod: Skoller.Assignment.Mod, responses: Integer, audience: Integer}]` or `[]`
+  """
   def get_shared_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
@@ -249,12 +249,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
-  # @doc """
-  # Gets public mods that have not been auto updated, but have enough students to be auto updated.
-  #
-  # ## Returns
-  # `[%{assignment_modification_id: Id, responses: Integer, audience: Integer, accepted: Integer}]` or `[]`
-  # """
+  @doc """
+  Gets public mods that have not been auto updated, but have enough students to be auto updated.
+  
+  ## Returns
+  `[%{assignment_modification_id: Id, responses: Integer, audience: Integer, accepted: Integer}]` or `[]`
+  """
   def get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold) do
     from(m in Mod)
     |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
