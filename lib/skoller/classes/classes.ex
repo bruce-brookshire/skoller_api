@@ -52,7 +52,7 @@ defmodule Skoller.Classes do
   ## Examples
 
       iex> Skoller.Classes.get_class_by_id(1)
-      {:ok, %Skoller.Schools.Class{}
+      {:ok, %Skoller.Schools.Class{}}
 
   """
   def get_class_by_id(id) do
@@ -73,7 +73,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a preloaded `Skoller.Schools.Class` by id
+  Gets a `Skoller.Schools.Class` by id with `Skoller.Class.Weight`
 
   """
 
@@ -82,6 +82,15 @@ defmodule Skoller.Classes do
     |> Repo.preload([:weights])
   end
 
+  @doc """
+  Gets an editable `Skoller.Schools.Class` by id.
+
+  ## Examples
+
+      iex> Skoller.Classes.get_editable_class_by_id(1)
+      {:ok, %Skoller.Schools.Class{}}
+
+  """
   def get_editable_class_by_id(id) do
     Repo.get_by(Class, id: id, is_editable: true)
   end
@@ -90,7 +99,8 @@ defmodule Skoller.Classes do
   Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
 
   ## Behavior:
-   If there is no grade scale provided, a default is used: 
+    * If there is no grade scale provided, a default is used: `%{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}`
+    * If `user` is passed in that is a student, will add student created class fields.
 
   ## Examples
 
@@ -119,7 +129,7 @@ defmodule Skoller.Classes do
   ## Examples
 
       iex> Skoller.Classes.update_class(old_class, %{} = params)
-      %Skoller.Schools.Class{}
+      {:ok, %{class: %Skoller.Schools.Class{}, class_status: %Skoller.Schools.Class{}}}
 
   """
   def update_class(class_old, params) do
@@ -133,14 +143,29 @@ defmodule Skoller.Classes do
     |> Repo.transaction()
   end
 
+  @doc """
+  Gets a class status by status id
+
+  ## Returns
+  `Skoller.Classes.Status` or raises
+  """
   def get_status_by_id!(id) do
     Repo.get!(Status, id)
   end
 
+  @doc """
+  Gets all class statuses
+
+  ## Returns
+  `[Skoller.Classes.Status]` or `[]`
+  """
   def get_statuses() do
     Repo.all(Status)
   end
 
+  @doc """
+  Get editable classes in subquery form
+  """
   def get_editable_classes_subquery() do
     from(class in Class)
     |> where([class], class.is_editable == true)
@@ -199,8 +224,10 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets class_id and school_id
+  Gets all class_id and school_id.
 
+  ## Params
+  `%{"school_id" => id}`, gets all classes in in school
   """
   def get_school_from_class_subquery(_params \\ %{})
   def get_school_from_class_subquery(%{"school_id" => school_id}) do
@@ -215,37 +242,92 @@ defmodule Skoller.Classes do
     |> select([c, p], %{class_id: c.id, school_id: p.school_id})
   end
 
-  def get_class_count(dates, params) do
+  @doc """
+  Gets a count of classes created between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+   * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  
+  """
+  def get_class_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
   end
 
-  def get_completed_class_count(dates, params) do
+  @doc """
+  Gets a count of completed classes created between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+   * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  
+  """
+  def get_completed_class_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id == @completed_status)
     |> Repo.aggregate(:count, :id)
   end
 
-  def get_class_in_review_count(dates, params) do
+  @doc """
+  Gets a count of classes in review (has syllabus but not complete) created between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+   * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  
+  """
+  def get_class_in_review_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
     |> Repo.aggregate(:count, :id)
   end
 
-  def student_created_count(dates, params) do
+  @doc """
+  Gets a count of student created classes created between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+   * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  
+  """
+  def student_created_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.is_student_created == true)
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Gets oldest syllabus in each class.
+  """
   def classes_with_syllabus_subquery() do
     from(d in Doc)
     |> where([d], d.is_syllabus == true)
@@ -253,23 +335,49 @@ defmodule Skoller.Classes do
     |> order_by([d], asc: d.inserted_at)
   end
 
-  def classes_completed_by_diy_count(dates, params) do
+  @doc """
+  Gets a count of classes completed by students created between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+   * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  
+  """
+  def classes_completed_by_diy_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> join(:inner, [c, cs], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
     |> join(:inner, [c, cs, l], u in User, u.id == l.user_id)
     |> join(:inner, [c, cs, l, u], r in UserRole, r.user_id == u.id)
     |> where([c, cs, l, u, r], r.role_id == @student_role)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
+    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Takes an old class and a new class, and if the status has just changed to complete, send class complete notification.
+  """
+  def evaluate_class_completion(old_class, new_class)
   def evaluate_class_completion(%Class{class_status_id: @completed_status}, %Class{class_status_id: @completed_status}), do: nil
   def evaluate_class_completion(%Class{class_status_id: _old_status}, %Class{class_status_id: @completed_status} = class) do
     Task.start(NotificationHelper, :send_class_complete_notification, [class])
   end
   def evaluate_class_completion(_old_class, _class), do: nil
 
+  @doc """
+  Gets a count of all status and the count of classes in them.
+
+  ## Behavior
+  The syllabus worker statuses are only going to return syllabus workable schools.
+
+  ## Returns
+  `[%{id: Skoller.Classes.Status.id, name: Skoller.Classes.Status.name, classes: Integer}]` or `nil`
+  """
   def get_class_status_counts() do
     statuses = from(status in Status)
     |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
@@ -293,6 +401,20 @@ defmodule Skoller.Classes do
     statuses ++ admin_status ++ maint
   end
 
+  @doc """
+  Get all classes for a school, with professors and class periods.
+
+  ## Filters
+   * `%{"professor_name" => prof_first_or_last}`, filters professor first or last name with a contains search
+   * `%{"professor_id" => professor_id}`, filters professor id
+   * `%{"class_name" => class_name}`, filters class name
+   * `%{"or" => "true"}`, "or's" the filters instead of making them exclusive.
+
+  ## Returns
+  `[%{class: Skoller.Schools.Class, professor: Skoller.Professors.Professor, class_period: Skoller.Schools.ClassPeriod}]`
+  or `[]`
+
+  """
   def get_classes_by_school(school_id, filters \\ nil) do
     #TODO: Filter ClassPeriod
     from(class in Class)

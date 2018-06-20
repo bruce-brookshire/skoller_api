@@ -5,6 +5,8 @@ defmodule Skoller.Class.Help.Type do
   import Ecto.Changeset
   alias Skoller.Class.Help.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "class_help_types" do
     field :name, :string

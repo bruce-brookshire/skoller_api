@@ -5,6 +5,8 @@ defmodule Skoller.Class.Change.Type do
   import Ecto.Changeset
   alias Skoller.Class.Change.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "class_change_types" do
     field :name, :string

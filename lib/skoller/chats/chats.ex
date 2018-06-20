@@ -79,7 +79,7 @@ defmodule Skoller.Chats do
    * `Map`, `%{date_start: DateTime, date_end: DateTime}`
 
   ## Params
-   * `Map`, `%{"school_id" => Id}`
+   * `Map`, `%{"school_id" => Id}` filters by school
 
   ## Returns
   `%{class: Skoller.Schools.Class, count: Integer}` or `nil`
