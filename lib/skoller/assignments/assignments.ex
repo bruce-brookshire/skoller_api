@@ -77,28 +77,59 @@ defmodule Skoller.Assignments do
     end 
   end
 
+  @doc """
+  Creates a reminder message.
+
+  ## Returns
+  `{:ok, Skoller.Assignments.ReminderNotification}` or `{:error, changeset}`
+  """
   def add_assignment_message(%{"reminder_message" => params}) do
     ReminderNotification.changeset(%ReminderNotification{}, params)
     |> Repo.insert()
   end
 
+  @doc """
+  Gets all reminder messages
+
+  ## Returns
+  `[Skoller.Assignments.ReminderNotification]` or `[]`
+  """
   def get_assignment_messages() do
     Repo.all(ReminderNotification)
   end
 
+  @doc """
+  Deletes a reminder message.
+
+  ## Returns
+  `{:ok, Skoller.Assignments.ReminderNotification}` or `{:error, changeset}`
+  """
   def delete_assignment_messages(id) do
     Repo.get!(ReminderNotification, id)
     |> Repo.delete()
   end
 
+  @doc """
+  Gets the assignment reminder notification topics.
+
+  ## Returns
+  `[Skoller.Assignments.ReminderNotification.Topic]` or `[]`
+  """
   def get_assignment_message_topics() do
     Repo.all(Topic)
   end
 
+  @doc """
+  Gets an assignment reminder notification topic by id.
+
+  ## Returns
+  `Skoller.Assignments.ReminderNotification.Topic` or raises
+  """
   def get_assignment_message_topic_by_id!(id) do
     Repo.get!(Topic, id)
   end
 
+  #Gets messages based on topic and num.
   defp get_messages(topic, num) when num > 1 do
     from(rn in ReminderNotification)
     |> where([rn], rn.assignment_reminder_notification_topic_id == ^topic and rn.is_plural == true)
@@ -110,6 +141,7 @@ defmodule Skoller.Assignments do
     |> Repo.all()
   end
 
+  #Gets default message.
   defp get_default(@today_topic, num) when num > 1, do: @default_message_today_mult
   defp get_default(@today_topic, _num), do: @default_message_today_single
   defp get_default(@tomorrow_topic, num) when num > 1, do: @default_message_tomorrow_mult
@@ -117,6 +149,7 @@ defmodule Skoller.Assignments do
   defp get_default(@future_topic, num) when num > 1, do: @default_message_future_mult
   defp get_default(@future_topic, _num), do: @default_message_future_single
 
+  #Gets a random message from a list of messages.
   defp get_random_message([]), do: nil
   defp get_random_message(messages) do
     index = messages
