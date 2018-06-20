@@ -576,6 +576,7 @@ defmodule Skoller.Classes do
     |> Repo.update()
   end
 
+  #Check to see if there are other incomplete change requests.
   defp check_req_status(%Class{} = class) do
     cr_query = from(cr in ChangeRequest)
     |> where([cr], cr.class_id == ^class.id and cr.is_completed == false)
@@ -601,6 +602,7 @@ defmodule Skoller.Classes do
     |> Repo.update()
   end
 
+  #If a change request is attempted when a class is not complete, error
   defp change_status_check(%{class_status: %{is_complete: false}}) do
     {:error, %{error: "Class is incomplete, use Help Request."}}
   end
@@ -608,6 +610,7 @@ defmodule Skoller.Classes do
     class |> set_status(@change_status)
   end
 
+  #If a help request is attempted on a completed class, error
   defp help_status_check(%{class_status: %{is_complete: true}}) do
     {:error, %{error: "Class is complete, use Change Request."}}
   end
@@ -676,12 +679,17 @@ defmodule Skoller.Classes do
     HighSchools.get_changeset(old_class, params)
   end
 
+  #If user is a student, set student fields on changeset.
+  defp add_student_created_class_fields(changeset, user)
   defp add_student_created_class_fields(changeset, %{student: nil}), do: changeset
   defp add_student_created_class_fields(changeset, %{student: _}) do
     changeset |> Ecto.Changeset.change(%{is_student_created: true})
   end
   defp add_student_created_class_fields(changeset, _user), do: changeset
 
+
+  # The name is param exists to check the map type (string vs atom).
+  #TODO: Find a better way to do this.
   defp put_grade_scale(%{"grade_scale" => _} = params), do: params
   defp put_grade_scale(%{"name" => _name} = params) do
     params |> Map.put("grade_scale", @default_grade_scale)
