@@ -65,6 +65,7 @@ defmodule Skoller.Schools do
     |> Repo.all()
   end
 
+  # There are two of these, one for string maps and one for atom maps.
   defp get_timezone(%{adr_locality: loc, adr_country: country, adr_region: region}) do
     call_timezone(loc, country, region)
   end
