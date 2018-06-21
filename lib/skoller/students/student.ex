@@ -27,7 +27,6 @@ defmodule Skoller.Students.Student do
     field :is_reminder_notifications, :boolean, default: true
     field :is_chat_notifications, :boolean, default: true
     field :is_assign_post_notifications, :boolean, default: true
-    field :is_university, :boolean, default: true
     field :organization, :string
     field :bio, :string
     field :grad_year, :string
@@ -46,7 +45,7 @@ defmodule Skoller.Students.Student do
   @req_fields [:name_first, :name_last, :phone,
               :notification_time, :notification_days_notice, :is_notifications,
               :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications,
-               :is_assign_post_notifications, :future_reminder_notification_time, :is_university]
+               :is_assign_post_notifications, :future_reminder_notification_time]
   @opt_fields [:birthday, :gender, :organization, :bio, :grad_year]
   @all_fields @req_fields ++ @opt_fields
 
@@ -60,12 +59,28 @@ defmodule Skoller.Students.Student do
   end
 
   def check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
-    q = from s in Student,
-      where: s.phone == ^phone
-    case Repo.all(q) do
-      [] -> changeset
-      _phone -> changeset |> add_error(:phone, "Phone exists.")
+    case get_check_phone() do
+      false ->
+        changeset
+      true ->
+        q = from s in Student,
+          where: s.phone == ^phone
+        case Repo.all(q) do
+          [] -> changeset
+          _phone -> changeset |> add_error(:phone, "Phone exists.")
+        end
     end
   end
   def check_phone(changeset), do: changeset
+
+  defp get_check_phone() do
+    case System.get_env("CHECK_PHONE") do
+      nil -> false
+      val -> 
+        case val |> String.downcase() do
+          "true" -> true
+          _ -> false
+        end
+    end
+  end
 end

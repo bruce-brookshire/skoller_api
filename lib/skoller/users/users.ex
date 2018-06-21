@@ -35,8 +35,8 @@ defmodule Skoller.Users do
   end
 
   def create_user(params, opts \\ []) do
-    multi = params
-    |> get_changeset()
+    multi = %User{}
+    |> User.changeset_insert(params)
     |> verify_student(opts)
     |> verification_code(opts)
     |> get_enrolled_by(params)
@@ -85,15 +85,6 @@ defmodule Skoller.Users do
     |> where([l], l.class_id == ^class_id)
     |> select([l, u], %{lock: l, user: u})
     |> Repo.all()
-  end
-
-  defp get_changeset(%{"student" => %{"is_university" => true}} = params) do
-    %User{}
-    |> User.changeset_insert_university(params)
-  end
-  defp get_changeset(params) do
-    %User{}
-    |> User.changeset_insert(params)
   end
 
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do

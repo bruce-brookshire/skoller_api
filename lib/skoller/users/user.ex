@@ -45,18 +45,6 @@ defmodule Skoller.Users.User do
   end
 
   @doc false
-  def changeset_insert_university(%User{} = user, attrs) do
-    user
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-    |> update_change(:email, &String.downcase(&1))
-    |> unique_constraint(:email)
-    |> cast_assoc(:student)
-    |> validate_format(:email, ~r/@/)
-    |> put_pass_hash()
-  end
-
-  @doc false
   def changeset_update(%User{} = user, attrs) do
     user
     |> cast(attrs, @upd_fields)
