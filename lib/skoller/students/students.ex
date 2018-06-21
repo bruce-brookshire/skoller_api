@@ -31,12 +31,24 @@ defmodule Skoller.Students do
   @link_length 5
   @enrollment_limit 15
 
+  @doc """
+  Gets students in a class. Includes previously-enrolled students.
+
+  ## Returns
+  `[Skoller.Class.StudentClass]` or `[]`
+  """
   def get_students_by_class(class_id) do
     from(sc in StudentClass)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.all()
   end
 
+  @doc """
+  Gets a student class where the class is editable and the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `nil`
+  """
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
@@ -44,14 +56,35 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  @doc """
+  Gets a student class where the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `nil`
+  """
   def get_enrolled_class_by_ids(class_id, student_id) do
     Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
+  @doc """
+  Gets a student class where the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `Ecto.NoResultsError`
+  """
   def get_enrolled_class_by_ids!(class_id, student_id) do
     Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
+  @doc """
+  Enrolls a student in a class.
+
+  ## Params
+   * %{"color" => color}, sets the student class color.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def enroll_in_class(student_id, class_id, params) do
     case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id) do
       nil ->
@@ -63,12 +96,28 @@ defmodule Skoller.Students do
     end
   end
 
+  @doc """
+  Updates an enrolled student in a class.
+
+  ## Params
+   * %{"color" => String}, sets the student class color.
+   * %{"is_notifications" => Boolean}, sets the notifications for this class for this student.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def update_enrolled_class(old_student_class, params) do
     old_student_class
     |> StudentClass.update_changeset(params)
     |> Repo.update()
   end
 
+  @doc """
+  Drops an enrolled student from a class.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def drop_enrolled_class(student_class) do
     student_class
     |> Ecto.Changeset.change(%{is_dropped: true})
@@ -101,6 +150,9 @@ defmodule Skoller.Students do
     |> Repo.preload(:class)
   end
 
+  @doc """
+  Subquery for getting enrolled student classes by student.
+  """
   def get_enrolled_classes_by_student_id_subquery(student_id) do
     #TODO: Filter ClassPeriod
     from(sc in StudentClass)
