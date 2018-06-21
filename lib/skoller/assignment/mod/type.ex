@@ -5,6 +5,8 @@ defmodule Skoller.Assignment.Mod.Type do
   import Ecto.Changeset
   alias Skoller.Assignment.Mod.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "assignment_mod_types" do
     field :name, :string

@@ -44,9 +44,8 @@ defmodule Skoller.Assignments.Mods do
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in StudentClass, sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
-    |> where([mod, action, sc, sa], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> filter(params)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
@@ -216,6 +215,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
+  @doc """
+  Gets avatar urls for students who accepted a given mod.
+
+  ## Returns
+  `[String]` or `[]`
+  """
   def get_student_pic_by_mod_acceptance(mod_id) do
     from(user in User)
     |> join(:inner, [user], stu in Student, user.student_id == stu.id)
@@ -227,6 +232,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
+  @doc """
+  Gets public mods audience and response count.
+
+  ## Returns
+  `[%{mod: Skoller.Assignment.Mod, responses: Integer, audience: Integer}]` or `[]`
+  """
   def get_shared_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
@@ -237,6 +248,12 @@ defmodule Skoller.Assignments.Mods do
     |> Repo.all()
   end
 
+  @doc """
+  Gets public mods that have not been auto updated, but have enough students to be auto updated.
+  
+  ## Returns
+  `[%{assignment_modification_id: Id, responses: Integer, audience: Integer, accepted: Integer}]` or `[]`
+  """
   def get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold) do
     from(m in Mod)
     |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
@@ -258,6 +275,7 @@ defmodule Skoller.Assignments.Mods do
   end
   defp filter_new_assign_mods(query, _params), do: query
 
+  #This is a subquery that returns the responses for a mod of all enrolled students in that class.
   defp mod_responses_sub() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
@@ -265,6 +283,7 @@ defmodule Skoller.Assignments.Mods do
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
 
+  #This gets enrolled users' Skoller.Assignment.Mod.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)

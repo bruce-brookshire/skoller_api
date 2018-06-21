@@ -1,4 +1,7 @@
 defmodule Skoller.Notifications do
+  @moduledoc """
+  Context module for notifications
+  """
 
   alias Skoller.Repo
   alias Skoller.Students.Student
@@ -15,6 +18,12 @@ defmodule Skoller.Notifications do
 
   import Ecto.Query
 
+  @doc """
+  Gets devices where the students have not disabled notifications.
+
+  ## Returns
+  `[Skoller.Devices.Device]` or `[]`
+  """
   def get_notification_enabled_devices() do
     from(d in Device)
     |> join(:inner, [d], u in User, d.user_id == u.id)
