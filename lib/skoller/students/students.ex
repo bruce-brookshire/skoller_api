@@ -389,7 +389,7 @@ defmodule Skoller.Students do
   Creates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}
+  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
   """
   def create_student_assignment(params) do
     #Insert into assignments as from_mod as well.
@@ -408,7 +408,7 @@ defmodule Skoller.Students do
   Updates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}
+  `{:ok, %{student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
   """
   def update_student_assignment(old, params) do
     changeset = old
@@ -731,7 +731,6 @@ defmodule Skoller.Students do
     |> ghost_filter(params)
     |> maint_filter(params)
     |> name_filter(params)
-    |> number_filter(params)
     |> day_filter(params)
   end
 
