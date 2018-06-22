@@ -1,10 +1,6 @@
 defmodule Skoller.AuthErrorHandler do
-
-  @moduledoc """
-  
-  Guardian error handler.
-
-  """
+  @moduledoc false
+  # This is automatically used by guardian.
 
   import Plug.Conn
 

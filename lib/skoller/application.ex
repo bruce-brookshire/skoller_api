@@ -1,5 +1,7 @@
 defmodule Skoller.Application do
-  @moduledoc false
+  @moduledoc """
+  The Application entrypoint for Skoller.
+  """
 
   use Application
 
