@@ -33,6 +33,15 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets user and student from a student class for mod notifications.
+
+  ## Notes
+   * The class must be editable, and the student must be enrolled.
+
+  ## Returns
+  `%{user: Skoller.Users.User, student: Skoller.Students.Student}` or `nil`
+  """
   def get_user_from_student_class(student_class_id) do
     from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
@@ -45,6 +54,15 @@ defmodule Skoller.Notifications do
     |> List.first()
   end
 
+  @doc """
+  Gets devices from a class that have chat notifications enabled.
+
+  ## Notes
+   * The `student_id` does NOT get returned.
+
+  ## Returns
+  `[Skoller.Devices.Device]` or `[]`
+  """
   def get_class_chat_devices_by_class_id(student_id, class_id) do
     from(d in Device)
     |> join(:inner, [d], u in User, d.user_id == u.id)
@@ -55,6 +73,15 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets devices from an assignment that have assignment post notifications enabled.
+
+  ## Notes
+   * The `student_id` does NOT get returned.
+
+  ## Returns
+  `[Skoller.Devices.Device]` or `[]`
+  """
   def get_assignment_post_devices_by_assignment(student_id, assignment_id) do
     from(d in Device)
     |> join(:inner, [d], u in User, u.id == d.user_id)
@@ -68,6 +95,16 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets a list of assignments that are due for reminders.
+
+  ## Notes
+   * The atom can be either `:today` or `:future`
+   * Will not return completed assignments
+
+  ## Returns
+  `[%{udid: Skoller.Devices.Device.udid, days: Skoller.Students.Student.notification_days_notice, count: Integer}]` or `[]`
+  """
   def get_assignment_reminders(time, atom) do
     {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
     now = DateTime.utc_now() |> DateTime.to_date()
@@ -86,6 +123,15 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets users that are attached to a chat post with notifications enabled.
+
+  ## Notes
+   * The `student_id` does NOT get returned.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
   def get_notification_enabled_chat_post_users(student_id, chat_post_id) do
     from(s in PostStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
@@ -96,6 +142,15 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets users that are attached to a chat comment with notifications enabled.
+
+  ## Notes
+   * The `student_id` does NOT get returned.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
   def get_notification_enabled_chat_comment_users(student_id, chat_comment_id) do
     from(s in CommentStar)
     |> join(:inner, [s], stu in Student, stu.id == s.student_id)
@@ -107,6 +162,15 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets users that are attached to a chat post with notifications enabled through a comment.
+
+  ## Notes
+   * The `student_id` does NOT get returned.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
   def get_notification_enabled_chat_post_users_by_comment(student_id, chat_comment_id) do
     from(s in PostStar)
     |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
@@ -119,6 +183,12 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets user ids that in classes that need syllabi with notifications enabled.
+
+  ## Returns
+  `[Skoller.Users.User.id]` or `[]`
+  """
   def get_notification_enabled_needs_syllabus_users() do
     from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
@@ -129,6 +199,12 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
 
+  @doc """
+  Gets users in a class with notifications enabled.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
   def get_users_from_class(class_id) do
     from(sc in subquery(Students.get_enrollment_by_class_id_subquery(class_id)))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
@@ -138,6 +214,12 @@ defmodule Skoller.Notifications do
     |> Repo.all()
   end
   
+  @doc """
+  Gets enrolled users in a student class with notifications enabled.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
   def get_users_from_student_class(id) do
     from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)

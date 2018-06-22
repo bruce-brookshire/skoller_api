@@ -58,7 +58,7 @@ defmodule Skoller.Students.Student do
     |> check_phone()
   end
 
-  def check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
+  defp check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
     case get_check_phone() do
       false ->
         changeset
@@ -71,7 +71,7 @@ defmodule Skoller.Students.Student do
         end
     end
   end
-  def check_phone(changeset), do: changeset
+  defp check_phone(changeset), do: changeset
 
   defp get_check_phone() do
     case System.get_env("CHECK_PHONE") do

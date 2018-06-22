@@ -1,4 +1,8 @@
 defmodule Skoller.EnrolledSchools do
+  @moduledoc """
+  Context module for enrolled schools.
+  """
+
   alias Skoller.Repo
   alias Skoller.Schools.School
   alias Skoller.Students
@@ -36,6 +40,7 @@ defmodule Skoller.EnrolledSchools do
     |> select([student, sc, class], %{student_id: student.id, school_id: class.school_id})
   end
 
+  # gets count of enrollment per school.
   defp get_school_enrollment_subquery() do
     from(s in subquery(get_student_schools_subquery()))
     |> group_by([s], s.school_id)

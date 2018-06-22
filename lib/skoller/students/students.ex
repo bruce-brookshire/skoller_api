@@ -31,12 +31,24 @@ defmodule Skoller.Students do
   @link_length 5
   @enrollment_limit 15
 
+  @doc """
+  Gets students in a class. Includes previously-enrolled students.
+
+  ## Returns
+  `[Skoller.Class.StudentClass]` or `[]`
+  """
   def get_students_by_class(class_id) do
     from(sc in StudentClass)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.all()
   end
 
+  @doc """
+  Gets a student class where the class is editable and the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `nil`
+  """
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
@@ -44,14 +56,35 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  @doc """
+  Gets a student class where the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `nil`
+  """
   def get_enrolled_class_by_ids(class_id, student_id) do
     Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
+  @doc """
+  Gets a student class where the student enrolled.
+
+  ## Returns
+  `Skoller.Class.StudentClass` or `Ecto.NoResultsError`
+  """
   def get_enrolled_class_by_ids!(class_id, student_id) do
     Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
   end
 
+  @doc """
+  Enrolls a student in a class.
+
+  ## Params
+   * %{"color" => color}, sets the student class color.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def enroll_in_class(student_id, class_id, params) do
     case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id) do
       nil ->
@@ -63,23 +96,48 @@ defmodule Skoller.Students do
     end
   end
 
+  @doc """
+  Updates an enrolled student in a class.
+
+  ## Params
+   * %{"color" => String}, sets the student class color.
+   * %{"is_notifications" => Boolean}, sets the notifications for this class for this student.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def update_enrolled_class(old_student_class, params) do
     old_student_class
     |> StudentClass.update_changeset(params)
     |> Repo.update()
   end
 
+  @doc """
+  Drops an enrolled student from a class.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def drop_enrolled_class(student_class) do
     student_class
     |> Ecto.Changeset.change(%{is_dropped: true})
     |> Repo.update()
   end
 
+  @doc """
+  Gets a count of enrolled students per class
+
+  ## Returns
+  `Integer`
+  """
   def get_enrollment_by_class_id(id) do
     from(sc in subquery(get_enrollment_by_class_id_subquery(id)))
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Subquery that gets enrolled students in a class
+  """
   def get_enrollment_by_class_id_subquery(id) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false and sc.class_id == ^id)
@@ -101,6 +159,9 @@ defmodule Skoller.Students do
     |> Repo.preload(:class)
   end
 
+  @doc """
+  Subquery for getting enrolled student classes by student.
+  """
   def get_enrolled_classes_by_student_id_subquery(student_id) do
     #TODO: Filter ClassPeriod
     from(sc in StudentClass)
@@ -125,11 +186,13 @@ defmodule Skoller.Students do
     |> Repo.aggregate(:count, :id)
   end
 
-  def get_student_subquery(_params \\ %{})
   @doc """
-  Returns a subquery that provides a list of `Skoller.Students.Student` by `Skoller.Schools.School`
+  Returns a subquery that provides a list of enrolled students
 
+  ## Params
+   * `%{"school_id" => school_id}`, filters on school.
   """
+  def get_student_subquery(_params \\ %{})
   def get_student_subquery(%{"school_id" => _school_id} = params) do
     from(s in Student)
     |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
@@ -137,10 +200,6 @@ defmodule Skoller.Students do
     |> where([s, sc], sc.is_dropped == false)
     |> distinct([s], s.id)
   end
-  @doc """
-  Returns a subquery that provides a list of `Skoller.Students.Student`
-
-  """
   def get_student_subquery(_params) do
     from(s in Student)
   end
@@ -165,15 +224,33 @@ defmodule Skoller.Students do
     |> distinct([sc], sc.class_id)
   end
 
-  def get_enrolled_class_with_syllabus_count(dates, params) do
+  @doc """
+  Get a count of classes with syllabi and at least one student between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+  * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  """
+  def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(Classes.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> join(:inner, [c, cs], d in subquery(Classes.classes_with_syllabus_subquery()), d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
-    |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
   end
 
+  @doc """
+  Un-reads an assignment for a student.
+
+  ## Returns
+  `[{:ok, Skoller.Class.StudentAssignment}]`
+  """
   def un_read_assignment(student_id, assignment_id) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
@@ -184,27 +261,20 @@ defmodule Skoller.Students do
   end
 
   @doc """
-   Shows all `Skoller.Schools.Class`. Can be used as a search with multiple filters.
+   Shows all `Skoller.Schools.Class` with enrollment. Can be used as a search with multiple filters.
 
   ## Filters:
   * school
     * `Skoller.Schools.School` :id
-  * professor.name
+  * professor_name
     * `Skoller.Professors.Professor` :name
-  * class.status
+  * class_status
     * `Skoller.Classes.Status` :id
     * For ghost classes, use 0.
-  * class.name
+  * class_name
     * `Skoller.Schools.Class` :name
-  * class.number
-    * `Skoller.Schools.Class` :number
-  * class.meet_days
+  * class_meet_days
     * `Skoller.Schools.Class` :meet_days
-  * class.length
-    * 1st Half
-    * 2nd Half
-    * Full Term
-    * Custom
 
   """
   def get_classes_with_enrollment(params) do
@@ -220,6 +290,17 @@ defmodule Skoller.Students do
     |> Repo.all()
   end
 
+  @doc """
+  Gets student assignments with relative weights for all completed, enrolled classes of `student_id`
+
+  ## Filters
+   * %{"class", class}, filter by class.
+   * %{"date", Date}, filter by due date.
+   * %{"is_complete", Boolean}, filter by completion.
+
+  ## Returns
+  `[%{Skoller.Class.StudentClass}]` with assignments and is_pending_mods or `[]`
+  """
   def get_student_assignments(student_id, filters) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in Class, class.id == sc.class_id)
@@ -232,6 +313,13 @@ defmodule Skoller.Students do
     |> get_student_assingment_filter(filters)
   end
 
+  @doc """
+  Gets a student assignment with relative weight by assignment id.
+
+  ## Returns
+  `[%{Skoller.Class.StudentClass}]` with assignments or `[]`
+  """
+  #TODO: make this and the one argument one, one function.
   def get_student_assignment_by_id(id, :weight) do
     from(sc in subquery(get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
@@ -244,6 +332,13 @@ defmodule Skoller.Students do
     |> Enum.filter(& to_string(&1.id) == id)
     |> List.first()
   end
+
+  @doc """
+  Gets a student assignment by id in an editable class.
+
+  ## Returns
+  `Skoller.Class.StudentAssignment` or `nil`
+  """
   def get_student_assignment_by_id(id) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
@@ -253,6 +348,15 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  @doc """
+  Gets the `num` most common notification times and timezone combos.
+
+  ## Params
+   * %{"school_id" => school_id}, filters by school.
+
+  ## Returns
+  `%{notification_time: Time, timezone: String, count: Integer}` or `[]`
+  """
   def get_common_notification_times(num, params) do
     from(s in Student)
     |> join(:inner, [s], sc in subquery(get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
@@ -265,6 +369,14 @@ defmodule Skoller.Students do
     |> Repo.all()
   end
 
+  @doc """
+  Gets communities with a count of students.
+
+  Communities are students with at least `threshold` enrolled students
+
+  ## Returns
+  `%{class_id: Id, count: Integer}`
+  """
   def get_communities(threshold \\ @community_threshold) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false)
@@ -273,7 +385,14 @@ defmodule Skoller.Students do
     |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 
+  @doc """
+  Creates a student assignment. Also creates a mod.
+
+  ## Returns
+  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  """
   def create_student_assignment(params) do
+    #Insert into assignments as from_mod as well.
     changeset = Assignment.student_changeset(%Assignment{}, params)
     |> Ecto.Changeset.change(%{from_mod: true})
     |> validate_class_weight()
@@ -285,6 +404,12 @@ defmodule Skoller.Students do
     |> Repo.transaction()
   end
 
+  @doc """
+  Updates a student assignment. Also creates a mod.
+
+  ## Returns
+  `{:ok, %{student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  """
   def update_student_assignment(old, params) do
     changeset = old
     |> StudentAssignment.changeset_update(params)
@@ -296,18 +421,35 @@ defmodule Skoller.Students do
     |> Repo.transaction()
   end
   
+  @doc """
+  Gets a student class from an enrollment link.
+
+  ## Returns
+  `Skoller.Class.StudentClass` with `:student` and `:class` loaded, or `Ecto.NoResultsError`
+  """
   def get_student_class_by_enrollment_link(link) do
     student_class_id = link |> String.split_at(@link_length) |> elem(1)
     Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
     |> Repo.preload([:student, :class])
   end
 
+  @doc """
+  Enroll in a class with a student link.
+
+  Similar to enroll_in_class/3
+  """
   def enroll_by_link(link, student_id, params) do
     sc = get_student_class_by_enrollment_link(link)
     params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
     enroll(student_id, sc.class_id, params, [enrolled_by: sc.id])
   end
 
+  @doc """
+  Adds a field of study to a student.
+
+  ## Returns
+  `{:ok, Skoller.Students.FieldOfStudy}` with `:student` loaded or `{:error, Ecto.Changeset}`
+  """
   def add_field_of_study(params) do
     changeset = StudentField.changeset(%StudentField{}, params)
     case changeset |> Repo.insert() do
@@ -316,33 +458,41 @@ defmodule Skoller.Students do
     end
   end
 
+  @doc """
+  Gets a student field of study by student id and field id.
+
+  ## Returns
+  `{:ok, Skoller.Students.FieldOfStudy}` or `Ecto.NoResultsError`
+  """
   def get_field_of_study_by_id!(student_id, field_of_study_id) do
     Repo.get_by!(StudentField, student_id: student_id, field_of_study_id: field_of_study_id)
   end
 
+  @doc """
+  Deletes a student field of study.
+
+  ## Returns
+  `{:ok, Skoller.Students.FieldOfStudy}` or `{:error, Ecto.Changeset}`
+  """
   def delete_field_of_study(field) do
     Repo.delete(field)
   end
 
+  @doc """
+  Deletes all student fields of study by student.
+  """
   def delete_fields_of_study_by_student_id(student_id) do
     from(sf in StudentField)
     |> where([sf], sf.student_id == ^student_id)
     |> Repo.delete_all()
   end
 
-  defp add_enrolled_by(%Ecto.Changeset{valid?: true} = changeset, opts) do
-    case opts |> List.keytake(:enrolled_by, 0) do
-      nil -> changeset
-      val -> 
-        val = val 
-        |> elem(0) 
-        |> elem(1)
+  @doc """
+  Generates an enrollment link for a student that does not have one yet.
 
-        changeset |> Ecto.Changeset.change(%{enrolled_by: val})
-    end
-  end
-  defp add_enrolled_by(changeset, _opts), do: changeset
-
+  ## Returns
+  `{:ok, Skoller.Students.Student}` or `{:error, Ecto.Changeset}` or `{:ok, nil}` if there is already a link.
+  """
   def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
     link = generate_link(id)
     
@@ -352,6 +502,12 @@ defmodule Skoller.Students do
   end
   def generate_student_link(_student), do: {:ok, nil}
 
+  @doc """
+  Generates an enrollment link for a student class that does not have one yet.
+
+  ## Returns
+  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  """
   def generate_enrollment_link(%StudentClass{id: id} = student_class) do
     link = generate_link(id)
 
@@ -377,6 +533,21 @@ defmodule Skoller.Students do
     |> Repo.all()
   end
 
+  # Adds enrolled_by id to a student enrolling by a link.
+  defp add_enrolled_by(%Ecto.Changeset{valid?: true} = changeset, opts) do
+    case opts |> List.keytake(:enrolled_by, 0) do
+      nil -> changeset
+      val -> 
+        val = val 
+        |> elem(0) 
+        |> elem(1)
+
+        changeset |> Ecto.Changeset.change(%{enrolled_by: val})
+    end
+  end
+  defp add_enrolled_by(changeset, _opts), do: changeset
+
+  # Generates a link with @link_length random characters, with the id appended.
   defp generate_link(id) do
     @link_length
     |> :crypto.strong_rand_bytes() 
@@ -467,6 +638,7 @@ defmodule Skoller.Students do
     end
   end
 
+  # Makes sure the weight is actually a part of the class.
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
     class_id = changeset |> get_class_id_from_student_assignment_changeset()
@@ -477,6 +649,7 @@ defmodule Skoller.Students do
   end
   defp validate_class_weight(changeset), do: changeset
 
+  # Gets a class id from a student assignment.
   defp get_class_id_from_student_assignment_changeset(changeset) do
     case changeset |> Ecto.Changeset.get_field(:student_class_id) do
       nil -> changeset |> Ecto.Changeset.get_field(:class_id)
@@ -492,6 +665,7 @@ defmodule Skoller.Students do
   end
   defp auto_approve_mods(_params), do: {:ok, nil}
 
+  # Adds all non added public mods to a student enrolling in a class or re-enrolling..
   defp add_public_mods(%{student_class: student_class}) do
     mods = from(mod in Mod)
     |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
@@ -557,7 +731,6 @@ defmodule Skoller.Students do
     |> ghost_filter(params)
     |> maint_filter(params)
     |> name_filter(params)
-    |> number_filter(params)
     |> day_filter(params)
   end
 
@@ -628,16 +801,6 @@ defmodule Skoller.Students do
   end
   defp name_filter(dynamic, _), do: dynamic
 
-  defp number_filter(dynamic, %{"class_number" => filter, "or" => "true"}) do
-    number_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.number, ^number_filter) or ^dynamic)
-  end
-  defp number_filter(dynamic, %{"class_number" => filter}) do
-    number_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.number, ^number_filter) and ^dynamic)
-  end
-  defp number_filter(dynamic, _), do: dynamic
-
   defp day_filter(dynamic, %{"class_meet_days" => filter, "or" => "true"}) do
     dynamic([class, period, prof], class.meet_days == ^filter or ^dynamic)
   end
@@ -646,6 +809,7 @@ defmodule Skoller.Students do
   end
   defp day_filter(dynamic, _), do: dynamic
 
+  # Gets the count of students enrolled in a class.
   defp count_subquery() do
     from(c in Class)
     |> join(:left, [c], sc in StudentClass, c.id == sc.class_id)
@@ -659,6 +823,7 @@ defmodule Skoller.Students do
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 
+  # Makes sure students have less than @enrollment_limit classes.
   defp check_enrollment_limit(%Ecto.Changeset{valid?: true} = changeset, student_id) do
     class_count = from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> Repo.aggregate(:count, :id)
