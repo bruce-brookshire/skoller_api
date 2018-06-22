@@ -43,6 +43,9 @@ defmodule Skoller.Syllabi do
     end
   end
 
+  @doc """
+  Subquery that gets a list of classes where syllabus workers are allowed to work on them.
+  """
   def get_servable_classes_subquery() do
     subq = Settings.get_setting_by_name!(@syllabus_processing_setting).value
     |> generate_servable_schools_subquery()
@@ -52,6 +55,9 @@ defmodule Skoller.Syllabi do
     |> join(:inner, [class, period], sch in subquery(subq), sch.id == period.school_id)
   end
 
+  # This function takes in the current admin setting as the parameter.
+  # If it is true, it needs to find a list of schools overriding it to false.
+  # If it is false, it gets a list of schools overriding it to true.
   defp generate_servable_schools_subquery("true") do
     exclude_list = get_syllabus_overrides_subquery(false)
     |> Repo.all()
@@ -69,6 +75,7 @@ defmodule Skoller.Syllabi do
     |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
+  # TODO: this can probably get moved to Skoller.Locks
   defp lock_class(%{id: id}, user, nil) do
     Locks.lock_class(id, user.id)
   end
@@ -77,6 +84,7 @@ defmodule Skoller.Syllabi do
   end
   defp lock_class(class, _conn, _type), do: class
 
+  # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
   defp get_class(workers, lock_type, status_type) do
     case workers |> find_class(lock_type, status_type, [enrolled: true]) do
       nil -> workers |> find_class(lock_type, status_type, [])
@@ -84,6 +92,8 @@ defmodule Skoller.Syllabi do
     end
   end
 
+  # This gets a ratio of workers to avaliable classes at each school, finds the school with the most need,
+  # and then gets the oldest class at the school.
   defp find_class(workers, lock_type, status_type, opts) do
     status_type
     |> get_ratios(opts)
@@ -91,6 +101,7 @@ defmodule Skoller.Syllabi do
     |> get_oldest(status_type, lock_type, opts)
   end
 
+  # Gets the oldest class at a school with the params below.
   defp get_oldest(school_id, status, type, opts) do
     t = get_oldest_class_by_school(type, status, school_id, opts)
     Logger.info("Get oldest")
@@ -98,6 +109,8 @@ defmodule Skoller.Syllabi do
     t
   end
 
+  # This gets the oldest class at a school.
+  # The class must have a doc, must not be locked, must be editable.
   defp get_oldest_class_by_school(lock_type, class_status, school_id, opts) do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
@@ -120,6 +133,8 @@ defmodule Skoller.Syllabi do
     |> select([d], %{inserted_at: min(d.inserted_at), class_id: d.class_id})
   end
 
+  # Gets a list of classes that are valid for a syllabus worker to work.
+  # Must have a doc, be editable, and be set to have a syllabus.
   defp get_processable_classes(status_id, opts) do
     from(class in subquery(get_servable_classes_subquery()))
     |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
@@ -133,6 +148,7 @@ defmodule Skoller.Syllabi do
     |> Repo.all()
   end
 
+  # Gets a ratio of school_classes : total_classes for all schools.
   defp get_ratios(status, opts) do
     t = get_processable_classes(status, opts)
     |> get_enum_ratio()
@@ -141,9 +157,7 @@ defmodule Skoller.Syllabi do
     t
   end
 
-  #select count(p.school_id), p.school_id from public.class_locks l inner join public.classes c 
-  #on l.class_id = c.id inner join public.class_periods p on c.class_period_id = p.id where 
-  #l.class_lock_section_id = 100 and l.is_completed = false group by p.school_id;
+  # Gets a ratio of currently working users per school over total workers.
   defp get_workers(type) do
     t = from(lock in Lock)
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
@@ -159,6 +173,8 @@ defmodule Skoller.Syllabi do
     t
   end
 
+  # Takes in an enum where each element has a count, and returns
+  # the enum with a :ratio field.
   defp get_enum_ratio(enumerable) do
     sum = enumerable |> Enum.reduce(0, & &1.count + &2)
     
@@ -172,6 +188,7 @@ defmodule Skoller.Syllabi do
     |> Repo.all()
   end
 
+  # If opts are passed in with enrolled: true, then add a join to only get enrolled classes.
   defp enrolled_classes(query, []), do: query
   defp enrolled_classes(query, opts) do
     case opts |> List.keytake(:enrolled, 0) |> elem(0) do
@@ -213,7 +230,7 @@ defmodule Skoller.Syllabi do
     query |> where([lock], lock.class_lock_section_id == ^type)
   end
 
-  # needed structure is [%{count: 544, ratio: 1.0, school_id: 1}] or similar.
+  # Finds the biggest need in schools.
   defp biggest_difference(needed, workers) do
     needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
     max = needed |> Enum.reduce(%{need: 0, school: 0}, &
