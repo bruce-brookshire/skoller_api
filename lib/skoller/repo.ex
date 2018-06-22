@@ -1,4 +1,7 @@
 defmodule Skoller.Repo do
+  @moduledoc """
+  The Skoller Repository.
+  """
   use Ecto.Repo, otp_app: :skoller
 
   @doc """

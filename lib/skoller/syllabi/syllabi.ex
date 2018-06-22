@@ -1,4 +1,7 @@
 defmodule Skoller.Syllabi do
+  @moduledoc """
+  The Syllabi context module.
+  """
 
   alias Skoller.Repo
   alias Skoller.Classes
