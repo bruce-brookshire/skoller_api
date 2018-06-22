@@ -19,6 +19,19 @@ defmodule Skoller.Syllabi do
 
   @syllabus_processing_setting "is_auto_syllabus"
   
+  @doc """
+  Serves a class to a syllabus worker.
+
+  ## Notes
+   * The class will be the oldest enrolled class in the most underserved school,
+   followed by the oldest class in the most underserved school.
+   * The class will be locked for the worker.
+   * If the worker has a lock already, that will be served to them until abandoned.
+
+  ## Params
+   * The default is to serve a class regardless of status or lock.
+   * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
+  """
   def serve_class(user, lock_type \\ nil, status_type \\ nil) do
     case find_existing_lock(user, lock_type) do
       [] -> 
