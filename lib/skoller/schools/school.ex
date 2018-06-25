@@ -38,6 +38,7 @@ defmodule Skoller.Schools.School do
     school
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> unique_constraint(:school, name: :unique_school_index)
   end
 
   def changeset_update(%School{} = school, attrs) do
