@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Doc
