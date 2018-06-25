@@ -46,6 +46,7 @@ defmodule Skoller.Schools.School do
     |> cast(attrs, @upd_fields)
     |> validate_required(@req_fields)
     |> validate_editable()
+    |> unique_constraint(:school, name: :unique_school_index)
   end
 
   defp readonly(changeset, false), do: changeset
