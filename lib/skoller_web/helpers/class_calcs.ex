@@ -3,9 +3,9 @@ defmodule SkollerWeb.Helpers.ClassCalcs do
   alias Skoller.Repo
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Class.StudentClass
-  alias SkollerWeb.Helpers.AssignmentHelper
+  alias Skoller.StudentAssignments
 
   import Ecto.Query
 
@@ -43,7 +43,7 @@ defmodule SkollerWeb.Helpers.ClassCalcs do
     assign_weights = get_relative_weight(params)
 
     params
-    |> AssignmentHelper.get_assignments()
+    |> StudentAssignments.get_assignments()
     |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
   end
 

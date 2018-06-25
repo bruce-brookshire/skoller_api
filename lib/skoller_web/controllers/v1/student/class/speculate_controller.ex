@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Class.SpeculationView
   alias Skoller.Students

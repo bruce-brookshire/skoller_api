@@ -14,8 +14,7 @@ defmodule Skoller.Students do
   alias Skoller.Schools.ClassPeriod
   alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
-  alias Skoller.Class.StudentAssignment
-  alias SkollerWeb.Helpers.AssignmentHelper
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Assignments.Mods
@@ -24,6 +23,7 @@ defmodule Skoller.Students do
   alias Skoller.Class.Weight
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias Skoller.StudentAssignments
 
   import Ecto.Query
 
@@ -249,7 +249,7 @@ defmodule Skoller.Students do
   Un-reads an assignment for a student.
 
   ## Returns
-  `[{:ok, Skoller.Class.StudentAssignment}]`
+  `[{:ok, Skoller.StudentAssignments.StudentAssignment}]`
   """
   def un_read_assignment(student_id, assignment_id) do
     from(sa in StudentAssignment)
@@ -337,7 +337,7 @@ defmodule Skoller.Students do
   Gets a student assignment by id in an editable class.
 
   ## Returns
-  `Skoller.Class.StudentAssignment` or `nil`
+  `Skoller.StudentAssignments.StudentAssignment` or `nil`
   """
   def get_student_assignment_by_id(id) do
     from(sa in StudentAssignment)
@@ -389,7 +389,7 @@ defmodule Skoller.Students do
   Creates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
   """
   def create_student_assignment(params) do
     #Insert into assignments as from_mod as well.
@@ -408,7 +408,7 @@ defmodule Skoller.Students do
   Updates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{student_assignment: Skoller.Class.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
   """
   def update_student_assignment(old, params) do
     changeset = old
@@ -854,7 +854,7 @@ defmodule Skoller.Students do
     |> Ecto.Multi.insert(:student_class, changeset)
     |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
     |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
-    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
     

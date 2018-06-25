@@ -3,7 +3,7 @@ defmodule Skoller.Class.StudentClass do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Class.StudentClass
   alias Skoller.Schools.Class
   alias Skoller.Students.Student

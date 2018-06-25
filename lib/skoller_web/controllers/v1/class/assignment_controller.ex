@@ -7,8 +7,8 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   alias Skoller.Class.Weight
   alias Skoller.Repo
   alias SkollerWeb.AssignmentView
-  alias SkollerWeb.Helpers.AssignmentHelper
   alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.StudentAssignments
 
   import SkollerWeb.Helpers.AuthPlug
   import SkollerWeb.Helpers.LockPlug
@@ -35,7 +35,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.insert_student_assignments(&1))
+    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{assignment: assignment}} ->
@@ -47,7 +47,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    assignments = AssignmentHelper.get_assignments(%{class_id: class_id})
+    assignments = StudentAssignments.get_assignments(%{class_id: class_id})
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
 
@@ -75,7 +75,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.update(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &AssignmentHelper.update_student_assignments(&1))
+    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.update_assignments(&1))
 
     case Repo.transaction(multi) do
       {:ok, %{assignment: assignment}} ->

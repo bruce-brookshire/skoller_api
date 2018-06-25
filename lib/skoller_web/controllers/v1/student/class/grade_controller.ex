@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias Skoller.Students

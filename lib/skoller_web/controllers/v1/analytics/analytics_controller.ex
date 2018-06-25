@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Students
   alias Skoller.Classes
   alias Skoller.Chats

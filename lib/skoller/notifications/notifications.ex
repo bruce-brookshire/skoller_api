@@ -9,7 +9,7 @@ defmodule Skoller.Notifications do
   alias Skoller.Devices.Device
   alias Skoller.Classes
   alias Skoller.Students
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Class.StudentClass
   alias Skoller.Class.Assignment
   alias Skoller.Chat.Post.Star, as: PostStar

@@ -1,40 +1,49 @@
-defmodule SkollerWeb.Helpers.AssignmentHelper do
-  
+defmodule Skoller.StudentAssignments do
+  @moduledoc """
+  The context module for student assignments.
+  """
+
   alias Skoller.Repo
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Class.StudentClass
   alias Skoller.Class.Assignment
+  alias Skoller.Students
 
   import Ecto.Query
 
-  @moduledoc """
-  
-  Contains helper functions for inserting student assignments on enroll and assignment creation.
+  def get_assignment_by_ids(assignment_id, student_class_id) do
+    Repo.get_by(StudentAssignment, assignment_id: assignment_id, student_class_id: student_class_id)
+  end
 
-  """
-
-  def insert_student_assignments(%{student_class: %StudentClass{} = student_class}) do
-    assignments = get_assignments(%{class_id: student_class.class_id})
-    case assignments do
+  def insert_assignments(%{student_class: %StudentClass{} = student_class}) do
+    case get_assignments(%{class_id: student_class.class_id}) do
       [] -> {:ok, nil}
-      _ -> convert_and_insert(assignments, student_class)
+      assignments -> convert_and_insert(assignments, student_class)
     end
   end
 
-  def insert_student_assignments(%{assignment: %Assignment{} = assignment}) do
-    students = get_students(%{class_id: assignment.class_id})
-    case students do
+  def insert_assignments(%{assignment: %Assignment{} = assignment}) do
+    case Students.get_students_by_class(assignment.class_id) do
       [] -> {:ok, nil}
-      _ -> convert_and_insert(assignment, students)
+      students -> convert_and_insert(assignment, students)
     end
   end
 
-  def update_student_assignments(%{assignment: %Assignment{} = assignment}) do
-    students = get_students(%{class_id: assignment.class_id})
-    case students do
+  def update_assignments(%{assignment: %Assignment{} = assignment}) do
+    case Students.get_students_by_class(assignment.class_id) do
       [] -> {:ok, nil}
-      _ -> convert_and_update(assignment, students)
+      students -> convert_and_update(assignment, students)
     end
+  end
+
+  def convert_assignment(%Assignment{} = assign, %StudentClass{id: id}) do
+    %StudentAssignment{
+      name: assign.name,
+      weight_id: assign.weight_id,
+      assignment_id: assign.id,
+      student_class_id: id,
+      due: assign.due
+    }
   end
 
   def get_assignments(%StudentClass{id: id}) do
@@ -59,30 +68,14 @@ defmodule SkollerWeb.Helpers.AssignmentHelper do
     |> Repo.all()
   end
 
-  def convert_assignment(%Assignment{} = assign, %StudentClass{id: id}) do
-    %StudentAssignment{
-      name: assign.name,
-      weight_id: assign.weight_id,
-      assignment_id: assign.id,
-      student_class_id: id,
-      due: assign.due
-    }
-  end
-
-  defp get_students(%{class_id: class_id}) do
-    Repo.all(from sc in StudentClass, where: sc.class_id == ^class_id)
-  end
-
   defp convert_and_insert(assignment, student_class) do
     assignment
     |> convert_assignments(student_class)
-    |> insert_assignments()
+    |> insert()
 
-    inserted = get_inserted(student_class, assignment)
-
-    case inserted do
+    case get_inserted(student_class, assignment) do
       [] -> {:error, %{student_class: "Student Assignments not inserted"}}
-      _ -> {:ok, inserted}
+      inserted -> {:ok, inserted}
     end
   end
 
@@ -91,11 +84,9 @@ defmodule SkollerWeb.Helpers.AssignmentHelper do
     |> convert_assignments(student_class)
     |> Enum.each(&update_assignment(&1))
 
-    updated = get_inserted(student_class, assignment)
-
-    case updated do
+    case get_inserted(student_class, assignment) do
       [] -> {:error, %{student_class: "Student Assignments not updated"}}
-      _ -> {:ok, updated}
+      updated -> {:ok, updated}
     end
   end
 
@@ -109,26 +100,26 @@ defmodule SkollerWeb.Helpers.AssignmentHelper do
     |> get_assignments
   end
 
-  defp insert_assignments(enumerable) do
-    enumerable
-    |> Enum.each(&Repo.insert!(&1))
-  end
-
-  defp update_assignment(student_assignment) do
-    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
-      nil -> :ok
-      assign_old -> StudentAssignment.changeset_update_auto(assign_old, %{name: student_assignment.name,
-                                                                      weight_id: student_assignment.weight_id,
-                                                                      due: student_assignment.due}) 
-                    |> Repo.update
-    end
-  end
-
   defp convert_assignments(enumerable, %StudentClass{} = student_class) do
     enumerable |> Enum.map(&convert_assignment(&1, student_class))
   end
 
   defp convert_assignments(%Assignment{} = assign, enumerable) do
     enumerable |> Enum.map(&convert_assignment(assign, &1))
+  end
+
+  defp insert(enumerable) do
+    enumerable
+    |> Enum.each(&Repo.insert!(&1))
+  end
+
+  defp update_assignment(student_assignment) do
+    case get_assignment_by_ids(student_assignment.assignment_id, student_assignment.student_assignment_id) do
+      nil -> :ok
+      assign_old -> StudentAssignment.changeset_update_auto(assign_old, %{name: student_assignment.name,
+                                                                      weight_id: student_assignment.weight_id,
+                                                                      due: student_assignment.due}) 
+                    |> Repo.update
+    end
   end
 end
