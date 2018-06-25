@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.User.RoleController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.UserRole

@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Assignment.ModController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Assignments.Mods

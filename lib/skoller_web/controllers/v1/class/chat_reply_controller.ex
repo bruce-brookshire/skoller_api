@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo

@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.DeviceController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Devices

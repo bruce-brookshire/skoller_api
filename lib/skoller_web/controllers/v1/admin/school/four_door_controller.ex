@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.School.FourDoorController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.FourDoor

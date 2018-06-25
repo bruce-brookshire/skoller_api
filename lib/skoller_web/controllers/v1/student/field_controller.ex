@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.FieldController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Students

@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.SammiController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   import SkollerWeb.Helpers.AuthPlug

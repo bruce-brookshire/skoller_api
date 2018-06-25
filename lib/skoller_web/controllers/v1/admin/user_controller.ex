@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.UserController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.UserView

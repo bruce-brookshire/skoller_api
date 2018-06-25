@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.SyllabusWorkerController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.ClassView

@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.ChatController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.ChatPostView

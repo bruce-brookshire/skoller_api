@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.Class.ModController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Helpers.ModHelper

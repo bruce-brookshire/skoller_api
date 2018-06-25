@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.AssignmentController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Assignment

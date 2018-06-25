@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Repo

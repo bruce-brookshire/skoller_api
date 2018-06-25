@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.ClassController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   @moduledoc """

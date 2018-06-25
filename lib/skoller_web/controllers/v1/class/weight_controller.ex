@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.WeightController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Weight

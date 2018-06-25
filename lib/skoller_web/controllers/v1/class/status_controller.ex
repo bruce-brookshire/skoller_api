@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.StatusController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StatusView

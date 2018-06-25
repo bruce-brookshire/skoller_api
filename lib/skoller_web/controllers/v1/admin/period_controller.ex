@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.PeriodController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Schools.ClassPeriod

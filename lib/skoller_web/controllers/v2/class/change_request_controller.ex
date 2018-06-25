@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V2.Class.ChangeRequestController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Class.ChangeRequest

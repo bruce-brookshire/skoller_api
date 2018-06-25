@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.ClassController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StudentClassView
