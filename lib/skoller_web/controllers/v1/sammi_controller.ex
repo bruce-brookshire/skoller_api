@@ -15,4 +15,9 @@ defmodule SkollerWeb.Api.V1.SammiController do
       :error -> conn |> send_resp(503, "")
     end
   end
+
+  def train(conn, _params) do
+    Task.start(Api, :train, [])
+    conn |> send_resp(204, "")
+  end
 end

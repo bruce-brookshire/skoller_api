@@ -9,6 +9,9 @@ defmodule Sammi do
   def process_response_body(body) do
     require Logger
     Logger.info(inspect(body))
-    body |> Poison.decode!()
+    case body |> Poison.decode() do
+      {:ok, decode} -> {:ok, decode}
+      {:error, _error} -> {:error, body}
+    end
   end
 end
