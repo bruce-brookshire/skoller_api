@@ -7,6 +7,8 @@ defmodule Sammi do
 
   def process_response_body(""), do: ""
   def process_response_body(body) do
+    require Logger
+    Logger.info(inspect(body))
     body |> Poison.decode!()
   end
 end
