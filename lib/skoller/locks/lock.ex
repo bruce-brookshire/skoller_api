@@ -1,4 +1,5 @@
 defmodule Skoller.Locks.Lock do
+  @moduledoc false
 
   # @weight_lock 100
   # @assignment_lock 200

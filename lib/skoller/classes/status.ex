@@ -1,12 +1,5 @@
 defmodule Skoller.Classes.Status do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class_statuses
-
-  The primary key is not seeded.
-
-  """
+  @moduledoc false
 
   # @syllabus_status 200
   # @weight_status 300
@@ -20,6 +13,8 @@ defmodule Skoller.Classes.Status do
   import Ecto.Changeset
   alias Skoller.Classes.Status
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "class_statuses" do
     field :is_complete, :boolean, default: false

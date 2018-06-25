@@ -1,10 +1,5 @@
 defmodule Skoller.Professors.Professor do
-
-  @moduledoc """
-  
-  Changeset and schema for professors.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

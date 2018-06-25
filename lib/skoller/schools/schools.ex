@@ -7,6 +7,7 @@ defmodule Skoller.Schools do
   alias Skoller.Schools.School
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Timezone
+  alias Skoller.FourDoor
 
   import Ecto.Query
 
@@ -14,35 +15,41 @@ defmodule Skoller.Schools do
     Creates a `Skoller.Schools.School`
   """
   def create_school(params) do
-    {:ok, timezone} = Timezone.get_timezone(params["adr_locality"], params["adr_country"], params["adr_region"])
+    {:ok, timezone} = get_timezone(params)
     %School{}
     |> School.changeset_insert(params)
     |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.insert()
+    |> add_four_door()
   end
 
   @doc """
     Gets a `Skoller.Schools.School` by id
   """
   def get_school_by_id!(id) do
-    Repo.get!(School, id)
+    school = Repo.get!(School, id)
+    {:ok, school} = add_four_door({:ok, school})
+    school
   end
 
   def update_school(school_old, params) do
     school_old
     |> School.changeset_update(params)
     |> Repo.update()
+    |> add_four_door()
   end
 
   @doc """
     Gets a `Skoller.Schools.School` from a `Skoller.Schools.ClassPeriod`
   """
   def get_school_from_period(class_period_id) do
-    from(cp in ClassPeriod)
+    school = from(cp in ClassPeriod)
     |> join(:inner, [cp], s in School, s.id == cp.school_id)
     |> where([cp], cp.id == ^class_period_id)
     |> select([cp, s], s)
     |> Repo.one()
+    {:ok, school} = add_four_door({:ok, school})
+    school
   end
 
   @doc """
@@ -57,6 +64,24 @@ defmodule Skoller.Schools do
     |> filter(filters)
     |> Repo.all()
   end
+
+  # There are two of these, one for string maps and one for atom maps.
+  defp get_timezone(%{adr_locality: loc, adr_country: country, adr_region: region}) do
+    call_timezone(loc, country, region)
+  end
+  defp get_timezone(%{"adr_locality" => loc, "adr_country" => country, "adr_region" => region}) do
+    call_timezone(loc, country, region)
+  end
+  defp get_timezone(_params), do: {:ok, nil}
+
+  defp call_timezone(loc, country, region) do
+    Timezone.get_timezone(loc, country, region)
+  end
+
+  defp add_four_door({:ok, school}) do
+    {:ok, FourDoor.get_four_door_by_school(school.id) |> Map.merge(school)}
+  end
+  defp add_four_door({:error, _school} = response), do: response
 
   defp filter(query, params) do
     query

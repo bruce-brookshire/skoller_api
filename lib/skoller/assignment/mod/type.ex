@@ -1,15 +1,12 @@
 defmodule Skoller.Assignment.Mod.Type do
-
-  @moduledoc """
-  
-  Schema and changeset for mod types.
-  
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignment.Mod.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "assignment_mod_types" do
     field :name, :string

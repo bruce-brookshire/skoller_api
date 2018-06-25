@@ -1,10 +1,16 @@
 defmodule Skoller.Mailer do
+  @moduledoc """
+  Module for sending emails using `Bamboo.Mailer`
+  """
   use Bamboo.Mailer, otp_app: :skoller
 
   @divider "--"
   @skoller "The Skoller Team"
   @logo_url "https://www.skoller.co/src/assets/images/logo-wide-blue@1x.png"
 
+  @doc """
+  A default signature to use on Skoller emails.
+  """
   def signature() do
     "<h3 style='margin-bottom: 0'>" <> @divider <> "</h3>" <> 
     "<h3 style='margin: 0'>" <> @skoller <> "</h3>" <>
@@ -12,6 +18,9 @@ defmodule Skoller.Mailer do
     "<img src=" <> @logo_url <> " alt = logo style='width: 120px'></a>"
   end
 
+  @doc """
+  A default alternate signature to use on Skoller emails.
+  """
   def text_signature() do
     @divider <> "\n" <>
     @skoller

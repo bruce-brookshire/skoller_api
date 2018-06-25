@@ -1,15 +1,12 @@
 defmodule Skoller.Class.Change.Type do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class change types.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Class.Change.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "class_change_types" do
     field :name, :string

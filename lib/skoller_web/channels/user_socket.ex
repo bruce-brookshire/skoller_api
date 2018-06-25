@@ -1,4 +1,7 @@
 defmodule SkollerWeb.UserSocket do
+  @moduledoc """
+  Defines a websocket for Skoller. Runs authentication on the user when joining.
+  """
   use Phoenix.Socket
 
   alias SkollerWeb.Helpers.AuthPlug

@@ -1,17 +1,12 @@
 defmodule Skoller.Role do
-
-  @moduledoc """
-  
-  Defines schema and changeset for roles.
-
-  The primary key is not seeded.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Role
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "roles" do
     field :name, :string

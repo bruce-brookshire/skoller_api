@@ -1,10 +1,5 @@
 defmodule Skoller.FieldsOfStudy.FieldOfStudy do
-
-  @moduledoc """
-  
-  Schema and changeset for fields_of_study
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset

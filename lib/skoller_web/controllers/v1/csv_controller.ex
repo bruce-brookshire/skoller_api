@@ -9,12 +9,14 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
+  alias Skoller.Periods
   
   import SkollerWeb.Helpers.AuthPlug
   
   @admin_role 200
-  @headers [:campus, :class_type, :number, :crn, :meet_days, :meet_end_time, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
-  
+  @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
+  @school_headers [:name, :adr_locality, :adr_region, :period_name]
+
   plug :verify_role, %{role: @admin_role}
 
   def fos(conn, %{"file" => file}) do
@@ -62,6 +64,32 @@ defmodule SkollerWeb.Api.V1.CSVController do
     end
   end
 
+  def school(conn, %{"file" => file}) do
+    uploads = file.path 
+    |> File.stream!()
+    |> CSV.decode(headers: @school_headers)
+    |> Enum.map(&process_school_row(&1))
+
+    conn |> render(CSVView, "index.json", csv: uploads)
+  end
+
+  defp process_school_row(school) do
+    case school do
+      {:ok, school} ->
+        school = school |> Map.put(:adr_country, "us")
+        new_school = Schools.create_school(school)
+        new_school |> create_period(school)
+        new_school
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp create_period({:ok, school}, params) do
+    Periods.create_period(%{"school_id" => school.id, "name" => params.period_name})
+  end
+  defp create_period({:error, _school}, _params), do: {:ok, nil}
+
   defp process_class_row(class, period_id) do
     case class do
       {:ok, class} ->
@@ -82,10 +110,10 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   defp process_professor(%{prof_name_first: name_first, prof_name_last: name_last, class_period_id: class_period_id}) do
-    school_id = Schools.get_school_from_period(class_period_id)
-    case Professors.get_professor_by_name(name_first, name_last, school_id) do
+    school = Schools.get_school_from_period(class_period_id)
+    case Professors.get_professor_by_name(name_first, name_last, school.id) do
       nil -> 
-        Professors.create_professor(%{name_first: name_first, name_last: name_last, school_id: school_id})
+        Professors.create_professor(%{name_first: name_first, name_last: name_last, school_id: school.id})
       prof ->
         {:ok, prof}
     end

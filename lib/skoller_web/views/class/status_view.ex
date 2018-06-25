@@ -28,7 +28,8 @@ defmodule SkollerWeb.Class.StatusView do
   def render("status.json", %{status: status}) do
     %{
       id: status.id,
-      name: status.name
+      name: status.name,
+      is_complete: status.is_complete
     }
   end
 end

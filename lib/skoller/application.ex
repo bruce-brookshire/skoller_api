@@ -1,9 +1,6 @@
 defmodule Skoller.Application do
-
   @moduledoc """
-  
-  Skoller startup.
-
+  The Application entrypoint for Skoller.
   """
 
   use Application

@@ -1,12 +1,5 @@
 defmodule Skoller.Users.User do
-
-  @moduledoc """
-  
-  Defines changeset and schema for users.
-  
-  Email will be validated against school email domains if the user is a student.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -48,18 +41,6 @@ defmodule Skoller.Users.User do
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
-    |> put_pass_hash()
-  end
-
-  @doc false
-  def changeset_insert_university(%User{} = user, attrs) do
-    user
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-    |> update_change(:email, &String.downcase(&1))
-    |> unique_constraint(:email)
-    |> cast_assoc(:student)
-    |> validate_format(:email, ~r/@.+\.edu$/)
     |> put_pass_hash()
   end
 

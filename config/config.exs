@@ -22,18 +22,22 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+# This is for file uploads.
 config :arc,
   storage: Arc.Storage.S3,
   bucket: {:system, "AWS_S3_BUCKET"}
 
+#this is for AWS access
 config :ex_aws,
   access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
   secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
 
+#this is for texting
 config :ex_twilio, 
   account_sid: {:system, "TWILIO_ACCT_SID"},
   auth_token: {:system, "TWILIO_AUTH"}
 
+#this is for apple notifications
 config :pigeon, :apns,
   apns_default: %{
     cert: {:skoller, "apns/cert.pem"},
@@ -41,6 +45,7 @@ config :pigeon, :apns,
     mode: :dev
   }
 
+#this is for local email
 config :skoller, Skoller.Mailer,
   adapter: Bamboo.LocalAdapter
 

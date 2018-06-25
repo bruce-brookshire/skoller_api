@@ -1,4 +1,6 @@
 defmodule Skoller.Chat.Post do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Post

@@ -1,4 +1,6 @@
 defmodule Skoller.CustomSignups.Signup do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.CustomSignups.Signup

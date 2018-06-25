@@ -6,9 +6,9 @@ defmodule Skoller.Admin.Users do
   alias Skoller.Repo
   alias Skoller.Users.User
   alias Skoller.UserRole
-  alias Skoller.Students
   alias Skoller.Students.Student
   alias Skoller.Users.Report
+  alias Skoller.EnrolledSchools
 
   import Ecto.Query
 
@@ -41,7 +41,7 @@ defmodule Skoller.Admin.Users do
     from(user in User)
     |> join(:inner, [user], role in UserRole, role.user_id == user.id)
     |> join(:left, [user, role], student in Student, student.id == user.student_id)
-    |> join(:left, [user, role, student], ss in subquery(Students.get_schools_for_student_subquery()), ss.student_id == student.id)
+    |> join(:left, [user, role, student], ss in subquery(EnrolledSchools.get_student_schools_subquery()), ss.student_id == student.id)
     |> where([user, role, student, ss], ^filters(params))
     |> distinct([user], user.id)
     |> select([user, role, student], %{user: user, student: student})
@@ -49,17 +49,35 @@ defmodule Skoller.Admin.Users do
     |> Enum.map(&Map.put(&1, :user, &1.user |> Repo.preload([:roles])))
   end
   
+  @doc """
+  Gets a user by id with `:roles`, `:student`, and `:reports` loaded.
+
+  ## Returns
+  `Skoller.Users.User` or `Ecto.NoResultsError`
+  """
   def get_user_by_id!(id) do
     Repo.get!(User, id)
     |> Repo.preload([:roles, :student, :reports])
   end
 
+  @doc """
+  Marks a report as complete (i.e. read and action taken)
+
+  ## Returns
+  `{:ok, Skoller.Users.Report}` or `{:error, Ecto.Changeset}`
+  """
   def complete_report(id) do
     Repo.get!(Report, id)
     |> Ecto.Changeset.change(%{is_complete: true})
     |> Repo.update()
   end
 
+  @doc """
+  Gets a list of reports that have not been completed
+
+  ## Returns
+  `[Skoller.Users.Report]` or `[]`
+  """
   def get_incomplete_reports() do
     from(r in Report)
     |> where([r], r.is_complete == false)

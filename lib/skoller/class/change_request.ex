@@ -1,4 +1,6 @@
 defmodule Skoller.Class.ChangeRequest do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -6,12 +8,6 @@ defmodule Skoller.Class.ChangeRequest do
   alias Skoller.Schools.Class
   alias Skoller.Class.Change.Type
   alias Skoller.Users.User
-
-  @moduledoc """
-  
-  Schema and changeset for class change requests.
-
-  """
 
   schema "class_change_requests" do
     field :is_completed, :boolean, default: false

@@ -1,8 +1,9 @@
 defmodule Skoller.Chat.Post.Star do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Chat.Post.Star
-
 
   schema "chat_post_stars" do
     field :chat_post_id, :id

@@ -1,15 +1,12 @@
 defmodule Skoller.Class.Help.Type do
-
-  @moduledoc """
-  
-  Defines schema and changeset for class help types.
-
-  """
+  @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Class.Help.Type
 
+  # The primary key is a normal, non-incrementing ID. Seeded by seed
+  # file or migration.
   @primary_key {:id, :id, []}
   schema "class_help_types" do
     field :name, :string

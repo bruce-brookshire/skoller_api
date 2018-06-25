@@ -43,6 +43,12 @@ defmodule SkollerWeb.Router do
     end
 
     scope "/v1", V1, as: :v1 do
+      post "/schools/csv", CSVController, :school
+
+      get "/four-door/overrides", Admin.School.FourDoorController, :index
+      get "/four-door", Admin.FourDoorController, :index
+      put "/four-door", Admin.FourDoorController, :update
+
       get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
 
       post "/enrollment-link/:token", Student.ClassController, :link
@@ -86,6 +92,9 @@ defmodule SkollerWeb.Router do
       get "/school/list", SchoolController, :index
       resources "/schools", SchoolController, only: [:create]
       resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
+
+        post "/four-door", Admin.School.FourDoorController, :school
+        delete "/four-door", Admin.School.FourDoorController, :delete
 
         # School Professor routes
         resources "/professors", ProfessorController, only: [:create, :index]

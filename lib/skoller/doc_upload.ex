@@ -3,6 +3,10 @@ defmodule Skoller.DocUpload do
     Provides doc upload utilities.
 
     Defines valid extensions, filename, and storage path.
+
+    For more information, See `Arc`
+
+    S3 buckets are defined in env vars.
   """
 
   use Arc.Definition
@@ -12,21 +16,26 @@ defmodule Skoller.DocUpload do
   @extensions ~w(.pdf .txt .rtf .jpg .png .jpeg .doc .docx .pages)
   @acl :public_read
 
+  @doc false
   # Whitelist file extensions:
   def validate({file, _}) do
     @extensions |> Enum.member?(Path.extname(file.file_name))
   end
 
+  @doc false
   # Override the persisted filenames:
   def filename(_version, {_file, scope}) do
     scope["id"]
   end
 
+  @doc false
   # Override the storage directory:
   def storage_dir(_, _) do
     "uploads/class/docs/"
   end
 
+  @doc false
+  # This is what runs the soffice_pdf bash script for when a file is not a pdf.
   def transform(:original, {file, _scope}) do
     case String.ends_with?(file.file_name, [".txt", ".rtf", ".doc", ".docx", ".pages", ".jpg", ".png", ".jpeg"]) do
       true -> {:soffice_pdf, fn(input, output) -> [input, output] end, :pdf}
@@ -34,16 +43,9 @@ defmodule Skoller.DocUpload do
     end
   end
 
+  @doc false
+  #this passes the mime type to s3.
   def s3_object_headers(_version, {file, _scope}) do
     [content_type: MIME.from_path(file.file_name)] # for "image.png", would produce: "image/png"
   end
-
-  # Specify custom headers for s3 objects
-  # Available options are [:cache_control, :content_disposition,
-  #    :content_encoding, :content_length, :content_type,
-  #    :expect, :expires, :storage_class, :website_redirect_location]
-  #
-  # def s3_object_headers(version, {file, scope}) do
-  #   [content_type: Plug.MIME.path(file.file_name)]
-  # end
 end

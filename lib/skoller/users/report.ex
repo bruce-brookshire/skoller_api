@@ -1,4 +1,6 @@
 defmodule Skoller.Users.Report do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Users.User
