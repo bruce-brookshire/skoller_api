@@ -5,6 +5,7 @@ defmodule Sammi.Api do
   require Logger
 
   @extract_url "/extract"
+  @status_url "/"
   
   @doc """
   Extracts a syllabus at the `path`.
@@ -18,6 +19,23 @@ defmodule Sammi.Api do
         {:ok, response}
       {:error, error} ->
         {:error, error}
+    end
+  end
+
+  @doc """
+  Checks the status of Sammi
+
+  ## Returns
+  `:ok` or `:error`
+  """
+  def status() do
+    case get(@status_url, []) do
+      {:ok, _response} ->
+        :ok
+      {:error, response} ->
+        Logger.error("sammi status failed.")
+        Logger.error(inspect(response))
+        :error
     end
   end
 
