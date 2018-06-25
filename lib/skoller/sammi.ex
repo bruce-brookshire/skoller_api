@@ -24,7 +24,6 @@ defmodule Skoller.Sammi do
   def sammi(%{"is_syllabus" => "true", "class_id" => class_id}, file) do
     case Sammi.Api.extract(file) do
       {:ok, sammi} ->
-        Logger.info(inspect(sammi))
         sammi |> add_grade_scale(class_id)
         sammi |> add_professor_info(class_id)
         :ok
