@@ -1,8 +1,17 @@
 defmodule Sammi.Api do
+  @moduledoc """
+  The Sammi API
+  """
   require Logger
 
   @extract_url "/extract"
   
+  @doc """
+  Extracts a syllabus at the `path`.
+
+  ## Returns
+  `{:ok, Map}` or `{:error, reason}`
+  """
   def extract(path) do
     case get(@extract_url <> "/" <> path, [recv_timeout: 5 * 60 * 1000]) do
       {:ok, response} ->

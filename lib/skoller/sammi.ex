@@ -1,4 +1,7 @@
 defmodule Skoller.Sammi do
+  @moduledoc """
+  The context module for Sammi
+  """
 
   alias Skoller.Professors
   alias Skoller.Repo
@@ -6,6 +9,17 @@ defmodule Skoller.Sammi do
 
   require Logger
 
+  @doc """
+  Uses Sammi to extract syllabus info and set professor and grade scale info.
+
+  ## Notes
+   * Only runs if `%{"is_syllabus" => "true"}` is part of `params`
+   * Due to long run time, this should be set as a `Task`
+
+  ## Returns
+  `:ok` or `:error`
+  """
+  def sammi(params, file)
   def sammi(_params, nil), do: nil
   def sammi(%{"is_syllabus" => "true", "class_id" => class_id}, file) do
     case Sammi.Api.extract(file) do
@@ -13,10 +27,12 @@ defmodule Skoller.Sammi do
         Logger.info(inspect(sammi))
         sammi |> add_grade_scale(class_id)
         sammi |> add_professor_info(class_id)
+        :ok
       {:error, val} ->
         val
         |> inspect()
         |> Logger.error()
+        :error
     end
   end
   def sammi(_params, _file), do: nil
