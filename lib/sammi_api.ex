@@ -1,6 +1,6 @@
 defmodule Sammi.Api do
   @moduledoc """
-  The Sammi API
+  Uses `Sammi` to create the routes of the Sammi API.
   """
   require Logger
 
@@ -24,7 +24,7 @@ defmodule Sammi.Api do
   end
 
   @doc """
-  Checks the status of Sammi
+  Checks the status of Sammi.
 
   ## Returns
   `:ok` or `:error`
@@ -40,6 +40,12 @@ defmodule Sammi.Api do
     end
   end
 
+  @doc """
+  Starts training on Sammi.
+
+  ## Returns
+  `:ok` or `:error`
+  """
   def train() do
     case post(@train_url, "", [recv_timeout: 60 * 60 * 1000]) do
       {:ok, _response} ->
