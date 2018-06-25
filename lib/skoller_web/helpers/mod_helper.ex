@@ -373,7 +373,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
   end
 
   defp insert_student_assignment(student_assignment, _) do
-    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
+    case StudentAssignments.get_assignment_by_ids(student_assignment.assignment_id, student_assignment.student_class_id) do
       nil -> Repo.insert(student_assignment)
       assign -> {:ok, assign}
     end
