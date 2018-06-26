@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias SkollerWeb.Admin.ForecastView
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Helpers.RepoHelper
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
   alias Skoller.Students
 
   import SkollerWeb.Plugs.Auth

@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Student.NotificationController do
 
   alias SkollerWeb.Student.NotificationView
   alias Skoller.Chats
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
   alias Skoller.Assignments
 
   import SkollerWeb.Plugs.Auth

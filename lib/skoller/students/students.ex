@@ -16,7 +16,7 @@ defmodule Skoller.Students do
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Class.Assignment
   alias Skoller.Class.Weight

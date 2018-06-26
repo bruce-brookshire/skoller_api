@@ -4,7 +4,7 @@ defmodule SkollerWeb.Assignment.ModView do
   alias SkollerWeb.Assignment.ModView
   alias SkollerWeb.ClassView
   alias Skoller.Repo
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
 
   @name_assignment_mod 100
   @weight_assignment_mod 200

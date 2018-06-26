@@ -1,4 +1,4 @@
-defmodule Skoller.Assignments.Mods do
+defmodule Skoller.Mods do
   @moduledoc """
   Context module for mods
   """

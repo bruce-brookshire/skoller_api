@@ -32,6 +32,12 @@ defmodule SkollerWeb.CSVView do
     )
   end
 
+  def render("csv.json", %{csv: {:error, :class, %Ecto.Changeset{} = changeset, _}}) do
+    changeset.changes |> Map.merge(
+      render_one(changeset, ChangesetView, "error.json")
+    )
+  end
+
   def render("csv.json", %{csv: {:error, text}}) do
     %{
       error: text

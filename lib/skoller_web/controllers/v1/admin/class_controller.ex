@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   alias SkollerWeb.Admin.ClassView
   alias Skoller.Classes
   alias Skoller.Students
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
 
   import SkollerWeb.Plugs.Auth
   

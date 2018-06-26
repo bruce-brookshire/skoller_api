@@ -8,7 +8,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Assignment.Mod
   alias Skoller.Class.Assignment
   alias Skoller.Classes
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
   alias Skoller.Notifications
   alias Skoller.Devices
 

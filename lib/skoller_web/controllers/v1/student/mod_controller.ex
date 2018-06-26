@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Assignment.ModView
-  alias Skoller.Assignments.Mods
+  alias Skoller.Mods
   alias Skoller.Students
 
   import SkollerWeb.Plugs.Auth
