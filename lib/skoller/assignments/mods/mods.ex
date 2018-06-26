@@ -5,7 +5,7 @@ defmodule Skoller.Assignments.Mods do
 
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
-  alias Skoller.Class.StudentClass
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
   alias Skoller.Class.Assignment

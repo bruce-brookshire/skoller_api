@@ -7,7 +7,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.AssignmentView
-  alias SkollerWeb.Helpers.ClassCalcs
+  alias Skoller.StudentAssignments
 
   @enrollment_path "/e/"
 
@@ -49,7 +49,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   end
 
   defp get_ordered_assignments(student_class) do
-    ClassCalcs.get_assignments_with_relative_weight(student_class)
+    StudentAssignments.get_assignments_with_relative_weight(student_class)
     |> order()
   end
 

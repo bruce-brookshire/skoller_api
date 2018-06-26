@@ -4,7 +4,7 @@ defmodule Skoller.Students do
   """
   
   alias Skoller.Repo
-  alias Skoller.Class.StudentClass
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Schools.Class
   alias Skoller.Schools.School
   alias Skoller.Students.Student
@@ -12,7 +12,6 @@ defmodule Skoller.Students do
   alias Skoller.Classes.Status
   alias Skoller.Professors.Professor
   alias Skoller.Schools.ClassPeriod
-  alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Assignment.Mod
@@ -35,7 +34,7 @@ defmodule Skoller.Students do
   Gets students in a class. Includes previously-enrolled students.
 
   ## Returns
-  `[Skoller.Class.StudentClass]` or `[]`
+  `[Skoller.StudentClasses.StudentClass]` or `[]`
   """
   def get_students_by_class(class_id) do
     from(sc in StudentClass)
@@ -47,7 +46,7 @@ defmodule Skoller.Students do
   Gets a student class where the class is editable and the student enrolled.
 
   ## Returns
-  `Skoller.Class.StudentClass` or `nil`
+  `Skoller.StudentClasses.StudentClass` or `nil`
   """
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
@@ -60,7 +59,7 @@ defmodule Skoller.Students do
   Gets a student class where the student enrolled.
 
   ## Returns
-  `Skoller.Class.StudentClass` or `nil`
+  `Skoller.StudentClasses.StudentClass` or `nil`
   """
   def get_enrolled_class_by_ids(class_id, student_id) do
     Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
@@ -70,7 +69,7 @@ defmodule Skoller.Students do
   Gets a student class where the student enrolled.
 
   ## Returns
-  `Skoller.Class.StudentClass` or `Ecto.NoResultsError`
+  `Skoller.StudentClasses.StudentClass` or `Ecto.NoResultsError`
   """
   def get_enrolled_class_by_ids!(class_id, student_id) do
     Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
@@ -83,7 +82,7 @@ defmodule Skoller.Students do
    * %{"color" => color}, sets the student class color.
 
   ## Returns
-  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
   """
   def enroll_in_class(student_id, class_id, params) do
     case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id) do
@@ -104,7 +103,7 @@ defmodule Skoller.Students do
    * %{"is_notifications" => Boolean}, sets the notifications for this class for this student.
 
   ## Returns
-  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
   """
   def update_enrolled_class(old_student_class, params) do
     old_student_class
@@ -116,7 +115,7 @@ defmodule Skoller.Students do
   Drops an enrolled student from a class.
 
   ## Returns
-  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
   """
   def drop_enrolled_class(student_class) do
     student_class
@@ -144,12 +143,12 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns `Skoller.Class.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Students.Student` currently has.
+  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Students.Student` currently has.
 
   ## Examples
 
       iex> val = Skoller.Students.get_enrolled_classes_by_student_id(1)
-      [%Skoller.Class.StudentClass{class: %Skoller.Schools.Class{}}]
+      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Schools.Class{}}]
 
   """
   def get_enrolled_classes_by_student_id(student_id) do
@@ -205,7 +204,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns a subquery that provides a list of `Skoller.Class.StudentClass` where the classes are not dropped by `Skoller.Schools.School`
+  Returns a subquery that provides a list of `Skoller.StudentClasses.StudentClass` where the classes are not dropped by `Skoller.Schools.School`
 
   """
   def get_enrolled_student_classes_subquery(params \\ %{}) do
@@ -299,7 +298,7 @@ defmodule Skoller.Students do
    * %{"is_complete", Boolean}, filter by completion.
 
   ## Returns
-  `[%{Skoller.Class.StudentClass}]` with assignments and is_pending_mods or `[]`
+  `[%{Skoller.StudentClasses.StudentClass}]` with assignments and is_pending_mods or `[]`
   """
   def get_student_assignments(student_id, filters) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
@@ -308,7 +307,7 @@ defmodule Skoller.Students do
     |> where([sc, class, cs], cs.is_complete == true)
     |> where_filters(filters)
     |> Repo.all()
-    |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
+    |> Enum.flat_map(&StudentAssignments.get_assignments_with_relative_weight(&1))
     |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
     |> get_student_assingment_filter(filters)
   end
@@ -317,7 +316,7 @@ defmodule Skoller.Students do
   Gets a student assignment with relative weight by assignment id.
 
   ## Returns
-  `[%{Skoller.Class.StudentClass}]` with assignments or `[]`
+  `[%{Skoller.StudentClasses.StudentClass}]` with assignments or `[]`
   """
   #TODO: make this and the one argument one, one function.
   def get_student_assignment_by_id(id, :weight) do
@@ -328,7 +327,7 @@ defmodule Skoller.Students do
     |> where([sc, sa], sa.id == ^id)
     |> where([sc, sa, class, cs], cs.is_complete == true)
     |> Repo.all()
-    |> Enum.flat_map(&ClassCalcs.get_assignments_with_relative_weight(&1))
+    |> Enum.flat_map(&StudentAssignments.get_assignments_with_relative_weight(&1))
     |> Enum.filter(& to_string(&1.id) == id)
     |> List.first()
   end
@@ -425,7 +424,7 @@ defmodule Skoller.Students do
   Gets a student class from an enrollment link.
 
   ## Returns
-  `Skoller.Class.StudentClass` with `:student` and `:class` loaded, or `Ecto.NoResultsError`
+  `Skoller.StudentClasses.StudentClass` with `:student` and `:class` loaded, or `Ecto.NoResultsError`
   """
   def get_student_class_by_enrollment_link(link) do
     student_class_id = link |> String.split_at(@link_length) |> elem(1)
@@ -506,7 +505,7 @@ defmodule Skoller.Students do
   Generates an enrollment link for a student class that does not have one yet.
 
   ## Returns
-  `{:ok, Skoller.Class.StudentClass}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
   """
   def generate_enrollment_link(%StudentClass{id: id} = student_class) do
     link = generate_link(id)

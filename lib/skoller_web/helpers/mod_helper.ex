@@ -11,7 +11,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Repo
-  alias Skoller.Class.StudentClass
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.NotificationHelper

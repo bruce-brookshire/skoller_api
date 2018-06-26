@@ -5,9 +5,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
 
   alias Skoller.Repo
   alias Skoller.StudentAssignments.StudentAssignment
-  alias SkollerWeb.Helpers.ClassCalcs
   alias SkollerWeb.Class.SpeculationView
   alias Skoller.Students
+  alias Skoller.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
   
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
     student_class = student_class |> Repo.preload(:class)
 
     grade_speculation = student_class
-                  |> Map.put(:completion, ClassCalcs.get_class_completion(student_class))
+                  |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
                   |> speculate_grade(params)
     
     case grade_speculation do
@@ -40,7 +40,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   end
 
   defp get_class_weighted_grade(%{} = params) do
-    assignments = ClassCalcs.get_assignments_with_relative_weight(params)
+    assignments = StudentAssignments.get_assignments_with_relative_weight(params)
 
     assignments
     |> Enum.reduce(Decimal.new(0), &Decimal.add(&2, Decimal.mult(&1.relative_weight, get_assignment_grade(&1))))

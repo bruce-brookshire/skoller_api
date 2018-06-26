@@ -1,7 +1,7 @@
 defmodule Skoller.Repo.Migrations.AddEnrollmentLinkToClasses do
   use Ecto.Migration
   alias Skoller.Students
-  alias Skoller.Class.StudentClass
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Repo
 
   import Ecto.Query
