@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   alias Skoller.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.LockPlug
+  import SkollerWeb.Plugs.Lock
   import Ecto.Query
 
   @student_role 100

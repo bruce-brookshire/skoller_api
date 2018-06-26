@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   alias SkollerWeb.Class.WeightView
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.LockPlug
+  import SkollerWeb.Plugs.Lock
   
   @student_role 100
   @admin_role 200
