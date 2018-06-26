@@ -50,8 +50,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
     cond do
       existing_mod == [] and assignment.from_mod == true ->
         # The assignment is not an original assignment, and needs a mod.
-        assign = Repo.get(Assignment, assignment.id)
-        student_class = Repo.get_by(StudentClass, class_id: assign.class_id, student_id: params["student_id"])
+        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
 
         mod |> insert_mod(student_class)
       existing_mod == [] and assignment.from_mod == false -> 
@@ -59,14 +58,12 @@ defmodule SkollerWeb.Helpers.ModHelper do
         {:ok, existing_mod}
       existing_mod.is_private == true and mod.is_private == false ->
         # The assignment has a mod that needs to be published.
-        assign = Repo.get(Assignment, assignment.id)
-        student_class = Repo.get_by(StudentClass, class_id: assign.class_id, student_id: params["student_id"])
+        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
 
         mod |> publish_mod(student_class)
       true -> 
         # The assignment has a mod already, and needs no changes 
-        assign = Repo.get(Assignment, assignment.id)
-        student_class = Repo.get_by(StudentClass, class_id: assign.class_id, student_id: params["student_id"])
+        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
 
         Ecto.Multi.new
         |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
