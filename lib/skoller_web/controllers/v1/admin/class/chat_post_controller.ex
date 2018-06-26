@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
   @admin_role 200

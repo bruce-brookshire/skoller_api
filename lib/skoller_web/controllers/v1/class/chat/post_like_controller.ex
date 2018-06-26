@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   alias Skoller.Students
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
 

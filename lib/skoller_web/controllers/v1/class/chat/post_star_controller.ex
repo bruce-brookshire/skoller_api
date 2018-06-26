@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
   alias Skoller.Students
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
   import Ecto.Query
 
   @student_role 100

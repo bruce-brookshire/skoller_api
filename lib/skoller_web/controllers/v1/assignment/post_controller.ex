@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias Skoller.Students
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
 

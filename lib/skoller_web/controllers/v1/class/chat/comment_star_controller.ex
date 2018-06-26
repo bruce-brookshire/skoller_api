@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
   alias SkollerWeb.Class.ChatCommentView
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
 

@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   alias SkollerWeb.Helpers.NotificationHelper
 
   import SkollerWeb.Plugs.Auth
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
   import Ecto.Query
 
   @student_role 100
