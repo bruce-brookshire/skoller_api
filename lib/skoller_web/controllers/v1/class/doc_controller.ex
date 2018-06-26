@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView
-  alias SkollerWeb.Helpers.ClassDocUpload
+  alias Skoller.ClassDocs
   alias Skoller.Sammi
   alias Skoller.Classes
 
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    location = ClassDocUpload.upload_class_doc(file)
+    location = ClassDocs.upload_class_doc(file)
 
     Task.start(Sammi, :sammi, [params, location])
   

@@ -1,13 +1,9 @@
 defmodule Skoller.PicUpload do
-  @moduledoc """
-    Provides doc upload utilities.
-
-    Defines valid extensions, filename, and storage path.
-
-    For more information, See `Arc`
-
-    S3 buckets are defined in env vars.
-  """
+  @moduledoc false
+  # Provides doc upload utilities.
+  # Defines valid extensions, filename, and storage path.
+  # For more information, See `Arc`
+  # S3 buckets are defined in env vars.
 
   use Arc.Definition
   use Arc.Ecto.Definition

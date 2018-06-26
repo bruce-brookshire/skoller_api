@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
 
   alias Skoller.Repo
   alias Skoller.Class.StudentRequest
-  alias SkollerWeb.Helpers.ClassDocUpload
+  alias Skoller.ClassDocs
   alias Skoller.Class.Doc
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
@@ -54,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   end
 
   defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
-    location = ClassDocUpload.upload_class_doc(file)
+    location = ClassDocs.upload_class_doc(file)
 
     params = %{} 
     |> Map.put("path", location)
