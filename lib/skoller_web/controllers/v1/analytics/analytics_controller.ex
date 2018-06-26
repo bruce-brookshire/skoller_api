@@ -19,7 +19,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Classes
   alias Skoller.Chats
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Ecto.Query
   
   @admin_role 200

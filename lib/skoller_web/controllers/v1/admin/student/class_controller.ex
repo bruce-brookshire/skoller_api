@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   alias SkollerWeb.Helpers.ModHelper
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200

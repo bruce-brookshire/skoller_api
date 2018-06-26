@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
   alias Skoller.Users
   alias Skoller.Locks
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Bamboo.Email
   
   @admin_role 200

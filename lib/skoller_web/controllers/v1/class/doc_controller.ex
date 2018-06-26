@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias Skoller.Classes
 
   import Ecto.Query
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200

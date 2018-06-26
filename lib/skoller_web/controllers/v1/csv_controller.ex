@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Schools
   alias Skoller.Periods
   
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]

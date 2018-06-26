@@ -4,7 +4,7 @@ defmodule SkollerWeb.UserSocket do
   """
   use Phoenix.Socket
 
-  alias SkollerWeb.Helpers.AuthPlug
+  alias SkollerWeb.Plugs.Auth
 
   ## Channels
   channel "chat:*", SkollerWeb.ChatChannel
@@ -28,7 +28,7 @@ defmodule SkollerWeb.UserSocket do
   def connect(%{"token" => token}, socket) do
     case Guardian.Phoenix.Socket.authenticate(socket, Skoller.Auth, token) do
       {:ok, authed_socket} ->
-        case authed_socket |> AuthPlug.get_auth_obj() do
+        case authed_socket |> Auth.get_auth_obj() do
           {:ok, user} ->
             {:ok, assign(authed_socket, :user, user)}
           {:error, _} -> :error

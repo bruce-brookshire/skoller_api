@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   alias Skoller.Admin.Users
   alias SkollerWeb.ReportView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

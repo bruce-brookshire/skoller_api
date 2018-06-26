@@ -4,7 +4,7 @@ defmodule SkollerWeb.Class.ChatReplyView do
   alias Skoller.Repo
   alias SkollerWeb.Class.ChatReplyView
   alias SkollerWeb.Class.Chat.LikeView
-  alias SkollerWeb.Helpers.ChatHelper
+  alias Skoller.Chats
 
   def render("index.json", %{chat_replies: chat_replies}) do
     render_many(chat_replies, ChatReplyView, "chat_reply.json")
@@ -35,7 +35,7 @@ defmodule SkollerWeb.Class.ChatReplyView do
       student: render_one(chat_reply.student, SkollerWeb.StudentView, "student-short.json"),
       id: chat_reply.id,
       likes: render_many(chat_reply.likes, LikeView, "like.json"),
-      is_liked: chat_reply.likes |> ChatHelper.is_liked(student_id),
+      is_liked: chat_reply |> Chats.is_liked(student_id),
       inserted_at: chat_reply.inserted_at
     }
   end

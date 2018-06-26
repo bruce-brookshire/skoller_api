@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   alias SkollerWeb.Class.SpeculationView
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   alias Skoller.Chat.Reply.Like
   alias SkollerWeb.Class.ChatReplyView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
 
   @student_role 100

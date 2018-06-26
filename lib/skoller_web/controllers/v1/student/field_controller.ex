@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Student.FieldController do
   alias Skoller.Students
   alias SkollerWeb.StudentView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Assignments.Mods
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Ecto.Query
   
   @admin_role 200

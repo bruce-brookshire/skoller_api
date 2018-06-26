@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   alias SkollerWeb.Helpers.NotificationHelper
   alias SkollerWeb.NotificationView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

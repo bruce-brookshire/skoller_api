@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Admin.FieldController do
   alias Skoller.FieldsOfStudy
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

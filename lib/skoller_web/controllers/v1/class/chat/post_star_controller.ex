@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
   import Ecto.Query
 

@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
 
   @student_role 100

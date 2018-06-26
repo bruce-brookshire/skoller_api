@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Student.NotificationController do
   alias Skoller.Assignments.Mods
   alias Skoller.Assignments
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   

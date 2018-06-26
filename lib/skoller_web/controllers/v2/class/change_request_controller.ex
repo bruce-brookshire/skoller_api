@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V2.Class.ChangeRequestController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   @admin_role 200

@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatReplyController do
   alias Skoller.Repo
   alias Skoller.Chat.Reply
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
 
   @student_role 100

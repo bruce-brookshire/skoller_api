@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.StudentAssignments
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.LockPlug
   import Ecto.Query
 

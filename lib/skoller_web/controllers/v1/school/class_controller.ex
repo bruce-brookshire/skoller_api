@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.School.ClassController do
   alias SkollerWeb.MinClassView
   alias Skoller.Classes
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

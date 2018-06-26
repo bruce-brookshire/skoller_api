@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.ReportUserController do
 
   alias Skoller.Users
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

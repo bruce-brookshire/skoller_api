@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Repo
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @admin_role 200
 

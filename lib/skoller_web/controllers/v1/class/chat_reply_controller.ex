@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   alias Skoller.Chat.Comment
   alias SkollerWeb.Helpers.NotificationHelper
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
   import Ecto.Query
 

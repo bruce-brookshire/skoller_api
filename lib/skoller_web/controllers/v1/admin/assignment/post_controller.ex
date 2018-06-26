@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.Assignment.PostController do
   alias Skoller.Repo
   alias Skoller.Assignment.Post
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
 
   @student_role 100

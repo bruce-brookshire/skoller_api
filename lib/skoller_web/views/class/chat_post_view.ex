@@ -5,8 +5,8 @@ defmodule SkollerWeb.Class.ChatPostView do
   alias SkollerWeb.Class.ChatPostView
   alias SkollerWeb.Class.ChatCommentView
   alias SkollerWeb.Class.Chat.LikeView
-  alias SkollerWeb.Helpers.ChatHelper
   alias Skoller.Chat.Post.Star
+  alias Skoller.Chats
 
   def render("index.json", %{chat_posts: %{chat_posts: chat_posts, color: color}, current_student_id: current_student_id}) do
     render_many(chat_posts, ChatPostView, "chat_post.json", %{current_student_id: current_student_id, color: color})
@@ -56,7 +56,7 @@ defmodule SkollerWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json", %{current_student_id: student_id}),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
+      is_liked: chat_post |> Chats.is_liked(student_id),
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, SkollerWeb.ClassView, "class_short.json"),
       color: color,
@@ -93,7 +93,7 @@ defmodule SkollerWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      is_liked: chat_post.likes |> ChatHelper.is_liked(student_id),
+      is_liked: chat_post |> Chats.is_liked(student_id),
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, SkollerWeb.ClassView, "class_short.json"),
       color: color,

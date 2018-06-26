@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Locks
   alias Skoller.FourDoor
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   @admin_role 200

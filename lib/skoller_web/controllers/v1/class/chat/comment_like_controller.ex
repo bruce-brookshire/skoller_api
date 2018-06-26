@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentLikeController do
   alias Skoller.Chat.Comment.Like
   alias SkollerWeb.Class.ChatCommentView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import SkollerWeb.Helpers.ChatPlug
 
   @student_role 100

@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Assignment.ReminderController do
   alias Skoller.Assignments
   alias SkollerWeb.Assignment.ReminderNotificationView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @admin_role 200
 

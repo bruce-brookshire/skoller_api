@@ -4,7 +4,7 @@ defmodule SkollerWeb.Class.ChatCommentView do
   alias Skoller.Repo
   alias SkollerWeb.Class.ChatCommentView
   alias SkollerWeb.Class.ChatReplyView
-  alias SkollerWeb.Helpers.ChatHelper
+  alias Skoller.Chats
   alias SkollerWeb.Class.Chat.LikeView
   alias Skoller.Chat.Comment.Star
 
@@ -39,7 +39,7 @@ defmodule SkollerWeb.Class.ChatCommentView do
       id: chat_comment.id,
       replies: render_many(chat_comment.chat_replies, ChatReplyView, "chat_reply_detail.json", %{current_student_id: student_id}),
       likes: render_many(chat_comment.likes, LikeView, "like.json"),
-      is_liked: chat_comment.likes |> ChatHelper.is_liked(student_id),
+      is_liked: chat_comment |> Chats.is_liked(student_id),
       is_starred: chat_comment |> is_starred(student_id),
       inserted_at: chat_comment.inserted_at
     }

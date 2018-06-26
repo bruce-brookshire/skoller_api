@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Ecto.Query
   import SkollerWeb.Helpers.ChatPlug
 

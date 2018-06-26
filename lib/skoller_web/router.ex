@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Router do
   use SkollerWeb, :router
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   pipeline :api do
     plug :accepts, ["json"]

@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   alias Skoller.Students
   alias Skoller.Assignments.Mods
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   @change_req_role 400

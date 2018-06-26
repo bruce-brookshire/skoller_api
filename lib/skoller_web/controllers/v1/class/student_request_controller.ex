@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   @admin_role 200

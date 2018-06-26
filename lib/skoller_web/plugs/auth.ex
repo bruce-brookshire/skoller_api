@@ -1,9 +1,6 @@
-defmodule SkollerWeb.Helpers.AuthPlug do
-
+defmodule SkollerWeb.Plugs.Auth do
   @moduledoc """
-  
   Handles auth plugs.
-
   """
 
   alias Skoller.Repo
