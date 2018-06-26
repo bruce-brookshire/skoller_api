@@ -116,6 +116,12 @@ defmodule Skoller.StudentAssignments do
     |> Repo.all()
   end
 
+  @doc """
+  Gets the class completion for a student.
+
+  ## Returns
+  `Decimal`
+  """
   def get_class_completion(%StudentClass{id: student_class_id} = student_class) do
     relative_weights = get_relative_weight(student_class)
 
@@ -124,7 +130,14 @@ defmodule Skoller.StudentAssignments do
     |> Enum.reduce(Decimal.new(0), &Decimal.add(get_weight(&1, relative_weights), &2))
   end
 
-  # Gets assignments with relative weights by either StudentAssignment or Assignments based on params.
+  @doc """
+  Gets assignments with relative weights by either StudentAssignment or Assignments based on params.
+
+  ## Returns
+  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Class.Assignment]`, or `[]`
+  If the structs are returned, they will have a `:relative_weight` key.
+  """
+  # TODO: This is messy too, just like the other stuff. Try to split it out a bit.
   def get_assignments_with_relative_weight(%{} = params) do #good.
     assign_weights = get_relative_weight(params)
 
@@ -133,39 +146,42 @@ defmodule Skoller.StudentAssignments do
     |> Enum.map(&Map.put(&1, :relative_weight, get_weight(&1, assign_weights)))
   end
 
+  # Gets completed assignments for a student class.
   defp get_completed_assignments(student_class_id) do
     query = from(assign in StudentAssignment)
     query
-        |> where([assign], assign.student_class_id == ^student_class_id)
-        |> where([assign], not(is_nil(assign.grade)))
-        |> where([assign], not(is_nil(assign.weight_id)))
-        |> Repo.all()
+    |> where([assign], assign.student_class_id == ^student_class_id)
+    |> where([assign], not(is_nil(assign.grade)))
+    |> where([assign], not(is_nil(assign.weight_id)))
+    |> Repo.all()
   end
 
-  defp get_weight(%{weight_id: weight_id}, enumerable) do
-    enumerable
+  # Attempts to find a weight in the assignment_or_student_assignment_enumerable, or returns 0.
+  defp get_weight(%{weight_id: weight_id}, assignment_or_student_assignment_enumerable) do
+    assignment_or_student_assignment_enumerable
     |> Enum.find(%{}, & &1.weight_id == weight_id)
     |> Map.get(:relative, Decimal.new(0))
   end
 
-  defp get_relative_weight(%{class_id: class_id} = params) do #good
-    assign_count_subq = params
-                  |> relative_weight_subquery()
-
+  # Returns the relative weight for each weight category.
+  defp get_relative_weight(%{class_id: class_id} = params) do
     assign_count = from(w in Weight)
-    |> join(:left, [w], s in subquery(assign_count_subq), s.weight_id == w.id)
+    |> join(:left, [w], s in subquery(relative_weight_subquery(params)), s.weight_id == w.id)
     |> where([w], w.class_id == ^class_id)
     |> select([w, s], %{weight: w.weight, count: s.count, weight_id: w.id})
     |> Repo.all()
     
     weight_sum = assign_count 
-                  |> Enum.filter(& &1.weight != nil)
-                  |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
+    |> Enum.filter(& &1.weight != nil)
+    |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
 
     assign_count
     |> Enum.map(&Map.put(&1, :relative, calc_relative_weight(&1, weight_sum)))
   end
 
+  # This gets the count of assignments and the weight id for either a student class or a class.
+  # If it is for a class, it will only be for assignments that are not mods.
+  # TODO: Split logic here.
   defp relative_weight_subquery(%StudentClass{id: id}) do #good
     query = (from assign in StudentAssignment)
     query
@@ -174,7 +190,6 @@ defmodule Skoller.StudentAssignments do
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
     |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id})
   end
-
   defp relative_weight_subquery(%{class_id: class_id}) do
     query = (from assign in Assignment)
     query
