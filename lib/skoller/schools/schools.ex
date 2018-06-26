@@ -90,7 +90,7 @@ defmodule Skoller.Schools do
   end
 
   defp name_filter(query, %{"name" => name}) do
-    name_filter = name <> "%"
+    name_filter = "%" <> name <> "%"
     query
     |> where([school], ilike(school.name, ^name_filter))
   end
