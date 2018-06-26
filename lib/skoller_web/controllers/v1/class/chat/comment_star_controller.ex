@@ -1,12 +1,14 @@
 defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
   alias Skoller.Chat.Comment.Star
   alias SkollerWeb.Class.ChatCommentView
 
-  import SkollerWeb.Helpers.AuthPlug
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
 

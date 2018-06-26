@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Repo
@@ -12,12 +14,12 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Students
   alias Skoller.Classes
   alias Skoller.Chats
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Ecto.Query
   
   @admin_role 200

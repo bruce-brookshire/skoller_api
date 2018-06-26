@@ -7,7 +7,7 @@ defmodule Skoller.Students.Student do
   alias Skoller.Users.User
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Schools.Class
-  alias Skoller.Class.StudentClass
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Repo
   import Ecto.Query
 

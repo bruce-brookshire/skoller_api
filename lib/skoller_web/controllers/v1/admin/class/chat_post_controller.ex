@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
@@ -6,9 +8,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Ecto.Query
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
   @admin_role 200

@@ -11,12 +11,12 @@ defmodule SkollerWeb.Helpers.ModHelper do
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Repo
-  alias Skoller.Class.StudentClass
-  alias Skoller.Class.StudentAssignment
-  alias SkollerWeb.Helpers.AssignmentHelper
+  alias Skoller.StudentClasses.StudentClass
+  alias Skoller.StudentAssignments.StudentAssignment
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Admin.Settings
+  alias Skoller.StudentAssignments
 
   import Ecto.Query
 
@@ -349,7 +349,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, atom) do
     student_assignment = Assignment
     |> Repo.get!(mod.assignment_id)
-    |> AssignmentHelper.convert_assignment(student_class)
+    |> StudentAssignments.convert_assignment(student_class)
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
@@ -373,7 +373,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
   end
 
   defp insert_student_assignment(student_assignment, _) do
-    case Repo.get_by(StudentAssignment, assignment_id: student_assignment.assignment_id, student_class_id: student_assignment.student_class_id) do
+    case StudentAssignments.get_assignment_by_ids(student_assignment.assignment_id, student_assignment.student_class_id) do
       nil -> Repo.insert(student_assignment)
       assign -> {:ok, assign}
     end

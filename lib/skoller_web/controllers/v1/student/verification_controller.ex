@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.VerificationController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Repo
@@ -6,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Student.VerificationController do
   alias SkollerWeb.Helpers.VerificationHelper
   alias SkollerWeb.Sms
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

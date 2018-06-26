@@ -1,11 +1,7 @@
 defmodule SkollerWeb.Api.V1.ClassController do
-  use SkollerWeb, :controller
-
-  @moduledoc """
+  @moduledoc false
   
-  Handles functionality relating to classes.
-
-  """
+  use SkollerWeb, :controller
   
   alias SkollerWeb.ClassView
   alias SkollerWeb.Class.SearchView
@@ -13,7 +9,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   alias Skoller.Classes
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200

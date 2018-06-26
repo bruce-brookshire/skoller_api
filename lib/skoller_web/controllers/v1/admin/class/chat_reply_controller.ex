@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ChatReplyController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
   alias Skoller.Chat.Reply
 
-  import SkollerWeb.Helpers.AuthPlug
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
   @admin_role 200

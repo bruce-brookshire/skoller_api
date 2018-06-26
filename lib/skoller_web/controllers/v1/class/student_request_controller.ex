@@ -1,15 +1,17 @@
 defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Repo
   alias Skoller.Class.StudentRequest
-  alias SkollerWeb.Helpers.ClassDocUpload
+  alias Skoller.ClassDocs
   alias Skoller.Class.Doc
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   @admin_role 200
@@ -52,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   end
 
   defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
-    location = ClassDocUpload.upload_class_doc(file)
+    location = ClassDocs.upload_class_doc(file)
 
     params = %{} 
     |> Map.put("path", location)

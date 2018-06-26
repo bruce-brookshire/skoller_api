@@ -1,10 +1,12 @@
 defmodule SkollerWeb.Api.V1.Class.StatusController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StatusView
   alias Skoller.Classes
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   @syllabus_worker_role 300

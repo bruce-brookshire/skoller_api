@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.MinVerController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Admin.Settings

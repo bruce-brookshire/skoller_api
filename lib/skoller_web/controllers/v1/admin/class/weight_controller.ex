@@ -1,12 +1,14 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Weight
   alias Skoller.Repo
   alias SkollerWeb.Class.WeightView
 
-  import SkollerWeb.Helpers.AuthPlug
-  import SkollerWeb.Helpers.LockPlug
+  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.Lock
   
   @student_role 100
   @admin_role 200

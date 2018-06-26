@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Doc
@@ -11,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   alias Skoller.Universities
   alias Skoller.Professors
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   require Logger
   

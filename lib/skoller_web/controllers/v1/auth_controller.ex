@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.AuthController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Users
@@ -6,7 +8,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   alias SkollerWeb.AuthView
   alias SkollerWeb.Helpers.TokenHelper
   
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   plug :verify_user_exists
 

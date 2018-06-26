@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.SchoolController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Classes
@@ -6,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   alias Skoller.Schools
   alias Skoller.EnrolledSchools
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Admin.PeriodController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Repo
   alias SkollerWeb.PeriodView
   
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

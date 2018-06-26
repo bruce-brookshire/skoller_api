@@ -1,10 +1,12 @@
 defmodule SkollerWeb.Api.V1.DeviceController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Devices
   alias SkollerWeb.User.DeviceView
   
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   plug :verify_user
 

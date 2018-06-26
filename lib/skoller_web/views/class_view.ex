@@ -9,7 +9,7 @@ defmodule SkollerWeb.ClassView do
     alias Skoller.Repo
     alias SkollerWeb.SchoolView
     alias SkollerWeb.Class.StudentRequestView
-    alias Skoller.Class.StudentClass
+    alias Skoller.StudentClasses.StudentClass
     alias SkollerWeb.PeriodView
     alias Skoller.Schools
 

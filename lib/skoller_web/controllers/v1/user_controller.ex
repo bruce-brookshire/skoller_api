@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.UserController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Users
@@ -8,7 +10,7 @@ defmodule SkollerWeb.Api.V1.UserController do
   alias Skoller.Repo
   alias Ecto.UUID
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200

@@ -1,10 +1,12 @@
 defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Admin.Users
   alias SkollerWeb.ReportView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

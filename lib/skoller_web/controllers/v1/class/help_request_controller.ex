@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Class.HelpRequest
@@ -7,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200

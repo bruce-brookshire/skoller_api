@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Admin.FieldController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.School.FieldOfStudyView
   alias Skoller.FieldsOfStudy
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

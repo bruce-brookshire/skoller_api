@@ -1,9 +1,6 @@
-defmodule SkollerWeb.Helpers.ChatPlug do
-  
+defmodule SkollerWeb.Plugs.ChatAuth do
   @moduledoc """
-  
   Handles chat auth.
-
   """
 
   alias Skoller.Repo

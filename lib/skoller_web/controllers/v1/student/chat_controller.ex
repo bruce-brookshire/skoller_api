@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Student.ChatController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.ChatPostView
   alias SkollerWeb.Student.InboxView
   alias Skoller.Chats
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
 
   @student_role 100
   

@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Assignment.PostController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
@@ -8,8 +10,8 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
 

@@ -1,4 +1,8 @@
 defmodule Sammi do
+  @moduledoc """
+  Uses `HTTPoison.Base` to create a web interface with the Sammi API.
+  """
+
   use HTTPoison.Base
 
   def process_url(url) do

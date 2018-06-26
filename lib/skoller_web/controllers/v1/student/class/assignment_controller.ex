@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Repo
@@ -8,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

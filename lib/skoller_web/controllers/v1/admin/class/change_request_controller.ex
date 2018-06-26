@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
@@ -8,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
   alias Skoller.Classes
   alias Skoller.Mailer
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   import Bamboo.Email
 
   @from_email "noreply@skoller.co"

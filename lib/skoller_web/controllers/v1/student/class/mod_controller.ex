@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Student.Class.ModController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.AssignmentView
   alias Skoller.Students
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

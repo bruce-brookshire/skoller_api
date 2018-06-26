@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Helpers.LockPlug do
+defmodule SkollerWeb.Plugs.Lock do
   
   @moduledoc """
   

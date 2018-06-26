@@ -5,8 +5,8 @@ defmodule Skoller.Assignments.Mods do
 
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
-  alias Skoller.Class.StudentClass
-  alias Skoller.Class.StudentAssignment
+  alias Skoller.StudentClasses.StudentClass
+  alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
   alias Skoller.Class.Assignment
   alias Skoller.Students
@@ -39,7 +39,7 @@ defmodule Skoller.Assignments.Mods do
 
   ## Returns
   `[%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
-  student_assignment: Skoller.Class.StudentAssignment}]` or `[]`
+  student_assignment: Skoller.StudentAssignments.StudentAssignment}]` or `[]`
   """
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
@@ -60,7 +60,7 @@ defmodule Skoller.Assignments.Mods do
 
   ## Returns
   `%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
-  student_assignment: Skoller.Class.StudentAssignment}`, `nil`, or raises if more than one
+  student_assignment: Skoller.StudentAssignments.StudentAssignment}`, `nil`, or raises if more than one
   """
   def get_student_mod_by_id(student_id, mod_id) do
     from(mod in Mod)

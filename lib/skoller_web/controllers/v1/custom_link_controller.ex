@@ -1,10 +1,12 @@
 defmodule SkollerWeb.Api.V1.CustomLinkController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.CustomSignups
   alias SkollerWeb.LinkView
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
 

@@ -1,9 +1,11 @@
 defmodule SkollerWeb.Api.V1.ReportUserController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Users
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   

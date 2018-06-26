@@ -1,16 +1,18 @@
 defmodule SkollerWeb.Api.V1.Class.DocController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Class.Doc
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView
-  alias SkollerWeb.Helpers.ClassDocUpload
+  alias Skoller.ClassDocs
   alias Skoller.Sammi
   alias Skoller.Classes
 
   import Ecto.Query
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @student_role 100
   @admin_role 200
@@ -21,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
 
-    location = ClassDocUpload.upload_class_doc(file)
+    location = ClassDocs.upload_class_doc(file)
 
     Task.start(Sammi, :sammi, [params, location])
   

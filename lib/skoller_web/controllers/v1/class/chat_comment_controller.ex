@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
   
   alias Skoller.Repo
@@ -9,8 +11,8 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.NotificationHelper
 
-  import SkollerWeb.Helpers.AuthPlug
-  import SkollerWeb.Helpers.ChatPlug
+  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.ChatAuth
   import Ecto.Query
 
   @student_role 100

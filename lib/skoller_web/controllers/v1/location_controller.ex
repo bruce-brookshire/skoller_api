@@ -1,4 +1,6 @@
 defmodule SkollerWeb.Api.V1.LocationController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.Locations

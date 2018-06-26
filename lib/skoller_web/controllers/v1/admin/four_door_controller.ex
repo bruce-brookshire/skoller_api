@@ -1,11 +1,13 @@
 defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
+  @moduledoc false
+  
   use SkollerWeb, :controller
 
   alias Skoller.FourDoor
   alias SkollerWeb.AllView
   alias SkollerWeb.Helpers.RepoHelper
 
-  import SkollerWeb.Helpers.AuthPlug
+  import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   

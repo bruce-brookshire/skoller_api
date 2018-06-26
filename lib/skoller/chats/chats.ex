@@ -117,6 +117,21 @@ defmodule Skoller.Chats do
     |> sort_by_params(filters)
   end
 
+  @doc """
+  Returns whether any item in `chat_item_enum` is liked by `student_id`.
+
+  ## Notes
+  Can be posts, comments, or likes.
+
+  ## Returns
+  `Boolean`
+  """
+  def is_liked([], _student_id), do: false
+  def is_liked(chat_item_enum, student_id) do
+    chat_item_enum |> Repo.preload(:likes)
+    chat_item_enum.likes |> Enum.any?(& to_string(&1.student_id) == to_string(student_id))
+  end
+
   defp sort_by_params(enum, %{"sort" => @sort_hot}) do
     enum
     |> Enum.sort(&hot_algorithm(&1) >= hot_algorithm(&2))
