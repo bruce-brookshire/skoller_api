@@ -14,7 +14,7 @@ defmodule Sammi do
     require Logger
     Logger.info(inspect(body))
     case body |> Poison.decode() do
-      {:ok, decode} -> {:ok, decode}
+      {:ok, decode} -> decode
       {:error, _error} -> {:error, body}
     end
   end
