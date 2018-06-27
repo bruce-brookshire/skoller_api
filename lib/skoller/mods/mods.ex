@@ -269,6 +269,26 @@ defmodule Skoller.Mods do
     |> Repo.all()
   end
 
+  @doc """
+  This creates a new assignment mod from an assignment or a student assignment. It should
+  be used when a new assignment or student assignment is created.
+
+  ## Behavior for an assignment
+   * This will create a mod if the assignment is not an original assignment and no prior mod exists.
+   * If the assignment is original, it will do nothing
+   * It will publish a mod (make it public) if there was a private mod, and a student decides to create a public one that is the same.
+   * Will add back prior, missing actions from a previously deleted assignment if the assignment exists from others.
+
+  ## Behavior for a student assignment
+   * Finds all mods that were made to create the student assignment, and add them to the student.
+
+  ## Returns
+   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+  where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
+  `dismissed` are the actions that are dismissed as a result of creating the mod.
+   * `{:ok, nil}` if the assignment is original and no mod is needed, or if a student assignment is used.
+   * `{:ok, %{backlog: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action}}`
+  """
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
       data: %{
@@ -310,14 +330,14 @@ defmodule Skoller.Mods do
     student_assignment = student_assignment |> Repo.preload(:student_class)
     student_class = Students.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
     student_assignment
-    |> find_mods()
+    |> find_accepted_mods_for_student_assignment()
     |> Enum.map(&process_existing_mod(&1, student_class, params))
     |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
-  defp find_mods(%StudentAssignment{} = student_assignment) do
+  defp find_accepted_mods_for_student_assignment(%StudentAssignment{} = student_assignment) do
     from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id and act.is_accepted == true)
     |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> Repo.all
   end

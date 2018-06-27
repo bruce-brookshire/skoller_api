@@ -195,11 +195,11 @@ defmodule Skoller.StudentAssignments do
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
     |> compare_weights(changeset)
     |> compare_dates(changeset)
-    |> Repo.all()
+    |> Repo.one()
 
     case assign do
-      [] -> changeset |> check_student_assignment()
-      assign -> {:ok, assign |> List.first}
+      nil -> changeset |> check_student_assignment()
+      assign -> {:ok, assign}
     end
   end
 
