@@ -15,7 +15,7 @@ defmodule Sammi.Api do
   `{:ok, Map}` or `{:error, reason}`
   """
   def extract(path) do
-    case get(@extract_url <> "/" <> path, [recv_timeout: 5 * 60 * 1000]) do
+    case get(@extract_url <> "/" <> path, [recv_timeout: 15 * 60 * 1000]) do
       {:ok, response} ->
         {:ok, response}
       {:error, error} ->
