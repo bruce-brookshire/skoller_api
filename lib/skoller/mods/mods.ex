@@ -335,6 +335,132 @@ defmodule Skoller.Mods do
     |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
+  def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
+    student_assignment = student_assignment |> Repo.preload(:assignment)
+    status = changes |> Enum.map(&check_change(&1, student_assignment, params))
+    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+  end
+
+  #compare new change with original assignment. If original, dismiss mods. Otherwise, create mod.
+  defp check_change({:weight_id, weight_id}, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
+    case old_weight_id == weight_id do
+      false -> weight_id |> insert_weight_mod(student_assignment, params)
+      true -> dismiss_mods(student_assignment, @weight_assignment_mod)
+    end
+  end
+  defp check_change({:due, due}, %{assignment: %{due: old_due}} = student_assignment, params) do
+    case compare_dates(old_due, due) do
+      :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
+      _ -> due |> insert_due_mod(student_assignment, params)
+    end
+  end
+  defp check_change({:name, name}, %{assignment: %{name: old_name}} = student_assignment, params) do
+    case old_name == name do
+      false -> name |> insert_name_mod(student_assignment, params)
+      true -> dismiss_mods(student_assignment, @name_assignment_mod)
+    end
+  end
+  defp check_change(_tuple, _student_assignment, _params), do: {:ok, :no_mod}
+
+  defp insert_weight_mod(weight_id, %{} = student_assignment, params) do
+    student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
+
+    mod = %{
+      data: %{
+        weight_id: weight_id
+      },
+      assignment_mod_type_id: @weight_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student_class.student_id,
+      assignment_id: student_assignment.assignment.id
+    }
+    
+    existing_mod = mod |> find_mod()
+    cond do
+      is_nil(existing_mod) -> 
+        mod |> insert_mod(student_class)
+      existing_mod.is_private == true and mod.is_private == false -> 
+        mod |> publish_mod(student_class)
+      true -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
+        |> Repo.transaction()
+    end
+  end
+
+  defp insert_due_mod(due, %{} = student_assignment, params) do
+    student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
+
+    now = DateTime.utc_now()
+
+    #Due dates being set to the past are automatically private.
+    is_private = case DateTime.compare(now, due) do
+      :gt -> true
+      _ -> is_private(params["is_private"])
+    end
+
+    mod = %{
+      data: %{
+        due: due
+      },
+      assignment_mod_type_id: @due_assignment_mod,
+      is_private: is_private,
+      student_id: student_class.student_id,
+      assignment_id: student_assignment.assignment.id
+    }
+
+    existing_mod = mod |> find_mod()
+    cond do
+      is_nil(existing_mod) -> 
+        mod |> insert_mod(student_class)
+      existing_mod.is_private == true and mod.is_private == false -> 
+        mod |> publish_mod(student_class)
+      true -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
+        |> Repo.transaction()
+    end
+  end
+
+  defp insert_name_mod(name, %{} = student_assignment, params) do
+    student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
+
+    mod = %{
+      data: %{
+        name: name
+      },
+      assignment_mod_type_id: @name_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student_class.student_id,
+      assignment_id: student_assignment.assignment.id
+    }
+
+    existing_mod = mod |> find_mod()
+    cond do
+      is_nil(existing_mod) -> 
+        mod |> insert_mod(student_class)
+      existing_mod.is_private == true and mod.is_private == false -> 
+        mod |> publish_mod(student_class)
+      true -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
+        |> Repo.transaction()
+    end
+  end
+
+  defp dismiss_mods(%StudentAssignment{} = student_assignment, change_type) do
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_mod_type_id == ^change_type)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
+  end
+
   defp find_accepted_mods_for_student_assignment(%StudentAssignment{} = student_assignment) do
     from(mod in Mod)
     |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id and act.is_accepted == true)
@@ -450,6 +576,10 @@ defmodule Skoller.Mods do
     end
   end
 
+  defp dismiss_prior_mods(%Mod{} = mod, student_class_id, _) do
+    dismiss_prior_mods(mod, student_class_id)
+  end
+
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
@@ -511,4 +641,11 @@ defmodule Skoller.Mods do
 
   defp is_private(nil), do: false
   defp is_private(value), do: value
+
+  defp compare_dates(nil, nil), do: :eq
+  defp compare_dates(nil, _due), do: :neq
+  defp compare_dates(_old_due, nil), do: :neq
+  defp compare_dates(old_due, due) do
+    DateTime.compare(old_due, due)
+  end
 end

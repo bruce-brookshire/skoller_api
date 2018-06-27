@@ -30,12 +30,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
   @auto_upd_response_threshold "auto_upd_response_thresh"
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
 
-  def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
-    student_assignment = student_assignment |> Repo.preload(:assignment)
-    status = changes |> Enum.map(&get_changes(&1, student_assignment, params))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
-  end
-
   def insert_delete_mod(%{student_assignment: student_assignment}, params) do
     student_class = Repo.get!(StudentClass, student_assignment.student_class_id)
 
@@ -237,17 +231,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
     |> Repo.transaction()
   end
 
-  defp insert_mod(mod, %StudentClass{} = student_class) do
-    changeset = Mod.changeset(%Mod{}, mod)
-
-    Ecto.Multi.new
-    |> Ecto.Multi.insert(:mod, changeset)
-    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
-    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
-    |> Repo.transaction()
-  end
-
   defp publish_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
     changeset = Mod.changeset(mod, %{is_private: false})
     
@@ -256,17 +239,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
     |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
-    |> Repo.transaction()
-  end
-
-  defp publish_mod(mod, %StudentClass{} = student_class) do
-    changeset = Mod.changeset(mod, %{is_private: false})
-    
-    Ecto.Multi.new
-    |> Ecto.Multi.update(:mod, changeset)
-    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
-    |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
 
@@ -338,129 +310,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
     iso_date
   end
 
-  #If there are no changes, this function will not be hit at all.
-  defp get_changes(tuple, %{} = student_assignment, params) do
-    case tuple do
-      {:weight_id, weight_id} -> check_change(:weight, weight_id, student_assignment, params)
-      {:due, due} -> check_change(:due, due, student_assignment, params)
-      {:name, name} -> check_change(:name, name, student_assignment, params)
-      _ -> {:ok, :no_mod}
-    end
-  end
-
-  defp check_change(:weight, weight_id, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
-    case old_weight_id == weight_id do
-      false -> weight_id |> insert_weight_mod(student_assignment, params)
-      true -> dismiss_mods(student_assignment, @weight_assignment_mod)
-    end
-  end
-  defp check_change(:due, due, %{assignment: %{due: old_due}} = student_assignment, params) do
-    case compare_dates(old_due, due) do
-      :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
-      _ -> due |> insert_due_mod(student_assignment, params)
-    end
-  end
-  defp check_change(:name, name, %{assignment: %{name: old_name}} = student_assignment, params) do
-    case old_name == name do
-      false -> name |> insert_name_mod(student_assignment, params)
-      true -> dismiss_mods(student_assignment, @name_assignment_mod)
-    end
-  end
-
-  defp compare_dates(nil, nil), do: :eq
-  defp compare_dates(nil, _due), do: :neq
-  defp compare_dates(_old_due, nil), do: :neq
-  defp compare_dates(old_due, due) do
-    DateTime.compare(old_due, due)
-  end
-
-  defp insert_weight_mod(weight_id, %{} = student_assignment, params) do
-    student_class = Repo.get!(StudentClass, student_assignment.student_class_id)
-
-    mod = %{
-      data: %{
-        weight_id: weight_id
-      },
-      assignment_mod_type_id: @weight_assignment_mod,
-      is_private: is_private(params["is_private"]),
-      student_id: student_class.student_id,
-      assignment_id: student_assignment.assignment.id
-    }
-    
-    existing_mod = mod |> find_mod()
-    cond do
-      existing_mod == [] -> 
-        mod |> insert_mod(student_class)
-      existing_mod.is_private == true and mod.is_private == false -> 
-        mod |> publish_mod(student_class)
-      true -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
-        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
-        |> Repo.transaction()
-    end
-  end
-
-  defp insert_due_mod(due, %{} = student_assignment, params) do
-    student_class = Repo.get!(StudentClass, student_assignment.student_class_id)
-
-    now = DateTime.utc_now()
-    is_private = case DateTime.compare(now, due) do
-      :gt -> true
-      _ -> is_private(params["is_private"])
-    end
-
-    mod = %{
-      data: %{
-        due: due
-      },
-      assignment_mod_type_id: @due_assignment_mod,
-      is_private: is_private,
-      student_id: student_class.student_id,
-      assignment_id: student_assignment.assignment.id
-    }
-
-    existing_mod = mod |> find_mod()
-    cond do
-      existing_mod == [] -> 
-        mod |> insert_mod(student_class)
-      existing_mod.is_private == true and mod.is_private == false -> 
-        mod |> publish_mod(student_class)
-      true -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
-        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
-        |> Repo.transaction()
-    end
-  end
-
-  defp insert_name_mod(name, %{} = student_assignment, params) do
-    student_class = Repo.get!(StudentClass, student_assignment.student_class_id)
-
-    mod = %{
-      data: %{
-        name: name
-      },
-      assignment_mod_type_id: @name_assignment_mod,
-      is_private: is_private(params["is_private"]),
-      student_id: student_class.student_id,
-      assignment_id: student_assignment.assignment.id
-    }
-
-    existing_mod = mod |> find_mod()
-    cond do
-      existing_mod == [] -> 
-        mod |> insert_mod(student_class)
-      existing_mod.is_private == true and mod.is_private == false -> 
-        mod |> publish_mod(student_class)
-      true -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
-        |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
-        |> Repo.transaction()
-    end
-  end
-  
   defp find_mod(mod) do
     mod = from(mod in Mod)
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
@@ -522,10 +371,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
               |> Ecto.Changeset.change(%{is_accepted: true, is_manual: false})
               |> Repo.update()
     end
-  end
-
-  defp dismiss_prior_mods(%Mod{} = mod, student_class_id, _) do
-    dismiss_prior_mods(mod, student_class_id)
   end
 
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id) do

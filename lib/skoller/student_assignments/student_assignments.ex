@@ -10,7 +10,6 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.Students
   alias Skoller.Class.Weight
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.ModHelper
   alias Skoller.StudentClasses
 
   import Ecto.Query
@@ -181,7 +180,7 @@ defmodule Skoller.StudentAssignments do
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, changeset)
-    |> Ecto.Multi.run(:mod, &ModHelper.insert_update_mod(&1, changeset, params))
+    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params))
     |> Repo.transaction()
   end
 
