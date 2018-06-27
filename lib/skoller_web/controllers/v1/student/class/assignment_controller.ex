@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
+  alias Skoller.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
   
@@ -25,7 +26,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
 
     params = params |> Map.put("student_class_id", student_class.id)
 
-    case Students.create_student_assignment(params) do
+    case StudentAssignments.create_student_assignment(params) do
       {:ok, %{student_assignment: student_assignment, mod: mod}} ->
         Task.start(ModHelper, :process_auto_update, [mod, :notification])
         Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
@@ -57,7 +58,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
         |> send_resp(401, "")
         |> halt()
       student_assignment -> 
-        case Students.update_student_assignment(student_assignment, params) do
+        case StudentAssignments.update_student_assignment(student_assignment, params) do
           {:ok, %{student_assignment: student_assignment, mod: mod}} ->
             Task.start(ModHelper, :process_auto_update, [mod, :notification])
             Task.start(NotificationHelper, :send_mod_update_notifications, [mod])

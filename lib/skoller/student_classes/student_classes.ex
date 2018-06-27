@@ -6,6 +6,7 @@ defmodule Skoller.StudentClasses do
   alias Skoller.Repo
   alias Skoller.Class.Weight
   alias Skoller.StudentAssignments.StudentAssignment
+  alias Skoller.StudentClasses.StudentClass
 
   import Ecto.Query
 
@@ -28,5 +29,17 @@ defmodule Skoller.StudentClasses do
     weight_sum = student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(&1.weight, &2))
 
     student_grades |> Enum.reduce(Decimal.new(0), &Decimal.add(Decimal.div(Decimal.mult(&1.weight, &1.grade), weight_sum), &2))
+  end
+
+  def get_student_class_by_student_and_class(class_id, student_id) do
+    Repo.get_by(StudentClass, class_id: class_id, student_id: student_id)
+  end
+
+  def get_student_class_by_id(id) do
+    Repo.get(StudentClass, id)
+  end
+
+  def get_student_class_by_id!(id) do
+    Repo.get!(StudentClass, id)
   end
 end

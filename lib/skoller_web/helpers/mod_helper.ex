@@ -30,58 +30,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
   @auto_upd_response_threshold "auto_upd_response_thresh"
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
 
-  def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
-    mod = %{
-      data: %{
-        assignment: %{
-          name: assignment.name,
-          due: assignment.due,
-          class_id: assignment.class_id,
-          weight_id: assignment.weight_id,
-          id: assignment.id
-        }
-      },
-      assignment_mod_type_id: @new_assignment_mod,
-      is_private: is_private(params["is_private"]),
-      student_id: params["student_id"],
-      assignment_id: assignment.id
-    }
-    existing_mod = mod |> find_mod()
-    cond do
-      existing_mod == [] and assignment.from_mod == true ->
-        # The assignment is not an original assignment, and needs a mod.
-        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
-
-        mod |> insert_mod(student_class)
-      existing_mod == [] and assignment.from_mod == false -> 
-        # The assignment is original, and should not have a mod.
-        {:ok, existing_mod}
-      existing_mod.is_private == true and mod.is_private == false ->
-        # The assignment has a mod that needs to be published.
-        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
-
-        mod |> publish_mod(student_class)
-      true -> 
-        # The assignment has a mod already, and needs no changes 
-        student_class = Repo.get_by(StudentClass, class_id: assignment.class_id, student_id: params["student_id"])
-
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
-        |> Repo.transaction()
-    end
-  end
-
-  # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
-  def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
-    student_assignment = student_assignment |> Repo.preload(:student_class)
-    student_class = Repo.get_by(StudentClass, class_id: student_assignment.student_class.class_id, student_id: params["student_id"], is_dropped: false)
-    student_assignment
-    |> find_mods()
-    |> Enum.map(&process_existing_mod(&1, student_class, params))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
-  end
-
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&get_changes(&1, student_assignment, params))
@@ -322,18 +270,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
     |> Repo.transaction()
   end
 
-  defp process_existing_mod(mod, %StudentClass{} = student_class, params) do
-    case mod.is_private == true and is_private(params["is_private"]) == false do
-      true ->
-        mod |> publish_mod(student_class)
-      false -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id, :manual))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
-        |> Repo.transaction()
-    end
-  end
-
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
     student_assignment = Repo.get_by!(StudentAssignment, assignment_id: mod.assignment_id, student_class_id: id)
 
@@ -536,14 +472,7 @@ defmodule SkollerWeb.Helpers.ModHelper do
       mod -> mod
     end
   end
-
-  defp find_mods(%StudentAssignment{} = student_assignment) do
-    from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id)
-    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
-    |> Repo.all
-  end
-
+  
   defp insert_public_mod_action_query(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, %StudentClass{} = student_class) do
     from(sc in StudentClass)
     |> join(:left, [sc], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
@@ -637,32 +566,6 @@ defmodule SkollerWeb.Helpers.ModHelper do
         items = items |> Enum.map(&Repo.update!(Ecto.Changeset.change(&1, %{is_accepted: false, is_manual: false})))
         {:ok, items}
     end
-  end
-
-  defp get_backlogged_mods(mod) do
-    from(mod in Mod)
-    |> where([mod], mod.assignment_id == ^mod.assignment_id)
-    |> where([mod], mod.is_private == false)
-    |> where([mod], mod.id != ^mod.id)
-    |> Repo.all()
-  end
-
-  defp insert_backlogged_actions([], _student_class_id), do: {:ok, nil}
-  defp insert_backlogged_actions(enumerable, student_class_id) do
-    enumerable
-    |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
-    |> Enum.map(&Repo.insert!(&1))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
-  end
-
-  defp insert_backlogged_mods(mod, %StudentClass{} = sc, _) do
-    insert_backlogged_mods(mod, sc)
-  end
-
-  defp insert_backlogged_mods(mod, %StudentClass{id: id}) do
-    mod
-    |> get_backlogged_mods()
-    |> insert_backlogged_actions(id)
   end
 
   defp is_private(nil), do: false
