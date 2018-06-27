@@ -335,6 +335,27 @@ defmodule Skoller.Mods do
     |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
   end
 
+  @doc """
+  Compares a student assignment with a changeset's changes, and adds mods when there are differences.
+
+  ## Mod Types
+   * Due date changes on the `due` field
+   * Name changes on the `name` field
+   * Weight changes on the `weight_id` field.
+
+  ## Behavior
+   * If a change is reverted back to the original assignment's value for a given type, all accepted mods of that type will be dismissed.
+
+  ## Returns
+  `{:ok, [t]}` where `t` is any item from the list below.
+   * `{:ok, :no_mod}` when there are no changes.
+   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+  where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
+  `dismissed` are the actions that are dismissed as a result of creating the mod.
+   * `{:ok, [Skoller.Assignment.Mod.Action]}` when there are actions that are dismissed due to reverting back to no changes.
+   * `{:ok, nil}`
+   * `{:ok, %{self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+  """
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&check_change(&1, student_assignment, params))
