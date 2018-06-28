@@ -397,6 +397,14 @@ defmodule Skoller.Mods do
     end
   end
 
+  @doc """
+  Applies all actions that are currently nil in `actions`.
+
+  See `apply_mod/3`.
+
+  ## Returns
+  `{:ok, [t]}` where `t` is the result of `apply_mod/3`
+  """
   def apply_mods(actions, _) do
     nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
 
@@ -405,6 +413,18 @@ defmodule Skoller.Mods do
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
+  @doc """
+  Applies a mod to a student assignment.
+
+  ## Behavior
+  This will either create, delete, or change a student assignment.
+
+  ## Returns
+  `Ecto.Multi` with the following keys depending on mod type.
+   * New mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
+   * Delete mod: `[:student_assignment, :self_action, :dismissed]`
+   * Change mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
+  """
   def apply_mod(%Mod{} = mod, %StudentClass{} = student_class, atom \\ :manual) do
     case mod.assignment_mod_type_id do
       @delete_assignment_mod -> apply_delete_mod(mod, student_class, atom)
@@ -413,6 +433,12 @@ defmodule Skoller.Mods do
     end
   end
 
+  @doc """
+  Updates a mod.
+
+  ## Returns
+  `{:ok, %Skoller.Assignment.Mod{}}` or `{:error, %Ecto.Changeset{}}`
+  """
   def update_mod(mod_old, params) do
     mod_old
     |> Ecto.Changeset.change(params)
