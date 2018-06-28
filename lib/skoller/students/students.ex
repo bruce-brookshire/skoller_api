@@ -30,6 +30,16 @@ defmodule Skoller.Students do
   @enrollment_limit 15
 
   @doc """
+  Gets a student by id.
+
+  ## Returns
+  `Skoller.Students.Student` or `Ecto.NoResultsError`
+  """
+  def get_student_by_id!(student_id) do
+    Repo.get!(Student, student_id)
+  end
+
+  @doc """
   Gets students in a class. Includes previously-enrolled students.
 
   ## Returns
