@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias Skoller.Repo
   alias Skoller.Assignment.Post
   alias SkollerWeb.Assignment.PostView
-  alias SkollerWeb.Helpers.NotificationHelper
+  alias Skoller.AssignmentPostNotifications
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students
 
@@ -30,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
     case Repo.transaction(multi) do
       {:ok, %{post: post}} ->
-        Task.start(NotificationHelper, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
+        Task.start(AssignmentPostNotifications, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
         render(conn, PostView, "show.json", %{post: post})
       {:error, _, failed_value, _} ->
         conn

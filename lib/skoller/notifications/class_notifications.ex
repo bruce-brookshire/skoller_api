@@ -9,6 +9,7 @@ defmodule Skoller.ClassNotifications do
   alias Skoller.Devices
 
   @class_complete_category "Class.Complete"
+  @manual_syllabus_category "Manual.NeedsSyllabus"
 
   @class_complete "We didn't find any assignments on the syllabus. Be sure to add assignments on the app throughout the semester so you and your classmates can keep up. 💯"  
   @is_ready " is ready!"
@@ -16,6 +17,8 @@ defmodule Skoller.ClassNotifications do
   @from_syllabus "from the class syllabus. Any new assignments or schedule changes are up to you and your classmates. 💯"
   @one_assign_class_complete "assignment " <> @from_syllabus
   @multiple_assign_class_complete "assignments " <> @from_syllabus
+
+  @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
   def send_class_complete_notification(%{is_editable: true} = class) do
     devices = class.id
@@ -27,6 +30,16 @@ defmodule Skoller.ClassNotifications do
     devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
   end
   def send_class_complete_notification(_class), do: :ok
+
+  def send_needs_syllabus_notifications() do
+    users = Notifications.get_notification_enabled_needs_syllabus_users()
+    |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
+
+    Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
+
+    users
+    |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
+  end
 
   defp class_complete_msg(assignments) do
     case Enum.count(assignments) do

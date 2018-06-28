@@ -26,6 +26,16 @@ defmodule Skoller.Assignments do
   @default_message_future_mult "You have [num] assignments in the next [days] days. Check them out!"
 
   @doc """
+  Gets an assignment by id.
+
+  ## Returns
+  `Skoller.Class.Assignment` or `Ecto.NoResultsError`
+  """
+  def get_assignment_by_id!(assignment_id) do
+    Repo.get!(Assignment, assignment_id)
+  end
+
+  @doc """
   Gets all assignment posts for a student.
 
   ## Notes
