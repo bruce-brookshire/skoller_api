@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
   alias Skoller.StudentAssignments
@@ -47,7 +46,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   def show(conn, %{"id" => id}) do
     student_assignment = Students.get_student_assignment_by_id(id, :weight)
     
-    pending_mods = ModHelper.pending_mods_for_assignment(student_assignment)
+    pending_mods = Mods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
 
     render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)

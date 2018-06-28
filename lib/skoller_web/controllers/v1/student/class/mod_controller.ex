@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.ModController do
   
   use SkollerWeb, :controller
 
-  alias SkollerWeb.Helpers.ModHelper
+  alias Skoller.Mods
   alias SkollerWeb.AssignmentView
   alias Skoller.Students
 
@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.ModController do
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
     student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
 
-    assignments = student_class |> ModHelper.get_new_assignment_mods()
+    assignments = student_class |> Mods.get_new_assignment_mods()
 
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end

@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
   alias SkollerWeb.Class.StudentClassView
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.ModHelper
+  alias Skoller.Mods
   alias Skoller.Students
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
@@ -78,6 +78,6 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   end
 
   defp get_new_class_assignments(%{} = student_class) do
-    student_class |> ModHelper.get_new_assignment_mods()
+    student_class |> Mods.get_new_assignment_mods()
   end
 end

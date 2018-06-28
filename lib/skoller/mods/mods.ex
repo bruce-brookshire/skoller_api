@@ -445,6 +445,40 @@ defmodule Skoller.Mods do
     |> Repo.update()
   end
 
+  @doc """
+  Gets unanswered mods for a student assignment.
+
+  An unanswered mod is when `is_accepted` is `nil`
+
+  ## Returns
+  `[Skoller.Assignment.Mod]` or `[]`
+  """
+  def pending_mods_for_student_assignment(%{student_class_id: student_class_id, assignment_id: assignment_id}) do
+    from(m in Mod)
+    |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_class_id)
+    |> where([m], m.assignment_id == ^assignment_id)
+    |> where([m, act], is_nil(act.is_accepted))
+    |> Repo.all
+  end
+
+  @doc """
+  Gets new assignment mods for a student that are unanswered.
+
+  An unanswered mod is when `is_accepted` is `nil`
+
+  ## Returns
+  `[Skoller.Class.Assignment]` or `[]`
+  """
+  def get_new_assignment_mods(%StudentClass{} = student_class) do
+    from(mod in Mod)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
+    |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
+    |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
+    |> where([mod, act], is_nil(act.is_accepted))
+    |> select([mod, act, assign], assign)
+    |> Repo.all()
+  end
+
   defp apply_action_mods(action) do
     student_class = StudentClasses.get_student_class_by_id!(action.student_class_id)
     mod = Repo.get!(Mod, action.assignment_modification_id)

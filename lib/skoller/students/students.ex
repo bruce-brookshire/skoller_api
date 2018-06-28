@@ -12,7 +12,6 @@ defmodule Skoller.Students do
   alias Skoller.Classes.Status
   alias Skoller.Professors.Professor
   alias Skoller.Schools.ClassPeriod
-  alias SkollerWeb.Helpers.ModHelper
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
@@ -559,7 +558,7 @@ defmodule Skoller.Students do
   end
 
   defp is_pending_mods(assignment) do
-    case ModHelper.pending_mods_for_assignment(assignment) do
+    case Mods.pending_mods_for_student_assignment(assignment) do
       [] -> false
       _ -> true
     end
