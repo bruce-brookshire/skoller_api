@@ -3,13 +3,10 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   alias Skoller.Repo
   alias SkollerWeb.Notification
   alias Skoller.Students.Student
-  alias Skoller.Assignment.Mod
   alias Skoller.Class.Assignment
   alias Skoller.Classes
-  alias Skoller.Mods
   alias Skoller.Notifications
   alias Skoller.Devices
-  alias Skoller.Dates
 
   @moduledoc """
   
@@ -17,8 +14,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
 
   """
 
-  @class_complete_category "Class.Complete"
-  @auto_update_category "Update.Auto"
   @class_chat_comment "ClassChat.Comment"
   @class_chat_post "ClassChat.Post"
   @class_chat_reply "ClassChat.Reply"
@@ -26,32 +21,7 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @manual_custom_category "Manual.Custom"
   @assignment_post "Assignment.Post"
 
-  @name_assignment_mod 100
-  @weight_assignment_mod 200
-  @due_assignment_mod 300
-  @new_assignment_mod 400
-  @delete_assignment_mod 500
-
-  @of_s " of "
-  @to_s " to "
   @in_s " in "
-  @removed "removed "
-  @due "due "
-  @notification_end "."
-  @no_weight "no weight"
-
-  @class_complete "We didn't find any assignments on the syllabus. Be sure to add assignments on the app throughout the semester so you and your classmates can keep up. 💯"
-  @we_created "We created"
-  @from_syllabus "from the class syllabus. Any new assignments or schedule changes are up to you and your classmates. 💯"
-  @one_assign_class_complete "assignment " <> @from_syllabus
-  @multiple_assign_class_complete "assignments " <> @from_syllabus
-
-  @auto_delete "Autoupdate: assignment has been removed"
-  @auto_add "Autoupdate: assignment has been added"
-  @auto_update " has been autoupdated"
-  #@of_class_accepted "% of your classmates have made this change."
-
-  @is_ready " is ready!"
 
   @commented " commented on a post you follow."
   @commented_yours " commented on your post."
@@ -63,49 +33,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @commented_on_s " commented on "
 
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
-
-  def send_class_complete_notification(%{is_editable: true} = class) do
-    devices = class.id
-            |> Notifications.get_users_from_class()
-            |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
-    class = class |> Repo.preload([:assignments])
-    msg = class.assignments |> class_complete_msg()
-    
-    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
-  end
-  def send_class_complete_notification(_class), do: :ok
-
-  def send_auto_update_notification(actions) do
-    actions |> Enum.each(&build_auto_update_notification(&1))
-  end
-
-  def build_auto_update_notification({:ok, action}) do
-    mod = Repo.get(Mod, action.assignment_modification_id)
-          |> Repo.preload(:assignment)
-    class = Mods.get_class_from_mod_id(mod.id)
-    case class.is_editable do
-      true -> 
-        title = case mod.assignment_mod_type_id do
-          @new_assignment_mod -> @auto_add
-          @delete_assignment_mod -> @auto_delete
-          _ -> mod.assignment.name <> @auto_update
-        end
-        body = case mod.assignment_mod_type_id do
-          @new_assignment_mod -> mod_add_notification_text(mod, class)
-          @delete_assignment_mod -> mod_delete_notification_text(mod, class)
-          _ -> text = mod_change_notification_text(mod, class)
-          len = text |> String.length
-          msg = text |> String.slice(0..0) |> String.upcase()
-          msg <> (text |> String.slice(1..len))
-        end
-        Notifications.get_users_from_student_class(action.student_class_id)
-        |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
-        |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
-      false -> 
-        :ok
-    end
-  end
-  def build_auto_update_notification(_), do: nil
 
   def send_new_post_notification(post, student_id) do
     student = Repo.get!(Student, student_id)
@@ -171,19 +98,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
   end
 
-  # defp add_acceptance_percentage(mod) do
-  #   actions = from(act in Action)
-  #   |> join(:inner, [act], mod in Mod, act.assignment_modification_id == mod.id)
-  #   |> where([act, mod], mod.id == ^mod.id)
-  #   |> Repo.all()
-
-  #   count = actions |> Enum.count()
-
-  #   accepted = actions |> Enum.count(& &1.is_accepted == true)
-
-  #   (accepted / count) * 100 |> Kernel.round()
-  # end
-
   defp build_chat_post_notification(post, student, class) do
     student.name_first <> " " <> student.name_last <> @posted_s <> class.name <> ": " <> post.post
   end
@@ -209,66 +123,5 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   defp put_user_devices(user) do
     Devices.get_devices_by_user_id(user.id)
     |> Enum.map(&Map.put(&1, :msg, user.msg))
-  end
-
-  defp class_complete_msg(assignments) do
-    case Enum.count(assignments) do
-      0 -> @class_complete
-      1 -> @we_created <> " 1 " <> @one_assign_class_complete
-      num -> @we_created <> " " <> to_string(num) <> " " <> @multiple_assign_class_complete
-    end
-  end
-
-  defp mod_add_notification_text(mod, class) do
-    case mod.assignment.due do
-      nil ->
-        mod.assignment.name <> @in_s <> class.name <> @notification_end
-      due ->
-        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> Dates.format_date(due) <> @notification_end
-    end
-  end
-
-  defp mod_change_notification_text(%{data: %{due: nil}} = mod, class) do
-    @removed <> " " <> mod_type(mod) <> @of_s <> class_and_assign_name(mod, class)
-  end
-  defp mod_change_notification_text(mod, class) do
-    mod_type(mod) <> @of_s <> class_and_assign_name(mod, class) <> @to_s <> mod_change(mod) <> @notification_end
-  end
-
-  defp class_and_assign_name(mod, class) do
-    class.name <> " " <> mod.assignment.name
-  end
-
-  defp mod_delete_notification_text(mod, class) do
-    mod.assignment.name <> @in_s <> class.name <> @notification_end
-  end
-
-  defp mod_type(%Mod{assignment_mod_type_id: type}) do
-    case type do
-      @name_assignment_mod -> "name"
-      @weight_assignment_mod -> "weight"
-      @due_assignment_mod -> "due date"
-    end
-  end
-
-  defp mod_change(%Mod{assignment_mod_type_id: type, data: data}) do
-    case type do
-      @name_assignment_mod -> data["name"]
-      @weight_assignment_mod -> get_weight_from_id(data["weight_id"])
-      @due_assignment_mod -> format_date_from_iso(data["due"])
-    end
-  end
-
-  defp get_weight_from_id(nil), do: @no_weight
-
-  defp get_weight_from_id(id) do
-    weight = Repo.get!(Weight, id)
-    weight.name
-  end
-
-  defp format_date_from_iso(date) do
-    {:ok, date, _offset} = date |> DateTime.from_iso8601()
-    
-    date |> Dates.format_date()
   end
 end

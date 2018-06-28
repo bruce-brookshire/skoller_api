@@ -72,9 +72,6 @@ defmodule Skoller.ModActions do
   `%Skoller.Assignment.Mod{}` or `nil`
   """
   def get_mod_from_action(%Action{} = action) do
-    from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id)
-    |> where([mod, act], act.id == ^action.id)
-    |> Repo.one
+    Repo.get(Mod, action.assignment_modification_id)
   end
 end

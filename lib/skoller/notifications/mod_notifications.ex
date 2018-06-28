@@ -21,6 +21,7 @@ defmodule Skoller.ModNotifications do
   @delete_assignment_mod 500
 
   @pending_update_category "Update.Pending"
+  @auto_update_category "Update.Auto"
 
   @a_classmate_has "A classmate has "
   @added "added "
@@ -39,6 +40,10 @@ defmodule Skoller.ModNotifications do
   @and_s " and "
   @c_and_s ", and "
   @notification_end "."
+
+  @auto_delete "Autoupdate: assignment has been removed"
+  @auto_add "Autoupdate: assignment has been added"
+  @auto_update " has been autoupdated"
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = Notifications.get_user_from_student_class(action.student_class_id)
@@ -62,6 +67,38 @@ defmodule Skoller.ModNotifications do
   def send_mod_update_notifications(mod) do
     mod.actions |> Enum.each(&send_mod_update_notifications(&1))
   end
+
+  def send_auto_update_notification(actions) do
+    actions |> Enum.each(&build_auto_update_notification(&1))
+  end
+
+  defp build_auto_update_notification({:ok, action}) do
+    mod = ModActions.get_mod_from_action(action)
+          |> Repo.preload(:assignment)
+    class = Mods.get_class_from_mod_id(mod.id)
+    case class.is_editable do
+      true -> 
+        title = case mod.assignment_mod_type_id do
+          @new_assignment_mod -> @auto_add
+          @delete_assignment_mod -> @auto_delete
+          _ -> mod.assignment.name <> @auto_update
+        end
+        body = case mod.assignment_mod_type_id do
+          @new_assignment_mod -> mod_add_notification_text(mod, class)
+          @delete_assignment_mod -> mod_delete_notification_text(mod, class)
+          _ -> text = mod_change_notification_text(mod, class)
+          len = text |> String.length
+          msg = text |> String.slice(0..0) |> String.upcase()
+          msg <> (text |> String.slice(1..len))
+        end
+        Notifications.get_users_from_student_class(action.student_class_id)
+        |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
+        |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
+      false -> 
+        :ok
+    end
+  end
+  defp build_auto_update_notification(_), do: nil
 
   defp build_notifications(%Action{} = action, %{student: student}, devices) do
     count = ModActions.get_pending_mod_count_for_student(student.id)
