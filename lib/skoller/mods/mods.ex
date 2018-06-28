@@ -134,6 +134,7 @@ defmodule Skoller.Mods do
     |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
     |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
     |> where([class, sc, act], is_nil(act.is_accepted))
+    |> distinct([class], class.id)
     |> Repo.all()
   end
 

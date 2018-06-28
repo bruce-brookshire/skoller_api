@@ -2,17 +2,14 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   
   alias Skoller.Repo
   alias SkollerWeb.Notification
-  alias Skoller.Assignment.Mod.Action
   alias Skoller.Students.Student
-  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Assignment.Mod
   alias Skoller.Class.Assignment
   alias Skoller.Classes
   alias Skoller.Mods
   alias Skoller.Notifications
   alias Skoller.Devices
-
-  import Ecto.Query
+  alias Skoller.Dates
 
   @moduledoc """
   
@@ -22,7 +19,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
 
   @class_complete_category "Class.Complete"
   @auto_update_category "Update.Auto"
-  @pending_update_category "Update.Pending"
   @class_chat_comment "ClassChat.Comment"
   @class_chat_post "ClassChat.Post"
   @class_chat_reply "ClassChat.Reply"
@@ -36,20 +32,11 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @new_assignment_mod 400
   @delete_assignment_mod 500
 
-  @a_classmate_has "A classmate has "
-  @you_have "You have "
-  @updates_pending " updates pending"
   @of_s " of "
   @to_s " to "
-  @the_s " the "
   @in_s " in "
-  @and_s " and "
-  @c_and_s ", and "
-  @updated "updated"
-  @added "added "
   @removed "removed "
   @due "due "
-  @due_date "due date"
   @notification_end "."
   @no_weight "no weight"
 
@@ -76,29 +63,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
   @commented_on_s " commented on "
 
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
-
-  def send_mod_update_notifications({:ok, %Action{} = action}) do
-    user = Notifications.get_user_from_student_class(action.student_class_id)
-    devices = user.user.id |> Devices.get_devices_by_user_id()
-    case devices do
-      [] -> :ok
-      _ -> action |> build_notifications(user, devices)
-    end
-  end
-
-  def send_mod_update_notifications({:ok, %{actions: _} = mod}) do
-    send_mod_update_notifications(mod)
-  end
-
-  def send_mod_update_notifications(mod) when is_list(mod) do
-    mod |> Enum.each(&send_mod_update_notifications(&1))
-  end
-
-  def send_mod_update_notifications(%{actions: nil}), do: nil
-  def send_mod_update_notifications({:ok, _}), do: nil
-  def send_mod_update_notifications(mod) do
-    mod.actions |> Enum.each(&send_mod_update_notifications(&1))
-  end
 
   def send_class_complete_notification(%{is_editable: true} = class) do
     devices = class.id
@@ -255,36 +219,12 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     end
   end
 
-  defp build_notifications(%Action{} = action, %{student: student}, devices) do
-    count = get_pending_mods_for_student(student.id)
-    msg = case count do
-      1 -> action |> one_pending_mod_notification()
-      num -> student |> multiple_pending_mod_notification(num)
-    end
-    devices |> Enum.each(&Notification.create_notification(&1.udid, msg, @pending_update_category))
-  end
-
-  defp one_pending_mod_notification(action) do
-    mod = get_mod_from_action(action) |> Repo.preload(:assignment)
-    class = Mods.get_class_from_mod_id(mod.id)
-    cond do
-      mod.assignment_mod_type_id == @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
-      mod.assignment_mod_type_id == @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
-      is_nil(mod.data["due"]) -> @a_classmate_has <> @removed <> @the_s <> @due_date <> @of_s <> class_and_assign_name(mod, class)
-      true -> @a_classmate_has <> @updated <> @the_s <> mod_change_notification_text(mod, class)
-    end
-  end
-
-  defp multiple_pending_mod_notification(student, num) do
-    @you_have <> to_string(num) <> @updates_pending <> @in_s <> class_list(student) <> @notification_end
-  end
-
   defp mod_add_notification_text(mod, class) do
     case mod.assignment.due do
       nil ->
         mod.assignment.name <> @in_s <> class.name <> @notification_end
       due ->
-        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> format_date(due) <> @notification_end
+        mod.assignment.name <> @in_s <> class.name <> ", " <> @due <> Dates.format_date(due) <> @notification_end
     end
   end
 
@@ -303,25 +243,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     mod.assignment.name <> @in_s <> class.name <> @notification_end
   end
 
-  defp class_list(%Student{} = student) do
-    Mods.get_classes_with_pending_mod_by_student_id(student.id)
-    |> Enum.uniq
-    |> format_list
-  end
-
-  defp format_list(list) do
-    head = list |> List.first()
-    tail = list |> List.last()
-    case list |> Enum.count() do
-      1 -> head.name
-      2 -> head.name <> @and_s <> tail.name
-      _ -> str = list |> List.delete_at(-1)
-                      |> List.delete_at(0)
-                      |> List.foldl(@c_and_s <> tail.name, & ", " <> &1.name <> &2)
-        head.name <> str
-    end
-  end
-
   defp mod_type(%Mod{assignment_mod_type_id: type}) do
     case type do
       @name_assignment_mod -> "name"
@@ -338,25 +259,6 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     end
   end
 
-  defp get_pending_mods_for_student(student_id) do
-    from(act in Action)
-    |> join(:inner, [act], sc in StudentClass, sc.id == act.student_class_id)
-    |> join(:inner, [act, sc], stu in Student, stu.id == sc.student_id)
-    |> where([act], is_nil(act.is_accepted))
-    |> where([act, sc, stu], stu.id == ^student_id)
-    |> select([act, sc, stu], count(act.id))
-    |> Repo.all
-    |> List.first
-  end
-
-  defp get_mod_from_action(%Action{} = action) do
-    from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id)
-    |> where([mod, act], act.id == ^action.id)
-    |> Repo.all
-    |> List.first()
-  end
-
   defp get_weight_from_id(nil), do: @no_weight
 
   defp get_weight_from_id(id) do
@@ -364,46 +266,9 @@ defmodule SkollerWeb.Helpers.NotificationHelper do
     weight.name
   end
 
-  defp format_date(date) do
-    day_of_week = get_day_of_week(Date.day_of_week(date))
-    month = get_month(date.month)
-    day = get_day(date.day)
-    day_of_week <> ", " <> month <> " " <> day
-  end
-
   defp format_date_from_iso(date) do
     {:ok, date, _offset} = date |> DateTime.from_iso8601()
     
-    date |> format_date()
+    date |> Dates.format_date()
   end
-
-  defp get_month(1), do: "January"
-  defp get_month(2), do: "February"
-  defp get_month(3), do: "March"
-  defp get_month(4), do: "April"
-  defp get_month(5), do: "May"
-  defp get_month(6), do: "June"
-  defp get_month(7), do: "July"
-  defp get_month(8), do: "August"
-  defp get_month(9), do: "September"
-  defp get_month(10), do: "October"
-  defp get_month(11), do: "November"
-  defp get_month(12), do: "December"
-
-  defp get_day(1), do: "1st"
-  defp get_day(2), do: "2nd"
-  defp get_day(3), do: "3rd"
-  defp get_day(21), do: "21st"
-  defp get_day(22), do: "22nd"
-  defp get_day(23), do: "23rd"
-  defp get_day(31), do: "31st"
-  defp get_day(day), do: to_string(day) <> "th"
-
-  defp get_day_of_week(1), do: "Monday"
-  defp get_day_of_week(2), do: "Tuesday"
-  defp get_day_of_week(3), do: "Wednesday"
-  defp get_day_of_week(4), do: "Thursday"
-  defp get_day_of_week(5), do: "Friday"
-  defp get_day_of_week(6), do: "Saturday"
-  defp get_day_of_week(7), do: "Sunday"
 end
