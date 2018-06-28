@@ -11,6 +11,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Students
   alias Skoller.StudentAssignments
   alias Skoller.Mods
+  alias Skoller.AutoUpdates
 
   import SkollerWeb.Plugs.Auth
   
@@ -29,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
 
     case StudentAssignments.create_student_assignment(params) do
       {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-        Task.start(ModHelper, :process_auto_update, [mod, :notification])
+        Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
         Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
@@ -61,7 +62,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       student_assignment -> 
         case StudentAssignments.update_student_assignment(student_assignment, params) do
           {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-            Task.start(ModHelper, :process_auto_update, [mod, :notification])
+            Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
             Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
             render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
           {:error, _, failed_value, _} ->
@@ -84,7 +85,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
 
         case Repo.transaction(multi) do
           {:ok, %{mod: mod}} ->
-            Task.start(ModHelper, :process_auto_update, [mod, :notification])
+            Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
             Task.start(NotificationHelper, :send_mod_update_notifications, [mod])
             conn
             |> send_resp(200, "")

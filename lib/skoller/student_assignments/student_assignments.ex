@@ -25,6 +25,16 @@ defmodule Skoller.StudentAssignments do
   end
 
   @doc """
+  Gets a student assignment by assignment id and student class id.
+
+  ## Returns
+  `Skoller.StudentAssignments.StudentAssignment` or `Ecto.NoResultsError`
+  """
+  def get_assignment_by_ids!(assignment_id, student_class_id) do
+    Repo.get_by!(StudentAssignment, assignment_id: assignment_id, student_class_id: student_class_id)
+  end
+
+  @doc """
   Inserts assignments for all students in the class, or inserts all class assignments for a student.
 
   ## Behavior

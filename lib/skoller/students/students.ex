@@ -22,6 +22,7 @@ defmodule Skoller.Students do
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
   alias Skoller.StudentClasses
+  alias Skoller.AutoUpdates
 
   import Ecto.Query
 
@@ -134,11 +135,19 @@ defmodule Skoller.Students do
   end
 
   @doc """
+  Subquery that gets enrolled students in a class by class id.
+  """
+  def get_enrollment_by_class_id_subquery(class_id) do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false and sc.class_id == ^class_id)
+  end
+
+  @doc """
   Subquery that gets enrolled students in a class
   """
-  def get_enrollment_by_class_id_subquery(id) do
+  def enrolled_student_class_subquery() do
     from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false and sc.class_id == ^id)
+    |> where([sc], sc.is_dropped == false)
   end
 
   @doc """
@@ -520,7 +529,7 @@ defmodule Skoller.Students do
 
   defp auto_approve_mods(%{mods: mods}) do
     status = mods
-    |> Enum.map(&ModHelper.process_auto_update(&1))
+    |> Enum.map(&AutoUpdates.process_auto_update(&1))
 
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
