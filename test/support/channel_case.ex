@@ -1,4 +1,4 @@
-defmodule ClassnavapiWeb.ChannelCase do
+defmodule SkollerWeb.ChannelCase do
   @moduledoc """
   This module defines the test case to be used by
   channel tests.
@@ -21,15 +21,15 @@ defmodule ClassnavapiWeb.ChannelCase do
       use Phoenix.ChannelTest
 
       # The default endpoint for testing
-      @endpoint ClassnavapiWeb.Endpoint
+      @endpoint SkollerWeb.Endpoint
     end
   end
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Classnavapi.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Skoller.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Classnavapi.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Skoller.Repo, {:shared, self()})
     end
     :ok
   end

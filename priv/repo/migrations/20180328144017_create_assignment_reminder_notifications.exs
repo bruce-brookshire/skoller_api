@@ -1,4 +1,4 @@
-defmodule Classnavapi.Repo.Migrations.CreateAssignmentReminderNotifications do
+defmodule Skoller.Repo.Migrations.CreateAssignmentReminderNotifications do
   use Ecto.Migration
 
   def change do

@@ -6,7 +6,7 @@ use Mix.Config
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :classnavapi, ClassnavapiWeb.Endpoint,
+config :skoller, SkollerWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -37,15 +37,15 @@ config :logger, :console, format: "[$level] $message\n"
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-config :classnavapi, Classnavapi.Repo,
+config :skoller, Skoller.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "classnavapi_dev",
+  database: "skoller_dev",
   hostname: "localhost",
   pool_size: 10
 
 # Configure Guardian Token Generation
-config :classnavapi, Classnavapi.Auth,
-            issuer: "Classnavapi",
+config :skoller, Skoller.Auth,
+            issuer: "Skoller",
             secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"
