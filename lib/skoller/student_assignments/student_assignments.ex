@@ -404,7 +404,7 @@ defmodule Skoller.StudentAssignments do
   end
 
   defp update_assignment(student_assignment) do
-    case get_assignment_by_ids(student_assignment.assignment_id, student_assignment.student_assignment_id) do
+    case get_assignment_by_ids(student_assignment.assignment_id, student_assignment.student_class_id) do
       nil -> :ok
       assign_old -> StudentAssignment.changeset_update_auto(assign_old, %{name: student_assignment.name,
                                                                       weight_id: student_assignment.weight_id,
