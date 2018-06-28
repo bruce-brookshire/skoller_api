@@ -15,7 +15,7 @@ defmodule Skoller.AutoUpdates do
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
 
   @doc """
-  See process_auto_update/1. Also sends notificaitons on success.
+  See `process_auto_update/1`. Also sends notificaitons on success.
 
   For use in a Task.
   """
