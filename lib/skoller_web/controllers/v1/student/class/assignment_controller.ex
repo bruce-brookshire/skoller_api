@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
   alias Skoller.StudentAssignments
+  alias Skoller.Mods
 
   import SkollerWeb.Plugs.Auth
   
@@ -79,7 +80,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       student_assignment -> 
         multi = Ecto.Multi.new
         |> Ecto.Multi.delete(:student_assignment, student_assignment)
-        |> Ecto.Multi.run(:mod, &ModHelper.insert_delete_mod(&1, params))
+        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params))
 
         case Repo.transaction(multi) do
           {:ok, %{mod: mod}} ->

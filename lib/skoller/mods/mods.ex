@@ -362,6 +362,40 @@ defmodule Skoller.Mods do
     status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
   end
 
+  @doc """
+  Inserts a mod when someone deletes an assignment.
+
+  ## Returns
+   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+  where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
+  `dismissed` are the actions that are dismissed as a result of creating the mod.
+   * `{:ok, %{self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+  """
+  def insert_delete_mod(%{student_assignment: student_assignment}, params) do
+    student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
+
+    mod = %{
+      data: %{},
+      assignment_mod_type_id: @delete_assignment_mod,
+      is_private: is_private(params["is_private"]),
+      student_id: student_class.student_id,
+      assignment_id: student_assignment.assignment_id
+    }
+
+    existing_mod = mod |> find_mod()
+    cond do
+      is_nil(existing_mod) -> 
+        mod |> insert_mod(student_class, student_assignment)
+      existing_mod.is_private == true and mod.is_private == false -> 
+        mod |> publish_mod(student_class, student_assignment)
+      true -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+        |> Repo.transaction()
+    end
+  end
+
   #compare new change with original assignment. If original, dismiss mods. Otherwise, create mod.
   defp check_change({:weight_id, weight_id}, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
     case old_weight_id == weight_id do
@@ -482,6 +516,16 @@ defmodule Skoller.Mods do
     |> dismiss_from_results()
   end
 
+  defp dismiss_mods(%StudentAssignment{} = student_assignment, @delete_assignment_mod, _) do
+    from(mod in Mod)
+    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> where([mod], mod.assignment_mod_type_id != @delete_assignment_mod)
+    |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
+    |> select([mod, action], action)
+    |> Repo.all()
+    |> dismiss_from_results()
+  end
+
   defp find_accepted_mods_for_student_assignment(%StudentAssignment{} = student_assignment) do
     from(mod in Mod)
     |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id and act.is_accepted == true)
@@ -514,6 +558,28 @@ defmodule Skoller.Mods do
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
     |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
+    |> Repo.transaction()
+  end
+
+  defp insert_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
+    changeset = Mod.changeset(%Mod{}, mod)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:mod, changeset)
+    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+    |> Repo.transaction()
+  end
+
+  defp publish_mod(%{assignment_mod_type_id: @delete_assignment_mod} = mod, %StudentClass{} = student_class, student_assignment) do
+    changeset = Mod.changeset(mod, %{is_private: false})
+    
+    Ecto.Multi.new
+    |> Ecto.Multi.update(:mod, changeset)
+    |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
+    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
     |> Repo.transaction()
   end
 
