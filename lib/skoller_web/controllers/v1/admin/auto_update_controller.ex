@@ -9,10 +9,10 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Class.Assignment
   alias Skoller.Assignment.Mod
   alias SkollerWeb.Admin.ForecastView
-  alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Mods
   alias Skoller.Students
+  alias Skoller.AutoUpdates
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -92,7 +92,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
 
   defp auto_update_mod(mod) do
     mod = Repo.get!(Mod, mod.assignment_modification_id)
-    ModHelper.process_auto_update(mod, :notification)
+    AutoUpdates.process_auto_update(mod, :notification)
   end
 
   defp get_settings_from_params(params) do
