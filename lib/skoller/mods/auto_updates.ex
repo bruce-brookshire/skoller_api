@@ -3,10 +3,12 @@ defmodule Skoller.AutoUpdates do
   The context module for auto updates.
   """
 
+  alias Skoller.Repo
   alias Skoller.Admin.Settings
   alias Skoller.ModActions
   alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Mods
+  alias SkollerWeb.Helpers.RepoHelper
 
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
@@ -44,13 +46,12 @@ defmodule Skoller.AutoUpdates do
   """
   def process_auto_update(mod) do
     actions = mod |> ModActions.get_enrolled_actions_from_mod()
-    settings = Settings.get_auto_update_settings()
 
     update = actions 
     |> Enum.count()
-    |> auto_update_count_needed(settings)
-    |> auto_update_acted_ratio_needed(actions, settings)
-    |> auto_update_copied_ratio_needed(settings)
+    |> auto_update_count_needed()
+    |> auto_update_acted_ratio_needed(actions)
+    |> auto_update_copied_ratio_needed()
 
     case update do
       {:ok, _} ->
@@ -64,23 +65,23 @@ defmodule Skoller.AutoUpdates do
     end
   end
 
-  defp auto_update_count_needed(count, settings) do
-    threshold = settings |> get_setting(@auto_upd_enrollment_threshold) |> String.to_integer
+  defp auto_update_count_needed(count) do
+    threshold = Settings.get_setting_by_name!(@auto_upd_enrollment_threshold) |> String.to_integer
     case count < threshold do
       true -> {:error, :not_enough_enrolled}
       false -> {:ok, count}
     end
   end
 
-  defp auto_update_acted_ratio_needed({:error, msg}, _count, _settings), do: {:error, msg}
-  defp auto_update_acted_ratio_needed({:ok, count}, actions, settings) do
+  defp auto_update_acted_ratio_needed({:error, msg}, _count), do: {:error, msg}
+  defp auto_update_acted_ratio_needed({:ok, count}, actions) do
     acted = actions
     |> Enum.filter(& not(is_nil(&1.is_accepted)))
 
     action_count = acted
     |> Enum.count()
 
-    threshold = settings |> get_setting(@auto_upd_response_threshold) |> String.to_float
+    threshold = Settings.get_setting_by_name!(@auto_upd_response_threshold) |> String.to_float
 
     case action_count / count < threshold do
       true -> {:error, :not_enough_responses}
@@ -88,15 +89,15 @@ defmodule Skoller.AutoUpdates do
     end
   end
 
-  defp auto_update_copied_ratio_needed({:error, msg}, _settings), do: {:error, msg}
-  defp auto_update_copied_ratio_needed({:ok, acted}, settings) do
+  defp auto_update_copied_ratio_needed({:error, msg}), do: {:error, msg}
+  defp auto_update_copied_ratio_needed({:ok, acted}) do
     count = acted |> Enum.count()
 
     action_count = acted
     |> Enum.filter(& &1.is_accepted == true)
     |> Enum.count()
 
-    threshold = settings |> get_setting(@auto_upd_approval_threshold) |> String.to_float
+    threshold = Settings.get_setting_by_name!(@auto_upd_approval_threshold) |> String.to_float
 
     case action_count / count < threshold do
       true -> {:error, :not_enough_copied}

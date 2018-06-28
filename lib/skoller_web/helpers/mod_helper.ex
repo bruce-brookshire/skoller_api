@@ -13,17 +13,10 @@ defmodule SkollerWeb.Helpers.ModHelper do
   alias Skoller.Repo
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
-  alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.NotificationHelper
-  alias Skoller.Admin.Settings
 
   import Ecto.Query
 
   @new_assignment_mod 400
-
-  def apply_mod(_mod, _student_class, _atom \\ :manual) do
-
-  end
 
   def pending_mods_for_assignment(%StudentAssignment{} = student_assignment) do
     from(m in Mod)
@@ -49,46 +42,5 @@ defmodule SkollerWeb.Helpers.ModHelper do
     |> where([mod, act], is_nil(act.is_accepted))
     |> select([mod, act, assign], assign)
     |> Repo.all()
-  end
-
-  def process_auto_update(mod) do
-    actions = mod |> get_enrolled_actions_from_mod()
-    settings = Settings.get_auto_update_settings()
-
-    update = actions 
-    |> Enum.count()
-    |> auto_update_count_needed(settings)
-    |> auto_update_acted_ratio_needed(actions, settings)
-    |> auto_update_copied_ratio_needed(settings)
-
-    case update do
-      {:ok, _} ->
-        actions = mod |> get_actions_from_mod()
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
-        |> Ecto.Multi.run(:mods, &apply_mods(actions, &1))
-        |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
-        |> Repo.transaction()
-      {:error, _msg} -> {:ok, nil}
-    end
-  end
-
-  defp update_actions(actions, _) do
-    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
-    
-    status = nil_actions |> Enum.map(&update_action(&1))
-    
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
-  end
-
-  defp update_action(%Action{} = action) do
-    action
-    |> Ecto.Changeset.change(%{is_accepted: true, is_manual: false})
-    |> Repo.update()
-  end
-
-  defp get_setting(settings, key) do
-    setting = settings |> Enum.find(nil, &key == &1.name)
-    setting.value
   end
 end

@@ -8,7 +8,6 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Helpers.RepoHelper
-  alias SkollerWeb.Helpers.ModHelper
   alias SkollerWeb.Assignment.ModView
   alias Skoller.Mods
   alias Skoller.Students

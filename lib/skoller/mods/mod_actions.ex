@@ -8,6 +8,8 @@ defmodule Skoller.ModActions do
   alias Skoller.Assignment.Mod
   alias Skoller.Students
 
+  import Ecto.Query
+
   def get_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
     |> where([act], act.assignment_modification_id == ^id)
