@@ -8,7 +8,7 @@ defmodule Skoller.Mods do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Students
   alias Skoller.Schools.Class
   alias Skoller.Users.User
@@ -83,7 +83,7 @@ defmodule Skoller.Mods do
   Gets assignments with mod count and student count by class id.
 
   ## Returns
-  `[%{assignment: %{assignment: Skoller.Class.Assignment, mod_count: Integer, student_count: Integer}}]` or `[]`
+  `[%{assignment: %{assignment: Skoller.Assignments.Assignment, mod_count: Integer, student_count: Integer}}]` or `[]`
   """
   def get_mod_assignments_by_class(class_id) do
     from(a in Assignment)
@@ -468,7 +468,7 @@ defmodule Skoller.Mods do
   An unanswered mod is when `is_accepted` is `nil`
 
   ## Returns
-  `[Skoller.Class.Assignment]` or `[]`
+  `[Skoller.Assignments.Assignment]` or `[]`
   """
   def get_new_assignment_mods(%StudentClass{} = student_class) do
     from(mod in Mod)

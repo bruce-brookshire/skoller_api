@@ -1,9 +1,9 @@
-defmodule Skoller.Class.Assignment do
+defmodule Skoller.Assignments.Assignment do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Schools.Class
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Class.Weight

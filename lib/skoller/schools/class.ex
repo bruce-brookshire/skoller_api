@@ -13,7 +13,7 @@ defmodule Skoller.Schools.Class do
   alias Skoller.HelpRequests.HelpRequest
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
 
   schema "classes" do
     field :credits, :string

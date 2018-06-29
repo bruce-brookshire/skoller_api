@@ -5,7 +5,7 @@ defmodule Skoller.Assignment.Post do
   import Ecto.Changeset
   alias Skoller.Assignment.Post
   alias Skoller.Students.Student
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
 
   schema "assignment_posts" do
     field :post, :string

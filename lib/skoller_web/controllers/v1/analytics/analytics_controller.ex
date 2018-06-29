@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias SkollerWeb.AnalyticsView
   alias Skoller.ClassDocs.Doc
   alias Skoller.Students.Student
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Assignment.Mod.Type, as: ModType
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action

@@ -6,7 +6,7 @@ defmodule SkollerWeb.Plugs.Auth do
   alias Skoller.Repo
   alias Skoller.Users
   alias Skoller.Classes
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
 
   import Plug.Conn
 

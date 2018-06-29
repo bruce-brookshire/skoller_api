@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Class.Weight
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Students.Student
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Devices.Device

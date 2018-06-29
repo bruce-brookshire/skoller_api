@@ -5,7 +5,7 @@ defmodule Skoller.Assignment.Mod do
   import Ecto.Changeset
   alias Skoller.Assignment.Mod
   alias Skoller.Students.Student
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Assignment.Mod.Type
   alias Skoller.Assignment.Mod.Action
 
