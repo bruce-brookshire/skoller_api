@@ -1,9 +1,9 @@
-defmodule Skoller.Class.AbandonedLock do
+defmodule Skoller.Locks.AbandonedLock do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.AbandonedLock
+  alias Skoller.Locks.AbandonedLock
 
   schema "class_abandoned_locks" do
     field :class_lock_section_id, :id

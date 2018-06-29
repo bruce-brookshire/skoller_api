@@ -6,7 +6,7 @@ defmodule Skoller.Locks do
   alias Skoller.Repo
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
-  alias Skoller.Class.AbandonedLock
+  alias Skoller.Locks.AbandonedLock
   alias Skoller.MapErrors
 
   import Ecto.Query
