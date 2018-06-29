@@ -1,7 +1,7 @@
 defmodule Skoller.ClassPeriodTest do
   use Skoller.DataCase
 
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
 
   @valid_attrs %{name: "Quarter Name",
                 school_id: 1}

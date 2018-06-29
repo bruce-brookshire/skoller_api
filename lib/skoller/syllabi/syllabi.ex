@@ -6,7 +6,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.Repo
   alias Skoller.Classes
   alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Locks.Lock
   alias Skoller.ClassDocs.Doc
   alias Skoller.Schools.School

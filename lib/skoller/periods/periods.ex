@@ -3,7 +3,7 @@ defmodule Skoller.Periods do
   Context module for class periods
   """
 
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
 
   import Ecto.Query
@@ -15,7 +15,7 @@ defmodule Skoller.Periods do
    * `%{"name" => period_name}`, filters period name
 
   ## Returns
-  `[Skoller.Schools.ClassPeriod]` or `[]`
+  `[Skoller.Periods.ClassPeriod]` or `[]`
   """
   def get_periods_by_school_id(school_id, params \\ %{}) do
     from(period in ClassPeriod)
@@ -28,7 +28,7 @@ defmodule Skoller.Periods do
   Creates a period
 
   ## Returns
-  `{:ok, Skoller.Schools.ClassPeriod}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.Periods.ClassPeriod}` or `{:error, Ecto.Changeset}`
   """
   def create_period(params) do
     ClassPeriod.changeset_insert(%ClassPeriod{}, params)

@@ -11,7 +11,7 @@ defmodule Skoller.Chats do
   alias Skoller.ChatReplies.Reply
   alias Skoller.Students
   alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.Classes
   alias Skoller.ChatPosts.Like

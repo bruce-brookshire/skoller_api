@@ -5,7 +5,7 @@ defmodule Skoller.Classes do
 
   alias Skoller.Repo
   alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Classes.Status
   alias Skoller.ClassDocs.Doc
   alias Skoller.Locks.Lock
@@ -96,7 +96,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+  Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
 
   ## Behavior:
     * If there is no grade scale provided, a default is used: `%{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}`
@@ -124,7 +124,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Updates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+  Updates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
 
   ## Examples
 
@@ -172,7 +172,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Returns a count of `Skoller.Schools.Class` using the id of `Skoller.Schools.ClassPeriod`
+  Returns a count of `Skoller.Schools.Class` using the id of `Skoller.Periods.ClassPeriod`
 
   ## Examples
 
@@ -411,7 +411,7 @@ defmodule Skoller.Classes do
    * `%{"or" => "true"}`, "or's" the filters instead of making them exclusive.
 
   ## Returns
-  `[%{class: Skoller.Schools.Class, professor: Skoller.Professors.Professor, class_period: Skoller.Schools.ClassPeriod}]`
+  `[%{class: Skoller.Schools.Class, professor: Skoller.Professors.Professor, class_period: Skoller.Periods.ClassPeriod}]`
   or `[]`
 
   """

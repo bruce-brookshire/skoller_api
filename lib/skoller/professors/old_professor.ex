@@ -4,7 +4,7 @@ defmodule Skoller.Professors.OldProfessor do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Professors.OldProfessor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
 
   schema "professors" do
     field :email, :string

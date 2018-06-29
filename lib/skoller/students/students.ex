@@ -11,7 +11,7 @@ defmodule Skoller.Students do
   alias Skoller.Classes
   alias Skoller.Classes.Status
   alias Skoller.Professors.Professor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Mods.Mod
   alias Skoller.Mods.Action
@@ -185,7 +185,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns the count of students in a given `Skoller.Schools.ClassPeriod`.
+  Returns the count of students in a given `Skoller.Periods.ClassPeriod`.
 
   ## Examples
 
