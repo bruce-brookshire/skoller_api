@@ -3,10 +3,10 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Repo
   alias SkollerWeb.ClassView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
 
   import SkollerWeb.Plugs.Auth
@@ -21,6 +21,8 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
 
     class = Classes.get_class_by_id!(class_id)
 
+    params = params |> Map.put("user_id", conn.assigns[:user].id)
+
     changeset = ChangeRequest.changeset(%ChangeRequest{}, params)
     
     multi = Ecto.Multi.new
@@ -32,7 +34,7 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 end

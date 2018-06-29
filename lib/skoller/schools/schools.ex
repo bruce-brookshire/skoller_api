@@ -5,7 +5,7 @@ defmodule Skoller.Schools do
 
   alias Skoller.Repo
   alias Skoller.Schools.School
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Timezone
   alias Skoller.FourDoor
 
@@ -40,7 +40,7 @@ defmodule Skoller.Schools do
   end
 
   @doc """
-    Gets a `Skoller.Schools.School` from a `Skoller.Schools.ClassPeriod`
+    Gets a `Skoller.Schools.School` from a `Skoller.Periods.ClassPeriod`
   """
   def get_school_from_period(class_period_id) do
     school = from(cp in ClassPeriod)

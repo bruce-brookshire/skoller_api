@@ -4,13 +4,13 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatReplies.Reply
   alias SkollerWeb.Class.ChatReplyView
-  alias SkollerWeb.Helpers.RepoHelper
-  alias Skoller.Chat.Comment.Star, as: CommentStar
-  alias Skoller.Chat.Post.Star, as: PostStar
-  alias Skoller.Chat.Comment
-  alias SkollerWeb.Helpers.NotificationHelper
+  alias SkollerWeb.Responses.MultiError
+  alias Skoller.ChatComments.Star, as: CommentStar
+  alias Skoller.ChatPosts.Star, as: PostStar
+  alias Skoller.ChatComments.Comment
+  alias Skoller.ChatNotifications
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -35,11 +35,11 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
 
     case Repo.transaction(multi) do
       {:ok, %{reply: reply}} -> 
-        Task.start(NotificationHelper, :send_new_reply_notification, [reply, conn.assigns[:user].student_id])
+        Task.start(ChatNotifications, :send_new_reply_notification, [reply, conn.assigns[:user].student_id])
         render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

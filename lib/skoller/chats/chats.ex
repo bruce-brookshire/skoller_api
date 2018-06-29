@@ -4,17 +4,17 @@ defmodule Skoller.Chats do
   """
 
   alias Skoller.Repo
-  alias Skoller.Chat.Post
-  alias Skoller.Chat.Post.Star, as: PStar
-  alias Skoller.Chat.Comment
-  alias Skoller.Chat.Comment.Star, as: CStar
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatPosts.Post
+  alias Skoller.ChatPosts.Star, as: PStar
+  alias Skoller.ChatComments.Comment
+  alias Skoller.ChatComments.Star, as: CStar
+  alias Skoller.ChatReplies.Reply
   alias Skoller.Students
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Classes.Class
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.Classes
-  alias Skoller.Chat.Post.Like
+  alias Skoller.ChatPosts.Like
 
   import Ecto.Query
 
@@ -34,9 +34,9 @@ defmodule Skoller.Chats do
    * A starred post will have the `response` key in the return object as the most recent comment OR reply.
   
   ## Return
-  Returns a list of posts and comments with the format `[%{chat_post: Skoller.Chat.Post, color: String, star: Skoller.Chat.Post.Star, response: response}]`
-  for posts, and `[%{chat_comment: Skoller.Chat.Comment, color: String, star: Skoller.Chat.Comment.Star, parent_post: Skoller.Chat.Post, response: response}]`
-  for comments. The `response` object is `%{chat_post_id: Id, response: Skoller.Chat.Comment || Skoller.Chat.Reply, is_reply: Boolean, updated_at: DateTime, id: Id}`
+  Returns a list of posts and comments with the format `[%{chat_post: Skoller.ChatPosts.Post, color: String, star: Skoller.ChatPosts.Star, response: response}]`
+  for posts, and `[%{chat_comment: Skoller.ChatComments.Comment, color: String, star: Skoller.ChatComments.Star, parent_post: Skoller.ChatPosts.Post, response: response}]`
+  for comments. The `response` object is `%{chat_post_id: Id, response: Skoller.ChatComments.Comment || Skoller.ChatReplies.Reply, is_reply: Boolean, updated_at: DateTime, id: Id}`
   """
   def get_chat_notifications(student_id) do
     posts = from(p in Post)
@@ -82,7 +82,7 @@ defmodule Skoller.Chats do
    * `Map`, `%{"school_id" => Id}` filters by school
 
   ## Returns
-  `%{class: Skoller.Schools.Class, count: Integer}` or `nil`
+  `%{class: Skoller.Classes.Class, count: Integer}` or `nil`
   """
   def get_max_chat_activity(%{date_start: _date_start, date_end: _date_end} = dates, params) do
     from(c in Class)
@@ -95,10 +95,10 @@ defmodule Skoller.Chats do
   Gets the chat posts for all of a student's classes. Defaults to most recent ordering.
 
   ## Filters
-   * "sort" => `Skoller.Chat.Algorithm`
+   * "sort" => `Skoller.Chats.Algorithm`
 
   ## Returns
-  `[%{chat_post: Skoller.Chat.Post, color: String, enroll: Integer, likes: Integer}]` or `[]`
+  `[%{chat_post: Skoller.ChatPosts.Post, color: String, enroll: Integer, likes: Integer}]` or `[]`
   """
   def get_student_chat(student_id, filters) do
     from(p in Post)

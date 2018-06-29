@@ -4,21 +4,21 @@ defmodule Skoller.Classes do
   """
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Classes.Class
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Classes.Status
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Locks.Lock
   alias Skoller.Users.User
   alias Skoller.UserRole
   alias Skoller.Schools
   alias Skoller.Universities
   alias Skoller.HighSchools
-  alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Professors.Professor
-  alias Skoller.Class.ChangeRequest
-  alias Skoller.Class.StudentRequest
+  alias Skoller.ChangeRequests.ChangeRequest
+  alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Syllabi
+  alias Skoller.ClassNotifications
 
   import Ecto.Query
 
@@ -47,12 +47,12 @@ defmodule Skoller.Classes do
   @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id.
+  Gets a `Skoller.Classes.Class` by id.
 
   ## Examples
 
       iex> Skoller.Classes.get_class_by_id(1)
-      {:ok, %Skoller.Schools.Class{}}
+      {:ok, %Skoller.Classes.Class{}}
 
   """
   def get_class_by_id(id) do
@@ -60,12 +60,12 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id
+  Gets a `Skoller.Classes.Class` by id
 
   ## Examples
 
       iex> Skoller.Classes.get_class_by_id!(1)
-      %Skoller.Schools.Class{}
+      %Skoller.Classes.Class{}
 
   """
   def get_class_by_id!(id) do
@@ -73,7 +73,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id with `Skoller.Class.Weight`
+  Gets a `Skoller.Classes.Class` by id with `Skoller.Weights.Weight`
 
   """
 
@@ -83,12 +83,12 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets an editable `Skoller.Schools.Class` by id.
+  Gets an editable `Skoller.Classes.Class` by id.
 
   ## Examples
 
       iex> Skoller.Classes.get_editable_class_by_id(1)
-      {:ok, %Skoller.Schools.Class{}}
+      {:ok, %Skoller.Classes.Class{}}
 
   """
   def get_editable_class_by_id(id) do
@@ -96,7 +96,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Creates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+  Creates a `Skoller.Classes.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
 
   ## Behavior:
     * If there is no grade scale provided, a default is used: `%{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}`
@@ -105,7 +105,7 @@ defmodule Skoller.Classes do
   ## Examples
 
       iex> Skoller.Classes.create_class(%{} = params)
-      %Skoller.Schools.Class{}
+      %Skoller.Classes.Class{}
 
   """
   def create_class(params, user \\ nil) do
@@ -124,12 +124,12 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Updates a `Skoller.Schools.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Schools.ClassPeriod`
+  Updates a `Skoller.Classes.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
 
   ## Examples
 
       iex> Skoller.Classes.update_class(old_class, %{} = params)
-      {:ok, %{class: %Skoller.Schools.Class{}, class_status: %Skoller.Schools.Class{}}}
+      {:ok, %{class: %Skoller.Classes.Class{}, class_status: %Skoller.Classes.Class{}}}
 
   """
   def update_class(class_old, params) do
@@ -172,7 +172,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Returns a count of `Skoller.Schools.Class` using the id of `Skoller.Schools.ClassPeriod`
+  Returns a count of `Skoller.Classes.Class` using the id of `Skoller.Periods.ClassPeriod`
 
   ## Examples
 
@@ -188,7 +188,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Returns the `Skoller.Classes.Status` name and a count of `Skoller.Schools.Class` in the status
+  Returns the `Skoller.Classes.Status` name and a count of `Skoller.Classes.Class` in the status
 
   ## Examples
 
@@ -207,12 +207,12 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets all `Skoller.Schools.Class` in a period that share a hash (hashed from syllabus url)
+  Gets all `Skoller.Classes.Class` in a period that share a hash (hashed from syllabus url)
 
   ## Examples
 
       iex> Skoller.Classes.get_class_from_hash("123dadqwdvsdfscxsz", 1)
-      [%Skoller.Schools.Class{}]
+      [%Skoller.Classes.Class{}]
 
   """
   def get_class_from_hash(class_hash, period_id) do
@@ -365,7 +365,7 @@ defmodule Skoller.Classes do
   def evaluate_class_completion(old_class, new_class)
   def evaluate_class_completion(%Class{class_status_id: @completed_status}, %Class{class_status_id: @completed_status}), do: nil
   def evaluate_class_completion(%Class{class_status_id: _old_status}, %Class{class_status_id: @completed_status} = class) do
-    Task.start(NotificationHelper, :send_class_complete_notification, [class])
+    Task.start(ClassNotifications, :send_class_complete_notification, [class])
   end
   def evaluate_class_completion(_old_class, _class), do: nil
 
@@ -411,7 +411,7 @@ defmodule Skoller.Classes do
    * `%{"or" => "true"}`, "or's" the filters instead of making them exclusive.
 
   ## Returns
-  `[%{class: Skoller.Schools.Class, professor: Skoller.Professors.Professor, class_period: Skoller.Schools.ClassPeriod}]`
+  `[%{class: Skoller.Classes.Class, professor: Skoller.Professors.Professor, class_period: Skoller.Periods.ClassPeriod}]`
   or `[]`
 
   """
@@ -468,7 +468,7 @@ defmodule Skoller.Classes do
   | Student enrolled           | StudentClass object            |
 
   ## Returns
-  `{:ok, Skoller.Schools.Class}` or `{:ok, nil}` or `{:error, map}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.Classes.Class}` or `{:ok, nil}` or `{:error, map}` or `{:error, Ecto.Changeset}`
 
   """
   #TODO: Internalize class status updates (remove from SkollerWeb).

@@ -6,10 +6,10 @@ defmodule Skoller.Assignments do
   alias Skoller.Repo
   alias Skoller.Assignments.ReminderNotification
   alias Skoller.Assignments.ReminderNotification.Topic
-  alias Skoller.Assignment.Post
-  alias Skoller.Class.Assignment
+  alias Skoller.AssignmentPosts.Post
+  alias Skoller.Assignments.Assignment
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Students
 
   import Ecto.Query
@@ -26,13 +26,23 @@ defmodule Skoller.Assignments do
   @default_message_future_mult "You have [num] assignments in the next [days] days. Check them out!"
 
   @doc """
+  Gets an assignment by id.
+
+  ## Returns
+  `Skoller.Assignments.Assignment` or `Ecto.NoResultsError`
+  """
+  def get_assignment_by_id!(assignment_id) do
+    Repo.get!(Assignment, assignment_id)
+  end
+
+  @doc """
   Gets all assignment posts for a student.
 
   ## Notes
   The student's own posts are excluded.
 
   ## Returns
-  `[%{post: Skoller.Assignment.Post, assignment: Skoller.Class.Assignment, class: Skoller.Schools.Class, student_assignment: Skoller.StudentAssignments.StudentAssignment}]`
+  `[%{post: Skoller.AssignmentPosts.Post, assignment: Skoller.Assignments.Assignment, class: Skoller.Classes.Class, student_assignment: Skoller.StudentAssignments.StudentAssignment}]`
   or `[]`
   """
   def get_assignment_post_notifications(student_id) do

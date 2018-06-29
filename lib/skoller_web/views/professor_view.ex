@@ -1,4 +1,5 @@
 defmodule SkollerWeb.ProfessorView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.ProfessorView
@@ -13,21 +14,21 @@ defmodule SkollerWeb.ProfessorView do
 
   def render("professor.json", %{professor: professor}) do
     %{
-        id: professor.id,
-        name_first: professor.name_first,
-        name_last: professor.name_last,
-        email: professor.email,
-        office_availability: professor.office_availability,
-        office_location: professor.office_location,
-        phone: professor.phone
+      id: professor.id,
+      name_first: professor.name_first,
+      name_last: professor.name_last,
+      email: professor.email,
+      office_availability: professor.office_availability,
+      office_location: professor.office_location,
+      phone: professor.phone
     }
   end
 
   def render("professor-short.json", %{professor: professor}) do
     %{
-        id: professor.id,
-        name_first: professor.name_first,
-        name_last: professor.name_last
+      id: professor.id,
+      name_first: professor.name_first,
+      name_last: professor.name_last
     }
   end
 end

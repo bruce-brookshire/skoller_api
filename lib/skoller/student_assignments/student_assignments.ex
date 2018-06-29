@@ -6,9 +6,9 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.Repo
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Students
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Mods
   alias Skoller.StudentClasses
 
@@ -39,7 +39,7 @@ defmodule Skoller.StudentAssignments do
 
   ## Behavior
    * Passing a `Skoller.StudentClasses.StudentClass` will cause the student to get all assignments for the class.
-   * Passing a `Skoller.Class.Assignment` will cause all students to get the assignment.
+   * Passing a `Skoller.Assignments.Assignment` will cause all students to get the assignment.
 
   ## Returns
   `{:ok, [Skoller.StudentAssignments.StudentAssignment]}` or `{:ok, nil}` if there are no students or assignments
@@ -103,7 +103,7 @@ defmodule Skoller.StudentAssignments do
    * If passed a map containing `%{class_id: class_id}`, gets all assignments for that class.
 
   ## Returns
-  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Class.Assignment]`, or `[]`
+  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
   """
   # TODO: I made this when I first started Elixir. This is absolutely awful.
   # This is the single worst piece of code.
@@ -146,7 +146,7 @@ defmodule Skoller.StudentAssignments do
   Gets assignments with relative weights by either StudentAssignment or Assignments based on params.
 
   ## Returns
-  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Class.Assignment]`, or `[]`
+  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
   If the structs are returned, they will have a `:relative_weight` key.
   """
   # TODO: This is messy too, just like the other stuff. Try to split it out a bit.
@@ -162,7 +162,7 @@ defmodule Skoller.StudentAssignments do
   Creates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{assignment: Skoller.Class.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{assignment: Skoller.Assignments.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
   """
   def create_student_assignment(params) do
     #Insert into assignments as from_mod as well.
@@ -181,7 +181,7 @@ defmodule Skoller.StudentAssignments do
   Updates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
   """
   def update_student_assignment(old, params) do
     changeset = old

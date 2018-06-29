@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.StatusView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Class.StatusView

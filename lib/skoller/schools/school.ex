@@ -5,7 +5,7 @@ defmodule Skoller.Schools.School do
   import Ecto.Changeset
 
   alias Skoller.Schools.School
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
 
   schema "schools" do
     field :adr_country, :string

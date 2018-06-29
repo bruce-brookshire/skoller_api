@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.WeightController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Repo
   alias SkollerWeb.Class.WeightView
 

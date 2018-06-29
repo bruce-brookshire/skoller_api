@@ -4,11 +4,12 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Assignment.Post
+  alias Skoller.AssignmentPosts.Post
   alias SkollerWeb.Assignment.PostView
-  alias SkollerWeb.Helpers.NotificationHelper
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.AssignmentPostNotifications
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Students
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -30,11 +31,11 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
     case Repo.transaction(multi) do
       {:ok, %{post: post}} ->
-        Task.start(NotificationHelper, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
+        Task.start(AssignmentPostNotifications, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
         render(conn, PostView, "show.json", %{post: post})
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -55,6 +56,6 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
   defp un_read_assign(post) do
     status = Students.un_read_assignment(post.student_id, post.assignment_id)
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 end

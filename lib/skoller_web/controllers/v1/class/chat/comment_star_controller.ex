@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Comment.Star
+  alias Skoller.ChatComments.Star
   alias SkollerWeb.Class.ChatCommentView
 
   import SkollerWeb.Plugs.Auth

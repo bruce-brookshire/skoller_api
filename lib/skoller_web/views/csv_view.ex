@@ -1,11 +1,12 @@
 defmodule SkollerWeb.CSVView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.CSVView
   alias SkollerWeb.ChangesetView
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias SkollerWeb.School.FieldOfStudyView
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias SkollerWeb.ClassView
   alias Skoller.Schools.School
   alias SkollerWeb.SchoolView

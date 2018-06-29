@@ -11,12 +11,16 @@ defmodule Skoller.Notifications do
   alias Skoller.Students
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
-  alias Skoller.Class.Assignment
-  alias Skoller.Chat.Post.Star, as: PostStar
-  alias Skoller.Chat.Comment.Star, as: CommentStar
-  alias Skoller.Chat.Comment
+  alias Skoller.Assignments.Assignment
+  alias Skoller.ChatPosts.Star, as: PostStar
+  alias Skoller.ChatComments.Star, as: CommentStar
+  alias Skoller.ChatComments.Comment
+  alias Skoller.Notifications.ManualLog
+  alias Skoller.Notification
 
   import Ecto.Query
+
+  @manual_custom_category "Manual.Custom"
 
   @doc """
   Gets devices where the students have not disabled notifications.
@@ -228,6 +232,15 @@ defmodule Skoller.Notifications do
     |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all
+  end
+
+  def send_custom_notification(msg) do
+    devices = get_notification_enabled_devices()
+
+    Repo.insert(%ManualLog{affected_users: Enum.count(devices), notification_category: @manual_custom_category, msg: msg})
+  
+    devices
+    |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
   end
 
   defp filter_due_date(query, date, :today, time) do

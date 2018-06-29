@@ -40,9 +40,9 @@ defmodule SkollerWeb.ChatChannel do
   use Phoenix.Channel
 
   alias Skoller.Repo
-  alias Skoller.Chat.Post
-  alias Skoller.Chat.Comment
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatPosts.Post
+  alias Skoller.ChatComments.Comment
+  alias Skoller.ChatReplies.Reply
   alias Skoller.Classes
   alias Skoller.Schools
   alias Skoller.Students

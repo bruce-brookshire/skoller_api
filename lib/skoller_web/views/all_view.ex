@@ -1,4 +1,5 @@
 defmodule SkollerWeb.AllView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.AllView

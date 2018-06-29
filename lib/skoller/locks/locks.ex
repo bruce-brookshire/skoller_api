@@ -6,8 +6,8 @@ defmodule Skoller.Locks do
   alias Skoller.Repo
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
-  alias Skoller.Class.AbandonedLock
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Locks.AbandonedLock
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -58,14 +58,17 @@ defmodule Skoller.Locks do
   end
 
   @doc """
-  Unlocks a class to abandon locks.
+  Unlocks a class to abandon locks that are `min` old and incomplete.
 
   ## Returns
   `[{:ok, Skoller.Locks.Lock}]`
   """
-  def unlock_locks(locks) do
-    locks
-    |> Enum.map(&unlock_lock(&1, %{}))
+  def clear_locks(min) do
+    case get_incomplete_locks(min) do
+      [] -> {:ok, nil}
+      locks -> 
+        locks |> Enum.map(&unlock_lock(&1, %{}))
+    end
   end
 
   @doc """
@@ -81,13 +84,8 @@ defmodule Skoller.Locks do
     {:ok, delete_class_locks(class)}
   end
 
-  @doc """
-  Gets locks that are incomplete after `min` minutes.
-
-  ## Returns
-  `[Skoller.Locks.Lock]` or `[]`
-  """
-  def get_incomplete_locks(min) do
+  # Gets locks that are incomplete after `min` minutes.
+  defp get_incomplete_locks(min) do
     from(lock in Lock)
     |> where([lock], lock.is_completed == false)
     |> where([lock], lock.inserted_at < ago(^min, "minute"))
@@ -100,7 +98,7 @@ defmodule Skoller.Locks do
     |> Enum.map(&lock_section(class_id, user_id, &1.id))
 
     status
-    |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   #Locks the section if it is not already locked.

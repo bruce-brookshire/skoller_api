@@ -1,4 +1,7 @@
 defmodule SkollerWeb.Endpoint do
+  @moduledoc """
+  The endpoint is the http handler. It manages routes, sessions, loggers, sockets, and parsers.
+  """
   use Phoenix.Endpoint, otp_app: :skoller
 
   socket "/socket", SkollerWeb.UserSocket

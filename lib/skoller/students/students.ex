@@ -5,29 +5,39 @@ defmodule Skoller.Students do
   
   alias Skoller.Repo
   alias Skoller.StudentClasses.StudentClass
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Classes
   alias Skoller.Classes.Status
   alias Skoller.Professors.Professor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
   alias Skoller.StudentClasses
   alias Skoller.AutoUpdates
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
   @community_threshold 2
   @link_length 5
   @enrollment_limit 15
+
+  @doc """
+  Gets a student by id.
+
+  ## Returns
+  `Skoller.Students.Student` or `Ecto.NoResultsError`
+  """
+  def get_student_by_id!(student_id) do
+    Repo.get!(Student, student_id)
+  end
 
   @doc """
   Gets students in a class. Includes previously-enrolled students.
@@ -150,12 +160,12 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Students.Student` currently has.
+  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Classes.Class` that a `Skoller.Students.Student` currently has.
 
   ## Examples
 
       iex> val = Skoller.Students.get_enrolled_classes_by_student_id(1)
-      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Schools.Class{}}]
+      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Classes.Class{}}]
 
   """
   def get_enrolled_classes_by_student_id(student_id) do
@@ -175,7 +185,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns the count of students in a given `Skoller.Schools.ClassPeriod`.
+  Returns the count of students in a given `Skoller.Periods.ClassPeriod`.
 
   ## Examples
 
@@ -221,7 +231,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns a subquery that provides a list of `Skoller.Schools.Class`
+  Returns a subquery that provides a list of `Skoller.Classes.Class`
 
   """
   def get_enrolled_classes_subquery() do
@@ -267,7 +277,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-   Shows all `Skoller.Schools.Class` with enrollment. Can be used as a search with multiple filters.
+   Shows all `Skoller.Classes.Class` with enrollment. Can be used as a search with multiple filters.
 
   ## Filters:
   * school
@@ -278,9 +288,9 @@ defmodule Skoller.Students do
     * `Skoller.Classes.Status` :id
     * For ghost classes, use 0.
   * class_name
-    * `Skoller.Schools.Class` :name
+    * `Skoller.Classes.Class` :name
   * class_meet_days
-    * `Skoller.Schools.Class` :meet_days
+    * `Skoller.Classes.Class` :meet_days
 
   """
   def get_classes_with_enrollment(params) do
@@ -530,7 +540,7 @@ defmodule Skoller.Students do
     status = mods
     |> Enum.map(&AutoUpdates.process_auto_update(&1))
 
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp auto_approve_mods(_params), do: {:ok, nil}
 
@@ -544,7 +554,7 @@ defmodule Skoller.Students do
     
     status = mods |> Enum.map(&insert_mod_action(student_class, &1))
     
-    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, mods}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_mod_action(student_class, %Mod{} = mod) do

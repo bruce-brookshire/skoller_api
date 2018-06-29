@@ -4,7 +4,7 @@ defmodule Skoller.HighSchools do
   """
   
   alias Skoller.Repo
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
 
   @doc false
   def get_changeset(old_class \\ %Class{}, params) do
@@ -15,7 +15,7 @@ defmodule Skoller.HighSchools do
   Updates a high school
 
   ## Returns
-  `{:ok, Skoller.Schools.Class}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.Classes.Class}` or `{:error, Ecto.Changeset}`
   """
   def update_class(%Class{} = class, params) do
     Class.hs_changeset(class, params)

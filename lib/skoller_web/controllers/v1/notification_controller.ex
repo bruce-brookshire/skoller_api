@@ -4,9 +4,10 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Notification.ManualLog
-  alias SkollerWeb.Helpers.NotificationHelper
+  alias Skoller.Notifications.ManualLog
+  alias Skoller.ClassNotifications
   alias SkollerWeb.NotificationView
+  alias Skoller.Notifications
 
   import SkollerWeb.Plugs.Auth
   
@@ -15,7 +16,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   plug :verify_role, %{role: @admin_role}
 
   def syllabus(conn, _params) do
-    Task.start(NotificationHelper, :send_needs_syllabus_notifications, [])
+    Task.start(ClassNotifications, :send_needs_syllabus_notifications, [])
     conn |> send_resp(204, "")
   end
 
@@ -25,7 +26,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
         conn
         |> send_resp(422, "")
       else
-        Task.start(NotificationHelper, :send_custom_notification, [msg])
+        Task.start(Notifications, :send_custom_notification, [msg])
         conn |> send_resp(204, "")
       end
     else

@@ -1,11 +1,12 @@
 defmodule SkollerWeb.Class.ChatPostView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias Skoller.Repo
   alias SkollerWeb.Class.ChatPostView
   alias SkollerWeb.Class.ChatCommentView
   alias SkollerWeb.Class.Chat.LikeView
-  alias Skoller.Chat.Post.Star
+  alias Skoller.ChatPosts.Star
   alias Skoller.Chats
 
   def render("index.json", %{chat_posts: %{chat_posts: chat_posts, color: color}, current_student_id: current_student_id}) do

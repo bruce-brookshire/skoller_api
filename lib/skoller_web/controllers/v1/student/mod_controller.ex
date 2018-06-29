@@ -3,11 +3,11 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Assignment.ModView
   alias Skoller.Mods
   alias Skoller.Students
@@ -53,7 +53,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
         |> render(StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

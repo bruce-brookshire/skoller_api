@@ -1,10 +1,11 @@
 defmodule SkollerWeb.NotificationView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.NotificationView
 
   def render("index.json", %{notifications: notifications}) do
-      render_many(notifications, NotificationView, "notification.json")
+    render_many(notifications, NotificationView, "notification.json")
   end
 
   def render("notification.json", %{notification: notification}) do

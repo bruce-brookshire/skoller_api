@@ -19,7 +19,7 @@ defmodule Skoller.Application do
       # Start your own worker by calling:
       # Skoller.Worker.start_link(arg1, arg2, arg3)
       # worker(Skoller.Worker, [arg1, arg2, arg3]),
-      worker(SkollerWeb.Scheduler, [SkollerWeb.Jobs]),
+      worker(Skoller.Scheduler, [Skoller.Jobs]),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

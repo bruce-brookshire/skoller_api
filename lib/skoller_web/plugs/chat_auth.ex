@@ -4,7 +4,7 @@ defmodule SkollerWeb.Plugs.ChatAuth do
   """
 
   alias Skoller.Repo
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
   alias Skoller.Classes
   alias Skoller.Schools
 
