@@ -3,8 +3,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Class.Doc
-  alias Skoller.Repo
+  alias Skoller.ClassDocs
   alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
@@ -16,8 +15,8 @@ defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
   plug :verify_role, %{roles: [@admin_role, @change_req_role, @help_req_role]}
 
   def delete(conn, %{"id" => id}) do
-    doc = Repo.get!(Doc, id)
-    case Repo.delete(doc) do
+    doc = ClassDocs.get_doc_by_id!(id)
+    case ClassDocs.delete(doc) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

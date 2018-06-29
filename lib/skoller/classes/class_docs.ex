@@ -5,6 +5,8 @@ defmodule Skoller.ClassDocs do
   
   alias Skoller.DocUpload
   alias Ecto.UUID
+  alias Skoller.Repo
+  alias Skoller.Class.Doc
 
   require Logger
 
@@ -27,5 +29,25 @@ defmodule Skoller.ClassDocs do
         Logger.info(inspect(error))
         nil
     end
+  end
+
+  @doc """
+  Gets a doc by id
+
+  ## Returns
+  `%Skoller.Class.Doc{}` or `Ecto.NoResultsError`
+  """
+  def get_doc_by_id!(doc_id) do
+    Repo.get!(Doc, doc_id)
+  end
+
+  @doc """
+  Deletes a doc
+
+  ## Returns
+  `{:ok, %Skoller.Class.Doc{}}` or `{:error, %Ecto.Changeset{}}`
+  """
+  def delete(%Doc{} = doc) do
+    Repo.delete(doc)
   end
 end
