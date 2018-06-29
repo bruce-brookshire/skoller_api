@@ -29,10 +29,10 @@ Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 200, name: "This syllabus is c
 Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 300, name: "Issues viewing the file"})
 Skoller.Repo.insert!(%Skoller.Class.Help.Type{id: 400, name: "Other"})
 
-Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 100, name: "Grade Scale"})
-Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 200, name: "Weights"})
-Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 300, name: "Professor Info"})
-Skoller.Repo.insert!(%Skoller.Class.Change.Type{id: 400, name: "Class Info"})
+Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 100, name: "Grade Scale"})
+Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 200, name: "Weights"})
+Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 300, name: "Professor Info"})
+Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 400, name: "Class Info"})
 
 Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 100, name: "Name"})
 Skoller.Repo.insert!(%Skoller.Assignment.Mod.Type{id: 200, name: "Weight Category"})

@@ -15,7 +15,7 @@ defmodule Skoller.Classes do
   alias Skoller.Universities
   alias Skoller.HighSchools
   alias Skoller.Professors.Professor
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Syllabi
   alias Skoller.ClassNotifications

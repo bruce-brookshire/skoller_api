@@ -11,7 +11,7 @@ defmodule Skoller.Schools.Class do
   alias Skoller.Classes.Status
   alias Skoller.Students.Student
   alias Skoller.Class.HelpRequest
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Class.Assignment
 

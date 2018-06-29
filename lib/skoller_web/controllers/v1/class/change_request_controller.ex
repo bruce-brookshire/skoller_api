@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Repo
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError

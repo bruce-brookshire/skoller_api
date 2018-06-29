@@ -1,12 +1,12 @@
-defmodule Skoller.Class.ChangeRequest do
+defmodule Skoller.ChangeRequests.ChangeRequest do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Schools.Class
-  alias Skoller.Class.Change.Type
+  alias Skoller.ChangeRequests.Type
   alias Skoller.Users.User
 
   schema "class_change_requests" do
