@@ -34,7 +34,8 @@ defmodule SkollerWeb.Plugs.Auth do
     case Users.get_user_by_id(Guardian.Plug.current_resource(conn)) do
       %{is_active: false} -> {:error, :inactive}
       nil -> {:error, :no_user}
-      %{} = user -> {:ok, user}
+      %{} = user -> 
+        {:ok, user}
     end
   end 
 
