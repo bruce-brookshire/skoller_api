@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Chat.AlgorithmView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Chat.AlgorithmView

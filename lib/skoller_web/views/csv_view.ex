@@ -1,4 +1,5 @@
 defmodule SkollerWeb.CSVView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.CSVView

@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.StudentAssignmentView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Class.StudentAssignmentView

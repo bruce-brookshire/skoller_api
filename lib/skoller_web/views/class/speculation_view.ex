@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.SpeculationView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Class.SpeculationView

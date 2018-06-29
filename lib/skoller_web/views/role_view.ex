@@ -1,4 +1,5 @@
 defmodule SkollerWeb.RoleView do
+  @moduledoc false
   use SkollerWeb, :view
 
   def render("index.json", %{roles: roles}) do

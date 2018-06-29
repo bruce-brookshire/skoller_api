@@ -1,4 +1,5 @@
 defmodule SkollerWeb.LocationView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.LocationView

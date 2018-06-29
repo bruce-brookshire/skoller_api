@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Student.InboxView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Student.InboxView

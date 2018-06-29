@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Assignment.ReminderNotification.TopicView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Assignment.ReminderNotification.TopicView

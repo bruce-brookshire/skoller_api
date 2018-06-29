@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.WeightView do
+    @moduledoc false
     use SkollerWeb, :view
 
     alias SkollerWeb.Class.WeightView
