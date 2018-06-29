@@ -18,11 +18,4 @@ defmodule SkollerWeb.Helpers.RepoHelper do
     |> put_status(:unprocessable_entity)
     |> render(SkollerWeb.ErrorView, "error.json", error: failed_value)
   end
-
-  def errors(tuple) do
-    case tuple do
-      {:error, _val} -> true
-      _ -> false
-    end
-  end
 end

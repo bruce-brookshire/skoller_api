@@ -13,6 +13,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Mods
   alias Skoller.Students
   alias Skoller.AutoUpdates
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -72,7 +73,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
 
   defp update_settings(settings, _) do
     status = settings |> Enum.map(&update_setting(&1))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_setting(%{"name" => name} = params) do

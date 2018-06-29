@@ -12,6 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   alias Skoller.Classes
   alias Skoller.Universities
   alias Skoller.Professors
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
 
@@ -50,12 +51,12 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
 
   defp check_statuses(classes, docs) do
     status = classes |> Enum.map(&Classes.check_status(&1, %{doc: elem(docs |> Enum.find(fn(x) -> elem(x, 1).class_id == &1.id end), 1)}))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_class_doc(classes, params, _) do
     status = classes |> Enum.map(&insert_doc(&1, params))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_doc(class, params) do

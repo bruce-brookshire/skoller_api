@@ -8,7 +8,7 @@ defmodule Skoller.AutoUpdates do
   alias Skoller.ModActions
   alias Skoller.ModNotifications
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.MapErrors
 
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
@@ -110,7 +110,7 @@ defmodule Skoller.AutoUpdates do
     
     status = nil_actions |> Enum.map(&ModActions.update_action(&1, %{is_accepted: true, is_manual: false}))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_mod(mod, _) do

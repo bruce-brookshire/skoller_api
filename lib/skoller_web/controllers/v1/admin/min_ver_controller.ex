@@ -7,6 +7,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
   alias SkollerWeb.Admin.SettingView
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Repo
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
 
@@ -30,7 +31,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
 
   defp update_settings(settings, _) do
     status = settings |> Enum.map(&update_setting(&1))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_setting(%{"name" => name} = params) do

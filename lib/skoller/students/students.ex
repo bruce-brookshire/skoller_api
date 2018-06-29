@@ -16,12 +16,12 @@ defmodule Skoller.Students do
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
   alias Skoller.StudentClasses
   alias Skoller.AutoUpdates
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -540,7 +540,7 @@ defmodule Skoller.Students do
     status = mods
     |> Enum.map(&AutoUpdates.process_auto_update(&1))
 
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp auto_approve_mods(_params), do: {:ok, nil}
 
@@ -554,7 +554,7 @@ defmodule Skoller.Students do
     
     status = mods |> Enum.map(&insert_mod_action(student_class, &1))
     
-    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, mods}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_mod_action(student_class, %Mod{} = mod) do

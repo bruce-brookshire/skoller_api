@@ -9,10 +9,10 @@ defmodule Skoller.Users do
   alias Skoller.Students
   alias Skoller.Locks.Lock
   alias Skoller.Students.Student
-  alias SkollerWeb.Helpers.RepoHelper
   alias SkollerWeb.Helpers.VerificationHelper
   alias Skoller.CustomSignups
   alias Skoller.Users.Report
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -210,7 +210,7 @@ defmodule Skoller.Users do
     delete_fields_of_study(user.student.id)
     status = fields |> Enum.map(&add_field_of_study(user, &1))
 
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp add_fields_of_study(_map, _params), do: {:ok, nil}
 
@@ -237,7 +237,7 @@ defmodule Skoller.Users do
     status = roles
     |> Enum.map(&add_role(user, &1))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp add_roles_preloaded(_map, _params), do: {:ok, nil}
 

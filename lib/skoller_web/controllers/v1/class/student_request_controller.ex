@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
 
@@ -45,7 +46,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
 
   defp upload_class_docs(user, %{"files" => files} = params, student_request) do 
     status = files |> Enum.map(&upload_class_doc(user, &1, params, student_request))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp upload_class_docs(_user, _params, _student_request), do: {:ok, nil}
 

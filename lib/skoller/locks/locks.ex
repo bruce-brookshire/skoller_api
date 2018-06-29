@@ -7,7 +7,7 @@ defmodule Skoller.Locks do
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
   alias Skoller.Class.AbandonedLock
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -100,7 +100,7 @@ defmodule Skoller.Locks do
     |> Enum.map(&lock_section(class_id, user_id, &1.id))
 
     status
-    |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   #Locks the section if it is not already locked.
