@@ -1,4 +1,4 @@
-defmodule Skoller.Admin.Settings do
+defmodule Skoller.Settings do
   @moduledoc """
   The context module for Admin Settings.
   """
@@ -6,7 +6,7 @@ defmodule Skoller.Admin.Settings do
   #TODO: this can be split into a context for each kind of setting
 
   alias Skoller.Repo
-  alias Skoller.Admin.Setting
+  alias Skoller.Settings.Setting
 
   import Ecto.Query
 
@@ -17,7 +17,7 @@ defmodule Skoller.Admin.Settings do
   @doc """
   Gets the current auto update settings from admin_settings.
 
-  Returns `[Skoller.Admin.Setting]` or `[]`
+  Returns `[Skoller.Settings.Setting]` or `[]`
   """
   def get_auto_update_settings() do
     from(s in Setting)
@@ -28,7 +28,7 @@ defmodule Skoller.Admin.Settings do
   @doc """
   Gets the current minimum version settings from admin_settings.
 
-  Returns `[Skoller.Admin.Setting]` or `[]`
+  Returns `[Skoller.Settings.Setting]` or `[]`
   """
   def get_min_ver_settings() do
     from(s in Setting)
@@ -39,7 +39,7 @@ defmodule Skoller.Admin.Settings do
   @doc """
   Gets the current four door settings from admin_settings.
 
-  Returns `[Skoller.Admin.Setting]` or `[]`
+  Returns `[Skoller.Settings.Setting]` or `[]`
   """
   def get_four_door_settings() do
     from(s in Setting)
@@ -52,7 +52,7 @@ defmodule Skoller.Admin.Settings do
 
   If `name` does not exist, an error will be thrown
 
-  Returns `Skoller.Admin.Setting` or `Ecto.NoResultsError`
+  Returns `Skoller.Settings.Setting` or `Ecto.NoResultsError`
   """
   def get_setting_by_name!(name) do
     Repo.get!(Setting, name)
@@ -61,9 +61,9 @@ defmodule Skoller.Admin.Settings do
   @doc """
   Updates an admin setting.
 
-  `setting` must be of type `Skoller.Admin.Setting`.
+  `setting` must be of type `Skoller.Settings.Setting`.
 
-  Returns `{:ok, Skoller.Admin.Setting}` or `{:error, Ecto.Changeset}`
+  Returns `{:ok, Skoller.Settings.Setting}` or `{:error, Ecto.Changeset}`
   """
   def update_setting(%Setting{} = setting, params) do
     Setting.changeset_update(setting, params)

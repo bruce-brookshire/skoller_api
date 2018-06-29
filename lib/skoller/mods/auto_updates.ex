@@ -4,7 +4,7 @@ defmodule Skoller.AutoUpdates do
   """
 
   alias Skoller.Repo
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias Skoller.ModActions
   alias Skoller.ModNotifications
   alias Skoller.Mods

@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.MinVerController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias SkollerWeb.Admin.SettingView
 
   def index(conn, _params) do

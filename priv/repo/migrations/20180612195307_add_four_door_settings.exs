@@ -2,7 +2,7 @@ defmodule Skoller.Repo.Migrations.AddFourDoorSettings do
   use Ecto.Migration
 
   alias Skoller.Repo
-  alias Skoller.Admin.Setting
+  alias Skoller.Settings.Setting
 
   def up do
     Repo.insert!(%Setting{name: "is_diy_enabled", value: "true", topic: "FourDoor"})

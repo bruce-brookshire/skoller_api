@@ -1,9 +1,9 @@
-defmodule Skoller.Admin.Setting do
+defmodule Skoller.Settings.Setting do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Admin.Setting
+  alias Skoller.Settings.Setting
 
   # The @primary_key line overrides the auto-increment id primary key.
   # For example, this table has a primary key of name, and type string
