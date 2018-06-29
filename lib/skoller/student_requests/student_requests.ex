@@ -4,11 +4,11 @@ defmodule Skoller.StudentRequests do
   """
 
   alias Skoller.Repo
-  alias Skoller.Class.StudentRequest
+  alias Skoller.StudentRequests.StudentRequest
   alias Skoller.ClassDocs
   alias Skoller.Classes
   alias Skoller.MapErrors
-  alias Skoller.Class.StudentRequest.Doc
+  alias Skoller.StudentRequests.Doc
 
   @syllabus_request 100
 
@@ -19,8 +19,8 @@ defmodule Skoller.StudentRequests do
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` has the following
-   * `{:student_request, Skoller.Class.StudentRequest}`
-   * `{:doc_upload, Skoller.Class.StudentRequest.Doc}`
+   * `{:student_request, Skoller.StudentRequests.StudentRequest}`
+   * `{:doc_upload, Skoller.StudentRequests.Doc}`
    * `{:status, Skoller.Classes.check_status/2}`
   """
   def create(user, class_id, params) do
@@ -42,7 +42,7 @@ defmodule Skoller.StudentRequests do
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where map contains
-   * `{:student_request, Skoller.Class.StudentRequest}`
+   * `{:student_request, Skoller.StudentRequests.StudentRequest}`
    * `{:class_status, Skoller.Classes.check_status/2}`
   """
   def complete(request_id) do

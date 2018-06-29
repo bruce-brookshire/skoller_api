@@ -12,7 +12,7 @@ defmodule Skoller.Schools.Class do
   alias Skoller.Students.Student
   alias Skoller.Class.HelpRequest
   alias Skoller.Class.ChangeRequest
-  alias Skoller.Class.StudentRequest
+  alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Class.Assignment
 
   schema "classes" do

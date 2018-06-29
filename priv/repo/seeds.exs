@@ -50,9 +50,9 @@ user = Skoller.Repo.insert!(%Skoller.Users.User{email: "dev_admin@skoller.co",
 Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 200})
 Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 300})
 
-Skoller.Repo.insert!(%Skoller.Class.StudentRequest.Type{id: 100, name: "The wrong syllabus has been uploaded for this class"})
-Skoller.Repo.insert!(%Skoller.Class.StudentRequest.Type{id: 200, name: "Need to submit an additional/revised assignment schedule"})
-Skoller.Repo.insert!(%Skoller.Class.StudentRequest.Type{id: 300, name: "Other"})
+Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 100, name: "The wrong syllabus has been uploaded for this class"})
+Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 200, name: "Need to submit an additional/revised assignment schedule"})
+Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 300, name: "Other"})
 
 Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 100, name: "Hot"})
 Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 200, name: "Most Recent"})
