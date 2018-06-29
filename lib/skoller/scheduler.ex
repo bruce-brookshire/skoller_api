@@ -1,17 +1,26 @@
-defmodule SkollerWeb.Scheduler do
+defmodule Skoller.Scheduler do
+  @moduledoc false
+  # A Scheduler that runs the passed in module's `run/0` function every interval.
+  # This needs to be run from a `Supervisor.Spec.worker/3` call.
   use GenServer
 
+  # This will currently run on every 5 minute interval in an hour.
+  # It is NOT every 5 minutes from spin up.
   @interval_min 5
 
+  # This puts :jobs on the state for future calls.
   def start_link(module) do
     GenServer.start_link(__MODULE__, %{jobs: module})
   end
 
+  # This is the first call after start_link/1
   def init(state) do
     schedule_work()
     {:ok, state}
   end
 
+  # This is triggered whenever an event with :work is created.
+  # It immediately reschedules itself, and then runs module.run.
   def handle_info(:work, state) do
     schedule_work()
     require Logger
@@ -20,6 +29,7 @@ defmodule SkollerWeb.Scheduler do
     {:noreply, state}
   end
 
+  # This creates a :work event to be processed after get_time_diff/1 milliseconds.
   defp schedule_work() do
     now = Time.utc_now()
     Process.send_after(self(), :work, get_time_diff(now))
