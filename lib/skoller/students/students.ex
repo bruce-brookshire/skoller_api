@@ -5,7 +5,7 @@ defmodule Skoller.Students do
   
   alias Skoller.Repo
   alias Skoller.StudentClasses.StudentClass
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Classes
@@ -160,12 +160,12 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Schools.Class` that a `Skoller.Students.Student` currently has.
+  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Classes.Class` that a `Skoller.Students.Student` currently has.
 
   ## Examples
 
       iex> val = Skoller.Students.get_enrolled_classes_by_student_id(1)
-      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Schools.Class{}}]
+      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Classes.Class{}}]
 
   """
   def get_enrolled_classes_by_student_id(student_id) do
@@ -231,7 +231,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns a subquery that provides a list of `Skoller.Schools.Class`
+  Returns a subquery that provides a list of `Skoller.Classes.Class`
 
   """
   def get_enrolled_classes_subquery() do
@@ -277,7 +277,7 @@ defmodule Skoller.Students do
   end
 
   @doc """
-   Shows all `Skoller.Schools.Class` with enrollment. Can be used as a search with multiple filters.
+   Shows all `Skoller.Classes.Class` with enrollment. Can be used as a search with multiple filters.
 
   ## Filters:
   * school
@@ -288,9 +288,9 @@ defmodule Skoller.Students do
     * `Skoller.Classes.Status` :id
     * For ghost classes, use 0.
   * class_name
-    * `Skoller.Schools.Class` :name
+    * `Skoller.Classes.Class` :name
   * class_meet_days
-    * `Skoller.Schools.Class` :meet_days
+    * `Skoller.Classes.Class` :meet_days
 
   """
   def get_classes_with_enrollment(params) do

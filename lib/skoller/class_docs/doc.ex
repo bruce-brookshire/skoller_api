@@ -4,7 +4,7 @@ defmodule Skoller.ClassDocs.Doc do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.ClassDocs.Doc
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Users.User
 
   schema "docs" do

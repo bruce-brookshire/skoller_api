@@ -5,7 +5,7 @@ defmodule Skoller.Periods.ClassPeriod do
   import Ecto.Changeset
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
 
   schema "class_periods" do
     field :name, :string

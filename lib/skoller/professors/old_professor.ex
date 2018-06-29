@@ -1,5 +1,7 @@
 defmodule Skoller.Professors.OldProfessor do
   @moduledoc false
+
+  # LEAVE THIS CUZ I HAVE NO IDEA IF MIGRATIONS WILL WORK WITHOUT IT
   
   use Ecto.Schema
   import Ecto.Changeset

@@ -10,7 +10,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.UserRole
   alias Skoller.Schools.School
   alias Skoller.Periods.ClassPeriod
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Weights.Weight
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment

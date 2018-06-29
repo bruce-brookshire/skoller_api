@@ -9,7 +9,7 @@ defmodule Skoller.Assignments do
   alias Skoller.AssignmentPosts.Post
   alias Skoller.Assignments.Assignment
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Students
 
   import Ecto.Query
@@ -42,7 +42,7 @@ defmodule Skoller.Assignments do
   The student's own posts are excluded.
 
   ## Returns
-  `[%{post: Skoller.AssignmentPosts.Post, assignment: Skoller.Assignments.Assignment, class: Skoller.Schools.Class, student_assignment: Skoller.StudentAssignments.StudentAssignment}]`
+  `[%{post: Skoller.AssignmentPosts.Post, assignment: Skoller.Assignments.Assignment, class: Skoller.Classes.Class, student_assignment: Skoller.StudentAssignments.StudentAssignment}]`
   or `[]`
   """
   def get_assignment_post_notifications(student_id) do

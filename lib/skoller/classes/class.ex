@@ -1,9 +1,9 @@
-defmodule Skoller.Schools.Class do
+defmodule Skoller.Classes.Class do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
   alias Skoller.ClassDocs.Doc
   alias Skoller.Professors.Professor

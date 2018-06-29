@@ -6,7 +6,7 @@ defmodule SkollerWeb.CSVView do
   alias SkollerWeb.ChangesetView
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias SkollerWeb.School.FieldOfStudyView
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias SkollerWeb.ClassView
   alias Skoller.Schools.School
   alias SkollerWeb.SchoolView
