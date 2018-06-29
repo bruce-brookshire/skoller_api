@@ -6,7 +6,7 @@ defmodule Skoller.ClassDocs do
   alias Skoller.DocUpload
   alias Ecto.UUID
   alias Skoller.Repo
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.MapErrors
   alias Skoller.Classes
 
@@ -37,7 +37,7 @@ defmodule Skoller.ClassDocs do
   Gets a doc by id
 
   ## Returns
-  `%Skoller.Class.Doc{}` or `Ecto.NoResultsError`
+  `%Skoller.ClassDocs.Doc{}` or `Ecto.NoResultsError`
   """
   def get_doc_by_id!(doc_id) do
     Repo.get!(Doc, doc_id)
@@ -47,7 +47,7 @@ defmodule Skoller.ClassDocs do
   Deletes a doc
 
   ## Returns
-  `{:ok, %Skoller.Class.Doc{}}` or `{:error, %Ecto.Changeset{}}`
+  `{:ok, %Skoller.ClassDocs.Doc{}}` or `{:error, %Ecto.Changeset{}}`
   """
   def delete(%Doc{} = doc) do
     Repo.delete(doc)
@@ -57,7 +57,7 @@ defmodule Skoller.ClassDocs do
   Inserts a doc
 
   ## Returns
-  `{:ok, %Skoller.Class.Doc{}}` or `{:error, %Ecto.Changeset{}}`
+  `{:ok, %Skoller.ClassDocs.Doc{}}` or `{:error, %Ecto.Changeset{}}`
   """
   def insert(params) do
     Doc.changeset(%Doc{}, params)
@@ -71,7 +71,7 @@ defmodule Skoller.ClassDocs do
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` contains
-   * `{:doc, [Skoller.Class.Doc]}`
+   * `{:doc, [Skoller.ClassDocs.Doc]}`
    * `{:status, [Skoller.Classes.Status]}`
   """
   def multi_insert_docs(classes, params) do

@@ -5,7 +5,7 @@ defmodule Skoller.Schools.Class do
   import Ecto.Changeset
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Professors.Professor
   alias Skoller.Class.Weight
   alias Skoller.Classes.Status
