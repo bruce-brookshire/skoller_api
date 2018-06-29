@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
 
   alias Skoller.FourDoor
   alias SkollerWeb.AllView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
 
   import SkollerWeb.Plugs.Auth
   
@@ -25,7 +25,7 @@ defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
         render(conn, AllView, "show.json", all: fd)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 end

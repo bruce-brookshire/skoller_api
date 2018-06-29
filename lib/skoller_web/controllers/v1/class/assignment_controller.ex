@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   alias Skoller.Class.Weight
   alias Skoller.Repo
   alias SkollerWeb.AssignmentView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
@@ -42,7 +42,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -82,7 +82,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

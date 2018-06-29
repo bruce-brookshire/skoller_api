@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
   alias SkollerWeb.Class.DocView
   alias Skoller.DocUpload
   alias Ecto.UUID
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
   alias Skoller.Universities
   alias Skoller.Professors
@@ -45,7 +45,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
         render(conn, DocView, "index.json", docs: doc)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

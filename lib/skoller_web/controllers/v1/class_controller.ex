@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   
   alias SkollerWeb.ClassView
   alias SkollerWeb.Class.SearchView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
   alias Skoller.Students
 
@@ -39,7 +39,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -86,7 +86,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 end

@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   alias Skoller.Repo
   alias Skoller.Mailer
   alias SkollerWeb.Helpers.TokenHelper
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.AuthView
 
   import Bamboo.Email
@@ -36,7 +36,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
         render(conn, AuthView, "show.json", auth: auth)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

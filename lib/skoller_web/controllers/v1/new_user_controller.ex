@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   alias Skoller.Users
   alias SkollerWeb.AuthView
   alias SkollerWeb.Helpers.TokenHelper
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Sms
 
   def create(conn, params) do
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
         render(conn, AuthView, "show.json", [user: user, token: token])
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

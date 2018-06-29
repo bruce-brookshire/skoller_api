@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
 
   alias Skoller.Admin.Settings
   alias SkollerWeb.Admin.SettingView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Repo
   alias Skoller.MapErrors
 
@@ -25,7 +25,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
         render(conn, SettingView, "index.json", settings: settings)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

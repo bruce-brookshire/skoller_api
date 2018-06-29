@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Class.LockView
   alias Skoller.Classes
   alias Skoller.Users
@@ -46,7 +46,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

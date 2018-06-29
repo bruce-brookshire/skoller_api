@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Class.Assignment
   alias Skoller.Assignment.Mod
   alias SkollerWeb.Admin.ForecastView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Mods
   alias Skoller.Students
   alias Skoller.AutoUpdates
@@ -53,7 +53,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
         render(conn, SettingView, "index.json", settings: settings)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

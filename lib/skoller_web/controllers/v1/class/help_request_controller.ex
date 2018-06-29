@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   alias Skoller.Class.HelpRequest
   alias Skoller.Repo
   alias SkollerWeb.ClassView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
 
   import SkollerWeb.Plugs.Auth
@@ -36,7 +36,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 end

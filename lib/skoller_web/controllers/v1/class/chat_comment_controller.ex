@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   alias SkollerWeb.Class.ChatCommentView
   alias Skoller.Chat.Comment.Star
   alias Skoller.Chat.Post.Star, as: PostStar
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.ChatNotifications
 
   import SkollerWeb.Plugs.Auth
@@ -38,7 +38,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
         render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

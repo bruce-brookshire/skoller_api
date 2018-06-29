@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias Skoller.Assignment.Post
   alias SkollerWeb.Assignment.PostView
   alias Skoller.AssignmentPostNotifications
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Students
   alias Skoller.MapErrors
 
@@ -35,7 +35,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
         render(conn, PostView, "show.json", %{post: post})
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
