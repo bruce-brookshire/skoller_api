@@ -15,7 +15,7 @@ defmodule Skoller.Notifications do
   alias Skoller.ChatPosts.Star, as: PostStar
   alias Skoller.ChatComments.Star, as: CommentStar
   alias Skoller.ChatComments.Comment
-  alias Skoller.Notification.ManualLog
+  alias Skoller.Notifications.ManualLog
   alias Skoller.Notification
 
   import Ecto.Query

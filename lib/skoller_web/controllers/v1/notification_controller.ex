@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Notification.ManualLog
+  alias Skoller.Notifications.ManualLog
   alias Skoller.ClassNotifications
   alias SkollerWeb.NotificationView
   alias Skoller.Notifications
