@@ -8,8 +8,8 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Comment.Star, as: CommentStar
   alias SkollerWeb.Class.ChatPostView
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -68,7 +68,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
     status = update
     |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: true})))
     
-    case status |> Enum.find({:ok, status}, &RepoHelper.errors(&1)) do
+    case status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1)) do
       {:ok, _} -> conn |> send_resp(204, "")
       {:error, _} -> conn |> send_resp(422, "")
     end

@@ -7,8 +7,8 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   alias Skoller.Chat.Post
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Chat.Post.Star
-  alias SkollerWeb.Helpers.NotificationHelper
   alias Skoller.Students
+  alias Skoller.ChatNotifications
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -31,7 +31,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
 
     case Repo.transaction(multi) do
       {:ok, %{post: post}} -> 
-        Task.start(NotificationHelper, :send_new_post_notification, [post, conn.assigns[:user].student_id])
+        Task.start(ChatNotifications, :send_new_post_notification, [post, conn.assigns[:user].student_id])
         sc = Students.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->

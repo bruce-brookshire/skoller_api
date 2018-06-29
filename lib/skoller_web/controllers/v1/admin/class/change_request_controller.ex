@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
   
   alias Skoller.Repo
   alias SkollerWeb.Class.ChangeRequestView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Class.ChangeRequest
   alias Skoller.Classes
   alias Skoller.Mailer
@@ -45,7 +45,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestController do
         render(conn, ChangeRequestView, "show.json", change_request: change_request)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

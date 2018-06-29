@@ -6,14 +6,14 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   alias Skoller.Repo
   alias Skoller.Users
   alias SkollerWeb.AuthView
-  alias SkollerWeb.Helpers.TokenHelper
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Token
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Sms
 
   def create(conn, params) do
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:user, &create_user(params, &1))
-    |> Ecto.Multi.run(:token, &TokenHelper.login(&1.user))
+    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
     |> Repo.transaction()
 
     case multi do
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
         render(conn, AuthView, "show.json", [user: user, token: token])
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

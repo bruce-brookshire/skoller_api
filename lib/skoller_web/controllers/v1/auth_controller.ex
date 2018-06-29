@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   alias Skoller.Users
   alias Skoller.Devices
   alias SkollerWeb.AuthView
-  alias SkollerWeb.Helpers.TokenHelper
+  alias Skoller.Token
   
   import SkollerWeb.Plugs.Auth
 
@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
     user = Users.get_user_by_email(email)
 
     if Comeonin.Bcrypt.checkpw(password, user.password_hash) do
-        {:ok, token} = TokenHelper.login(user)
+        {:ok, token} = Token.login(user.id)
         token = Map.new(%{token: token}) |> Map.merge(%{user: user})
         render(conn, AuthView, "show.json", auth: token)
     else

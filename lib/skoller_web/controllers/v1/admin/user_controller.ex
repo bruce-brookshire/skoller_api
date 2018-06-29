@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.UserView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
@@ -22,7 +22,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
         render(conn, UserView, "show.json", user: user)
       {:error, failed_value} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -45,7 +45,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 end

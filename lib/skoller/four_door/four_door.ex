@@ -6,8 +6,8 @@ defmodule Skoller.FourDoor do
   alias Skoller.Repo
   alias Skoller.FourDoor.FourDoorOverride
   alias Skoller.Admin.Settings
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Schools.School
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -92,7 +92,7 @@ defmodule Skoller.FourDoor do
   end
   defp update_four_door_defaults(params, _) do
     status = params |> Enum.map(&update_setting(&1))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_setting(item) do

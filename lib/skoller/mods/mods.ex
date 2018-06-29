@@ -13,9 +13,9 @@ defmodule Skoller.Mods do
   alias Skoller.Schools.Class
   alias Skoller.Users.User
   alias Skoller.Students.Student
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -134,6 +134,7 @@ defmodule Skoller.Mods do
     |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
     |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
     |> where([class, sc, act], is_nil(act.is_accepted))
+    |> distinct([class], class.id)
     |> Repo.all()
   end
 
@@ -333,7 +334,7 @@ defmodule Skoller.Mods do
     student_assignment
     |> find_accepted_mods_for_student_assignment()
     |> Enum.map(&process_existing_mod(&1, student_class, params))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
+    |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
   end
 
   @doc """
@@ -360,7 +361,7 @@ defmodule Skoller.Mods do
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
     status = changes |> Enum.map(&check_change(&1, student_assignment, params))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   @doc """
@@ -410,7 +411,7 @@ defmodule Skoller.Mods do
 
     status = nil_actions |> Enum.map(&apply_action_mods(&1))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   @doc """
@@ -528,7 +529,7 @@ defmodule Skoller.Mods do
 
     status = missing_mods |> Enum.map(&Repo.insert(%Action{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_assignment.student_class_id}))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   #compare new change with original assignment. If original, dismiss mods. Otherwise, create mod.
@@ -742,7 +743,7 @@ defmodule Skoller.Mods do
     enumerable
     |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
     |> Enum.map(&Repo.insert!(&1))
-    |> Enum.find({:ok, nil}, &RepoHelper.errors(&1))
+    |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_backlogged_mods(mod, %StudentClass{} = sc, _) do
@@ -767,7 +768,7 @@ defmodule Skoller.Mods do
     status = mod
             |> insert_public_mod_action_query(student_class)
             |> Enum.map(&Repo.insert(%Action{assignment_modification_id: mod.id, student_class_id: &1.id, is_accepted: nil}))
-    case status |> Enum.find({:ok, nil}, &RepoHelper.errors(&1)) do
+    case status |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1)) do
       {:ok, nil} -> {:ok, status}
       {:error, val} -> {:error, val}
     end

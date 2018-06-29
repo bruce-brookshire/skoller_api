@@ -7,9 +7,10 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
   alias Skoller.Class.StudentRequest
   alias Skoller.ClassDocs
   alias Skoller.Class.Doc
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
   alias SkollerWeb.Class.StudentRequestView
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
 
@@ -39,13 +40,13 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
         render(conn, StudentRequestView, "show.json", student_request: student_request)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
   defp upload_class_docs(user, %{"files" => files} = params, student_request) do 
     status = files |> Enum.map(&upload_class_doc(user, &1, params, student_request))
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp upload_class_docs(_user, _params, _student_request), do: {:ok, nil}
 

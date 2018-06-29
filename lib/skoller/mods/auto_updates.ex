@@ -6,9 +6,9 @@ defmodule Skoller.AutoUpdates do
   alias Skoller.Repo
   alias Skoller.Admin.Settings
   alias Skoller.ModActions
-  alias SkollerWeb.Helpers.NotificationHelper
+  alias Skoller.ModNotifications
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.MapErrors
 
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
@@ -22,7 +22,7 @@ defmodule Skoller.AutoUpdates do
   def process_auto_update(mod, :notification) do
     case mod |> process_auto_update() do
       {:ok, nil} -> {:ok, nil}
-      {:ok, %{actions: actions}} -> NotificationHelper.send_auto_update_notification(actions)
+      {:ok, %{actions: actions}} -> ModNotifications.send_auto_update_notification(actions)
     end
   end
 
@@ -110,7 +110,7 @@ defmodule Skoller.AutoUpdates do
     
     status = nil_actions |> Enum.map(&ModActions.update_action(&1, %{is_accepted: true, is_manual: false}))
     
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_mod(mod, _) do

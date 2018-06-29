@@ -6,8 +6,8 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   alias Skoller.Users
   alias Skoller.Repo
   alias Skoller.Mailer
-  alias SkollerWeb.Helpers.TokenHelper
-  alias SkollerWeb.Helpers.RepoHelper
+  alias Skoller.Token
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.AuthView
 
   import Bamboo.Email
@@ -29,19 +29,19 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   def reset(conn, %{"password" => password}) do
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:user, Users.change_password(conn.assigns[:user], password))
-    |> Ecto.Multi.run(:token, &TokenHelper.login(&1))
+    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
 
     case Repo.transaction(multi) do
       {:ok, %{} = auth} ->
         render(conn, AuthView, "show.json", auth: auth)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
   defp send_forgot_pass_email(user) do
-    {:ok, token} = user |> TokenHelper.short_token()
+    {:ok, token} = user.id |> Token.short_token()
     user 
     |> forgot_pass_email(token)
     |> Mailer.deliver_later

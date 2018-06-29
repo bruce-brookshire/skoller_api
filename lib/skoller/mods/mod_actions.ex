@@ -48,4 +48,30 @@ defmodule Skoller.ModActions do
     |> Ecto.Changeset.change(params)
     |> Repo.update()
   end
+
+  @doc """
+  Gets the pending mod count for a student.
+
+  A pending mod is a mod that has an action for the student with `is_accepted` as `nil`
+
+  ## Returns
+  `Integer`
+  """
+  def get_pending_mod_count_for_student(student_id) do
+    from(act in Action)
+    |> join(:inner, [act], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
+    |> where([act], is_nil(act.is_accepted))
+    |> select([act], count(act.id))
+    |> Repo.one
+  end
+
+  @doc """
+  Gets a mod from an action.
+
+  ## Returns
+  `%Skoller.Assignment.Mod{}` or `nil`
+  """
+  def get_mod_from_action(%Action{} = action) do
+    Repo.get(Mod, action.assignment_modification_id)
+  end
 end

@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Student.VerificationController do
 
   alias Skoller.Repo
   alias Skoller.Students.Student
-  alias SkollerWeb.Helpers.VerificationHelper
+  alias Skoller.Verification
   alias SkollerWeb.Sms
 
   import SkollerWeb.Plugs.Auth
@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Student.VerificationController do
   def resend(conn, %{"student_id" => student_id}) do
     student = Student |> Repo.get!(student_id)
 
-    code = VerificationHelper.generate_verify_code()
+    code = Verification.generate_verify_code()
 
     student = student |> Ecto.Changeset.change(%{verification_code: code})
 

@@ -16,18 +16,28 @@ defmodule Skoller.Students do
   alias Skoller.Assignment.Mod
   alias Skoller.Assignment.Mod.Action
   alias Skoller.Mods
-  alias SkollerWeb.Helpers.RepoHelper
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
   alias Skoller.StudentClasses
   alias Skoller.AutoUpdates
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
   @community_threshold 2
   @link_length 5
   @enrollment_limit 15
+
+  @doc """
+  Gets a student by id.
+
+  ## Returns
+  `Skoller.Students.Student` or `Ecto.NoResultsError`
+  """
+  def get_student_by_id!(student_id) do
+    Repo.get!(Student, student_id)
+  end
 
   @doc """
   Gets students in a class. Includes previously-enrolled students.
@@ -530,7 +540,7 @@ defmodule Skoller.Students do
     status = mods
     |> Enum.map(&AutoUpdates.process_auto_update(&1))
 
-    status |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp auto_approve_mods(_params), do: {:ok, nil}
 
@@ -544,7 +554,7 @@ defmodule Skoller.Students do
     
     status = mods |> Enum.map(&insert_mod_action(student_class, &1))
     
-    status |> Enum.find({:ok, mods}, &RepoHelper.errors(&1))
+    status |> Enum.find({:ok, mods}, &MapErrors.check_tuple(&1))
   end
 
   defp insert_mod_action(student_class, %Mod{} = mod) do

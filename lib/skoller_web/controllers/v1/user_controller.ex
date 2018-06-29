@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.UserController do
 
   alias Skoller.Users
   alias SkollerWeb.UserView
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias Skoller.PicUpload
   alias Skoller.Repo
   alias Ecto.UUID
@@ -33,7 +33,7 @@ defmodule SkollerWeb.Api.V1.UserController do
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 

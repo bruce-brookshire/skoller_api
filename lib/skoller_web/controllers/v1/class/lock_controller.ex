@@ -4,12 +4,13 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias SkollerWeb.Helpers.RepoHelper
+  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Class.LockView
   alias Skoller.Classes
   alias Skoller.Users
   alias Skoller.Locks
   alias Skoller.FourDoor
+  alias Skoller.MapErrors
 
   import SkollerWeb.Plugs.Auth
 
@@ -45,7 +46,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn
-        |> RepoHelper.multi_error(failed_value)
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -81,6 +82,6 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     status = Locks.unlock_locks(class_id, user.id, params)
 
     status
-    |> Enum.find({:ok, status}, &RepoHelper.errors(&1))
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 end
