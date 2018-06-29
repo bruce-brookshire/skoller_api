@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.ChatPostView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias Skoller.Repo

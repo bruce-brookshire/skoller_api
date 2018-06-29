@@ -1,7 +1,6 @@
 defmodule Sammi do
-  @moduledoc """
-  Uses `HTTPoison.Base` to create a web interface with the Sammi API.
-  """
+  @moduledoc false
+  # Uses `HTTPoison.Base` to create a web interface with the Sammi API.
 
   use HTTPoison.Base
 

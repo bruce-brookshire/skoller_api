@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Class.Chat.LikeView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Class.Chat.LikeView

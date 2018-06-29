@@ -1,4 +1,5 @@
 defmodule SkollerWeb.ErrorView do
+  @moduledoc false
   use SkollerWeb, :view
 
   def render("error.json", %{error: error}) do

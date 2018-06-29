@@ -1,4 +1,5 @@
 defmodule SkollerWeb.School.FieldOfStudyView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.School.FieldOfStudyView

@@ -1,4 +1,7 @@
 defmodule Timezone do
+  @moduledoc false
+  # Uses `HTTPoison.Base` to create a web interface with the Timezone API.
+
   use HTTPoison.Base
   
   @timezone_url "http://vip.timezonedb.com/v2/"

@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   alias SkollerWeb.AuthView
   alias Skoller.Token
   alias SkollerWeb.Responses.MultiError
-  alias SkollerWeb.Sms
+  alias Skoller.Sms
 
   def create(conn, params) do
     multi = Ecto.Multi.new

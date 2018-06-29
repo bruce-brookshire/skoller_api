@@ -1,4 +1,5 @@
 defmodule SkollerWeb.Student.NotificationView do
+  @moduledoc false
   use SkollerWeb, :view
 
   alias SkollerWeb.Student.NotificationView
