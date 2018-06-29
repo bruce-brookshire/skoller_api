@@ -23,27 +23,15 @@ defmodule Skoller.Class.ChangeRequest do
     timestamps()
   end
 
-  @req_fields [:class_id, :class_change_type_id]
-  @opt_fields [:note, :is_completed, :data, :user_id]
+  @req_fields [:class_id, :class_change_type_id, :data, :user_id]
+  @opt_fields [:note, :is_completed]
   @all_fields @req_fields ++ @opt_fields
-
-  @v2req_fields [:class_id, :class_change_type_id, :data, :user_id]
-  @v2opt_fields [:note, :is_completed]
-  @v2all_fields @v2req_fields ++ @v2opt_fields
 
   @doc false
   def changeset(%ChangeRequest{} = issue, attrs) do
     issue
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> foreign_key_constraint(:user_id)
-    |> foreign_key_constraint(:class_change_type_id)
-  end
-
-  def v2changeset(%ChangeRequest{} = issue, attrs) do
-    issue
-    |> cast(attrs, @v2all_fields)
-    |> validate_required(@v2req_fields)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:class_change_type_id)
   end

@@ -21,6 +21,8 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
 
     class = Classes.get_class_by_id!(class_id)
 
+    params = params |> Map.put("user_id", conn.assigns[:user].id)
+
     changeset = ChangeRequest.changeset(%ChangeRequest{}, params)
     
     multi = Ecto.Multi.new

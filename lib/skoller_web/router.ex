@@ -39,12 +39,6 @@ defmodule SkollerWeb.Router do
   scope "/api", SkollerWeb.Api do
     pipe_through :api_auth_verified
 
-    scope "/v2", V2, as: :v2 do
-      resources "/classes", ClassController, only: [] do
-        post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
-      end
-    end
-
     scope "/v1", V1, as: :v1 do
       get "/sammi", SammiController, :status
       post "/sammi/train", SammiController, :train
