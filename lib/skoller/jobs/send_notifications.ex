@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Jobs.SendNotifications do
+defmodule Skoller.Jobs.SendNotifications do
 
   alias Skoller.Assignments
   alias Skoller.Notifications

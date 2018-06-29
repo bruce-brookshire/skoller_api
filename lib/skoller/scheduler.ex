@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Scheduler do
+defmodule Skoller.Scheduler do
   use GenServer
 
   @interval_min 5

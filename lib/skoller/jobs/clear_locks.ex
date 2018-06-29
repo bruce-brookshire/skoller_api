@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Jobs.ClearLocks do
+defmodule Skoller.Jobs.ClearLocks do
   
   alias Skoller.Locks
 

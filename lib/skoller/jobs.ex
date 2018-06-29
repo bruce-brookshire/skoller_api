@@ -1,6 +1,6 @@
-defmodule SkollerWeb.Jobs do
+defmodule Skoller.Jobs do
   
-  alias SkollerWeb.Jobs
+  alias Skoller.Jobs
 
   def run() do
     now = Time.utc_now()
