@@ -5,7 +5,7 @@ defmodule Skoller.AssignmentNotifications do
 
   alias Skoller.Assignments
   alias Skoller.Notifications
-  alias SkollerWeb.Notification
+  alias Skoller.Notification
 
   @assignment_reminder_today_category 100
   @assignment_reminder_tomorrow_category 200
