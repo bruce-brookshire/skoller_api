@@ -1,6 +1,6 @@
-defmodule SkollerWeb.Sms do
+defmodule Skoller.Sms do
   @moduledoc """
-    Provides SMS utilities.
+  Provides SMS utilities.
   """
 
   alias ExTwilio.Message
@@ -11,6 +11,11 @@ defmodule SkollerWeb.Sms do
   @verification_msg1 "Your Skoller verification code is "
   @verification_msg2 ". #SkollerAtMe"
 
+  @doc """
+  Sends a verification text to the `phone`.
+
+  Uses `Mix.env/0` to only send actual texts in `:prod` mode.
+  """
   def verify_phone(phone, code) do
     case Mix.env do
       :prod -> Message.create(

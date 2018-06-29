@@ -1,4 +1,7 @@
 defmodule SkollerWeb.Router do
+  @moduledoc """
+  Routes requests to the appropriate controller.
+  """
   use SkollerWeb, :router
 
   import SkollerWeb.Plugs.Auth

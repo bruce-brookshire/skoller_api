@@ -3,12 +3,6 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   
   use SkollerWeb, :controller
 
-  @moduledoc """
-  
-  Handles functionality relating to classes.
-
-  """
-
   alias SkollerWeb.Admin.ClassView
   alias Skoller.Classes
   alias Skoller.Students

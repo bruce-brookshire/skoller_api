@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Student.VerificationController do
   alias Skoller.Repo
   alias Skoller.Students.Student
   alias Skoller.Verification
-  alias SkollerWeb.Sms
+  alias Skoller.Sms
 
   import SkollerWeb.Plugs.Auth
   

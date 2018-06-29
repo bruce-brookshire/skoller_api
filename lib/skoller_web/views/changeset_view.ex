@@ -1,13 +1,16 @@
 defmodule SkollerWeb.ChangesetView do
-  use SkollerWeb, :view
-  @doc """
-  Traverses and translates changeset errors.
-  See `Ecto.Changeset.traverse_errors/2` and
-  `Api.ErrorHelpers.translate_error/1` for more details.
+  @moduledoc """
+  Renders errors from `Ecto.Changeset` to JSON.
   """
 
+  use SkollerWeb, :view
   alias Ecto.Changeset
 
+  @doc """
+    Traverses and translates changeset errors.
+    See `Ecto.Changeset.traverse_errors/2` and
+    `Api.ErrorHelpers.translate_error/1` for more details.
+  """
   def translate_errors(changeset) do
     Changeset.traverse_errors(changeset, &translate_error/1)
   end
