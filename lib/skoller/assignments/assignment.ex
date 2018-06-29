@@ -17,7 +17,7 @@ defmodule Skoller.Assignments.Assignment do
     belongs_to :class, Class, define_field: false
     belongs_to :weight, Weight, define_field: false
     has_many :student_assignments, StudentAssignment
-    has_many :posts, Skoller.Assignment.Post
+    has_many :posts, Skoller.AssignmentPosts.Post
 
     timestamps()
   end

@@ -1,9 +1,9 @@
-defmodule Skoller.Assignment.Post do
+defmodule Skoller.AssignmentPosts.Post do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Assignment.Post
+  alias Skoller.AssignmentPosts.Post
   alias Skoller.Students.Student
   alias Skoller.Assignments.Assignment
 
