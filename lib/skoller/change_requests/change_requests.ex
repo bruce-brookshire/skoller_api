@@ -4,7 +4,7 @@ defmodule Skoller.ChangeRequests do
   """
 
   alias Skoller.Repo
-  alias Skoller.Class.ChangeRequest
+  alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Classes
   alias Skoller.Mailer
 
@@ -23,7 +23,7 @@ defmodule Skoller.ChangeRequests do
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` contains 
-   * `{:change_request, Skoller.Class.ChangeRequest}`
+   * `{:change_request, Skoller.ChangeRequests.ChangeRequest}`
    * `{:class_status, Skoller.Schools.Class}`
   """
   def complete(id) do

@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequest.TypeController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Class.StudentRequest.Type
+  alias Skoller.StudentRequests.Type
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentRequest.TypeView
 

@@ -1,9 +1,9 @@
-defmodule Skoller.Class.Change.Type do
+defmodule Skoller.ChangeRequests.Type do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Change.Type
+  alias Skoller.ChangeRequests.Type
 
   # The primary key is a normal, non-incrementing ID. Seeded by seed
   # file or migration.

@@ -1,12 +1,12 @@
-defmodule Skoller.Class.HelpRequest do
+defmodule Skoller.HelpRequests.HelpRequest do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.HelpRequest
+  alias Skoller.HelpRequests.HelpRequest
   alias Skoller.Users.User
   alias Skoller.Schools.Class
-  alias Skoller.Class.Help.Type
+  alias Skoller.HelpRequests.Type
 
   schema "class_help_requests" do
     field :note, :string

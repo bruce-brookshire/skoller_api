@@ -10,9 +10,9 @@ defmodule Skoller.Schools.Class do
   alias Skoller.Class.Weight
   alias Skoller.Classes.Status
   alias Skoller.Students.Student
-  alias Skoller.Class.HelpRequest
-  alias Skoller.Class.ChangeRequest
-  alias Skoller.Class.StudentRequest
+  alias Skoller.HelpRequests.HelpRequest
+  alias Skoller.ChangeRequests.ChangeRequest
+  alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Class.Assignment
 
   schema "classes" do

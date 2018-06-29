@@ -3,13 +3,12 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
-  alias Skoller.Chat.Post
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
+  alias Skoller.ChatPosts
+  alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
-  import Ecto.Query
   import SkollerWeb.Plugs.ChatAuth
 
   @student_role 100
@@ -19,43 +18,35 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def delete(%{assigns: %{user: %{student: %{id: student_id}}}} = conn, %{"id" => id}) do
-    post = Repo.get_by!(Post, student_id: student_id, id: id)
-    case Repo.delete(post) do
-      {:ok, _struct} ->
-        conn
-        |> send_resp(200, "")
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
-
   def delete(conn, %{"id" => id}) do
-    post = Repo.get!(Post, id)
-    case Repo.delete(post) do
+    post = conn |> get_post(id)
+    case ChatPosts.delete(post) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    posts = from(p in Post)
-    |> where([p], p.class_id == ^class_id)
-    |> Repo.all()
-
+    posts = ChatPosts.get_posts_by_class(class_id)
     conn |> render_index_view(posts, class_id)
   end
 
   def show(conn, %{"id" => id}) do
-    post = Repo.get!(Post, id)
+    post = ChatPosts.get!(id)
     conn |> render_show_view(post)
+  end
+
+  # If a student is attempting to delete, verify it is their post.
+  defp get_post(%{assigns: %{user: %{student: %{id: student_id}}}}, id) do
+    ChatPosts.get_post_by_student_and_id!(student_id, id)
+  end
+  defp get_post(_conn, id) do
+    ChatPosts.get!(id)
   end
 
   defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts, class_id) do

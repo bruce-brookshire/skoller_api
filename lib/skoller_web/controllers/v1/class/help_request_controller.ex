@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Class.HelpRequest
+  alias Skoller.HelpRequests.HelpRequest
   alias Skoller.Repo
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError

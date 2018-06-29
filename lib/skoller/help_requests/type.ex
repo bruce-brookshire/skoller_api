@@ -1,9 +1,9 @@
-defmodule Skoller.Class.Help.Type do
+defmodule Skoller.HelpRequests.Type do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Class.Help.Type
+  alias Skoller.HelpRequests.Type
 
   # The primary key is a normal, non-incrementing ID. Seeded by seed
   # file or migration.

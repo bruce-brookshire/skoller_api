@@ -3,8 +3,8 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
-  alias Skoller.Chat.Comment
+  alias Skoller.ChatComments
+  alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -16,29 +16,24 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def delete(%{assigns: %{user: %{student: %{id: student_id}}}} = conn, %{"id" => id}) do
-    comment = Repo.get_by!(Comment, student_id: student_id, id: id)
-    case Repo.delete(comment) do
+  def delete(conn, %{"id" => id}) do
+    comment = conn |> get_comment(id)
+    case ChatComments.delete(comment) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    comment = Repo.get!(Comment, id)
-    case Repo.delete(comment) do
-      {:ok, _struct} ->
-        conn
-        |> send_resp(200, "")
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
-    end
+  # If a student is attempting to delete, verify it is their comment.
+  defp get_comment(%{assigns: %{user: %{student: %{id: student_id}}}}, id) do
+    ChatComments.get_comment_by_student_and_id!(student_id, id)
+  end
+  defp get_comment(_conn, id) do
+    ChatComments.get!(id)
   end
 end

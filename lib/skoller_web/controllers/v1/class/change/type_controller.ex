@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.Change.TypeController do
 
   use SkollerWeb, :controller
   
-  alias Skoller.Class.Change.Type
+  alias Skoller.ChangeRequests.Type
   alias Skoller.Repo
   alias SkollerWeb.Class.Change.TypeView
 
