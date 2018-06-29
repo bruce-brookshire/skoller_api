@@ -1,13 +1,13 @@
-defmodule Skoller.Assignment.Mod do
+defmodule Skoller.Mods.Mod do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Assignment.Mod
+  alias Skoller.Mods.Mod
   alias Skoller.Students.Student
   alias Skoller.Assignments.Assignment
-  alias Skoller.Assignment.Mod.Type
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Type
+  alias Skoller.Mods.Action
 
   schema "assignment_modifications" do
     field :data, :map

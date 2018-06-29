@@ -4,8 +4,8 @@ defmodule Skoller.ModNotifications do
   """
 
   alias Skoller.Repo
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Notifications
   alias Skoller.Devices
   alias Skoller.ModActions

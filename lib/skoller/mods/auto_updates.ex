@@ -42,7 +42,7 @@ defmodule Skoller.AutoUpdates do
 
   ## Returns
    * `{:ok, nil}` if there is no auto update needed
-   * `{:ok, %{mod: Skoller.Assignment.Mod, mods: [], actions: [Skoller.Assignment.Mod.Action]}}`
+   * `{:ok, %{mod: Skoller.Mods.Mod, mods: [], actions: [Skoller.Mods.Action]}}`
   """
   def process_auto_update(mod) do
     actions = mod |> ModActions.get_enrolled_actions_from_mod()

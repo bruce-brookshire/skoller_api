@@ -8,9 +8,9 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.ClassDocs.Doc
   alias Skoller.Students.Student
   alias Skoller.Assignments.Assignment
-  alias Skoller.Assignment.Mod.Type, as: ModType
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Type, as: ModType
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Chat.Post
   alias Skoller.Chat.Comment
   alias Skoller.Chat.Reply

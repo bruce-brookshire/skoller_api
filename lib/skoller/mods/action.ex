@@ -1,9 +1,9 @@
-defmodule Skoller.Assignment.Mod.Action do
+defmodule Skoller.Mods.Action do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Action
 
   schema "modification_actions" do
     field :is_accepted, :boolean

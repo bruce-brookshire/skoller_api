@@ -4,8 +4,8 @@ defmodule Skoller.ModActions do
   """
 
   alias Skoller.Repo
-  alias Skoller.Assignment.Mod.Action
-  alias Skoller.Assignment.Mod
+  alias Skoller.Mods.Action
+  alias Skoller.Mods.Mod
   alias Skoller.Students
 
   import Ecto.Query
@@ -14,7 +14,7 @@ defmodule Skoller.ModActions do
   Gets all actions from a mod.
 
   ## Returns
-  `[Skoller.Assignment.Mod.Action]` or `[]`
+  `[Skoller.Mods.Action]` or `[]`
   """
   def get_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
@@ -27,7 +27,7 @@ defmodule Skoller.ModActions do
   Gets all actions from a mod where the student is currently enrolled in the class.
 
   ## Returns
-  `[Skoller.Assignment.Mod.Action]` or `[]`
+  `[Skoller.Mods.Action]` or `[]`
   """
   def get_enrolled_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
@@ -41,7 +41,7 @@ defmodule Skoller.ModActions do
   Updates an action.
 
   ## Returns
-  `{:ok, %Skoller.Assignment.Mod.Action{}}` or `{:error, %Ecto.Changeset{}}`
+  `{:ok, %Skoller.Mods.Action{}}` or `{:error, %Ecto.Changeset{}}`
   """
   def update_action(action_old, params) do
     action_old
@@ -69,7 +69,7 @@ defmodule Skoller.ModActions do
   Gets a mod from an action.
 
   ## Returns
-  `%Skoller.Assignment.Mod{}` or `nil`
+  `%Skoller.Mods.Mod{}` or `nil`
   """
   def get_mod_from_action(%Action{} = action) do
     Repo.get(Mod, action.assignment_modification_id)

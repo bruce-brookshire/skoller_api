@@ -13,8 +13,8 @@ defmodule Skoller.Students do
   alias Skoller.Professors.Professor
   alias Skoller.Schools.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Mods
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy

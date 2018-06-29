@@ -1,9 +1,9 @@
-defmodule Skoller.Assignment.Mod.Type do
+defmodule Skoller.Mods.Type do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Assignment.Mod.Type
+  alias Skoller.Mods.Type
 
   # The primary key is a normal, non-incrementing ID. Seeded by seed
   # file or migration.

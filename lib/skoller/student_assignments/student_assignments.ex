@@ -162,7 +162,7 @@ defmodule Skoller.StudentAssignments do
   Creates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{assignment: Skoller.Assignments.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{assignment: Skoller.Assignments.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
   """
   def create_student_assignment(params) do
     #Insert into assignments as from_mod as well.
@@ -181,7 +181,7 @@ defmodule Skoller.StudentAssignments do
   Updates a student assignment. Also creates a mod.
 
   ## Returns
-  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Assignment.Mod` or `{:error, _, _, _}`
+  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
   """
   def update_student_assignment(old, params) do
     changeset = old

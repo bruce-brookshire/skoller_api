@@ -3,8 +3,8 @@ defmodule Skoller.Mods do
   Context module for mods
   """
 
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
@@ -28,7 +28,7 @@ defmodule Skoller.Mods do
   @doc """
   Gets all the mods for an assignment.
 
-  Returns `[Skoller.Assignment.Mod]` with mod action details or `[]`
+  Returns `[Skoller.Mods.Mod]` with mod action details or `[]`
   """
   def get_mods_by_assignment(assignment_id) do
     from(m in Mod)
@@ -44,7 +44,7 @@ defmodule Skoller.Mods do
    * `%{"is_new_assignments" => "true"}`, :boolean, returns only new assignment mods for a student
 
   ## Returns
-  `[%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
+  `[%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
   student_assignment: Skoller.StudentAssignments.StudentAssignment}]` or `[]`
   """
   def get_student_mods(student_id, params \\ %{}) do
@@ -65,7 +65,7 @@ defmodule Skoller.Mods do
   Student must still be enrolled in class.
 
   ## Returns
-  `%{mod: Skoller.Assignment.Mod, action: Skoller.Assignment.Mod.Action, 
+  `%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
   student_assignment: Skoller.StudentAssignments.StudentAssignment}`, `nil`, or raises if more than one
   """
   def get_student_mod_by_id(student_id, mod_id) do
@@ -209,7 +209,7 @@ defmodule Skoller.Mods do
   Gets public mods that have at least one response as well as the accepted and response count.
 
   ## Returns
-  `[%{mod: Skoller.Assignment.Mod, responses: Integer, accepted: Integer}]` or `[]`
+  `[%{mod: Skoller.Mods.Mod, responses: Integer, accepted: Integer}]` or `[]`
   """
   def get_responded_mods() do
     from(m in Mod)
@@ -243,7 +243,7 @@ defmodule Skoller.Mods do
   Gets public mods audience and response count.
 
   ## Returns
-  `[%{mod: Skoller.Assignment.Mod, responses: Integer, audience: Integer}]` or `[]`
+  `[%{mod: Skoller.Mods.Mod, responses: Integer, audience: Integer}]` or `[]`
   """
   def get_shared_mods() do
     from(m in Mod)
@@ -285,11 +285,11 @@ defmodule Skoller.Mods do
    * Finds all mods that were made to create the student assignment, and add them to the student.
 
   ## Returns
-   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{mod: Skoller.Mods.Mod, actions: [Skoller.Mods.Action], self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
   `dismissed` are the actions that are dismissed as a result of creating the mod.
    * `{:ok, nil}` if the assignment is original and no mod is needed, or if a student assignment is used.
-   * `{:ok, %{backlog: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{backlog: [Skoller.Mods.Action], self_action: Skoller.Mods.Action}}`
   """
   def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
     mod = %{
@@ -351,12 +351,12 @@ defmodule Skoller.Mods do
   ## Returns
   `{:ok, [t]}` where `t` is any item from the list below.
    * `{:ok, :no_mod}` when there are no changes.
-   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{mod: Skoller.Mods.Mod, actions: [Skoller.Mods.Action], self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
   `dismissed` are the actions that are dismissed as a result of creating the mod.
-   * `{:ok, [Skoller.Assignment.Mod.Action]}` when there are actions that are dismissed due to reverting back to no changes.
+   * `{:ok, [Skoller.Mods.Action]}` when there are actions that are dismissed due to reverting back to no changes.
    * `{:ok, nil}`
-   * `{:ok, %{self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   """
   def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
@@ -368,10 +368,10 @@ defmodule Skoller.Mods do
   Inserts a mod when someone deletes an assignment.
 
   ## Returns
-   * `{:ok, %{mod: Skoller.Assignment.Mod, actions: [Skoller.Assignment.Mod.Action], self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{mod: Skoller.Mods.Mod, actions: [Skoller.Mods.Action], self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   where `mod` is the mod that is created, `actions` are the actions generated for the other students, `self_action` is the action created for the assignment creator, and
   `dismissed` are the actions that are dismissed as a result of creating the mod.
-   * `{:ok, %{self_action: Skoller.Assignment.Mod.Action, dismissed: Skoller.Assignment.Mod.Action}}`
+   * `{:ok, %{self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   """
   def insert_delete_mod(%{student_assignment: student_assignment}, params) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
@@ -438,7 +438,7 @@ defmodule Skoller.Mods do
   Updates a mod.
 
   ## Returns
-  `{:ok, %Skoller.Assignment.Mod{}}` or `{:error, %Ecto.Changeset{}}`
+  `{:ok, %Skoller.Mods.Mod{}}` or `{:error, %Ecto.Changeset{}}`
   """
   def update_mod(mod_old, params) do
     mod_old
@@ -452,7 +452,7 @@ defmodule Skoller.Mods do
   An unanswered mod is when `is_accepted` is `nil`
 
   ## Returns
-  `[Skoller.Assignment.Mod]` or `[]`
+  `[Skoller.Mods.Mod]` or `[]`
   """
   def pending_mods_for_student_assignment(%{student_class_id: student_class_id, assignment_id: assignment_id}) do
     from(m in Mod)
@@ -849,7 +849,7 @@ defmodule Skoller.Mods do
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
 
-  #This gets enrolled users' Skoller.Assignment.Mod.Action and Skoller.Users.User for a given mod.
+  #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
