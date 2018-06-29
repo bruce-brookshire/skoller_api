@@ -2,7 +2,7 @@ defmodule Skoller.Repo.Migrations.AddIosMinVer do
   use Ecto.Migration
 
   alias Skoller.Repo
-  alias Skoller.Admin.Setting
+  alias Skoller.Settings.Setting
 
   def up do
     Repo.insert!(%Setting{name: "min_ios_version", value: "0.0.0", topic: "MinVersions"})

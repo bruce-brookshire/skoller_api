@@ -8,12 +8,12 @@ defmodule Skoller.Syllabi do
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Locks.Lock
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Schools.School
   alias Skoller.Students
   alias Skoller.Classes.Status
   alias Skoller.Locks
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias Skoller.FourDoor.FourDoorOverride
 
   import Ecto.Query

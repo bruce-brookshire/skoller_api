@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Admin.MinVerController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias SkollerWeb.Admin.SettingView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Repo

@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView

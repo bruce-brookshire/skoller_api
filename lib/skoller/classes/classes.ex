@@ -7,7 +7,7 @@ defmodule Skoller.Classes do
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
   alias Skoller.Classes.Status
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Locks.Lock
   alias Skoller.Users.User
   alias Skoller.UserRole
@@ -73,7 +73,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id with `Skoller.Class.Weight`
+  Gets a `Skoller.Schools.Class` by id with `Skoller.Weights.Weight`
 
   """
 

@@ -5,15 +5,15 @@ defmodule Skoller.Schools.Class do
   import Ecto.Changeset
   alias Skoller.Schools.Class
   alias Skoller.Schools.ClassPeriod
-  alias Skoller.Class.Doc
+  alias Skoller.ClassDocs.Doc
   alias Skoller.Professors.Professor
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Classes.Status
   alias Skoller.Students.Student
   alias Skoller.HelpRequests.HelpRequest
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
-  alias Skoller.Class.Assignment
+  alias Skoller.Assignments.Assignment
 
   schema "classes" do
     field :credits, :string

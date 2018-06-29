@@ -4,12 +4,12 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatReplies.Reply
   alias SkollerWeb.Class.ChatReplyView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Chat.Comment.Star, as: CommentStar
-  alias Skoller.Chat.Post.Star, as: PostStar
-  alias Skoller.Chat.Comment
+  alias Skoller.ChatComments.Star, as: CommentStar
+  alias Skoller.ChatPosts.Star, as: PostStar
+  alias Skoller.ChatComments.Comment
   alias Skoller.ChatNotifications
 
   import SkollerWeb.Plugs.Auth

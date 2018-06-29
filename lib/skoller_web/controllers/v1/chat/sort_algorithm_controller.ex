@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Chat.SortAlgorithmController do
   
   alias Skoller.Repo
   alias SkollerWeb.Chat.AlgorithmView
-  alias Skoller.Chat.Algorithm
+  alias Skoller.Chats.Algorithm
 
   def index(conn, _params) do
     algorithms = Repo.all(Algorithm)

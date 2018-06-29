@@ -4,10 +4,10 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Comment
+  alias Skoller.ChatComments.Comment
   alias SkollerWeb.Class.ChatCommentView
-  alias Skoller.Chat.Comment.Star
-  alias Skoller.Chat.Post.Star, as: PostStar
+  alias Skoller.ChatComments.Star
+  alias Skoller.ChatPosts.Star, as: PostStar
   alias SkollerWeb.Responses.MultiError
   alias Skoller.ChatNotifications
 

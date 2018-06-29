@@ -5,7 +5,7 @@ defmodule Skoller.FourDoor do
 
   alias Skoller.Repo
   alias Skoller.FourDoor.FourDoorOverride
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias Skoller.Schools.School
   alias Skoller.MapErrors
 
@@ -83,7 +83,7 @@ defmodule Skoller.FourDoor do
   Updates the four door defaults
 
   ## Returns
-  `{:ok, %{settings: {:ok, [Skoller.Admin.Setting]}}}` or `{:error, _, _, _}`
+  `{:ok, %{settings: {:ok, [Skoller.Settings.Setting]}}}` or `{:error, _, _, _}`
   """
   def update_four_door_defaults(params) do
     Ecto.Multi.new()

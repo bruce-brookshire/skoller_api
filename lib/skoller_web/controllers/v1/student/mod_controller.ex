@@ -3,8 +3,8 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Assignment.Mod
-  alias Skoller.Assignment.Mod.Action
+  alias Skoller.Mods.Mod
+  alias Skoller.Mods.Action
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Responses.MultiError

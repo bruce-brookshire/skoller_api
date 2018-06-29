@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Assignment.Post
+  alias Skoller.AssignmentPosts.Post
   alias SkollerWeb.Assignment.PostView
   alias Skoller.AssignmentPostNotifications
   alias SkollerWeb.Responses.MultiError

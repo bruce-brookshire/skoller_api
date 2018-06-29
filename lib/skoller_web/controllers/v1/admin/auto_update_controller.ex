@@ -4,10 +4,10 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias Skoller.Admin.Settings
+  alias Skoller.Settings
   alias SkollerWeb.Admin.SettingView
-  alias Skoller.Class.Assignment
-  alias Skoller.Assignment.Mod
+  alias Skoller.Assignments.Assignment
+  alias Skoller.Mods.Mod
   alias SkollerWeb.Admin.ForecastView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Mods

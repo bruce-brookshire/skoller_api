@@ -8,7 +8,7 @@ defmodule Skoller.StudentRequests.Doc do
   schema "class_student_request_docs" do
     field :class_student_request_id, :id
     field :doc_id, :id
-    belongs_to :docs, Skoller.Class.Doc, define_field: false
+    belongs_to :docs, Skoller.ClassDocs.Doc, define_field: false
     belongs_to :class_student_requests, Skoller.StudentRequests.StudentRequest, define_field: false
 
     timestamps()

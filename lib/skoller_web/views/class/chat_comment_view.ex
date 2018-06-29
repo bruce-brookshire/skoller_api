@@ -7,7 +7,7 @@ defmodule SkollerWeb.Class.ChatCommentView do
   alias SkollerWeb.Class.ChatReplyView
   alias Skoller.Chats
   alias SkollerWeb.Class.Chat.LikeView
-  alias Skoller.Chat.Comment.Star
+  alias Skoller.ChatComments.Star
 
   def render("index.json", %{chat_comments: chat_comments}) do
     render_many(chat_comments, ChatCommentView, "chat_comment.json")

@@ -4,7 +4,7 @@ defmodule Skoller.StudentClasses do
   """
 
   alias Skoller.Repo
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
 
