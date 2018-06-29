@@ -17,6 +17,7 @@ defmodule SkollerWeb.Plugs.Auth do
     case conn |> get_auth_obj() do
       {:ok, user} ->
         assign(conn, :user, user)
+      {:error, :inactive} -> conn |> forbidden
       {:error, _} -> conn |> unauth
     end
   end
@@ -33,7 +34,8 @@ defmodule SkollerWeb.Plugs.Auth do
     case Users.get_user_by_id(Guardian.Plug.current_resource(conn)) do
       %{is_active: false} -> {:error, :inactive}
       nil -> {:error, :no_user}
-      %{} = user -> {:ok, user}
+      %{} = user -> 
+        {:ok, user}
     end
   end 
 
@@ -211,6 +213,12 @@ defmodule SkollerWeb.Plugs.Auth do
   defp unauth(conn) do
     conn
     |> send_resp(401, "")
+    |> halt()
+  end
+
+  defp forbidden(conn) do
+    conn
+    |> send_resp(403, "")
     |> halt()
   end
 end
