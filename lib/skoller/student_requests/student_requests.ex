@@ -35,6 +35,29 @@ defmodule Skoller.StudentRequests do
     |> Repo.transaction()
   end
 
+  @doc """
+  Completes a student request.
+
+  May change the class status.
+
+  ## Returns
+  `{:ok, Map}` or `{:error, _, _, _}` where map contains
+   * `{:student_request, Skoller.Class.StudentRequest}`
+   * `{:class_status, Skoller.Classes.check_status/2}`
+  """
+  def complete(request_id) do
+    student_request_old = Repo.get!(StudentRequest, request_id)
+
+    changeset = StudentRequest.changeset(student_request_old, %{is_completed: true})
+
+    class = Classes.get_class_by_id(student_request_old.class_id)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:student_request, changeset)
+    |> Ecto.Multi.run(:class_status, &Classes.check_status(class, &1))
+    |> Repo.transaction()
+  end
+
   defp upload_class_docs(user, %{"files" => files} = params, student_request) do 
     status = files |> Enum.map(&upload_class_doc(user, &1, params, student_request))
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
