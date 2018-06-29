@@ -4,6 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
   use SkollerWeb, :controller
   
   alias Skoller.ChatComments
+  alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -24,7 +25,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 

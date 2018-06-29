@@ -6,6 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
   alias Skoller.ChatPosts
+  alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -26,7 +27,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 

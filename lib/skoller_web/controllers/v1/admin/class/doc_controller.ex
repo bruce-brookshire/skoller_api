@@ -5,6 +5,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
 
   alias Skoller.Class.Doc
   alias Skoller.Repo
+  alias SkollerWeb.ChangesetView
 
   import SkollerWeb.Plugs.Auth
   
@@ -23,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 end
