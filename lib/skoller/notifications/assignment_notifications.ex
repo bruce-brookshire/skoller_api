@@ -1,4 +1,7 @@
-defmodule Skoller.Jobs.SendNotifications do
+defmodule Skoller.AssignmentNotifications do
+  @moduledoc """
+  A context module for sending assignment notifications.
+  """
 
   alias Skoller.Assignments
   alias Skoller.Notifications
@@ -8,7 +11,7 @@ defmodule Skoller.Jobs.SendNotifications do
   @assignment_reminder_tomorrow_category 200
   @assignment_reminder_future_category 300
 
-  def run(time) do
+  def send_assignment_reminder_notifications(time) do
     time 
     |> Notifications.get_assignment_reminders(:today)
     |> Enum.each(&send_notifications(&1, :today))
