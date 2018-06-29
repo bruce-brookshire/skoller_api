@@ -3,9 +3,10 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Repo
   alias SkollerWeb.Class.WeightView
+  alias Skoller.Weights
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
@@ -21,9 +22,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   plug :check_lock, %{type: :weight, using: :class_id}
 
   def create(conn, params) do
-    changeset = Weight.changeset_admin(%Weight{}, params)
-
-    case Repo.insert(changeset) do
+    case Weights.insert(params) do
       {:ok, weight} ->
         render(conn, WeightView, "show.json", weight: weight)
       {:error, changeset} ->
@@ -34,11 +33,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   end
 
   def update(conn, %{"id" => id} = params) do
-  
-    weight_old = Repo.get!(Weight, id)
-    changeset = Weight.changeset(weight_old, params)
+    weight_old = Weights.get!(id)
 
-    case Repo.update(changeset) do
+    case Weights.update(weight_old, params) do
       {:ok, weight} ->
         render(conn, WeightView, "show.json", weight: weight)
       {:error, changeset} ->

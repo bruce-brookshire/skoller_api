@@ -73,7 +73,7 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a `Skoller.Schools.Class` by id with `Skoller.Class.Weight`
+  Gets a `Skoller.Schools.Class` by id with `Skoller.Weights.Weight`
 
   """
 

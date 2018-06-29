@@ -8,7 +8,7 @@ defmodule SkollerWeb.Plugs.Lock do
 
   alias Skoller.Repo
   alias Skoller.Locks
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Assignments.Assignment
   alias Skoller.Classes
 

@@ -6,7 +6,7 @@ defmodule Skoller.Assignments.Assignment do
   alias Skoller.Assignments.Assignment
   alias Skoller.Schools.Class
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
 
   schema "assignments" do
     field :due, :utc_datetime

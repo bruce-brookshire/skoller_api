@@ -8,7 +8,7 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Assignments.Assignment
   alias Skoller.Students
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Mods
   alias Skoller.StudentClasses
 

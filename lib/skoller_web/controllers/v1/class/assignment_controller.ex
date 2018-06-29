@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   use SkollerWeb, :controller
 
   alias Skoller.Assignments.Assignment
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Repo
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Responses.MultiError

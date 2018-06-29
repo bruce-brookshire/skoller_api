@@ -1,10 +1,10 @@
-defmodule Skoller.Class.Weight do
+defmodule Skoller.Weights.Weight do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Skoller.Class.Weight
+  alias Skoller.Weights.Weight
   alias Skoller.Schools.Class
 
   schema "class_weights" do
@@ -23,14 +23,14 @@ defmodule Skoller.Class.Weight do
   @all_adm @adm_req
 
   @doc false
-  def changeset(%Weight{} = weight, attrs) do
+  def changeset_update(%Weight{} = weight, attrs) do
     weight
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> validate_number(:weight, greater_than: 0)
   end
 
-  def changeset_admin(%Weight{} = weight, attrs) do
+  def changeset_insert(%Weight{} = weight, attrs) do
     weight
     |> cast(attrs, @all_adm)
     |> validate_required(@adm_req)
