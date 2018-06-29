@@ -3,8 +3,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Weights.Weight
-  alias Skoller.Repo
   alias SkollerWeb.Class.WeightView
   alias Skoller.Weights
 
@@ -46,9 +44,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   end
 
   def delete(conn, %{"id" => id}) do
-    weight = Repo.get!(Weight, id)
+    weight = Weights.get!(id)
 
-    case Repo.delete(weight) do
+    case Weights.delete(weight) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

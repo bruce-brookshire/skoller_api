@@ -37,4 +37,14 @@ defmodule Skoller.Weights do
     Weight.changeset_update(weight_old, params)
     |> Repo.update()
   end
+
+  @doc """
+  Deletes a weight.
+
+  ## Returns
+  `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
+  """
+  def delete(%Weight{} = weight) do
+    Repo.delete(weight)
+  end
 end
