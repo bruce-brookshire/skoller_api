@@ -1,14 +1,14 @@
-defmodule Skoller.Chat.Comment.Like do
+defmodule Skoller.ChatComments.Like do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Chat.Comment.Like
+  alias Skoller.ChatComments.Like
 
   schema "chat_comment_likes" do
     field :chat_comment_id, :id
     field :student_id, :id
-    belongs_to :chat_comment, Skoller.Chat.Comment, define_field: false
+    belongs_to :chat_comment, Skoller.ChatComments.Comment, define_field: false
 
     timestamps()
   end

@@ -1,13 +1,13 @@
-defmodule Skoller.Chat.Comment do
+defmodule Skoller.ChatComments.Comment do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Chat.Comment
+  alias Skoller.ChatComments.Comment
   alias Skoller.Students.Student
-  alias Skoller.Chat.Reply
-  alias Skoller.Chat.Comment.Like
-  alias Skoller.Chat.Post
+  alias Skoller.ChatReplies.Reply
+  alias Skoller.ChatComments.Like
+  alias Skoller.ChatPosts.Post
 
   schema "chat_comments" do
     field :comment, :string

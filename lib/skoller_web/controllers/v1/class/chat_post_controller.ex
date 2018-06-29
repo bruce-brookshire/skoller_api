@@ -4,9 +4,9 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Post
+  alias Skoller.ChatPosts.Post
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.Chat.Post.Star
+  alias Skoller.ChatPosts.Star
   alias Skoller.Students
   alias Skoller.ChatNotifications
 

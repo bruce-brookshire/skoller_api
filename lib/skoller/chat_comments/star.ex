@@ -1,15 +1,15 @@
-defmodule Skoller.Chat.Comment.Star do
+defmodule Skoller.ChatComments.Star do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Chat.Comment.Star
+  alias Skoller.ChatComments.Star
 
   schema "chat_comment_stars" do
     field :chat_comment_id, :id
     field :student_id, :id
     field :is_read, :boolean, default: false
-    belongs_to :chat_comment, Skoller.Chat.Comment, define_field: false
+    belongs_to :chat_comment, Skoller.ChatComments.Comment, define_field: false
 
     timestamps()
   end

@@ -1,4 +1,4 @@
-defmodule Skoller.Chat.Algorithm do
+defmodule Skoller.Chats.Algorithm do
   @moduledoc false
   
   use Ecto.Schema

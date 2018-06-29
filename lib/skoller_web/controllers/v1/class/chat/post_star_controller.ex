@@ -4,9 +4,9 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Post.Star
-  alias Skoller.Chat.Comment
-  alias Skoller.Chat.Comment.Star, as: CommentStar
+  alias Skoller.ChatPosts.Star
+  alias Skoller.ChatComments.Comment
+  alias Skoller.ChatComments.Star, as: CommentStar
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
   alias Skoller.MapErrors

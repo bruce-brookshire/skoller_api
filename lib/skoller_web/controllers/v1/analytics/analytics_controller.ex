@@ -11,9 +11,9 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Mods.Type, as: ModType
   alias Skoller.Mods.Mod
   alias Skoller.Mods.Action
-  alias Skoller.Chat.Post
-  alias Skoller.Chat.Comment
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatPosts.Post
+  alias Skoller.ChatComments.Comment
+  alias Skoller.ChatReplies.Reply
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Students
   alias Skoller.Classes

@@ -54,8 +54,8 @@ Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 100, name: "The wrong syl
 Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 200, name: "Need to submit an additional/revised assignment schedule"})
 Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 300, name: "Other"})
 
-Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 100, name: "Hot"})
-Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 200, name: "Most Recent"})
-Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 300, name: "Top from the past 24 hours"})
-Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 400, name: "Top from the past week"})
-Skoller.Repo.insert!(%Skoller.Chat.Algorithm{id: 500, name: "Top from the semester"})
+Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 100, name: "Hot"})
+Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 200, name: "Most Recent"})
+Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 300, name: "Top from the past 24 hours"})
+Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 400, name: "Top from the past week"})
+Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 500, name: "Top from the semester"})

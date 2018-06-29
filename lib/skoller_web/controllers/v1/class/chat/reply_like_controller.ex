@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Reply.Like
+  alias Skoller.ChatReplies.Like
   alias SkollerWeb.Class.ChatReplyView
 
   import SkollerWeb.Plugs.Auth

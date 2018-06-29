@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   use SkollerWeb, :controller
   
   alias Skoller.Repo
-  alias Skoller.Chat.Post.Like
+  alias Skoller.ChatPosts.Like
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.Students
 

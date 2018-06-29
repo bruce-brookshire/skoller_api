@@ -4,8 +4,8 @@ defmodule SkollerWeb.Student.Inbox.ResponseView do
 
   alias SkollerWeb.Student.Inbox.ResponseView
   alias Skoller.Repo
-  alias Skoller.Chat.Reply
-  alias Skoller.Chat.Comment
+  alias Skoller.ChatReplies.Reply
+  alias Skoller.ChatComments.Comment
 
   def render("show.json", %{response: response}) do
     render_one(response, ResponseView, "response.json")

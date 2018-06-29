@@ -4,13 +4,13 @@ defmodule Skoller.ChatReplies do
   """
 
   alias Skoller.Repo
-  alias Skoller.Chat.Reply
+  alias Skoller.ChatReplies.Reply
 
   @doc """
   Gets a reply by id
 
   ## Returns
-  `%Skoller.Chat.Reply{}` or `Ecto.NoResultsError`
+  `%Skoller.ChatReplies.Reply{}` or `Ecto.NoResultsError`
   """
   def get!(reply_id) do
     Repo.get!(Reply, reply_id)
@@ -20,7 +20,7 @@ defmodule Skoller.ChatReplies do
   Gets a reply by student id and chat post id.
 
   ## Returns
-  `%Skoller.Chat.Reply{}` or `Ecto.NoResultsError`
+  `%Skoller.ChatReplies.Reply{}` or `Ecto.NoResultsError`
   """
   def get_reply_by_student_and_id!(student_id, reply_id) do
     Repo.get_by!(Reply, student_id: student_id, id: reply_id)
@@ -30,7 +30,7 @@ defmodule Skoller.ChatReplies do
   Deletes a reply.
 
   ## Returns
-  `{:ok, %Skoller.Chat.Reply{}}` or `{:error, %Ecto.Changeset{}}`
+  `{:ok, %Skoller.ChatReplies.Reply{}}` or `{:error, %Ecto.Changeset{}}`
   """
   def delete(%Reply{} = reply) do
     Repo.delete(reply)
