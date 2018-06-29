@@ -4,13 +4,13 @@ defmodule Skoller.HelpRequests do
   """
 
   alias Skoller.Repo
-  alias Skoller.Class.HelpRequest
+  alias Skoller.HelpRequests.HelpRequest
 
   @doc """
   Completes a help request.
 
   ## Returns
-  `{:ok, Skoller.Class.HelpRequest}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.HelpRequests.HelpRequest}` or `{:error, Ecto.Changeset}`
   """
   def complete(request_id) do
     HelpRequest
