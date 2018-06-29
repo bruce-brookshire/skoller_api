@@ -9,7 +9,7 @@ defmodule Skoller.Users do
   alias Skoller.Students
   alias Skoller.Locks.Lock
   alias Skoller.Students.Student
-  alias SkollerWeb.Helpers.VerificationHelper
+  alias Skoller.Verification
   alias Skoller.CustomSignups
   alias Skoller.Users.Report
   alias Skoller.MapErrors
@@ -156,7 +156,7 @@ defmodule Skoller.Users do
       "true" -> 
         u_changeset
       _ ->
-        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, VerificationHelper.generate_verify_code)})
+        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, Verification.generate_verify_code)})
     end
   end
   defp verification_code(changeset, _opts), do: changeset
