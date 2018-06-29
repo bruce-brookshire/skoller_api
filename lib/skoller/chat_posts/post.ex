@@ -4,7 +4,7 @@ defmodule Skoller.ChatPosts.Post do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.ChatPosts.Post
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.ChatComments.Comment
   alias Skoller.Students.Student
   alias Skoller.ChatPosts.Like

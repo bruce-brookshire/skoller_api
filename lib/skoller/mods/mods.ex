@@ -10,7 +10,7 @@ defmodule Skoller.Mods do
   alias Skoller.Repo
   alias Skoller.Assignments.Assignment
   alias Skoller.Students
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Users.User
   alias Skoller.Students.Student
   alias Skoller.StudentClasses
@@ -99,7 +99,7 @@ defmodule Skoller.Mods do
   Gets the class from a mod id
 
   ## Returns
-  `Skoller.Schools.Class`, `nil` or raises if more than one.
+  `Skoller.Classes.Class`, `nil` or raises if more than one.
   """
   def get_class_from_mod_id(mod_id) do
     from(class in Class)
@@ -127,7 +127,7 @@ defmodule Skoller.Mods do
   Gets the enrolled classes that a student has pending mods in.
 
   ## Returns
-  `[Skoller.Schools.Class]` or `[]`
+  `[Skoller.Classes.Class]` or `[]`
   """
   def get_classes_with_pending_mod_by_student_id(student_id) do
     from(class in Class)

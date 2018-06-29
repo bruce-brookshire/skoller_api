@@ -39,7 +39,7 @@ defmodule Skoller.AdminClasses do
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` is a map containing:
-   * `{:class, Skoller.Schools.Class}`
+   * `{:class, Skoller.Classes.Class}`
    * `{:class_locks, Tuple}`
   """
   def update_status(class_id, status_id) do

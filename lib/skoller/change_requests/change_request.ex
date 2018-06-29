@@ -5,7 +5,7 @@ defmodule Skoller.ChangeRequests.ChangeRequest do
   import Ecto.Changeset
 
   alias Skoller.ChangeRequests.ChangeRequest
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.ChangeRequests.Type
   alias Skoller.Users.User
 

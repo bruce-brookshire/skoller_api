@@ -7,7 +7,7 @@ defmodule Skoller.StudentRequests.StudentRequest do
   alias Skoller.Users.User
   alias Skoller.StudentRequests.Type
   alias Skoller.StudentRequests.Doc
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
 
   schema "class_student_requests" do
     field :is_completed, :boolean, default: false

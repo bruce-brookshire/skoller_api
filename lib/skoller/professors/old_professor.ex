@@ -1,10 +1,12 @@
 defmodule Skoller.Professors.OldProfessor do
   @moduledoc false
+
+  # LEAVE THIS CUZ I HAVE NO IDEA IF MIGRATIONS WILL WORK WITHOUT IT
   
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Professors.OldProfessor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
 
   schema "professors" do
     field :email, :string

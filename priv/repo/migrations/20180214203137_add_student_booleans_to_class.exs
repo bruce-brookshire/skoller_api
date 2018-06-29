@@ -4,7 +4,7 @@ defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
   import Ecto.Query
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.Classes.Status
 
   def change do

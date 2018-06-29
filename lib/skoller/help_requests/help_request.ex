@@ -5,7 +5,7 @@ defmodule Skoller.HelpRequests.HelpRequest do
   import Ecto.Changeset
   alias Skoller.HelpRequests.HelpRequest
   alias Skoller.Users.User
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.HelpRequests.Type
 
   schema "class_help_requests" do

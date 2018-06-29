@@ -4,7 +4,7 @@ defmodule Skoller.Assignments.Assignment do
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Assignments.Assignment
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Weights.Weight
 

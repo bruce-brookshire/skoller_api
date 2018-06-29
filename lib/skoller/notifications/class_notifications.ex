@@ -35,7 +35,7 @@ defmodule Skoller.ClassNotifications do
     users = Notifications.get_notification_enabled_needs_syllabus_users()
     |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
 
-    Repo.insert(%Skoller.Notification.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
+    Repo.insert(%Skoller.Notifications.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
 
     users
     |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))

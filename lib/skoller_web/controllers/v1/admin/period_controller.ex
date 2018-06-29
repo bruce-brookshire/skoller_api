@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Admin.PeriodController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
   alias SkollerWeb.PeriodView
   

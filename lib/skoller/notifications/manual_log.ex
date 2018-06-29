@@ -1,9 +1,9 @@
-defmodule Skoller.Notification.ManualLog do
+defmodule Skoller.Notifications.ManualLog do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Notification.ManualLog
+  alias Skoller.Notifications.ManualLog
 
   schema "manual_notification_logs" do
     field :affected_users, :integer

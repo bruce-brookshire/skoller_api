@@ -24,7 +24,7 @@ defmodule Skoller.ChangeRequests do
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` contains 
    * `{:change_request, Skoller.ChangeRequests.ChangeRequest}`
-   * `{:class_status, Skoller.Schools.Class}`
+   * `{:class_status, Skoller.Classes.Class}`
   """
   def complete(id) do
     change_request_old = Repo.get!(ChangeRequest, id)

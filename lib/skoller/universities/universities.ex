@@ -4,7 +4,7 @@ defmodule Skoller.Universities do
   """
 
   alias Skoller.Repo
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
 
   @doc false
   def get_changeset(old_class \\ %Class{}, params) do
@@ -15,7 +15,7 @@ defmodule Skoller.Universities do
   Updates a class.
 
   ## Returns
-  `{:ok, Skoller.Schools.Class}` or `{:error, Ecto.Changeset}`
+  `{:ok, Skoller.Classes.Class}` or `{:error, Ecto.Changeset}`
   """
   def update_class(%Class{} = class, params) do
     Class.university_changeset(class, params)
@@ -26,7 +26,7 @@ defmodule Skoller.Universities do
   Gets a class by crn
 
   ## Returns
-  `Skoller.Schools.Class` or `nil`
+  `Skoller.Classes.Class` or `nil`
   """
   def get_class_by_crn(crn, class_period_id) do
     Repo.get_by(Class, class_period_id: class_period_id, crn: crn)

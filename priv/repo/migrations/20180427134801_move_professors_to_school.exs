@@ -3,7 +3,7 @@ defmodule Skoller.Repo.Migrations.MoveProfessorsToSchool do
 
   alias Skoller.Repo
   alias Skoller.Professors.Professor
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Professors.OldProfessor
 
   def up do

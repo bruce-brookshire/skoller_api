@@ -5,7 +5,7 @@ defmodule Skoller.Weights.Weight do
   import Ecto.Changeset
 
   alias Skoller.Weights.Weight
-  alias Skoller.Schools.Class
+  alias Skoller.Classes.Class
 
   schema "class_weights" do
     field :name, :string

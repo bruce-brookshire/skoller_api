@@ -10,8 +10,8 @@ defmodule Skoller.Chats do
   alias Skoller.ChatComments.Star, as: CStar
   alias Skoller.ChatReplies.Reply
   alias Skoller.Students
-  alias Skoller.Schools.Class
-  alias Skoller.Schools.ClassPeriod
+  alias Skoller.Classes.Class
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.Classes
   alias Skoller.ChatPosts.Like
@@ -82,7 +82,7 @@ defmodule Skoller.Chats do
    * `Map`, `%{"school_id" => Id}` filters by school
 
   ## Returns
-  `%{class: Skoller.Schools.Class, count: Integer}` or `nil`
+  `%{class: Skoller.Classes.Class, count: Integer}` or `nil`
   """
   def get_max_chat_activity(%{date_start: _date_start, date_end: _date_end} = dates, params) do
     from(c in Class)
