@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   def create(conn, params) do
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:user, &create_user(params, &1))
-    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
+    |> Ecto.Multi.run(:token, &Token.login(&1.user.user.id))
     |> Repo.transaction()
 
     case multi do
