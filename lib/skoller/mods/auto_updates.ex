@@ -81,7 +81,7 @@ defmodule Skoller.AutoUpdates do
     action_count = acted
     |> Enum.count()
 
-    threshold = Settings.get_setting_by_name!(@auto_upd_response_threshold) |> String.to_float
+    threshold = Settings.get_setting_by_name!(@auto_upd_response_threshold).value |> String.to_float
 
     case action_count / count < threshold do
       true -> {:error, :not_enough_responses}
@@ -97,7 +97,7 @@ defmodule Skoller.AutoUpdates do
     |> Enum.filter(& &1.is_accepted == true)
     |> Enum.count()
 
-    threshold = Settings.get_setting_by_name!(@auto_upd_approval_threshold) |> String.to_float
+    threshold = Settings.get_setting_by_name!(@auto_upd_approval_threshold).value |> String.to_float
 
     case action_count / count < threshold do
       true -> {:error, :not_enough_copied}
