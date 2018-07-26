@@ -66,7 +66,7 @@ defmodule Skoller.AutoUpdates do
   end
 
   defp auto_update_count_needed(count) do
-    threshold = Settings.get_setting_by_name!(@auto_upd_enrollment_threshold) |> String.to_integer
+    threshold = Settings.get_setting_by_name!(@auto_upd_enrollment_threshold).value |> String.to_integer
     case count < threshold do
       true -> {:error, :not_enough_enrolled}
       false -> {:ok, count}
