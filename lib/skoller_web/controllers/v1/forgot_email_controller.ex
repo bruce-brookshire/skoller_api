@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   import Bamboo.Email
 
   @from_email "noreply@skoller.co"
-  @reset_password_route "/reset_password/"
+  @reset_password_route "/reset_password"
   @forgot_email_text1 "You forgot your password? It's okay. None of us are perfect. Click " 
   @forgot_email_text2 " to reset it."
   @this_link "this link"
@@ -28,7 +28,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
 
   def reset(conn, %{"password" => password}) do
     multi = Ecto.Multi.new
-    |> Ecto.Multi.run(:user, Users.change_password(conn.assigns[:user], password))
+    |> Ecto.Multi.run(:user, &change_password(conn.assigns[:user], password, &1))
     |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
 
     case Repo.transaction(multi) do
@@ -38,6 +38,10 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
         conn
         |> MultiError.render(failed_value)
     end
+  end
+
+  defp change_password(user, password, _) do
+    Users.change_password(user, password)
   end
 
   defp send_forgot_pass_email(user) do
@@ -52,7 +56,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
     |> to(user.email)
     |> from(@from_email)
     |> subject("Forgot Password")
-    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Mailer.signature())
+    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Mailer.signature())
     |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Mailer.text_signature())
   end
 end
