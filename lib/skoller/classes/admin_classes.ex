@@ -92,7 +92,7 @@ defmodule Skoller.AdminClasses do
     |> Repo.insert()
 
     case note do
-      {:ok, _note} -> get_full_class_by_id!(class_id)
+      {:ok, _note} -> {:ok, get_full_class_by_id!(class_id)}
       {:error, _error} -> note
     end
   end

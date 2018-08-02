@@ -13,8 +13,12 @@ defmodule SkollerWeb.Api.V1.Class.NoteController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{"class_id" => class_id} = params) do
-    class = AdminClasses.create_note(class_id, params)
-
-    render(conn, ClassView, "show.json", class: class)
+    case AdminClasses.create_note(class_id, params) do
+      {:ok, class} -> render(conn, ClassView, "show.json", class: class)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 end
