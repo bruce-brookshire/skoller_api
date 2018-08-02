@@ -69,6 +69,10 @@ defmodule Skoller.AdminClasses do
     multi
   end
 
+  def load_notes(class) do
+    class |> Repo.preload(:notes)
+  end
+
   defp send_need_syllabus_email(user, class) do
     user = user |> Repo.preload(:student)
     new_email()

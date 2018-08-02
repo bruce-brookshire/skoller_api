@@ -14,6 +14,7 @@ defmodule Skoller.Classes.Class do
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Assignments.Assignment
+  alias Skoller.Classes.Note
 
   schema "classes" do
     field :credits, :string
@@ -52,6 +53,7 @@ defmodule Skoller.Classes.Class do
     has_many :change_requests, ChangeRequest
     has_many :student_requests, StudentRequest
     has_many :assignments, Assignment
+    has_many :notes, Note
 
     timestamps()
   end
