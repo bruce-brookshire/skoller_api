@@ -120,6 +120,9 @@ defmodule SkollerWeb.Router do
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
       resources "/classes", ClassController, only: [:update, :index] do
+
+        post "/notes", Class.NoteController, :create
+
         put "/statuses", Admin.Class.StatusController, :update
 
         # Chat routes

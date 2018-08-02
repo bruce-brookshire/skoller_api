@@ -12,10 +12,13 @@ defmodule Skoller.Classes.Note do
     timestamps()
   end
 
+  @req_fields [:notes, :class_id]
+  @all_fields @req_fields
+
   @doc false
   def changeset(%Note{} = note, attrs) do
     note
-    |> cast(attrs, [:notes])
-    |> validate_required([:notes])
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
   end
 end

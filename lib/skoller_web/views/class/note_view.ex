@@ -1,7 +1,9 @@
 defmodule SkollerWeb.Class.NoteView do
-  def render("note.json", %{notes: notes}) do
+  use SkollerWeb, :view
+
+  def render("note.json", %{note: note}) do
     %{
-      notes: notes.notes
+      notes: note.notes
     }
   end
 end
