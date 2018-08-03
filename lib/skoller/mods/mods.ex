@@ -806,6 +806,16 @@ defmodule Skoller.Mods do
     end
   end
 
+  defp process_self_action(%Mod{id: mod_id}, student_class_id, _atom) do
+    case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
+      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true})
+      val -> val
+              |> Ecto.Changeset.change(%{is_accepted: true, is_manual: false})
+              |> Repo.update()
+    end
+  end
+
+
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id, _) do
     dismiss_prior_mods(mod, student_class_id)
   end
