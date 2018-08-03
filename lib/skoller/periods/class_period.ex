@@ -27,6 +27,7 @@ defmodule Skoller.Periods.ClassPeriod do
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:school_id)
+    |> unique_constraint(:class_periods, name: :unique_semester_index)
   end
 
   def changeset_update(%ClassPeriod{} = class_period, attrs) do
