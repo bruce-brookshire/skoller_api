@@ -18,7 +18,7 @@ config :skoller, SkollerWeb.Endpoint,
   url: [scheme: "https", host: "classnav-api-staging.herokuapp.com", port: 443]
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: System.get_env("LOG_LEVEL") |> String.to_atom()
 
 # ## SSL Support
 #
