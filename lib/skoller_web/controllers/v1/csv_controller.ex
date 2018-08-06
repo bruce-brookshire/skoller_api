@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
-  @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :upload_key]
+  @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :class_upload_key]
   @school_headers [:name, :adr_locality, :adr_region, :period_name]
 
   plug :verify_role, %{role: @admin_role}
