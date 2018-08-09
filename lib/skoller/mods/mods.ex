@@ -488,7 +488,7 @@ defmodule Skoller.Mods do
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
     case StudentAssignments.get_assignment_by_ids(mod.assignment_id, id) do
       nil ->
-        {:ok, nil}
+        Ecto.Multi.new
       student_assignment -> 
         Ecto.Multi.new
         |> Ecto.Multi.delete(:student_assignment, student_assignment)
