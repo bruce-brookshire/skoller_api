@@ -10,6 +10,8 @@ defmodule Skoller.AutoUpdates do
   alias Skoller.Mods
   alias Skoller.MapErrors
 
+  require Logger
+
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
@@ -22,7 +24,9 @@ defmodule Skoller.AutoUpdates do
   def process_auto_update(mod, :notification) do
     case mod |> process_auto_update() do
       {:ok, nil} -> {:ok, nil}
-      {:ok, %{actions: actions}} -> ModNotifications.send_auto_update_notification(actions)
+      {:ok, %{actions: actions}} -> 
+        Logger.info("Preparing auto update notifications for mod: " <> to_string(mod.id))
+        ModNotifications.send_auto_update_notification(actions)
     end
   end
 
@@ -45,6 +49,7 @@ defmodule Skoller.AutoUpdates do
    * `{:ok, %{mod: Skoller.Mods.Mod, mods: [], actions: [Skoller.Mods.Action]}}`
   """
   def process_auto_update(mod) do
+    Logger.info("Beginning auto update check for mod: " <> to_string(mod.id))
     actions = mod |> ModActions.get_enrolled_actions_from_mod()
 
     update = actions 
@@ -55,6 +60,7 @@ defmodule Skoller.AutoUpdates do
 
     case update do
       {:ok, _} ->
+        Logger.info("Beginning auto update for mod: " <> to_string(mod.id))
         actions = mod |> ModActions.get_actions_from_mod()
         Ecto.Multi.new
         |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
