@@ -476,7 +476,6 @@ defmodule Skoller.Mods do
     |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
     |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
     |> where([mod, act], is_nil(act.is_accepted))
-    |> select([mod, act, assign], assign)
     |> Repo.all()
   end
 

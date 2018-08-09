@@ -28,7 +28,7 @@ defmodule Skoller.Universities do
   ## Returns
   `Skoller.Classes.Class` or `nil`
   """
-  def get_class_by_crn("", class_period_id) do
+  def get_class_by_crn("", _class_period_id) do
     nil
   end
   def get_class_by_crn(crn, class_period_id) do

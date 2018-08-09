@@ -7,7 +7,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias SkollerWeb.Class.WeightView
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias SkollerWeb.AssignmentView
+  alias SkollerWeb.Assignment.ModView
   alias Skoller.StudentAssignments
 
   @enrollment_path "/e/"
@@ -27,7 +27,7 @@ defmodule SkollerWeb.Class.StudentClassView do
       grade: Decimal.to_float(Decimal.round(grade, 2)),
       completion: Decimal.to_float(Decimal.round(completion, 2)),
       enrollment: enrollment,
-      new_assignments: render_many(new_assignments, AssignmentView, "assignment.json")
+      new_assignments: render_many(new_assignments, ModView, "mod.json")
     })
   end
 
