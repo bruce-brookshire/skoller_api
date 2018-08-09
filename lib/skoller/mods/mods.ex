@@ -486,12 +486,15 @@ defmodule Skoller.Mods do
   end
 
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
-    student_assignment = StudentAssignments.get_assignment_by_ids!(mod.assignment_id, id)
-
-    Ecto.Multi.new
-    |> Ecto.Multi.delete(:student_assignment, student_assignment)
-    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id, atom))
-    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+    case StudentAssignments.get_assignment_by_ids(mod.assignment_id, id) do
+      nil ->
+        {:ok, nil}
+      student_assignment -> 
+        Ecto.Multi.new
+        |> Ecto.Multi.delete(:student_assignment, student_assignment)
+        |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id, atom))
+        |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+    end
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, atom) do
