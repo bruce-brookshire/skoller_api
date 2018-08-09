@@ -22,6 +22,8 @@ defmodule Skoller.Classes do
 
   import Ecto.Query
 
+  require Logger
+
   @student_role 100
 
   @needs_syllabus_status 200
@@ -474,54 +476,59 @@ defmodule Skoller.Classes do
   #TODO: Internalize class status updates (remove from SkollerWeb).
   #TODO: Standardize return objects
   # A new class has been added, and it is a class that will never have a syllabus.
-  def check_status(class, params)
-  def check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
+  def check_status(class, params) do
+    Logger.info("Checking status for class: " <> to_string(class.id) <> " and params:")
+    Logger.info(inspect(params))
+    cl_check_status(class, params)
+  end
+
+  defp cl_check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params) do
     class |> set_status(@completed_status)
   end
-  def check_status(%Class{class_status_id: status, is_syllabus: false} = class, _params) when status < @completed_status do
+  defp cl_check_status(%Class{class_status_id: status, is_syllabus: false} = class, _params) when status < @completed_status do
     class |> set_status(@completed_status)
   end
   # A new class has been added.
-  def check_status(%Class{class_status_id: nil} = class, _params) do
+  defp cl_check_status(%Class{class_status_id: nil} = class, _params) do
     class |> set_status(@needs_syllabus_status)
   end
   # A syllabus has been added to a class that needs a syllabus.
-  def check_status(%Class{class_status_id: @needs_syllabus_status} = class, %{doc: %{is_syllabus: true} = doc}) do
+  defp cl_check_status(%Class{class_status_id: @needs_syllabus_status} = class, %{doc: %{is_syllabus: true} = doc}) do
     case doc.class_id == class.id do
       true -> class |> set_status(@weight_status)
       false -> {:error, %{class_id: "Class and doc do not match"}}
     end
   end
   # A class in the change status has a change request completed.
-  def check_status(%Class{class_status_id: @change_status} = class, %{change_request: %{is_completed: true} = change_request}) do
+  defp cl_check_status(%Class{class_status_id: @change_status} = class, %{change_request: %{is_completed: true} = change_request}) do
     case change_request.class_id == class.id do
       true -> check_req_status(class)
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
   # A class in the change status has a student request completed.
-  def check_status(%Class{class_status_id: @change_status} = class, %{student_request: %{is_completed: true} = student_request}) do
+  defp cl_check_status(%Class{class_status_id: @change_status} = class, %{student_request: %{is_completed: true} = student_request}) do
     case student_request.class_id == class.id do
       true -> check_req_status(class)
       false -> {:error, %{class_id: "Class and student request do not match"}}
     end
   end
   # A class has a change request created.
-  def check_status(%Class{} = class, %{change_request: %{is_completed: false} = change_request}) do
+  defp cl_check_status(%Class{} = class, %{change_request: %{is_completed: false} = change_request}) do
     case change_request.class_id == class.id do
       true -> class |> Repo.preload(:class_status) |> change_status_check()
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
   # A class has a help request created.
-  def check_status(%Class{} = class, %{help_request: %{is_completed: false} = help_request}) do
+  defp cl_check_status(%Class{} = class, %{help_request: %{is_completed: false} = help_request}) do
     case help_request.class_id == class.id do
       true -> class |> Repo.preload(:class_status) |> help_status_check()
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
   # A class has been fully unlocked. Get the highest lock
-  def check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
+  defp cl_check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock
     |> Enum.filter(& elem(&1, 1).is_completed and elem(&1, 1).class_id == class.id)
     |> Enum.reduce(0, &case elem(&1, 1).class_lock_section_id > &2 do
@@ -536,41 +543,41 @@ defmodule Skoller.Classes do
     end
   end
   # A class has been unlocked in the weights status.
-  def check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock, is_completed: true} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@assignment_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
   # A class has been unlocked in the assignments status.
-  def check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock, is_completed: true} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@review_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
   # A class has been unlocked from the review status.
-  def check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@completed_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
   # A student enrolled into a ghost class.
-  def check_status(%Class{is_ghost: true} = class, %{student_class: student_class}) do
+  defp cl_check_status(%Class{is_ghost: true} = class, %{student_class: student_class}) do
     case student_class.class_id == class.id do
       true -> class |> remove_ghost()
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
   # A student created a student request.
-  def check_status(%Class{} = class, %{student_request: %{is_completed: false} = student_request}) do
+  defp cl_check_status(%Class{} = class, %{student_request: %{is_completed: false} = student_request}) do
     case student_request.class_id == class.id do
       true -> class |> Repo.preload(:class_status) |> set_request_status()
       false -> {:error, %{class_id: "Class id enrolled into does not match"}}
     end
   end
-  def check_status(_class, _params), do: {:ok, nil}
+  defp cl_check_status(_class, _params), do: {:ok, nil}
 
   defp set_status(class, status) do
     Ecto.Changeset.change(class, %{class_status_id: status})

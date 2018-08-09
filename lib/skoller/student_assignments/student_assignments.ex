@@ -14,6 +14,8 @@ defmodule Skoller.StudentAssignments do
 
   import Ecto.Query
 
+  require Logger
+
   @doc """
   Gets a student assignment by assignment id and student class id.
 
@@ -49,12 +51,14 @@ defmodule Skoller.StudentAssignments do
   # It needs to be split out depending on what is calling it, and likely into different modules altogether.
   def insert_assignments(student_class_or_assignment_struct)
   def insert_assignments(%{student_class: %StudentClass{} = student_class}) do
+    Logger.info("inserting assignments for student class: " <> to_string(student_class.id))
     case get_assignments(%{class_id: student_class.class_id}) do
       [] -> {:ok, nil}
       assignments -> convert_and_insert(assignments, student_class)
     end
   end
   def insert_assignments(%{assignment: %Assignment{} = assignment}) do
+    Logger.info("inserting assignment: " <> assignment.id <> " for students")
     case Students.get_students_by_class(assignment.class_id) do
       [] -> {:ok, nil}
       students -> convert_and_insert(assignment, students)

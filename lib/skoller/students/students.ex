@@ -25,6 +25,8 @@ defmodule Skoller.Students do
 
   import Ecto.Query
 
+  require Logger
+
   @community_threshold 2
   @link_length 5
   @enrollment_limit 15
@@ -491,6 +493,8 @@ defmodule Skoller.Students do
   def generate_enrollment_link(%StudentClass{id: id} = student_class) do
     link = generate_link(id)
 
+    Logger.info("Generating enrollment link " <> to_string(link) <> " for student class: " <> to_string(id))
+
     student_class
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
@@ -537,6 +541,7 @@ defmodule Skoller.Students do
   end
 
   defp auto_approve_mods(%{mods: mods}) do
+    Logger.info("Processing mod auto updates")
     status = mods
     |> Enum.map(&AutoUpdates.process_auto_update(&1))
 
@@ -546,6 +551,7 @@ defmodule Skoller.Students do
 
   # Adds all non added public mods to a student enrolling in a class or re-enrolling..
   defp add_public_mods(%{student_class: student_class}) do
+    Logger.info("Adding public mods for student class: " <> to_string(student_class.id))
     mods = from(mod in Mod)
     |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
     |> where([mod], mod.is_private == false)
@@ -715,6 +721,7 @@ defmodule Skoller.Students do
   defp check_enrollment_limit(changeset, _student_id), do: changeset
 
   defp enroll(student_id, class_id, params, opts \\ []) do
+    Logger.info("Enrolling class: " <> class_id <> " student: " <> student_id)
     changeset = StudentClass.changeset(%StudentClass{}, params)
     |> add_enrolled_by(opts)
     |> check_enrollment_limit(student_id)
