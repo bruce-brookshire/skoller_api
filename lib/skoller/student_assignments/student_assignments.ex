@@ -58,7 +58,7 @@ defmodule Skoller.StudentAssignments do
     end
   end
   def insert_assignments(%{assignment: %Assignment{} = assignment}) do
-    Logger.info("inserting assignment: " <> assignment.id <> " for students")
+    Logger.info("inserting assignment: " <> to_string(assignment.id) <> " for students")
     case Students.get_students_by_class(assignment.class_id) do
       [] -> {:ok, nil}
       students -> convert_and_insert(assignment, students)
