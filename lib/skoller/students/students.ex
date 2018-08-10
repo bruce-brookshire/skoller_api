@@ -721,7 +721,7 @@ defmodule Skoller.Students do
   defp check_enrollment_limit(changeset, _student_id), do: changeset
 
   defp enroll(student_id, class_id, params, opts \\ []) do
-    Logger.info("Enrolling class: " <> class_id <> " student: " <> student_id)
+    Logger.info("Enrolling class: " <> to_string(class_id) <> " student: " <> to_string(student_id))
     changeset = StudentClass.changeset(%StudentClass{}, params)
     |> add_enrolled_by(opts)
     |> check_enrollment_limit(student_id)
