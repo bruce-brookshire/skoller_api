@@ -19,6 +19,18 @@ defmodule Skoller.Users do
   @student_role 100
 
   @doc """
+  Gets student users.
+
+  ## Returns
+  `[Skoller.Users.User]` or `[]`
+  """
+  def get_student_users() do
+    from(u in User)
+    |> where([u], not(is_nil(u.student_id)))
+    |> Repo.all()
+  end
+
+  @doc """
   Reports a user
 
   ## Returns

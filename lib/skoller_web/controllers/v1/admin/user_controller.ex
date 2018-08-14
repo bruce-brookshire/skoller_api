@@ -36,6 +36,14 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     render(conn, UserView, "show.json", user: user)
   end
 
+  def csv(conn, _params) do
+    users = Users.get_student_users()
+    conn
+    |> put_resp_content_type("text/csv")
+    |> put_resp_header("content-disposition", "attachment; filename=\"Users-" <> to_string(DateTime.utc_now) <>  "\"")
+    |> send_resp(200, csv_users(users))
+  end
+
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Users.get_user_by_id!(user_id)
 
@@ -47,5 +55,18 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
         conn
         |> MultiError.render(failed_value)
     end
+  end
+
+  defp csv_users(users) do
+    users
+    |> Enum.map(&get_row_data(&1))
+    |> CSV.encode
+    |> Enum.to_list
+    |> to_string
+  end
+
+  def get_row_data(user) do
+    user = user |> Repo.preload(:student)
+    [user.email, user.student.name_first, user.student.name_last, user.student.phone]
   end
 end
