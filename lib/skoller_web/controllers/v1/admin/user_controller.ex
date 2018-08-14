@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
+  alias Skoller.Dates
 
   import SkollerWeb.Plugs.Auth
   
@@ -72,6 +73,18 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   def get_row_data(user) do
     user = user |> Repo.preload(:student)
-    [user.email, user.student.name_first, user.student.name_last, user.student.phone, to_string(user.inserted_at)]
+    [user.email, user.student.name_first, user.student.name_last, format_phone(user.student.phone), format_date(user.inserted_at)]
+  end
+
+  def format_phone(phone) do
+    (phone |> String.slice(0, 3)) <> "-" <> (phone |> String.slice(3, 3)) <> "-" <> (phone |> String.slice(6, 4))
+  end
+
+  def format_date(naive_date_time) do
+    date_time = DateTime.from_naive!(naive_date_time, "Etc/UTC")
+    {:ok, time} = Time.new(date_time.hour, date_time.minute, date_time.second)
+    date = DateTime.to_date(date_time)
+
+    to_string(date) <> " " <> to_string(time)
   end
 end
