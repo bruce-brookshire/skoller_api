@@ -62,11 +62,16 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     |> Enum.map(&get_row_data(&1))
     |> CSV.encode
     |> Enum.to_list
+    |> add_headers
     |> to_string
+  end
+
+  def add_headers(list) do
+    ["email,first,last,phone,created date\r\n" | list]
   end
 
   def get_row_data(user) do
     user = user |> Repo.preload(:student)
-    [user.email, user.student.name_first, user.student.name_last, user.student.phone]
+    [user.email, user.student.name_first, user.student.name_last, user.student.phone, to_string(user.inserted_at)]
   end
 end
