@@ -366,6 +366,7 @@ defmodule Skoller.Classes do
   """
   def evaluate_class_completion(old_class, new_class)
   def evaluate_class_completion(%Class{class_status_id: @completed_status}, %Class{class_status_id: @completed_status}), do: nil
+  def evaluate_class_completion(%Class{class_status_id: @change_status}, %Class{class_status_id: @completed_status}), do: nil
   def evaluate_class_completion(%Class{class_status_id: _old_status}, %Class{class_status_id: @completed_status} = class) do
     Task.start(ClassNotifications, :send_class_complete_notification, [class])
   end
