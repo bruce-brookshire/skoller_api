@@ -8,7 +8,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
-  alias Skoller.Dates
 
   import SkollerWeb.Plugs.Auth
   
