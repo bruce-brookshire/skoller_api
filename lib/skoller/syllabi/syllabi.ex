@@ -64,7 +64,7 @@ defmodule Skoller.Syllabi do
   defp generate_servable_schools_subquery("true") do
     exclude_list = get_syllabus_overrides_subquery(false)
     |> Repo.all()
-    |> Enum.reduce([], & &2 ++ List.wrap(&1.id))
+    |> Enum.reduce([], & &2 ++ List.wrap(&1.school_id))
 
     from(s in School)
     |> where([s], s.id not in ^exclude_list)
