@@ -8,10 +8,14 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
+  alias Skoller.Students
+  alias Skoller.StudentClasses
 
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
+
+  @needs_syllabus_status 200
   
   plug :verify_role, %{role: @admin_role}
 
@@ -66,24 +70,40 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     |> to_string
   end
 
-  def add_headers(list) do
-    ["email,first,last,phone,created date\r\n" | list]
+  defp add_headers(list) do
+    ["email,first,last,phone,created date,verified?,# of Classes,Classes Need Syllabus,school\r\n" | list]
   end
 
-  def get_row_data(user) do
+  defp get_row_data(user) do
     user = user |> Repo.preload(:student)
-    [user.email, user.student.name_first, user.student.name_last, format_phone(user.student.phone), format_date(user.inserted_at)]
+    student_classes = Students.get_enrolled_classes_by_student_id(user.student_id)
+    [user.email, user.student.name_first, user.student.name_last, format_phone(user.student.phone),
+      format_date(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
+      get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]
   end
 
-  def format_phone(phone) do
+  defp format_phone(phone) do
     (phone |> String.slice(0, 3)) <> "-" <> (phone |> String.slice(3, 3)) <> "-" <> (phone |> String.slice(6, 4))
   end
 
-  def format_date(naive_date_time) do
+  defp format_date(naive_date_time) do
     date_time = DateTime.from_naive!(naive_date_time, "Etc/UTC")
     {:ok, time} = Time.new(date_time.hour, date_time.minute, date_time.second)
     date = DateTime.to_date(date_time)
 
     to_string(date) <> " " <> to_string(time)
+  end
+
+  defp get_needs_syllabus_classes(student_classes) do
+    student_classes
+    |> Enum.filter(& &1.class.class_status_id == @needs_syllabus_status)
+    |> Enum.count
+  end
+
+  defp get_most_common_school_name(student_classes) do
+    case StudentClasses.get_most_common_school(student_classes) do
+      nil -> ""
+      school -> school.name
+    end
   end
 end
