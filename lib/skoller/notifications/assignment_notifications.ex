@@ -5,7 +5,7 @@ defmodule Skoller.AssignmentNotifications do
 
   alias Skoller.Assignments
   alias Skoller.Notifications
-  alias Skoller.Notification
+  alias Services.Notification
 
   @assignment_reminder_today_category 100
   @assignment_reminder_tomorrow_category 200
@@ -22,7 +22,7 @@ defmodule Skoller.AssignmentNotifications do
   end
 
   defp send_notifications(assignment, atom) do
-    Notification.create_notification(assignment.udid, get_message(assignment, atom), get_topic(atom, assignment.days).topic)
+    Notification.create_notification(assignment.udid, assignment.type, get_message(assignment, atom), get_topic(atom, assignment.days).topic)
   end
 
   defp get_message(assignment, atom) do

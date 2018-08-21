@@ -16,7 +16,7 @@ defmodule Skoller.Notifications do
   alias Skoller.ChatComments.Star, as: CommentStar
   alias Skoller.ChatComments.Comment
   alias Skoller.Notifications.ManualLog
-  alias Skoller.Notification
+  alias Services.Notification
 
   import Ecto.Query
 
@@ -107,7 +107,7 @@ defmodule Skoller.Notifications do
    * Will not return completed assignments
 
   ## Returns
-  `[%{udid: Skoller.Devices.Device.udid, days: Skoller.Students.Student.notification_days_notice, count: Integer}]` or `[]`
+  `[%{udid: Skoller.Devices.Device.udid, type: Skoller.Devices.Device.type, days: Skoller.Students.Student.notification_days_notice, count: Integer}]` or `[]`
   """
   def get_assignment_reminders(time, atom) do
     {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
@@ -122,8 +122,8 @@ defmodule Skoller.Notifications do
     |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
     |> filter_due_date(now, atom, time)
     |> where([student, sclass], sclass.is_dropped == false)
-    |> group_by([student, sclass, sassign, user, device], [device.udid, student.notification_days_notice])
-    |> select([student, sclass, sassign, user, device], %{udid: device.udid, days: student.notification_days_notice, count: count(sassign.id)})
+    |> group_by([student, sclass, sassign, user, device], [device.udid, device.type, student.notification_days_notice])
+    |> select([student, sclass, sassign, user, device], %{udid: device.udid, type: device.type, days: student.notification_days_notice, count: count(sassign.id)})
     |> Repo.all()
   end
 
@@ -240,7 +240,7 @@ defmodule Skoller.Notifications do
     Repo.insert(%ManualLog{affected_users: Enum.count(devices), notification_category: @manual_custom_category, msg: msg})
   
     devices
-    |> Enum.each(&Notification.create_notification(&1.udid, msg, @manual_custom_category))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, msg, @manual_custom_category))
   end
 
   defp filter_due_date(query, date, :today, time) do

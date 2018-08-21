@@ -5,7 +5,7 @@ defmodule Skoller.ClassNotifications do
 
   alias Skoller.Repo
   alias Skoller.Notifications
-  alias Skoller.Notification
+  alias Services.Notification
   alias Skoller.Devices
 
   @class_complete_category "Class.Complete"
@@ -27,7 +27,7 @@ defmodule Skoller.ClassNotifications do
     class = class |> Repo.preload([:assignments])
     msg = class.assignments |> class_complete_msg()
     
-    devices |> Enum.each(&Notification.create_notification(&1.udid, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, &1.type, %{title: class.name <> @is_ready, body: msg}, @class_complete_category))
   end
   def send_class_complete_notification(_class), do: :ok
 
@@ -38,7 +38,7 @@ defmodule Skoller.ClassNotifications do
     Repo.insert(%Skoller.Notifications.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
 
     users
-    |> Enum.each(&Notification.create_notification(&1.udid, @needs_syllabus_msg, @manual_syllabus_category))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, @needs_syllabus_msg, @manual_syllabus_category))
   end
 
   defp class_complete_msg(assignments) do

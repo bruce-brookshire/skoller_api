@@ -11,7 +11,7 @@ defmodule Skoller.ModNotifications do
   alias Skoller.ModActions
   alias Skoller.Dates
   alias Skoller.Students.Student
-  alias Skoller.Notification
+  alias Services.Notification
   alias Skoller.Mods
 
   @name_assignment_mod 100
@@ -93,7 +93,7 @@ defmodule Skoller.ModNotifications do
         end
         Notifications.get_users_from_student_class(action.student_class_id)
         |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
-        |> Enum.each(&Notification.create_notification(&1.udid, %{title: title, body: body}, @auto_update_category))
+        |> Enum.each(&Notification.create_notification(&1.udid, &1.type, %{title: title, body: body}, @auto_update_category))
       false -> 
         :ok
     end
@@ -106,7 +106,7 @@ defmodule Skoller.ModNotifications do
       1 -> action |> one_pending_mod_notification()
       num -> student |> multiple_pending_mod_notification(num)
     end
-    devices |> Enum.each(&Notification.create_notification(&1.udid, msg, @pending_update_category))
+    devices |> Enum.each(&Notification.create_notification(&1.udid, &1.type, msg, @pending_update_category))
   end
 
   defp one_pending_mod_notification(action) do
