@@ -7,6 +7,7 @@ defmodule Skoller.StudentClasses do
   alias Skoller.Weights.Weight
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
+  alias Skoller.Schools
 
   import Ecto.Query
 
@@ -59,5 +60,21 @@ defmodule Skoller.StudentClasses do
   """
   def get_student_class_by_id!(id) do
     Repo.get!(StudentClass, id)
+  end
+
+  @doc """
+  Gets most common school from a list of student classes.
+
+  ## Returns
+  `Skoller.StudentClasses.StudentClass` or `Ecto.NoResultsError`
+  """
+  def get_most_common_school([]), do: nil
+  def get_most_common_school(student_classes) do
+    max = student_classes
+    |> Enum.map(&Schools.get_school_from_period(&1.class.class_period_id))
+    |> Enum.chunk_by(& &1.id)
+    |> Enum.map(& %{school: List.first(&1), count: Enum.count(&1)})
+    |> Enum.max_by(& &1.count)
+    max.school
   end
 end
