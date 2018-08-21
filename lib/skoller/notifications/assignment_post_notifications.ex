@@ -7,7 +7,7 @@ defmodule Skoller.AssignmentPostNotifications do
   alias Skoller.Assignments
   alias Skoller.Classes
   alias Skoller.Notifications
-  alias Skoller.Notification
+  alias Services.Notification
 
   @assignment_post "Assignment.Post"
   
@@ -20,7 +20,7 @@ defmodule Skoller.AssignmentPostNotifications do
     assignment = Assignments.get_assignment_by_id!(post.assignment_id)
     class = Classes.get_class_by_id!(assignment.class_id)
     Notifications.get_assignment_post_devices_by_assignment(student_id, post.assignment_id)
-    |> Enum.each(&Notification.create_notification(&1.udid, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, build_assignment_post_msg(post, student, assignment, class), @assignment_post))
   end
   
   defp build_assignment_post_msg(post, student, assignment, class) do
