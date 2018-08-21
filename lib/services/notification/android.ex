@@ -16,15 +16,14 @@ defmodule Services.Notification.Android do
   """
   def create_notification(device, %{title: title, body: body}) do
     device
-    |> new(%{
-      "title" => title,
-      "body" => body})
+    |> new()
+    |> put_notification(%{"title" => title, "body" => body})
     |> FCM.push()
   end
   def create_notification(device, msg) do
     device
-    |> new(%{
-      "body" => msg})
+    |> new()
+    |> put_notification(%{"body" => msg})
     |> FCM.push()
   end
 end
