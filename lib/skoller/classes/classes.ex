@@ -427,6 +427,7 @@ defmodule Skoller.Classes do
     |> where([class, period, prof], ^filter(filters))
     |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
     |> order_by([class], desc: class.inserted_at)
+    |> limit(50)
     |> Repo.all()
   end
 
