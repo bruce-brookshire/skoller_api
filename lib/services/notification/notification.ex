@@ -23,8 +23,8 @@ defmodule Services.Notification do
     |> Logger.info()
   end
 
-  def create_notification(device, "android", msg, _category) do
-    Android.create_notification(device, msg)
+  def create_notification(device, "android", msg, category) do
+    Android.create_notification(device, msg, category)
     |> inspect()
     |> Logger.info()
   end

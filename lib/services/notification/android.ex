@@ -14,16 +14,18 @@ defmodule Services.Notification.Android do
    * `%{title: title, body: body}` as `msg` will send with a title and body.
    * `msg` as a `String` will send a simple message.
   """
-  def create_notification(device, %{title: title, body: body}) do
+  def create_notification(device, %{title: title, body: body}, category) do
     device
     |> new()
     |> put_notification(%{"title" => title, "body" => body})
+    |> put_collapse_key(category)
     |> FCM.push()
   end
-  def create_notification(device, msg) do
+  def create_notification(device, msg, category) do
     device
     |> new()
     |> put_notification(%{"body" => msg})
+    |> put_collapse_key(category)
     |> FCM.push()
   end
 end

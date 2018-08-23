@@ -89,11 +89,6 @@ config :pigeon, :apns,
     use_2197: true
   }
 
-config :pigeon, :fcm,
-  fcm_default: %{
-    key: System.get_env("FCM_KEY")
-  }
-
 # This is for emails
 config :skoller, Skoller.Mailer,
   adapter: Bamboo.SMTPAdapter,
