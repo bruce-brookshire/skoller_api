@@ -71,9 +71,11 @@ secret_key_base: System.get_env("API_SECRET_KEY")
 
 # Configure your database
 config :skoller, Skoller.Repo,
-adapter: Ecto.Adapters.Postgres,
-url: System.get_env("DATABASE_URL"),
-pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+  adapter: Ecto.Adapters.Postgres,
+  url: System.get_env("DATABASE_URL"),
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+  timeout: 60_000,
+  pool_timeout: 60_000
 
 # Configure Guardian Token Generation (this is for auth tokens)
 config :skoller, Skoller.Auth,
