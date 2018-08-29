@@ -134,7 +134,6 @@ defmodule Skoller.Syllabi do
     from(d in Doc)
     |> group_by([d], [d.class_id, d.inserted_at])
     |> order_by([d], asc: d.inserted_at)
-    |> limit(1)
     |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
   end
 
