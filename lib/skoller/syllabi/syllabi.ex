@@ -116,22 +116,23 @@ defmodule Skoller.Syllabi do
   # The class must have a doc, must not be locked, must be editable.
   defp get_oldest_class_by_school(lock_type, class_status, school_id, opts) do
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], doc in subquery(doc_subquery()), class.id == doc.class_id)
+    |> join(:inner, [class], doc in subquery(doc_subquery(school_id)), class.id == doc.class_id)
     |> lock_join(lock_type)
-    |> join(:inner, [class, period, doc, lock], s in Status, class.class_status_id == s.id)
+    |> join(:inner, [class], s in Status, class.class_status_id == s.id)
     |> enrolled_classes(opts)
     |> where([class], class.is_editable == true)
-    |> where([class, period], period.school_id == ^school_id)
-    |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
+    |> where([class, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> where_oldest_status(class_status)
-    |> order_by([class, period, doc, lock], asc: doc.inserted_at)
+    |> order_by([class, doc], asc: doc.inserted_at)
     |> limit(1)
     |> Repo.one()
   end
 
-  defp doc_subquery() do
+  defp doc_subquery(school_id) do
     from(d in Doc)
+    |> join(:inner, [d], c in Class, c.id == d.class_id)
+    |> join(:inner, [d, class], period in ClassPeriod, class.class_period_id == period.id)
+    |> where([d, class, period], period.school_id == ^school_id)
     |> group_by([d], [d.class_id, d.inserted_at])
     |> order_by([d], asc: d.inserted_at)
     |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
@@ -204,20 +205,20 @@ defmodule Skoller.Syllabi do
 
   defp lock_join(query, nil) do
     query
-    |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id)
+    |> join(:left, [class, doc], lock in Lock, class.id == lock.class_id)
   end
   defp lock_join(query, lock_type) do
     query
-    |> join(:left, [class, period, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^lock_type)
+    |> join(:left, [class, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^lock_type)
   end
 
   defp where_oldest_status(query, nil) do
     query
-    |> where([class, period, doc, lock, s], s.is_maintenance == false and s.is_complete == false)
+    |> where([class, doc, lock, s], s.is_maintenance == false and s.is_complete == false)
   end
   defp where_oldest_status(query, status_id) do
     query
-    |> where([class, period, doc, lock, s], s.id == ^status_id)
+    |> where([class, doc, lock, s], s.id == ^status_id)
   end
 
   defp where_processable_status(query, nil) do
