@@ -126,14 +126,16 @@ defmodule Skoller.Syllabi do
     |> where([class, period, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> where_oldest_status(class_status)
     |> order_by([class, period, doc, lock], asc: doc.inserted_at)
-    |> Repo.all()
-    |> List.first()
+    |> limit(1)
+    |> Repo.one()
   end
 
   defp doc_subquery() do
     from(d in Doc)
-    |> group_by([d], d.class_id)
-    |> select([d], %{inserted_at: min(d.inserted_at), class_id: d.class_id})
+    |> group_by([d], [d.class_id, d.inserted_at])
+    |> order_by([d], asc: d.inserted_at)
+    |> limit(1)
+    |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
   end
 
   # Gets a list of classes that are valid for a syllabus worker to work.
