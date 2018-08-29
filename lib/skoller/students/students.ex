@@ -154,14 +154,6 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Subquery that gets enrolled students in a class
-  """
-  def enrolled_student_class_subquery() do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-  end
-
-  @doc """
   Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Classes.Class` that a `Skoller.Students.Student` currently has.
 
   ## Examples

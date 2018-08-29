@@ -3,6 +3,7 @@ defmodule Skoller.Jobs do
   # This is passed in to Skoller.Scheduler
   alias Skoller.AssignmentNotifications
   alias Skoller.Locks
+  alias Skoller.Emails
 
   @open_lock_mins 60
 
@@ -11,6 +12,8 @@ defmodule Skoller.Jobs do
     now = Time.utc_now()
 
     now |> AssignmentNotifications.send_assignment_reminder_notifications()
+
+    now |> Emails.send_no_classes_email()
 
     Locks.clear_locks(@open_lock_mins)
   end
