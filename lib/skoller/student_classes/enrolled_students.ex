@@ -3,6 +3,8 @@ defmodule Skoller.EnrolledStudents do
   A context module based on enrolled students
   """
 
+  alias Skoller.StudentClasses.StudentClass
+
   import Ecto.Query
 
   @doc """
