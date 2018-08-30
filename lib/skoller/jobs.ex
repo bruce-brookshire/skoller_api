@@ -3,7 +3,7 @@ defmodule Skoller.Jobs do
   # This is passed in to Skoller.Scheduler
   alias Skoller.AssignmentNotifications
   alias Skoller.Locks
-  alias Skoller.Skoller.StudentClasses.Jobs as: SCJobs
+  alias Skoller.StudentClasses.Jobs, as: SCJobs
 
   @open_lock_mins 60
 

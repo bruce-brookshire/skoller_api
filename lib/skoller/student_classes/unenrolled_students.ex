@@ -5,6 +5,7 @@ defmodule Skoller.UnenrolledStudents do
 
   alias Skoller.Students.Student
   alias Skoller.EnrolledStudents
+  alias Skoller.Repo
 
   import Ecto.Query
 

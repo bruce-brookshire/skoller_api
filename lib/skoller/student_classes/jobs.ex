@@ -7,7 +7,6 @@ defmodule Skoller.StudentClasses.Jobs do
 
   alias Skoller.UnenrolledStudents
   alias Skoller.StudentClasses.Notifications
-  alias Skoller.StudentClasses.Jobs
   alias Skoller.StudentClasses.Emails
 
   def send_no_classes_messages(datetime) do
