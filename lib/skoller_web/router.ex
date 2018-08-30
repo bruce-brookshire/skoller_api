@@ -206,6 +206,9 @@ defmodule SkollerWeb.Router do
         get "/classes/:class_id", Student.ClassController, :show
         get "/classes/:class_id/mods", Student.Class.ModController, :index
         resources "/classes/:class_id/assignments", Student.Class.AssignmentController, only: [:create]
+
+        # School routes
+        get "/school", Student.SchoolController, :show
       end
 
       # Assignment routes
