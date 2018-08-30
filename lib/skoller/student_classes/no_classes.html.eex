@@ -1059,16 +1059,15 @@
                         
                         <td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;" valign="top">
                         
-                            <em>Copyright © *|CURRENT_YEAR|* *|LIST:COMPANY|*, All rights reserved.</em><br>
-*|IFNOT:ARCHIVE_PAGE|* *|LIST:DESCRIPTION|*<br>
-<br>
-<strong>Our mailing address is:</strong><br>
-*|HTML:LIST_ADDRESS_HTML|* *|END:IF|*<br>
-<br>
-Want to change how you receive these emails?<br>
-You can <a href="*|UPDATE_PROFILE|*">update your preferences</a> or <a href="*|UNSUB|*">unsubscribe from this list</a>.<br>
-<br>
-*|IF:REWARDS|* *|HTML:REWARDS|* *|END:IF|*
+                            <em>Copyright © 2018 Skoller, Inc., All rights reserved.</em><br>
+							<br>
+							<strong>Our mailing address is:</strong><br>
+							530 Church St. Suite 301<br>
+							Nashville, TN 37219<br>
+							<br>
+							Want to change how you receive these emails?<br>
+							You can <a href="*|UNSUB|*">unsubscribe from this list</a>.<br>
+							<br>
                         </td>
                     </tr>
                 </tbody></table>
