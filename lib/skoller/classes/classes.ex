@@ -421,7 +421,7 @@ defmodule Skoller.Classes do
   def get_classes_by_school(school_id, filters \\ nil) do
     #TODO: Filter ClassPeriod
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id and period.is_hidden == true)
     |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
     |> where([class, period], period.school_id == ^school_id)
     |> where([class, period, prof], ^filter(filters))
