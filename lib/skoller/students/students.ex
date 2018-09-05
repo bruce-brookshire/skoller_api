@@ -298,7 +298,7 @@ defmodule Skoller.Students do
   def get_classes_with_enrollment(params) do
     #TODO: Filter ClassPeriod
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id and period.is_hidden == false)
     |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
     |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
