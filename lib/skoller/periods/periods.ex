@@ -20,6 +20,7 @@ defmodule Skoller.Periods do
   def get_periods_by_school_id(school_id, params \\ %{}) do
     from(period in ClassPeriod)
     |> where([period], period.school_id == ^school_id)
+    |> where([period], period.is_hidden == false)
     |> filter(params)
     |> Repo.all()
   end
