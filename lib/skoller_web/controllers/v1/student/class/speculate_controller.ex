@@ -53,6 +53,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
     end
   end
 
+  defp speculate_grade(%{class: %{grade_scale: nil}}, _params) do
+    {:error, "No grade scale for class"}
+  end
   defp speculate_grade(%{} = student_class, %{"grade" => grade}) do
     complete = Decimal.new(1)
     case Decimal.cmp(complete, Decimal.round(student_class.completion, 5)) do
