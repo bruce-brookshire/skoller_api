@@ -11,6 +11,7 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.Weights.Weight
   alias Skoller.Mods
   alias Skoller.StudentClasses
+  alias Skoller.Classes.Weights
 
   import Ecto.Query
 
@@ -292,7 +293,7 @@ defmodule Skoller.StudentAssignments do
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset), do: changeset
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: weight_id}, valid?: true} = changeset) do
     class_id = changeset |> get_class_id_from_student_assignment_changeset()
-    case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
+    case Weights.get_class_weight_by_ids(class_id, weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
       _ -> changeset
     end

@@ -3,8 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.WeightController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Weights.Weight
-  alias Skoller.Repo
+  alias Skoller.Classes.Weights
   alias SkollerWeb.Class.WeightView
 
   import Ecto.Query
@@ -18,7 +17,7 @@ defmodule SkollerWeb.Api.V1.Class.WeightController do
   plug :verify_member, :class
 
   def index(conn, %{"class_id" => class_id}) do
-    weights = Repo.all(from a in Weight, where: a.class_id == ^class_id)
+    weights = Weights.get_class_weights(class_id)
     render(conn, WeightView, "index.json", weights: weights)
   end
 end
