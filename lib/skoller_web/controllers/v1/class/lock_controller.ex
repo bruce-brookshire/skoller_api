@@ -78,6 +78,9 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
       {:error, _error} ->
         conn
         |> send_resp(409, "")
+      {:error, _, failed_value, _} ->
+        conn
+        |> MultiError.render(failed_value)
     end
   end
 
@@ -93,6 +96,9 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
       {:error, _error} ->
         conn
         |> send_resp(409, "")
+      {:error, _, failed_value, _} ->
+        conn
+        |> MultiError.render(failed_value)
     end
   end
 
