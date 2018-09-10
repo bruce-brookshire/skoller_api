@@ -6,7 +6,7 @@ defmodule SkollerWeb.Plugs.Auth do
   alias Skoller.Repo
   alias Skoller.Users
   alias Skoller.Classes
-  alias Skoller.Assignments.Assignment
+  alias Skoller.Assignments
 
   import Plug.Conn
 
@@ -158,7 +158,7 @@ defmodule SkollerWeb.Plugs.Auth do
     end
   end
   defp find_item(conn, %{type: :class_assignment, items: classes, using: :id}, %{"id" => id}) do
-    case Repo.get(Assignment, String.to_integer(id)) do
+    case Assignments.get_assignment_by_id(String.to_integer(id)) do
       nil -> conn |> unauth
       assign -> 
         case classes |> Enum.any?(& &1.id == assign.class_id) do
@@ -177,7 +177,7 @@ defmodule SkollerWeb.Plugs.Auth do
     conn |> compare_classes(classes, class_id)
   end
   defp find_item(conn, %{type: :class_assignment, items: classes}, %{"assignment_id" => id}) do
-    case Repo.get(Assignment, String.to_integer(id)) do
+    case Assignments.get_assignment_by_id(String.to_integer(id))do
       nil -> conn |> unauth
       assign -> 
         case classes |> Enum.any?(& &1.id == assign.class_id) do

@@ -36,6 +36,16 @@ defmodule Skoller.Assignments do
   end
 
   @doc """
+  Gets an assignment by id.
+
+  ## Returns
+  `Skoller.Assignments.Assignment` or `nil`
+  """
+  def get_assignment_by_id(assignment_id) do
+    Repo.get(Assignment, assignment_id)
+  end
+
+  @doc """
   Gets all assignment posts for a student.
 
   ## Notes

@@ -10,6 +10,7 @@ defmodule Skoller.Periods.ClassPeriod do
   schema "class_periods" do
     field :name, :string
     field :school_id, :id
+    field :is_hidden, :boolean, default: false
     belongs_to :school, School, define_field: false
     has_many :classes, Class
 

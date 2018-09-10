@@ -33,8 +33,10 @@ defmodule Skoller.Schools do
   end
 
   def update_school(school_old, params) do
+    {:ok, timezone} = get_timezone(params)
     school_old
     |> School.changeset_update(params)
+    |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.update()
     |> add_four_door()
   end

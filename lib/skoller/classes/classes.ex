@@ -46,8 +46,6 @@ defmodule Skoller.Classes do
 
   @diy_complete_lock 200
 
-  @default_grade_scale %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"}
-
   @doc """
   Gets a `Skoller.Classes.Class` by id.
 
@@ -112,7 +110,6 @@ defmodule Skoller.Classes do
   """
   def create_class(params, user \\ nil) do
     class_period_id = params |> Map.get(:class_period_id, Map.get(params, "class_period_id"))
-    params = params |> put_grade_scale()
 
     changeset = class_period_id
     |> Schools.get_school_from_period()
@@ -421,7 +418,7 @@ defmodule Skoller.Classes do
   def get_classes_by_school(school_id, filters \\ nil) do
     #TODO: Filter ClassPeriod
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id and period.is_hidden == false)
     |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
     |> where([class, period], period.school_id == ^school_id)
     |> where([class, period, prof], ^filter(filters))
@@ -529,6 +526,7 @@ defmodule Skoller.Classes do
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
+  defp cl_check_status(%Class{class_status_id: @completed_status}, %{unlock: _unlock}), do: {:ok, nil}
   # A class has been fully unlocked. Get the highest lock
   defp cl_check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock
@@ -696,15 +694,4 @@ defmodule Skoller.Classes do
     changeset |> Ecto.Changeset.change(%{is_student_created: true})
   end
   defp add_student_created_class_fields(changeset, _user), do: changeset
-
-
-  # The name is param exists to check the map type (string vs atom).
-  #TODO: Find a better way to do this.
-  defp put_grade_scale(%{"grade_scale" => _} = params), do: params
-  defp put_grade_scale(%{"name" => _name} = params) do
-    params |> Map.put("grade_scale", @default_grade_scale)
-  end
-  defp put_grade_scale(%{name: _name} = params) do
-    params |> Map.put(:grade_scale, @default_grade_scale)
-  end
 end

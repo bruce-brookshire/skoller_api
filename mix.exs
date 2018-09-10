@@ -4,7 +4,7 @@ defmodule Skoller.Mixfile do
   def project do
     [
       app: :skoller,
-      version: "2.0.3",
+      version: "2.1.0",
       elixir: "~> 1.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -51,8 +51,8 @@ defmodule Skoller.Mixfile do
       {:comeonin, "~> 4.0"},
       {:bcrypt_elixir, "~> 1.0"},
       {:cors_plug, "~> 1.2"},
-      {:pigeon, "~> 1.1.1"},
-      {:kadabra, "~> 0.3.4"},
+      {:pigeon, "~> 1.2.2"},
+      {:kadabra, "~> 0.4.2"},
       {:ex_twilio, "~> 0.5.0"},
       {:csv, "~> 2.0.0"},
       {:bamboo, "~> 0.8"},

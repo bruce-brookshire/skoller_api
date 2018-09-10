@@ -45,6 +45,11 @@ config :pigeon, :apns,
     mode: :dev
   }
 
+config :pigeon, :fcm,
+  fcm_default: %{
+    key: System.get_env("FCM_KEY")
+  }
+
 #this is for local email
 config :skoller, Skoller.Mailer,
   adapter: Bamboo.LocalAdapter
