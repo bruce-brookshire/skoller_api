@@ -6,9 +6,8 @@ defmodule SkollerWeb.Plugs.Lock do
 
   """
 
-  alias Skoller.Repo
   alias Skoller.Locks
-  alias Skoller.Assignments.Assignment
+  alias Skoller.Assignments
   alias Skoller.Classes
   alias Skoller.Weights
 
@@ -57,7 +56,7 @@ defmodule SkollerWeb.Plugs.Lock do
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :assignment, using: :id}) do
     case conn.params |> check_using(:assignment, :id) do
       true ->
-        assign = Repo.get!(Assignment, conn.params["id"])
+        assign = Assignments.get_assignment_by_id!(conn.params["id"])
         case Locks.find_lock(assign.class_id, @assignment_lock, user.id) do
           nil -> conn |> check_maintenance(assign.class_id)
           _ -> conn
