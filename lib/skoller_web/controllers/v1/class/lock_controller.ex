@@ -1,5 +1,7 @@
 defmodule SkollerWeb.Api.V1.Class.LockController do
-  @moduledoc false
+  @moduledoc """
+    Lock controller
+  """
   
   use SkollerWeb, :controller
 
@@ -21,20 +23,34 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, :class
 
+  @doc """
+  Will return a list of locks for a class
+  """
   def index(conn, %{"class_id" => class_id}) do
     locks = Users.get_user_locks_by_class(class_id)
     render(conn, LockView, "index.json", locks: locks)
   end
 
-  def lock(%{assigns: %{user: %{roles: roles}}} = conn, params) do
-    case Enum.any?(roles, & &1.id == @admin_role) do
-      true -> lock_admin(conn, params)
-      false -> lock_diy(conn, params)
+  @doc """
+  Locks a class to the current user.
+
+  Returns a 409 when another user has the class locked already unless the user is an admin.
+  """
+  def lock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
+    lock = lock_class(user, class_id)
+    case lock do
+      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:error, _error} ->
+        conn
+        |> send_resp(409, "")
     end
   end
 
-  def unlock(%{assigns: %{user: user}} = conn, params) do
-    old_class = Classes.get_class_by_id(params["class_id"])
+  @doc """
+  Unlocks all locks from the logged in user for a class.
+  """
+  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
+    old_class = Classes.get_class_by_id(class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_class(user, params, &1))
@@ -50,31 +66,58 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     end
   end
 
-  defp lock_admin(%{assigns: %{user: user}} = conn, params) do
-    Locks.lock_class(params["class_id"], user.id)
+  @doc """
+  Locks a class's weights to the current user.
 
-    conn |> send_resp(204, "")
+  Returns a 409 when another user has the class locked already unless the user is an admin.
+  """
+  def weights(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
+    lock = lock_class(user, class_id, :weights)
+    case lock do
+      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:error, _error} ->
+        conn
+        |> send_resp(409, "")
+      {:error, _, failed_value, _} ->
+        conn
+        |> MultiError.render(failed_value)
+    end
   end
 
-  defp lock_diy(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
+  @doc """
+  Locks a class's assignments to the current user.
+
+  Returns a 409 when another user has the class locked already unless the user is an admin.
+  """
+  def assignments(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
+    lock = lock_class(user, class_id, :assignments)
+    case lock do
+      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:error, _error} ->
+        conn
+        |> send_resp(409, "")
+      {:error, _, failed_value, _} ->
+        conn
+        |> MultiError.render(failed_value)
+    end
+  end
+
+  defp lock_diy(user, class_id, atom) do
     class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:school)
     
     fd = FourDoor.get_four_door_by_school(class.school.id)
 
     case fd.is_diy_enabled do
-      true -> conn |> lock_full_class(user, params)
-      false -> conn |> send_resp(401, "")
+      true -> Locks.lock_class(class_id, user.id, atom)
+      false -> {:error, "DIY is not enabled."}
     end
   end
 
-  defp lock_full_class(conn, user, params) do
-    status = Locks.lock_class(params["class_id"], user.id)
-    case status do
-      {:ok, _lock} -> conn |> send_resp(204, "")
-      {:error, _error} ->
-        conn
-        |> send_resp(409, "")
+  defp lock_class(%{roles: roles} = user, class_id, atom \\ nil) do
+    case Enum.any?(roles, & &1.id == @admin_role) do
+      true -> Locks.lock_class(class_id, user.id, nil)
+      false -> lock_diy(user, class_id, atom)
     end
   end
 

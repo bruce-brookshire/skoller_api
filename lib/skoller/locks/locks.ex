@@ -11,6 +11,10 @@ defmodule Skoller.Locks do
 
   import Ecto.Query
 
+  @weight_lock 100
+  @assignment_lock 200
+  # @review_lock 300
+
   @doc """
   Finds an existing, incomplete lock for the class and user.
 
@@ -31,7 +35,7 @@ defmodule Skoller.Locks do
   ## Returns
   `{:ok, %{sections: Skoller.Locks.Section}}` or `{:error, _, _, _}`
   """
-  def lock_class(class_id, user_id) do
+  def lock_class(class_id, user_id, nil) do
     sections = from(sect in Section)
     |> where([sect], sect.is_diy == true)
     |> Repo.all()
@@ -39,6 +43,22 @@ defmodule Skoller.Locks do
     Ecto.Multi.new
     |> Ecto.Multi.run(:sections, &lock_sections(sections, class_id, user_id, &1))
     |> Repo.transaction()
+  end
+  def lock_class(class_id, user_id, :weights) do
+    case lock_section(class_id, user_id, @weight_lock) do
+      {:ok, section} -> 
+        map = Map.new() |> Map.put(:sections, List.wrap(section))
+        {:ok, map}
+      {:error, error} -> {:error, nil, error, nil}
+    end
+  end
+  def lock_class(class_id, user_id, :assignments) do
+    case lock_section(class_id, user_id, @assignment_lock) do
+      {:ok, section} -> 
+        map = Map.new() |> Map.put(:sections, List.wrap(section))
+        {:ok, map}
+      {:error, error} -> {:error, nil, error, nil}
+    end
   end
 
   @doc """

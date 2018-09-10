@@ -152,6 +152,8 @@ defmodule SkollerWeb.Router do
 
         # Class Lock routes
         post "/lock", Class.LockController, :lock
+        post "/lock/weights", Class.LockController, :weights
+        post "/lock/assignments", Class.LockController, :assignments
         post "/unlock", Class.LockController, :unlock
         get "/locks", Class.LockController, :index
 

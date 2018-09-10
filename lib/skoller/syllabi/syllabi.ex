@@ -80,7 +80,7 @@ defmodule Skoller.Syllabi do
 
   # TODO: this can probably get moved to Skoller.Locks
   defp lock_class(%{id: id}, user, nil) do
-    Locks.lock_class(id, user.id)
+    Locks.lock_class(id, user.id, nil)
   end
   defp lock_class(%{id: id}, user, type) do
     Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: id, is_completed: false})
