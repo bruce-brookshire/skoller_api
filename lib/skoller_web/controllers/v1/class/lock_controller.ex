@@ -26,10 +26,10 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     render(conn, LockView, "index.json", locks: locks)
   end
 
-  def lock(%{assigns: %{user: %{roles: roles} = user}} = conn, params) do
+  def lock(%{assigns: %{user: %{roles: roles} = user}} = conn, %{"class_id" => class_id}) do
     lock = case Enum.any?(roles, & &1.id == @admin_role) do
-      true -> Locks.lock_class(params["class_id"], user.id)
-      false -> lock_diy(user, params)
+      true -> Locks.lock_class(class_id, user.id)
+      false -> lock_diy(user, class_id)
     end
     case lock do
       {:ok, _lock} -> conn |> send_resp(204, "")
@@ -39,8 +39,8 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     end
   end
 
-  def unlock(%{assigns: %{user: user}} = conn, params) do
-    old_class = Classes.get_class_by_id(params["class_id"])
+  def unlock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
+    old_class = Classes.get_class_by_id(class_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_class(user, params, &1))
@@ -56,7 +56,15 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     end
   end
 
-  defp lock_diy(user, %{"class_id" => class_id}) do
+  def weights(conn, params) do
+    
+  end
+
+  def assignments(conn, params) do
+    
+  end
+
+  defp lock_diy(user, class_id) do
     class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:school)
     
