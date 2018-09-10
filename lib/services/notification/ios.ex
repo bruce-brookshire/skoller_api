@@ -1,4 +1,4 @@
-defmodule Skoller.Notification do
+defmodule Services.Notification.Ios do
   @moduledoc """
   Provides Notification utilities.
   """
@@ -7,15 +7,12 @@ defmodule Skoller.Notification do
 
   import Pigeon.APNS.Notification
 
-  require Logger
-
   @doc """
   Creates notification with either a title and body, or a simple message.
 
   ## Notes
    * `%{title: title, body: body}` as `msg` will send with a title and body.
    * `msg` as a `String` will send a simple message.
-   * Currently only supports Apple devices.
   """
   def create_notification(device, msg, category)
   def create_notification(device, %{title: title, body: body}, category) do
@@ -29,8 +26,6 @@ defmodule Skoller.Notification do
     |> put_category(category)
     |> put_sound("default")
     |> APNS.push()
-    |> inspect()
-    |> Logger.info()
   end
   def create_notification(device, msg, category) do
     msg
@@ -39,7 +34,5 @@ defmodule Skoller.Notification do
     |> put_category(category)
     |> put_sound("default")
     |> APNS.push()
-    |> inspect()
-    |> Logger.info()
   end
 end
