@@ -12,7 +12,6 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
-  import Ecto.Query
 
   @student_role 100
   @admin_role 200

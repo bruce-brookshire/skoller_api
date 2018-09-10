@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Class.WeightController do
   alias Skoller.Classes.Weights
   alias SkollerWeb.Class.WeightView
 
-  import Ecto.Query
   import SkollerWeb.Plugs.Auth
   
   @student_role 100

@@ -8,6 +8,8 @@ defmodule Skoller.Locks do
   alias Skoller.Locks.Section
   alias Skoller.Locks.AbandonedLock
   alias Skoller.MapErrors
+  alias Skoller.Classes.Weights
+  alias Skoller.Classes.Assignments
 
   import Ecto.Query
 
@@ -22,11 +24,11 @@ defmodule Skoller.Locks do
   `Skoller.Locks.Lock` or `nil`
   """
   def find_lock(class_id, lock_section, user_id) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
-    |> where([l], l.class_lock_section_id == ^lock_section)
-    |> Repo.all()
-    |> List.first()
+    Repo.get_by(Lock,
+      class_id: class_id,
+      class_lock_section_id: lock_section,
+      user_id: user_id,
+      is_completed: false)
   end
 
   @doc """
@@ -104,6 +106,13 @@ defmodule Skoller.Locks do
     {:ok, delete_class_locks(class)}
   end
 
+  defp get_completed_lock_by_section(class_id, class_lock_section_id) do
+    Repo.get_by(Lock,
+      class_id: class_id,
+      class_lock_section_id: class_lock_section_id,
+      is_completed: true)
+  end
+
   # Gets locks that are incomplete after `min` minutes.
   defp get_incomplete_locks(min) do
     from(lock in Lock)
@@ -123,19 +132,37 @@ defmodule Skoller.Locks do
 
   #Locks the section if it is not already locked.
   defp lock_section(class_id, user_id, class_lock_section_id) do
-    case Repo.get_by(Lock, class_id: class_id, 
-                            class_lock_section_id: class_lock_section_id, 
-                            user_id: user_id,
-                            is_completed: false) do
-      nil ->           
-        changeset = Lock.changeset(%Lock{}, %{
-          class_id: class_id, 
-          class_lock_section_id: class_lock_section_id, 
-          user_id: user_id
-        }) 
-        Repo.insert(changeset)
+    case find_lock(class_id, class_lock_section_id, user_id) do
+      nil -> create_new_lock(class_id, user_id, class_lock_section_id)
       lock -> {:ok, lock} 
     end
+  end
+
+  defp evaluate_completed_locks(class_id, @weight_lock) do
+    case Weights.get_class_weights(class_id) do
+      [] -> get_completed_lock_by_section(class_id, @weight_lock)
+      _weights -> nil
+    end
+  end
+  defp evaluate_completed_locks(class_id, @assignment_lock) do
+    case Assignments.all(class_id) do
+      [] -> get_completed_lock_by_section(class_id, @assignment_lock)
+      _weights -> nil
+    end
+  end
+  defp evaluate_completed_locks(_class_id, _class_lock_section_id), do: nil
+
+  defp create_new_lock(class_id, user_id, class_lock_section_id) do
+    case evaluate_completed_locks(class_id, class_lock_section_id) do
+      nil -> nil
+      lock -> lock |> delete_lock()
+    end
+    changeset = Lock.changeset(%Lock{}, %{
+      class_id: class_id, 
+      class_lock_section_id: class_lock_section_id, 
+      user_id: user_id
+    }) 
+    Repo.insert(changeset)
   end
   
   defp unlock_lock(lock_old, %{"is_completed" => true}) do
@@ -156,5 +183,9 @@ defmodule Skoller.Locks do
     from(l in Lock)
     |> where([l], l.class_id == ^class.id)
     |> Repo.delete_all()
+  end
+
+  defp delete_lock(lock) do
+    lock |> Repo.delete()
   end
 end
