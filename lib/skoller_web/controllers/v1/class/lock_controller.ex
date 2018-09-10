@@ -26,10 +26,16 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     render(conn, LockView, "index.json", locks: locks)
   end
 
-  def lock(%{assigns: %{user: %{roles: roles}}} = conn, params) do
-    case Enum.any?(roles, & &1.id == @admin_role) do
-      true -> lock_admin(conn, params)
-      false -> lock_diy(conn, params)
+  def lock(%{assigns: %{user: %{roles: roles} = user}} = conn, params) do
+    lock = case Enum.any?(roles, & &1.id == @admin_role) do
+      true -> Locks.lock_class(params["class_id"], user.id)
+      false -> lock_diy(user, params)
+    end
+    case lock do
+      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:error, _error} ->
+        conn
+        |> send_resp(409, "")
     end
   end
 
@@ -50,31 +56,15 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     end
   end
 
-  defp lock_admin(%{assigns: %{user: user}} = conn, params) do
-    Locks.lock_class(params["class_id"], user.id)
-
-    conn |> send_resp(204, "")
-  end
-
-  defp lock_diy(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
+  defp lock_diy(user, %{"class_id" => class_id}) do
     class = Classes.get_class_by_id!(class_id)
             |> Repo.preload(:school)
     
     fd = FourDoor.get_four_door_by_school(class.school.id)
 
     case fd.is_diy_enabled do
-      true -> conn |> lock_full_class(user, params)
-      false -> conn |> send_resp(401, "")
-    end
-  end
-
-  defp lock_full_class(conn, user, params) do
-    status = Locks.lock_class(params["class_id"], user.id)
-    case status do
-      {:ok, _lock} -> conn |> send_resp(204, "")
-      {:error, _error} ->
-        conn
-        |> send_resp(409, "")
+      true -> Locks.lock_class(class_id, user.id)
+      false -> {:error, "DIY is not enabled."}
     end
   end
 
