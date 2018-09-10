@@ -33,6 +33,8 @@ defmodule Skoller.Timezone do
 
   # This sends the request and logs errors/returns responses.
   defp request(url, params) do
+    Logger.info("Calling Time Zone API with params: ")
+    Logger.info(inspect(params))
     case Timezone.get(url, [], params: params) do
       {:ok, response} ->
         {:ok, response.body}
