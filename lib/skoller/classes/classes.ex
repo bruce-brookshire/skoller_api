@@ -529,6 +529,7 @@ defmodule Skoller.Classes do
       false -> {:error, %{class_id: "Class and change request do not match"}}
     end
   end
+  defp cl_check_status(%Class{class_status_id: @completed_status} = class, %{unlock: unlock}), do: {:ok, nil}
   # A class has been fully unlocked. Get the highest lock
   defp cl_check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock
