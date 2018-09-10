@@ -3,10 +3,9 @@ defmodule SkollerWeb.Plugs.ChatAuth do
   Handles chat auth.
   """
 
-  alias Skoller.Repo
-  alias Skoller.Assignments.Assignment
   alias Skoller.Classes
   alias Skoller.Schools
+  alias Skoller.Assignments
 
   import Plug.Conn
 
@@ -57,7 +56,7 @@ defmodule SkollerWeb.Plugs.ChatAuth do
     end
   end
   defp get_class({:ok, map}, conn, :assignment) do
-    assign = Repo.get!(Assignment, conn.params["assignment_id"])
+    assign = Assignments.get_assignment_by_id!(conn.params["assignment_id"])
     case Classes.get_class_by_id(assign.class_id) do
       %{is_assignment_posts_enabled: true} = class -> 
         {:ok, map |> Map.put(:class, class)}

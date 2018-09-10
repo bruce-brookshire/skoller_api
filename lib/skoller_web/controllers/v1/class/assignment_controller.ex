@@ -4,15 +4,14 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   use SkollerWeb, :controller
 
   alias Skoller.Assignments.Assignment
-  alias Skoller.Weights.Weight
   alias Skoller.Repo
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.StudentAssignments
+  alias Skoller.Classes.Weights
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
-  import Ecto.Query
 
   @student_role 100
   @admin_role 200
@@ -92,9 +91,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   defp check_weight_id(changeset, _params), do: changeset
 
   defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset, class_id) do
-    weights = from(w in Weight)
-    |> where([w], w.class_id == ^class_id)
-    |> Repo.all
+    weights = Weights.get_class_weights(class_id)
 
     case weights do
       [] -> changeset
@@ -102,7 +99,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
     end
   end
   defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) do
-    case Repo.get_by(Weight, class_id: class_id, id: weight_id) do
+    case Weights.get_class_weight_by_ids(class_id, weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
       _ -> changeset
     end

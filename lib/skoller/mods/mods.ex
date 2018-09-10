@@ -16,6 +16,7 @@ defmodule Skoller.Mods do
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
   alias Skoller.MapErrors
+  alias Skoller.Assignments
 
   import Ecto.Query
 
@@ -498,8 +499,7 @@ defmodule Skoller.Mods do
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, atom) do
-    student_assignment = Assignment
-    |> Repo.get!(mod.assignment_id)
+    student_assignment = Assignments.get_assignment_by_id!(mod.assignment_id)
     |> StudentAssignments.convert_assignment(student_class)
 
     Ecto.Multi.new
