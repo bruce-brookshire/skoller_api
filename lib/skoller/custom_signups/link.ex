@@ -30,6 +30,8 @@ defmodule Skoller.CustomSignups.Link do
     link
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> update_change(:link, &String.downcase(&1))
+    |> update_change(:link, &String.trim(&1))
     |> unique_constraint(:link, name: :unique_signup_link_index)
   end
 
@@ -37,6 +39,8 @@ defmodule Skoller.CustomSignups.Link do
   def changeset_update(%Link{} = link, attrs) do
     link
     |> cast(attrs, @all_upd)
+    |> update_change(:link, &String.downcase(&1))
+    |> update_change(:link, &String.trim(&1))
     |> validate_required(@req_upd)
   end
 end
