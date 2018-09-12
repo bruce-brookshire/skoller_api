@@ -43,6 +43,7 @@ defmodule Skoller.Mods do
 
   ## Params
    * `%{"is_new_assignments" => "true"}`, :boolean, returns only new assignment mods for a student
+   * `%{"class_id" => class_id}`, :id, returns only mods in class with `class_id`
 
   ## Returns
   `[%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
@@ -845,6 +846,7 @@ defmodule Skoller.Mods do
   defp filter(query, params) do
     query
     |> filter_new_assign_mods(params)
+    |> filter_class(params)
   end
 
   defp filter_new_assign_mods(query, %{"is_new_assignments" => "true"}) do
@@ -852,6 +854,12 @@ defmodule Skoller.Mods do
     |> where([mod], mod.assignment_mod_type_id == @new_assignment_mod)
   end
   defp filter_new_assign_mods(query, _params), do: query
+
+  defp filter_class(query, %{"class_id" => class_id}) do
+    query
+    |> where([mod, action, sc], sc.class_id == ^class_id)
+  end
+  defp filter_class(query, _params), do: query
 
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.
   defp mod_responses_sub() do
