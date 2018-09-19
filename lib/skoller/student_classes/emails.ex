@@ -9,7 +9,7 @@ defmodule Skoller.StudentClasses.Emails do
   import Bamboo.Email
 
   require EEx
-  EEx.function_from_file :defp, :build_no_classes_body, System.cwd() <> "/lib/skoller/student_classes/no_classes.html.eex", []
+  EEx.function_from_file :defp, :build_no_classes_body, System.cwd() <> "/lib/skoller/student_classes/no_classes.html.eex", [:unsub_path]
 
   @from_email "noreply@skoller.co"
   @no_classes_name "No Classes Email"
@@ -22,11 +22,12 @@ defmodule Skoller.StudentClasses.Emails do
   end
 
   defp build_no_classes_email(user) do
+    user_id = user.id |> to_string
     new_email()
     |> to(user.email)
     |> from(@from_email)
     |> subject("🚨 URGENT: You have no classes 🚨")
-    |> html_body(build_no_classes_body())
+    |> html_body(build_no_classes_body(System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id))
     |> text_body("test")
   end
 end

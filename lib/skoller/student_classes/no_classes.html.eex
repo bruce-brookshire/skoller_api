@@ -1531,7 +1531,7 @@
 																		Nashville, TN 37219<br>
 																		<br>
 																		Want to change how you receive these emails?<br>
-																		You can <a href="*|UNSUB|*">unsubscribe from this list</a>.<br>
+																		You can <a href="<%= unsub_path %>">unsubscribe from this list</a>.<br>
 																		<br>
 																	</td>
 																</tr>
