@@ -84,6 +84,7 @@ defmodule Skoller.Users.EmailPreferences do
   @doc """
   Upserts multiple email_preferences.
   """
+  def upsert_email_preferences(nil, _user_id), do: []
   def upsert_email_preferences(email_preferences, user_id) do
     Enum.map(email_preferences, &process_email_preference(&1, user_id))
   end

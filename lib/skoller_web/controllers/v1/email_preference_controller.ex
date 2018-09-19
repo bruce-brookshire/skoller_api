@@ -22,7 +22,7 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
         end
     end
 
-    email_preferences = EmailPreferences.upsert_email_preferences(params["email_preferences"])
+    email_preferences = EmailPreferences.upsert_email_preferences(params["email_preferences"], user_id)
 
     case EmailPreferences.update_user_subscription(user_id, params["user_unsubscribed"]) do
       {:error, changeset} ->
