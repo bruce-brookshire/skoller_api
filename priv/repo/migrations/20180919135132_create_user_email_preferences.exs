@@ -12,6 +12,6 @@ defmodule Skoller.Repo.Migrations.CreateUserEmailPreferences do
       timestamps()
     end
 
-    create index(:user_email_preferences, [:user_id])
+    create unique_index(:user_email_preferences, [:user_id])
   end
 end

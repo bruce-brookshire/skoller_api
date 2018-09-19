@@ -7,8 +7,7 @@ defmodule SkollerWeb.EmailPreferenceView do
   end
 
   def render("email_preference.json", %{email_preference: email_preference}) do
-    %{id: email_preference.id,
-      is_unsubscribed: email_preference.is_unsubscribed,
+    %{is_unsubscribed: email_preference.is_unsubscribed,
       is_no_classes_email: email_preference.is_no_classes_email,
       is_class_setup_email: email_preference.is_class_setup_email}
   end

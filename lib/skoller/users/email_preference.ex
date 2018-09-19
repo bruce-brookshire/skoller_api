@@ -14,7 +14,7 @@ defmodule Skoller.Users.EmailPreference do
     timestamps()
   end
 
-  @req_fields [:is_unsubscribed, :is_no_classes_email, :is_class_setup_email]
+  @req_fields [:is_unsubscribed, :is_no_classes_email, :is_class_setup_email, :user_id]
   @all_fields @req_fields
 
   @doc false
