@@ -15,13 +15,17 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
     end
   end
 
-  def show(conn, %{"user_id" => user_id}) do
-    email_preference = EmailPreferences.get_email_preferences_by_user(user_id)
-    render(conn, EmailPreferenceView, "show.json", email_preference: email_preference)
+  def index(conn, %{"user_id" => user_id}) do
+    email_preferences = EmailPreferences.get_email_preferences_by_user(user_id)
+    render(conn, EmailPreferenceView, "index.json", email_preferences: email_preferences)
   end
 
-  def update(conn, %{"user_id" => user_id} = params) do
-    email_preference = EmailPreferences.get_email_preferences_by_user!(user_id)
+  def update(conn, %{"user_id" => user_id, "id" => id} = params) do
+    email_preference = EmailPreferences.get_email_preferences_by_id!(id)
+
+    if email_preference.user_id != user_id do
+      conn |> send_resp(403, "")
+    end
 
     case EmailPreferences.update_email_preference(email_preference, params) do
       {:ok, email_preference} ->

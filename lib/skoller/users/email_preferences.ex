@@ -5,18 +5,22 @@ defmodule Skoller.Users.EmailPreferences do
   alias Skoller.Users.EmailPreference
   alias Skoller.Repo
 
+  import Ecto.Query
+
   @doc """
   Gets email preferences for a user.
   """
   def get_email_preferences_by_user(user_id) do
-    Repo.get_by(EmailPreference, user_id: user_id)
+    from(ep in EmailPreference)
+    |> where([ep], ep.user_id == ^user_id)
+    |> Repo.all()
   end
 
   @doc """
   Gets email preferences for a user.
   """
-  def get_email_preferences_by_user!(user_id) do
-    Repo.get_by!(EmailPreference, user_id: user_id)
+  def get_email_preferences_by_id!(id) do
+    Repo.get!(EmailPreference, id)
   end
 
   @doc """

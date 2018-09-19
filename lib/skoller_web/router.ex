@@ -274,9 +274,9 @@ defmodule SkollerWeb.Router do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
       get "/email-types", EmailTypeController, :index
-      put "/users/:user_id/email-preferences", EmailPreferenceController, :update
+      put "/users/:user_id/email-preferences/:id", EmailPreferenceController, :update
       post "/users/:user_id/email-preferences", EmailPreferenceController, :create
-      get "/users/:user_id/email-preferences", EmailPreferenceController, :show
+      get "/users/:user_id/email-preferences", EmailPreferenceController, :index
       resources "/fields-of-study/list", FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
