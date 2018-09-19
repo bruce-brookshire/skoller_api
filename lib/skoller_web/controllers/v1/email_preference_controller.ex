@@ -4,6 +4,7 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
   alias Skoller.Users.EmailPreferences
   alias Skoller.Users
   alias SkollerWeb.EmailPreferenceView
+  alias SkollerWeb.UserEmailPreferenceView
 
   def create(conn, %{"email" => email, "user_id" => user_id} = params) do
     case Users.get_user_by_email(email) do
@@ -26,8 +27,8 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
   end
 
   def index(conn, %{"user_id" => user_id}) do
-    email_preferences = EmailPreferences.get_email_preferences_by_user(user_id)
-    render(conn, EmailPreferenceView, "index.json", email_preferences: email_preferences)
+    user_email_preference = EmailPreferences.get_email_preferences_by_user(user_id)
+    render(conn, UserEmailPreferenceView, "show.json", user_email_preference: user_email_preference)
   end
 
   def update(conn, %{"user_id" => user_id, "id" => id, "email" => email} = params) do

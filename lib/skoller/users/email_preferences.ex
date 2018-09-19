@@ -3,17 +3,27 @@ defmodule Skoller.Users.EmailPreferences do
   The user email preferences context.
   """
   alias Skoller.Users.EmailPreference
+  alias Skoller.Users
   alias Skoller.Repo
 
   import Ecto.Query
 
   @doc """
   Gets email preferences for a user.
+
+  Returns
+  `%{email_preferences: [], user_unsubscribed: boolean}`
   """
   def get_email_preferences_by_user(user_id) do
-    from(ep in EmailPreference)
+    ep = from(ep in EmailPreference)
     |> where([ep], ep.user_id == ^user_id)
     |> Repo.all()
+
+    user = Users.get_user_by_id!(user_id)
+
+    Map.new()
+    |> Map.put(:email_preferences, ep)
+    |> Map.put(:user_unsubscribed, user.is_unsubscribed)
   end
 
   @doc """
