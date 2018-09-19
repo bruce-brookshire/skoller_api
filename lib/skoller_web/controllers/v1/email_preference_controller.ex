@@ -1,19 +1,13 @@
-defmodule SkollerWeb.EmailPreferenceController do
+defmodule SkollerWeb.Api.V1.EmailPreferenceController do
   use SkollerWeb, :controller
 
   alias Skoller.Users.EmailPreferences
-
-  import SkollerWeb.Plugs.Auth
-  
-  @student_role 100
-  @admin_role 200
-  
-  plug :verify_role, %{roles: [@admin_role, @student_role]}
+  alias SkollerWeb.EmailPreferenceView
 
   def create(conn, params) do
     case EmailPreferences.create_email_preference(params) do
       {:ok, email_preference} ->
-        conn |> render("show.json", email_preference: email_preference)
+        conn |> render(EmailPreferenceView, "show.json", email_preference: email_preference)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -23,7 +17,7 @@ defmodule SkollerWeb.EmailPreferenceController do
 
   def show(conn, %{"user_id" => user_id}) do
     email_preference = EmailPreferences.get_email_preferences_by_user(user_id)
-    render(conn, "show.json", email_preference: email_preference)
+    render(conn, EmailPreferenceView, "show.json", email_preference: email_preference)
   end
 
   def update(conn, %{"user_id" => user_id} = params) do
@@ -31,7 +25,7 @@ defmodule SkollerWeb.EmailPreferenceController do
 
     case EmailPreferences.update_email_preference(email_preference, params) do
       {:ok, email_preference} ->
-        conn |> render("show.json", email_preference: email_preference)
+        conn |> render(EmailPreferenceView, "show.json", email_preference: email_preference)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

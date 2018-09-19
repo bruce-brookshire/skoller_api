@@ -1,4 +1,6 @@
 defmodule Skoller.Users.EmailPreference do
+  @moduledoc false
+  
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Users.EmailPreference
