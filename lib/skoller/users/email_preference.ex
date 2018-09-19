@@ -16,11 +16,21 @@ defmodule Skoller.Users.EmailPreference do
   @req_fields [:is_unsubscribed, :email_type_id, :user_id]
   @all_fields @req_fields
 
+  @upd_req_fields [:is_unsubscribed]
+  @upd_all_fields @upd_req_fields
+
   @doc false
   def changeset(%EmailPreference{} = email_preference, attrs) do
     email_preference
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
     |> unique_constraint(:user_id, name: :user_email_preferences_unique_index)
+  end
+
+  @doc false
+  def upd_changeset(%EmailPreference{} = email_preference, attrs) do
+    email_preference
+    |> cast(attrs, @upd_all_fields)
+    |> validate_required(@upd_req_fields)
   end
 end

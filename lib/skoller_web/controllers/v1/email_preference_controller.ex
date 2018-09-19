@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
   def update(conn, %{"user_id" => user_id, "id" => id} = params) do
     email_preference = EmailPreferences.get_email_preferences_by_id!(id)
 
-    if email_preference.user_id != user_id do
+    if email_preference.user_id |> to_string() != user_id do
       conn |> send_resp(403, "")
     end
 

@@ -55,7 +55,7 @@ defmodule Skoller.Users.EmailPreferences do
   """
   def update_email_preference(%EmailPreference{} = email_preference, attrs) do
     email_preference
-    |> EmailPreference.changeset(attrs)
+    |> EmailPreference.upd_changeset(attrs)
     |> Repo.update()
   end
 end
