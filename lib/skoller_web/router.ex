@@ -273,6 +273,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
+      get "/email-types", EmailTypeController, :index
       put "/users/:user_id/email-preferences", EmailPreferenceController, :update
       post "/users/:user_id/email-preferences", EmailPreferenceController, :create
       get "/users/:user_id/email-preferences", EmailPreferenceController, :show
