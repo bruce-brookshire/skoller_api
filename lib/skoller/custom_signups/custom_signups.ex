@@ -52,6 +52,9 @@ defmodule Skoller.CustomSignups do
   `Skoller.CustomSignups.Link` or `nil`
   """
   def get_link_by_link(link) do
+    link = link
+    |> String.trim()
+    |> String.downcase()
     Repo.get_by(Link, link: link)
   end
 
