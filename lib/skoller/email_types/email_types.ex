@@ -12,4 +12,8 @@ defmodule Skoller.EmailTypes do
   Returns [Skoller.EmailTypes] or []
   """
   def all(), do: Repo.all(EmailType)
+
+  def get_by_name(name) do
+    Repo.get_by(EmailType, name: name)
+  end
 end

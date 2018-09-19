@@ -4,6 +4,7 @@ defmodule Skoller.StudentClasses.Emails do
   """
 
   alias Skoller.Mailer
+  alias Skoller.Users.EmailPreferences
 
   import Bamboo.Email
 
@@ -11,9 +12,11 @@ defmodule Skoller.StudentClasses.Emails do
   EEx.function_from_file :defp, :build_no_classes_body, System.cwd() <> "/lib/skoller/student_classes/no_classes.html.eex", []
 
   @from_email "noreply@skoller.co"
+  @no_classes_name "No Classes Email"
 
   def send_no_classes_emails(students) do
     students
+    |> Enum.filter(&EmailPreferences.check_email_subscription_status(List.first(&1.users), @no_classes_name))
     |> Enum.map(&build_no_classes_email(List.first(&1.users)))
     |> Enum.each(&Mailer.deliver_later(&1))
   end
