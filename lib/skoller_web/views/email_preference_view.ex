@@ -14,8 +14,7 @@ defmodule SkollerWeb.EmailPreferenceView do
     %{
       is_unsubscribed: email_preference.is_unsubscribed,
       email_type_id: email_preference.email_type_id,
-      user_id: email_preference.user_id,
-      id: email_preference.id
+      user_id: email_preference.user_id
     }
   end
 end

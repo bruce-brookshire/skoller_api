@@ -89,18 +89,18 @@ defmodule Skoller.Users.EmailPreferences do
     Enum.map(email_preferences, &process_email_preference(&1, user_id))
   end
 
-  defp process_email_preference(%{"id" => id} = email_preference, user_id) do
-    email_preference_old = get_email_preferences_by_id(id)
-
-    case user_id == email_preference_old.user_id do
-      true -> 
+  defp process_email_preference(email_preference, user_id) do
+    case get_email_preference_by_email_type(email_preference["email_type_id"], user_id) do
+      nil ->
+        email_preference
+        |> Map.put("user_id", user_id)
+        |> create_email_preference()
+      email_preference_old ->
         update_email_preference(email_preference_old, email_preference)
-      false ->
-        {:error, "non-matching ids"}
     end
   end
 
-  defp process_email_preference(email_preference) do
-    create_email_preference(email_preference)
+  defp get_email_preference_by_email_type(email_type_id, user_id) do
+    Repo.get_by(EmailPreference, email_type_id: email_type_id, user_id: user_id)
   end
 end
