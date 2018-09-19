@@ -29,6 +29,13 @@ defmodule Skoller.Users.EmailPreferences do
   @doc """
   Gets email preferences for a user.
   """
+  def get_email_preferences_by_id(id) do
+    Repo.get(EmailPreference, id)
+  end
+
+  @doc """
+  Gets email preferences for a user.
+  """
   def get_email_preferences_by_id!(id) do
     Repo.get!(EmailPreference, id)
   end
@@ -67,5 +74,32 @@ defmodule Skoller.Users.EmailPreferences do
     email_preference
     |> EmailPreference.upd_changeset(attrs)
     |> Repo.update()
+  end
+
+  def update_user_subscription(user_id, is_unsubscribed) do
+    Users.get_user_by_id!(user_id)
+    |> Users.update_user(%{is_unsubscribed: is_unsubscribed})
+  end
+
+  @doc """
+  Upserts multiple email_preferences.
+  """
+  def upsert_email_preferences(email_preferences, user_id) do
+    Enum.map(email_preferences, &process_email_preference(&1, user_id))
+  end
+
+  defp process_email_preference(%{"id" => id} = email_preference, user_id) do
+    email_preference_old = get_email_preferences_by_id(id)
+
+    case user_id == email_preference_old.user_id do
+      true -> 
+        update_email_preference(email_preference_old, email_preference)
+      false ->
+        {:error, "non-matching ids"}
+    end
+  end
+
+  defp process_email_preference(email_preference) do
+    create_email_preference(email_preference)
   end
 end
