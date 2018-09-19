@@ -2,9 +2,19 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
   use SkollerWeb, :controller
 
   alias Skoller.Users.EmailPreferences
+  alias Skoller.Users
   alias SkollerWeb.EmailPreferenceView
 
-  def create(conn, params) do
+  def create(conn, %{"email" => email, "user_id" => user_id} = params) do
+    case Users.get_user_by_email(email) do
+      nil -> 
+        conn |> send_resp(403, "")
+      user ->
+        if user_id != user.id |> to_string do
+          conn |> send_resp(403, "")
+        end
+    end
+
     case EmailPreferences.create_email_preference(params) do
       {:ok, email_preference} ->
         conn |> render(EmailPreferenceView, "show.json", email_preference: email_preference)
