@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.UpdateConstraintsOnUsers do
+  @moduledoc false
   use Ecto.Migration
 
   def up do

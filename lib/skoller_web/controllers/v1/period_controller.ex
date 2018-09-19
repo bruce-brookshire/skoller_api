@@ -1,6 +1,5 @@
 defmodule SkollerWeb.Api.V1.PeriodController do
   @moduledoc false
-  
   use SkollerWeb, :controller
 
   alias SkollerWeb.PeriodView

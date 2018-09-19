@@ -4,13 +4,13 @@ defmodule Skoller.StudentClasses.Notifications do
   """
 
   alias Skoller.Devices
-  alias Skoller.Notification
+  alias Services.Notification
 
   @no_class_category "Class.None"
 
   def send_no_classes_notification(students) do
     students_with_devices = students |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(List.first(&1.users).id)))
-    students_with_devices |> Enum.each(&Enum.each(&1.devices, fn(x) -> Notification.create_notification(x.udid, create_no_class_msg(), @no_class_category) end))
+    students_with_devices |> Enum.each(&Enum.each(&1.devices, fn(x) -> Notification.create_notification(x.udid, x.type, create_no_class_msg(), @no_class_category) end))
   end
 
   defp create_no_class_msg() do
