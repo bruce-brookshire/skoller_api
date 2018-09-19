@@ -22,5 +22,6 @@ defmodule Skoller.Users.EmailPreference do
     email_preference
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+    |> unique_constraint(:user_id, name: :user_email_preferences_user_id_index)
   end
 end
