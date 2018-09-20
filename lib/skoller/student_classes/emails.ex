@@ -28,12 +28,12 @@ defmodule Skoller.StudentClasses.Emails do
       Mailer.deliver_now(email)
     rescue
       error in Bamboo.SMTPAdapter.SMTPError ->
+        Logger.error(inspect(error.raw))
         case error.raw do
           {:retries_exceeded, _} ->
             EmailPreferences.update_user_subscription(user_id, true)
             Logger.info("unsubscribed user: " <> user_id |> to_string)
-          error ->
-            Logger.error(inspect(error))
+          _error -> nil
         end
     end
   end
