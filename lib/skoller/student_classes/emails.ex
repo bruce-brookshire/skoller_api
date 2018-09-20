@@ -24,6 +24,7 @@ defmodule Skoller.StudentClasses.Emails do
 
   defp deliver_message(%{email: email, user_id: user_id}) do
     try do
+      Logger.info("Sending email to :" <> user_id |> to_string)
       Mailer.deliver_now(email)
     rescue
       error in Bamboo.SMTPAdapter.SMTPError ->
@@ -34,7 +35,6 @@ defmodule Skoller.StudentClasses.Emails do
           error ->
             Logger.error(inspect(error))
         end
-        reraise error, System.stacktrace
     end
   end
 
