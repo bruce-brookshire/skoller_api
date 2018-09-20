@@ -9,7 +9,7 @@ defmodule Skoller.Jobs do
 
   # This function is called by Skoller.Scheduler every five minutes.
   def run() do
-    now = Time.utc_now()
+    now = DateTime.utc_now()
 
     now |> AssignmentNotifications.send_assignment_reminder_notifications()
 
