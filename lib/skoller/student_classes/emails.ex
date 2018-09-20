@@ -35,6 +35,8 @@ defmodule Skoller.StudentClasses.Emails do
             Logger.info("unsubscribed user: " <> user_id |> to_string)
           _error -> nil
         end
+      error ->
+        Logger.error(inspect(error))
     end
   end
 
