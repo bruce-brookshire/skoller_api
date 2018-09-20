@@ -1018,7 +1018,7 @@
 						<tr>
 						<td align="center" valign="top" width="600" style="width:600px;">
 						<![endif]-->
-						<table class="templateContainer" width="100%" cellspacing="0" cellpadding="0" border="0">
+						<table class="templateContainer" width="600px" cellspacing="0" cellpadding="0" border="0">
 							<tbody>
 								<tr>
 									<td id="templatePreheader" valign="top">
