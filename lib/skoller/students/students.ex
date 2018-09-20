@@ -22,6 +22,7 @@ defmodule Skoller.Students do
   alias Skoller.StudentClasses
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
+  alias Skoller.StudentPoints
 
   import Ecto.Query
 
@@ -30,6 +31,8 @@ defmodule Skoller.Students do
   @community_threshold 2
   @link_length 5
   @enrollment_limit 15
+
+  @class_referral_points_name "Class Referral"
 
   @doc """
   Gets a student by id.
@@ -735,6 +738,7 @@ defmodule Skoller.Students do
     |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
+    |> Ecto.Multi.run(:points, &add_points_to_student(&1.student_class))
     
     case multi |> Repo.transaction() do
       {:ok, trans} -> 
@@ -742,6 +746,14 @@ defmodule Skoller.Students do
       error -> error
     end
   end
+
+  defp add_points_to_student(%{enrolled_by: enrolled_by}) when not(is_nil(enrolled_by)) do
+    sc = StudentClasses.get_student_class_by_id!(enrolled_by)
+
+    sc.id
+    |> StudentPoints.add_points_to_student(@class_referral_points_name)
+  end
+  defp add_points_to_student(_student_class), do: {:ok, nil}
 
   defp enroll_in_dropped_class(item) do
     item
