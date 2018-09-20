@@ -13,7 +13,6 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>*|MC:SUBJECT|*</title>
 
 	<style type="text/css">
 		p {
@@ -1039,18 +1038,6 @@
 														<!--[if mso]>
 				<td valign="top" width="600" style="width:600px;">
 				<![endif]-->
-														<table style="max-width:100%; min-width:100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
-														 cellpadding="0" border="0" align="left">
-															<tbody>
-																<tr>
-
-																	<td class="mcnTextContent" style="padding: 0px 18px 9px; text-align: center;" valign="top">
-
-																		<a href="*|ARCHIVE|*" target="_blank">View this email in your browser</a>
-																	</td>
-																</tr>
-															</tbody>
-														</table>
 														<!--[if mso]>
 				</td>
 				<![endif]-->
@@ -1521,7 +1508,7 @@
 															<tbody>
 																<tr>
 
-																	<td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;"
+																	<td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; text-align:center;"
 																	 valign="top">
 
 																		<em>Copyright © 2018 Skoller, Inc., All rights reserved.</em><br>
