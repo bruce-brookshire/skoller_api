@@ -7,6 +7,7 @@ defmodule Skoller.ModActions do
   alias Skoller.Mods.Action
   alias Skoller.Mods.Mod
   alias Skoller.Students
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -31,7 +32,7 @@ defmodule Skoller.ModActions do
   """
   def get_enrolled_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
-    |> join(:inner, [act], sc in subquery(Students.enrolled_student_class_subquery()), sc.id == act.student_class_id)
+    |> join(:inner, [act], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), sc.id == act.student_class_id)
     |> where([act], act.assignment_modification_id == ^id)
     |> Repo.all()
   end
