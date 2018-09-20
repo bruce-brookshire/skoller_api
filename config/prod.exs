@@ -100,4 +100,4 @@ config :skoller, Skoller.Mailer,
   password: System.get_env("SMTP_PASSWORD"),
   tls: :always,
   ssl: false,
-  retries: 1
+  retries: 3
