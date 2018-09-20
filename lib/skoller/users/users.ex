@@ -202,6 +202,14 @@ defmodule Skoller.Users do
       enrolled_by -> Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.id)})
     end
   end
+  # Adds enrolled_by if "enrollment_link" is present in params.
+  defp get_enrolled_by(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, %{"student" => %{"enrollment_link" => link}}) do
+    enrolled_by = Students.get_student_class_by_enrollment_link(link)
+    case enrolled_by do
+      nil -> u_changeset
+      enrolled_by -> Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.student.id)})
+    end
+  end
   defp get_enrolled_by(changeset, _params), do: changeset
 
   # The standard insert user multi.
