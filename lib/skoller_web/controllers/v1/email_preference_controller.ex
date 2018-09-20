@@ -3,7 +3,6 @@ defmodule SkollerWeb.Api.V1.EmailPreferenceController do
 
   alias Skoller.Users.EmailPreferences
   alias Skoller.Users
-  alias SkollerWeb.EmailPreferenceView
   alias SkollerWeb.UserEmailPreferenceView
   alias Skoller.MapErrors
 
