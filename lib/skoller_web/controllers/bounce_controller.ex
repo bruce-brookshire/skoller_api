@@ -29,12 +29,13 @@ defmodule SkollerWeb.Api.BounceController do
   end
 
   def bounce(conn, params) do
-    if params["SubscribeURL"] do
-      url -> 
+    case params["SubscribeURL"] do
+      nil -> 
+        conn |> send_resp(403, "")
+      url ->
         HTTPoison.get(url)
         conn |> send_resp(204, "")
     end
-    conn |> send_resp(403, "")
   end
 
   defp unsubscribe_email(email) do
