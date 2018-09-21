@@ -270,6 +270,8 @@ defmodule SkollerWeb.Router do
   scope "/api", SkollerWeb.Api do
     pipe_through :api
 
+    post "/bounce", BounceController, :bounce
+
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
