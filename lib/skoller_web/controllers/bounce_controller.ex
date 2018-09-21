@@ -17,7 +17,7 @@ defmodule SkollerWeb.Api.BounceController do
       _ ->
         Logger.info("Recieved non-permanent bounce for email " <> inspect(bounce["bouncedRecepients"]))
     end
-    conn |> send_resp(200, "")
+    conn |> send_resp(204, "")
   end
 
   def bounce(conn, %{"notificationType" => "Complaint", "complaint" => complaint}) do
@@ -25,7 +25,11 @@ defmodule SkollerWeb.Api.BounceController do
 
     complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
 
-    conn |> send_resp(200, "")
+    conn |> send_resp(204, "")
+  end
+
+  def bounce(conn, _params) do
+    conn |> send_resp(204, "")
   end
 
   defp unsubscribe_email(email) do
