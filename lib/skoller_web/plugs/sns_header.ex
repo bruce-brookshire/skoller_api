@@ -7,7 +7,7 @@ defmodule SkollerWeb.Plugs.SNSHeader do
 
   def call(conn, _opts) do
     case conn |> get_req_header("content-type") |> List.first() do
-      "text/plain" -> 
+      "text/plain; charset=UTF-8" -> 
         case conn |> get_req_header("x-amz-sns-message-type") do
           [] -> conn
           _list -> put_req_header(conn, "content-type", "application/json")
