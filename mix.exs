@@ -42,10 +42,10 @@ defmodule Skoller.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:guardian, "~> 1.0-beta"},
-      {:arc, "~> 0.8.0"},
-      {:arc_ecto, "~> 0.7.0"},
-      {:ex_aws, "~> 1.1"},
-      {:hackney, "~> 1.6"},
+      {:arc, "~> 0.10.0"},
+      {:arc_ecto, "~> 0.10.0"},
+      {:ex_aws, "~> 2.0"},
+      {:hackney, "~> 1.13"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
       {:comeonin, "~> 4.0"},
@@ -55,9 +55,9 @@ defmodule Skoller.Mixfile do
       {:kadabra, "~> 0.4.2"},
       {:ex_twilio, "~> 0.5.0"},
       {:csv, "~> 2.0.0"},
-      {:bamboo, "~> 0.8"},
-      {:bamboo_smtp, "~> 1.4.0"},
-      {:timex, "~> 3.1"}
+      {:bamboo, "~> 1.0"},
+      {:timex, "~> 3.1"},
+      {:bamboo_ses, "~> 0.1.0"}
     ]
   end
 
