@@ -38,5 +38,6 @@ defmodule SkollerWeb.Api.BounceController do
         nil
       user -> 
         EmailPreferences.update_user_subscription(user.id, true)
+    end
   end
 end
