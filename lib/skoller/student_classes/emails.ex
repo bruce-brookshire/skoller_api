@@ -24,17 +24,9 @@ defmodule Skoller.StudentClasses.Emails do
 
   defp deliver_message(%{email: email, user_id: user_id}) do
     try do
-      Logger.info("Sending email to :" <> user_id |> to_string)
+      Logger.info("Sending email to: " <> user_id |> to_string)
       Mailer.deliver_now(email)
     rescue
-      error in Bamboo.SMTPAdapter.SMTPError ->
-        Logger.error(inspect(error.raw))
-        case error.raw do
-          {:retries_exceeded, _} ->
-            EmailPreferences.update_user_subscription(user_id, true)
-            Logger.info("unsubscribed user: " <> user_id |> to_string)
-          _error -> nil
-        end
       error ->
         Logger.error(inspect(error))
     end

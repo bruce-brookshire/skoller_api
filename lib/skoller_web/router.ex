@@ -32,7 +32,7 @@ defmodule SkollerWeb.Router do
   end
 
   if Mix.env == :dev do
-    forward "/sent_emails", Bamboo.EmailPreviewPlug
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
   end
 
   # Other scopes may use custom stacks.
@@ -269,6 +269,8 @@ defmodule SkollerWeb.Router do
 
   scope "/api", SkollerWeb.Api do
     pipe_through :api
+
+    post "/bounce", BounceController, :bounce
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login

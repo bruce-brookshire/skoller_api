@@ -93,11 +93,4 @@ config :pigeon, :apns,
 
 # This is for emails
 config :skoller, Skoller.Mailer,
-  adapter: Bamboo.SMTPAdapter,
-  server: System.get_env("SES_SERVER"),
-  port: System.get_env("SES_PORT"),
-  username: System.get_env("SMTP_USERNAME"),
-  password: System.get_env("SMTP_PASSWORD"),
-  tls: :always,
-  ssl: false,
-  retries: 3
+  adapter: Bamboo.SesAdapter
