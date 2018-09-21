@@ -10,6 +10,10 @@ defmodule SkollerWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :sns do
+    plug :accepts, ["json", "text"]
+  end
+
   pipeline :api_auth_verified do
     plug :accepts, ["json"]
     plug Guardian.Plug.Pipeline, module: Skoller.Auth,
@@ -268,9 +272,13 @@ defmodule SkollerWeb.Router do
   end
 
   scope "/api", SkollerWeb.Api do
-    pipe_through :api
+    pipe_through :sns
 
     post "/bounce", BounceController, :bounce
+  end
+
+  scope "/api", SkollerWeb.Api do
+    pipe_through :api
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login

@@ -23,6 +23,8 @@ defmodule SkollerWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  plug SkollerWeb.Plugs.SNSHeader
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
