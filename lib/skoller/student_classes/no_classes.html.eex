@@ -13,6 +13,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🚨 URGENT: You have no classes 🚨 </title>
   <style type="text/css">
     p {
       margin: 10px 0;
@@ -270,47 +271,41 @@
     <table id="bodyTable" width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" align="center">
       <tbody><tr>
         <td id="bodyCell" valign="top" align="center">
-  <!-- BEGIN TEMPLATE // -->
-  <!--[if (gte mso 9)|(IE)]>
-  <table align="center" border="0" cellspacing="0" cellpadding="0" width="600" style="width:600px;">
-  <tr>
-  <td align="center" valign="top" width="600" style="width:600px;">
-  <![endif]-->
-  <table class="templateContainer" width="600px" cellspacing="0" cellpadding="0" border="0">
-    <tbody><tr>
-      <td id="templateHeader" valign="top">
-        <table class="mcnImageBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
-          <tbody class="mcnImageBlockOuter"><tr>
-            <td style="padding:9px" class="mcnImageBlockInner" valign="top">
-              <table class="mcnImageContentContainer" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0"
+          <!-- BEGIN TEMPLATE // -->
+          <!--[if (gte mso 9)|(IE)]>
+          <table align="center" border="0" cellspacing="0" cellpadding="0" width="600" style="width:600px;">
+          <tr>
+          <td align="center" valign="top" width="600" style="width:600px;">
+          <![endif]-->
+          <table class="templateContainer" width="600px" cellspacing="0" cellpadding="0" border="0">
+            <tbody><tr>
+              <td id="templateHeader" valign="top">
+                <table class="mcnImageContentContainer" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0"
                   border="0" align="left">
-                <tbody><tr>
-                  <td class="mcnImageContent" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: center;"
-                    valign="top">
-                    <img alt="" src="https://gallery.mailchimp.com/4b86eb0d186e5ecc961f289a3/images/67faa75e-21ee-40d1-b8e8-baf44d7ad1dc.png"
-                      style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom; text-align: center;"
-                      class="mcnImage" width="564" />
-                  </td>
-                </tr></tbody>
-              </table>
-            </td>
-          </tr></tbody>
-        </table>
-      </td>
-    </tr>
+                  <tbody><tr>
+                    <td class="mcnImageContent" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: center;"
+                      valign="top">
+                      <img alt="" src="https://gallery.mailchimp.com/4b86eb0d186e5ecc961f289a3/images/67faa75e-21ee-40d1-b8e8-baf44d7ad1dc.png"
+                        style="max-width:600px; padding-bottom: 0; display: inline !important; vertical-align: bottom; text-align: center;"
+                        class="mcnImage" width="564" />
+                    </td>
+                  </tr></tbody>
+                </table>
+              </td>
+            </tr>
     <tr>
       <td id="templateUpperBody" valign="top">
-        <table class="mcnTextBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+        <table class="mcnTextBlock" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
           <tbody class="mcnTextBlockOuter"><tr>
             <td class="mcnTextBlockInner" style="padding-top: 9px;" valign="top">
             <!--[if mso]>
-            <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
+            <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width: 100%;">
             <tr>
             <![endif]-->
             <!--[if mso]>
-            <td valign="top" width="600" style="width:600px;">
+            <td valign="top" width="600" style="width: 600px;">
             <![endif]-->
-              <table style="max-width:100%; min-width:100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
+              <table style="max-width: 100%; min-width: 100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
                 cellpadding="0" border="0" align="left">
                 <tbody><tr>
                   <td class="mcnTextContent" style="padding-top: 0; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;"
@@ -336,9 +331,9 @@
     <tr>
       <td id="templateColumns" valign="top">
       <!--[if (gte mso 9)|(IE)]>
-      <table align="center" border="0" cellspacing="0" cellpadding="0" width="600" style="width:600px;">
+      <table align="center" border="0" cellspacing="0" cellpadding="0" width="600" style="width: 600px;">
       <tr>
-      <td align="center" valign="top" width="300" style="width:300px;">
+      <td align="center" valign="top" width="300" style="width: 300px;">
       <![endif]-->
         <table class="columnWrapper" width="300" cellspacing="0" cellpadding="0" border="0" align="left">
           <tbody><tr>
@@ -360,9 +355,9 @@
                   </td>
                 </tr></tbody>
               </table>
-              <table class="mcnButtonBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+              <table class="mcnButtonBlock" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tbody class="mcnButtonBlockOuter"><tr>
-                  <td style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;" class="mcnButtonBlockInner"
+                  <td style="padding-top: 0; padding-right: 18px; padding-bottom: 18px; padding-left: 18px;" class="mcnButtonBlockInner"
                     valign="top" align="center">
                     <table class="mcnButtonContentContainer" style="border-collapse: separate !important;border-radius: 3px;background-color: #2BAADF;"
                       cellspacing="0" cellpadding="0" border="0">
@@ -370,7 +365,7 @@
                         <td class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 15px;" valign="middle"
                           align="center">
                           <a class="mcnButton " title="Take me to the Website " href="https://skoller.co" target="_blank"
-                            style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Take
+                            style="font-weight: bold; letter-spacing: normal; line-height: 100%; text-align: center; text-decoration: none; color: #FFFFFF;">Take
                             me to the Website </a>
                         </td>
                       </tr></tbody>
@@ -392,36 +387,26 @@
                             <table class="mcnImageCardBlock" width="100%" cellspacing="0" cellpadding="0" border="0">
                               <tbody class="mcnImageCardBlockOuter">
                                 <tr>
-                                  <td class="mcnImageCardBlockInner" style="padding-top:9px; padding-right:18px; padding-bottom:9px; padding-left:18px;"
+                                  <td class="mcnImageCardBlockInner" style="padding-top: 9px; padding-right: 18px; padding-bottom: 9px; padding-left: 18px;"
                                    valign="top">
 
                                     <table class="mcnImageCardBottomContent" width="100%" cellspacing="0" cellpadding="0" border="0"
                                      align="right">
                                       <tbody>
                                         <tr>
-                                          <td class="mcnImageCardBottomImageContent" style="padding-top:0px; padding-right:0px; padding-bottom:0; padding-left:0px;"
+                                          <td class="mcnImageCardBottomImageContent" style="padding-top: 0px; padding-right: 0px; padding-bottom: 0; padding-left: 0px;"
                                            valign="top" align="left">
-
-
-
                                             <img alt="" src="https://gallery.mailchimp.com/4b86eb0d186e5ecc961f289a3/images/a549c2b2-f141-4ae4-a5b3-a930110cc24e.jpg"
-                                             style="max-width:751px;" class="mcnImage" width="264">
-
-
+                                             style="max-width: 600px;" class="mcnImage" width="264">
                                           </td>
                                         </tr>
                                         <tr>
                                           <td class="mcnTextContent" style="padding: 9px 18px;color: #F2F2F2;font-family: Helvetica;font-size: 14px;font-weight: normal;text-align: center;"
                                            width="246" valign="top">
-
                                           </td>
                                         </tr>
                                       </tbody>
                                     </table>
-
-
-
-
                                   </td>
                                 </tr>
                               </tbody>
@@ -482,12 +467,9 @@
                                     <table align="center" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
                                     <![endif]-->
-
                                                     <!--[if mso]>
                                         <td align="center" valign="top">
                                         <![endif]-->
-
-
                                                     <table style="display:inline;" cellspacing="0" cellpadding="0" border="0" align="left">
                                                       <tbody>
                                                         <tr>
@@ -501,13 +483,10 @@
                                                                     <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
                                                                       <tbody>
                                                                         <tr>
-
                                                                           <td class="mcnFollowIconContent" width="24" valign="middle" align="center">
                                                                             <a href="http://www.twitter.com/skolleratme" target="_blank"><img src="https://cdn-images.mailchimp.com/icons/social-block-v2/color-twitter-48.png"
                                                                                style="display:block;" class="" width="24" height="24"></a>
                                                                           </td>
-
-
                                                                         </tr>
                                                                       </tbody>
                                                                     </table>
@@ -519,16 +498,12 @@
                                                         </tr>
                                                       </tbody>
                                                     </table>
-
                                                     <!--[if mso]>
                                         </td>
                                         <![endif]-->
-
                                                     <!--[if mso]>
                                         <td align="center" valign="top">
                                         <![endif]-->
-
-
                                                     <table style="display:inline;" cellspacing="0" cellpadding="0" border="0" align="left">
                                                       <tbody>
                                                         <tr>
@@ -542,13 +517,10 @@
                                                                     <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
                                                                       <tbody>
                                                                         <tr>
-
                                                                           <td class="mcnFollowIconContent" width="24" valign="middle" align="center">
                                                                             <a href="http://www.facebook.com/skolleratme" target="_blank"><img src="https://cdn-images.mailchimp.com/icons/social-block-v2/color-facebook-48.png"
                                                                                style="display:block;" class="" width="24" height="24"></a>
                                                                           </td>
-
-
                                                                         </tr>
                                                                       </tbody>
                                                                     </table>
@@ -560,7 +532,6 @@
                                                         </tr>
                                                       </tbody>
                                                     </table>
-
                                                     <!--[if mso]>
                                         </td>
                                         <![endif]-->
@@ -568,8 +539,6 @@
                                                     <!--[if mso]>
                                         <td align="center" valign="top">
                                         <![endif]-->
-
-
                                                     <table style="display:inline;" cellspacing="0" cellpadding="0" border="0" align="left">
                                                       <tbody>
                                                         <tr>
@@ -583,13 +552,10 @@
                                                                     <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
                                                                       <tbody>
                                                                         <tr>
-
                                                                           <td class="mcnFollowIconContent" width="24" valign="middle" align="center">
                                                                             <a href="http://instagram.com/skolleratme" target="_blank"><img src="https://cdn-images.mailchimp.com/icons/social-block-v2/color-instagram-48.png"
                                                                                style="display:block;" class="" width="24" height="24"></a>
                                                                           </td>
-
-
                                                                         </tr>
                                                                       </tbody>
                                                                     </table>
@@ -601,16 +567,12 @@
                                                         </tr>
                                                       </tbody>
                                                     </table>
-
                                                     <!--[if mso]>
                                         </td>
                                         <![endif]-->
-
                                                     <!--[if mso]>
                                         <td align="center" valign="top">
                                         <![endif]-->
-
-
                                                     <table style="display:inline;" cellspacing="0" cellpadding="0" border="0" align="left">
                                                       <tbody>
                                                         <tr>
@@ -624,13 +586,10 @@
                                                                     <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
                                                                       <tbody>
                                                                         <tr>
-
                                                                           <td class="mcnFollowIconContent" width="24" valign="middle" align="center">
                                                                             <a href="http://www.skoller.co" target="_blank"><img src="https://cdn-images.mailchimp.com/icons/social-block-v2/color-link-48.png"
                                                                                style="display:block;" class="" width="24" height="24"></a>
                                                                           </td>
-
-
                                                                         </tr>
                                                                       </tbody>
                                                                     </table>
@@ -642,11 +601,9 @@
                                                         </tr>
                                                       </tbody>
                                                     </table>
-
                                                     <!--[if mso]>
                                         </td>
                                         <![endif]-->
-
                                                     <!--[if mso]>
                                     </tr>
                                     </table>
@@ -663,7 +620,6 @@
                                 </tr>
                               </tbody>
                             </table>
-
                           </td>
                         </tr>
                       </tbody>
@@ -680,7 +636,6 @@
         <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
         <tr>
         <![endif]-->
-
                             <!--[if mso]>
         <td valign="top" width="600" style="width:600px;">
         <![endif]-->
@@ -688,10 +643,8 @@
                              cellpadding="0" border="0" align="left">
                               <tbody>
                                 <tr>
-
                                   <td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px; text-align:center;"
                                    valign="top">
-
                                     <em>Copyright © 2018 Skoller, Inc., All rights reserved.</em><br>
                                     <br>
                                     <strong>Our mailing address is:</strong><br>
@@ -708,7 +661,6 @@
                             <!--[if mso]>
         </td>
         <![endif]-->
-
                             <!--[if mso]>
         </tr>
         </table>
