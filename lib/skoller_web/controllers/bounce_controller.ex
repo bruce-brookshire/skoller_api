@@ -9,14 +9,10 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"notificationType" => "Bounce", "bounce" => bounce}) do
-    case bounce["bounceType"] do
-      "Permanent" -> 
-        Logger.info("Recieved permanent bounce for email " <> inspect(bounce["bouncedRecepients"]))
+    Logger.info("Recieved bounce for email " <> inspect(bounce["bouncedRecepients"]))
 
-        bounce["bouncedRecepients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
-      _ ->
-        Logger.info("Recieved non-permanent bounce for email " <> inspect(bounce["bouncedRecepients"]))
-    end
+    bounce["bouncedRecepients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
+
     conn |> send_resp(204, "")
   end
 
