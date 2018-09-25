@@ -57,7 +57,7 @@ defmodule Skoller.Mixfile do
       {:csv, "~> 2.0.0"},
       {:bamboo, "~> 1.0"},
       {:timex, "~> 3.1"},
-      {:bamboo_ses, "~> 0.1.0"}
+      {:bamboo_smtp, "~> 1.6.0"}
     ]
   end
 
