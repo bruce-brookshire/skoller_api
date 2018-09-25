@@ -9,9 +9,9 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"notificationType" => "Bounce", "bounce" => bounce}) do
-    Logger.info("Recieved bounce for email " <> inspect(bounce["bouncedRecepients"]))
+    Logger.info("Recieved bounce for email " <> inspect(bounce["bouncdRecipients"]))
 
-    bounce["bouncedRecepients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
+    bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
 
     conn |> send_resp(204, "")
   end
