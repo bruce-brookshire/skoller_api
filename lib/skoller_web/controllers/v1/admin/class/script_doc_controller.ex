@@ -5,9 +5,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
 
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Classes
   alias Skoller.ClassDocs
   alias Skoller.Sammi
+  alias Skoller.Classes.Periods
 
   import SkollerWeb.Plugs.Auth
 
@@ -19,7 +19,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ScriptDocController do
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file} = params) do
 
-    classes = Classes.get_class_from_hash(params["class_hash"], params["period_id"])
+    classes = Periods.get_class_from_hash(params["class_hash"], params["period_id"])
     location = file |> ClassDocs.upload_class_doc()
 
     classes |> Enum.each(&Task.start(Sammi, :sammi, [%{"is_syllabus" => "true", "class_id" => &1.id}, location]))

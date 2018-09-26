@@ -11,6 +11,7 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Students
   alias Skoller.Mods
   alias Skoller.Classes.Note
+  alias Skoller.ClassesStatuses
 
   import Bamboo.Email
 
@@ -49,7 +50,7 @@ defmodule Skoller.AdminClasses do
     old_class = Classes.get_class_by_id!(class_id)
     |> Repo.preload(:class_status)
 
-    status = Classes.get_status_by_id!(status_id)
+    status = ClassesStatuses.get_status_by_id!(status_id)
 
     changeset = old_class
     |> Ecto.Changeset.change(%{class_status_id: status_id})

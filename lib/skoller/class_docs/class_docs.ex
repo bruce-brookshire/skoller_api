@@ -72,7 +72,7 @@ defmodule Skoller.ClassDocs do
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` contains
    * `{:doc, [Skoller.ClassDocs.Doc]}`
-   * `{:status, [Skoller.Classes.Status]}`
+   * `{:status, [Skoller.ClassesStatuses.Status]}`
   """
   def multi_insert_docs(classes, params) do
     Ecto.Multi.new

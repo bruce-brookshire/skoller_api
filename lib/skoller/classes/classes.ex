@@ -6,7 +6,7 @@ defmodule Skoller.Classes do
   alias Skoller.Repo
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
-  alias Skoller.Classes.Status
+  alias Skoller.ClassesStatuses.Status
   alias Skoller.ClassDocs.Doc
   alias Skoller.Locks.Lock
   alias Skoller.Users.User
@@ -83,19 +83,6 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets an editable `Skoller.Classes.Class` by id.
-
-  ## Examples
-
-      iex> Skoller.Classes.get_editable_class_by_id(1)
-      {:ok, %Skoller.Classes.Class{}}
-
-  """
-  def get_editable_class_by_id(id) do
-    Repo.get_by(Class, id: id, is_editable: true)
-  end
-
-  @doc """
   Creates a `Skoller.Classes.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
 
   ## Behavior:
@@ -140,86 +127,6 @@ defmodule Skoller.Classes do
     |> Ecto.Multi.update(:class, changeset)
     |> Ecto.Multi.run(:class_status, &check_status(&1.class, nil))
     |> Repo.transaction()
-  end
-
-  @doc """
-  Gets a class status by status id
-
-  ## Returns
-  `Skoller.Classes.Status` or raises
-  """
-  def get_status_by_id!(id) do
-    Repo.get!(Status, id)
-  end
-
-  @doc """
-  Gets all class statuses
-
-  ## Returns
-  `[Skoller.Classes.Status]` or `[]`
-  """
-  def get_statuses() do
-    Repo.all(Status)
-  end
-
-  @doc """
-  Get editable classes in subquery form
-  """
-  def get_editable_classes_subquery() do
-    from(class in Class)
-    |> where([class], class.is_editable == true)
-  end
-
-  @doc """
-  Returns a count of `Skoller.Classes.Class` using the id of `Skoller.Periods.ClassPeriod`
-
-  ## Examples
-
-      iex> val = Skoller.Classes.get_class_count_by_period(1)
-      ...> Kernel.is_integer(val)
-      true
-
-  """
-  def get_class_count_by_period(period_id) do
-    from(c in Class)
-    |> where([c], c.class_period_id == ^period_id)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
-  Returns the `Skoller.Classes.Status` name and a count of `Skoller.Classes.Class` in the status
-
-  ## Examples
-
-      iex> Skoller.Classes.get_status_counts(1)
-      [{status: name, count: num}]
-
-  """
-  def get_status_counts(school_id) do
-    from(class in Class)
-    |> join(:inner, [class], prd in ClassPeriod, class.class_period_id == prd.id)
-    |> join(:full, [class, prd], status in Status, class.class_status_id == status.id)
-    |> where([class, prd], prd.school_id == ^school_id)
-    |> group_by([class, prd, status], [status.name])
-    |> select([class, prd, status], %{status: status.name, count: count(class.id)})
-    |> Repo.all()
-  end
-
-  @doc """
-  Gets all `Skoller.Classes.Class` in a period that share a hash (hashed from syllabus url)
-
-  ## Examples
-
-      iex> Skoller.Classes.get_class_from_hash("123dadqwdvsdfscxsz", 1)
-      [%Skoller.Classes.Class{}]
-
-  """
-  def get_class_from_hash(class_hash, period_id) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> where([class, period], period.id == ^period_id)
-    |> where([class], class.class_upload_key == ^class_hash)
-    |> Repo.all()
   end
 
   @doc """
@@ -376,7 +283,7 @@ defmodule Skoller.Classes do
   The syllabus worker statuses are only going to return syllabus workable schools.
 
   ## Returns
-  `[%{id: Skoller.Classes.Status.id, name: Skoller.Classes.Status.name, classes: Integer}]` or `nil`
+  `[%{id: Skoller.ClassesStatuses.Status.id, name: Skoller.ClassesStatuses.Status.name, classes: Integer}]` or `nil`
   """
   def get_class_status_counts() do
     statuses = from(status in Status)

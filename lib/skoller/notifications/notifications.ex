@@ -17,6 +17,7 @@ defmodule Skoller.Notifications do
   alias Skoller.ChatComments.Comment
   alias Skoller.Notifications.ManualLog
   alias Services.Notification
+  alias Skoller.Classes.EditableClasses
 
   import Ecto.Query
 
@@ -50,7 +51,7 @@ defmodule Skoller.Notifications do
     from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
     |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
-    |> join(:inner, [sc, stu, usr], class in subquery(Classes.get_editable_classes_subquery()), sc.class_id == class.id)
+    |> join(:inner, [sc, stu, usr], class in subquery(EditableClasses.get_editable_classes_subquery()), sc.class_id == class.id)
     |> where([sc, stu, usr], sc.id == ^student_class_id)
     |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
     |> select([sc, stu, usr], %{user: usr, student: stu})

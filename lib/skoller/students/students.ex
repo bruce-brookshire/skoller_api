@@ -9,7 +9,7 @@ defmodule Skoller.Students do
   alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Classes
-  alias Skoller.Classes.Status
+  alias Skoller.ClassesStatuses.Status
   alias Skoller.Professors.Professor
   alias Skoller.Periods.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
@@ -23,6 +23,7 @@ defmodule Skoller.Students do
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
+  alias Skoller.Classes.EditableClasses
 
   import Ecto.Query
 
@@ -64,7 +65,7 @@ defmodule Skoller.Students do
   """
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
+    |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.one()
   end
@@ -290,7 +291,7 @@ defmodule Skoller.Students do
   * professor_name
     * `Skoller.Professors.Professor` :name
   * class_status
-    * `Skoller.Classes.Status` :id
+    * `Skoller.ClassesStatuses.Status` :id
     * For ghost classes, use 0.
   * class_name
     * `Skoller.Classes.Class` :name
