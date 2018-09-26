@@ -754,7 +754,7 @@ defmodule Skoller.Students do
   defp add_points_to_student(%{enrolled_by: enrolled_by}) when not(is_nil(enrolled_by)) do
     sc = StudentClasses.get_student_class_by_id!(enrolled_by)
 
-    sc.id
+    sc.student_id
     |> StudentPoints.add_points_to_student(@class_referral_points_name)
   end
   defp add_points_to_student(_student_class), do: {:ok, nil}
