@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias Skoller.ClassDocs
   alias Skoller.Sammi
   alias Skoller.Classes
+  alias Skoller.Classes.ClassStatuses
 
   import Ecto.Query
   import SkollerWeb.Plugs.Auth
@@ -38,7 +39,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{doc: doc}} ->

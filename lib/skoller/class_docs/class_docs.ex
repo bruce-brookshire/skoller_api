@@ -8,7 +8,7 @@ defmodule Skoller.ClassDocs do
   alias Skoller.Repo
   alias Skoller.ClassDocs.Doc
   alias Skoller.MapErrors
-  alias Skoller.Classes
+  alias Skoller.Classes.ClassStatuses
 
   require Logger
 
@@ -82,7 +82,7 @@ defmodule Skoller.ClassDocs do
   end
 
   defp check_statuses(classes, docs) do
-    status = classes |> Enum.map(&Classes.check_status(&1, %{doc: elem(docs |> Enum.find(fn(x) -> elem(x, 1).class_id == &1.id end), 1)}))
+    status = classes |> Enum.map(&ClassStatuses.check_status(&1, %{doc: elem(docs |> Enum.find(fn(x) -> elem(x, 1).class_id == &1.id end), 1)}))
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 

@@ -26,6 +26,7 @@ defmodule Skoller.Students do
   alias Skoller.Classes.EditableClasses
   alias Skoller.Classes.Schools
   alias Skoller.Classes.Docs
+  alias Skoller.Classes.ClassStatuses
 
   import Ecto.Query
 
@@ -737,7 +738,7 @@ defmodule Skoller.Students do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
     |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
-    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
     |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
