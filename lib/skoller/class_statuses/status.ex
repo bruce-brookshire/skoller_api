@@ -1,4 +1,4 @@
-defmodule Skoller.ClassesStatuses.Status do
+defmodule Skoller.ClassStatuses.Status do
   @moduledoc false
 
   # @syllabus_status 200
@@ -11,7 +11,7 @@ defmodule Skoller.ClassesStatuses.Status do
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.ClassesStatuses.Status
+  alias Skoller.ClassStatuses.Status
 
   # The primary key is a normal, non-incrementing ID. Seeded by seed
   # file or migration.

@@ -5,13 +5,13 @@ defmodule Skoller.ClassStatuses.Schools do
 
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
-  alias Skoller.ClassesStatuses.Status
+  alias Skoller.ClassStatuses.Status
   alias Skoller.Repo
 
   import Ecto.Query
 
   @doc """
-  Returns the `Skoller.ClassesStatuses.Status` name and a count of `Skoller.Classes.Class` in the status
+  Returns the `Skoller.ClassStatuses.Status` name and a count of `Skoller.Classes.Class` in the status
 
   ## Examples
 

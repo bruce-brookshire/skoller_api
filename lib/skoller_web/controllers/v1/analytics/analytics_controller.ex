@@ -19,6 +19,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Classes
   alias Skoller.Chats
   alias Skoller.Classes.Schools
+  alias Skoller.ClassStatuses.Classes, as: StatusClasses
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -42,7 +43,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
             |> Map.put(:date_start, start_date)
             |> Map.put(:date_end, end_date)
 
-    completed_classes = Classes.get_completed_class_count(dates, params)
+    completed_classes = StatusClasses.get_completed_class_count(dates, params)
     completed_by_diy = Classes.classes_completed_by_diy_count(dates, params)
     avg_classes = avg_classes(dates, params)
     avg_days_out = get_avg_days_out(params) |> convert_to_float()
@@ -54,7 +55,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:enrollment, enrollment_count(dates, params))
     |> Map.put(:completed_class, completed_classes)
     |> Map.put(:communitites, communitites(dates, params))
-    |> Map.put(:class_in_review, Classes.get_class_in_review_count(dates, params))
+    |> Map.put(:class_in_review, StatusClasses.get_class_in_review_count(dates, params))
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
     |> Map.put(:enrolled_class_syllabus_count, Students.get_enrolled_class_with_syllabus_count(dates, params))

@@ -11,7 +11,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.ClassDocs.Doc
   alias Skoller.Schools.School
   alias Skoller.Students
-  alias Skoller.ClassesStatuses.Status
+  alias Skoller.ClassStatuses.Status
   alias Skoller.Locks
   alias Skoller.Settings
   alias Skoller.FourDoor.FourDoorOverride

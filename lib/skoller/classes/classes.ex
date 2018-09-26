@@ -6,7 +6,7 @@ defmodule Skoller.Classes do
   alias Skoller.Repo
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
-  alias Skoller.ClassesStatuses.Status
+  alias Skoller.ClassStatuses.Status
   alias Skoller.ClassDocs.Doc
   alias Skoller.Locks.Lock
   alias Skoller.Users.User
@@ -38,8 +38,6 @@ defmodule Skoller.Classes do
   @weight_lock 100
   @assignment_lock 200
   @review_lock 300
-
-  @in_review_status 300
 
   @maint_status 999
   @maint_name "Under Maintenance"
@@ -151,48 +149,6 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets a count of completed classes created between the dates.
-
-  ## Dates
-   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
-
-  ## Params
-   * `Map`, `%{"school_id" => Id}` filters by school
-
-  ## Returns
-  `Integer`
-  
-  """
-  def get_completed_class_count(%{date_start: date_start, date_end: date_end}, params) do
-    from(c in Class)
-    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
-    |> where([c], c.class_status_id == @completed_status)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
-  Gets a count of classes in review (has syllabus but not complete) created between the dates.
-
-  ## Dates
-   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
-
-  ## Params
-   * `Map`, `%{"school_id" => Id}` filters by school
-
-  ## Returns
-  `Integer`
-  
-  """
-  def get_class_in_review_count(%{date_start: date_start, date_end: date_end}, params) do
-    from(c in Class)
-    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
-    |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
   Gets a count of student created classes created between the dates.
 
   ## Dates
@@ -265,7 +221,7 @@ defmodule Skoller.Classes do
   The syllabus worker statuses are only going to return syllabus workable schools.
 
   ## Returns
-  `[%{id: Skoller.ClassesStatuses.Status.id, name: Skoller.ClassesStatuses.Status.name, classes: Integer}]` or `nil`
+  `[%{id: Skoller.ClassStatuses.Status.id, name: Skoller.ClassStatuses.Status.name, classes: Integer}]` or `nil`
   """
   def get_class_status_counts() do
     statuses = from(status in Status)
