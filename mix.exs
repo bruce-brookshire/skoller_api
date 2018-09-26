@@ -45,6 +45,7 @@ defmodule Skoller.Mixfile do
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
       {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.13"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
