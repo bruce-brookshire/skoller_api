@@ -75,8 +75,6 @@ defmodule Skoller.Schools do
   end
 
   defp update_school_times(school, %{timezone: old_timezone}) do
-    require IEx
-    IEx.pry
     case old_timezone == school.timezone do
       true ->
         Ecto.Multi.new()
