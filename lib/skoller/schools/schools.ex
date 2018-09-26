@@ -74,6 +74,9 @@ defmodule Skoller.Schools do
     |> Repo.all()
   end
 
+  defp update_school_times(school, %{timezone: nil}) do
+    Timezones.process_timezone_change("Etc/UTC", school)
+  end
   defp update_school_times(school, %{timezone: old_timezone}) do
     case old_timezone == school.timezone do
       true ->
@@ -84,6 +87,7 @@ defmodule Skoller.Schools do
   end
 
   defp process_timezone_updates(changeset, _school, nil), do: changeset
+  defp process_timezone_updates(changeset, %{timezone: nil}, new_timezone), do: changeset |> Ecto.Changeset.change(%{timezone: new_timezone})
   defp process_timezone_updates(changeset, %{timezone: old_timezone}, new_timezone) do
     case old_timezone == new_timezone do
       true -> 
