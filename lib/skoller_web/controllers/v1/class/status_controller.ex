@@ -4,8 +4,8 @@ defmodule SkollerWeb.Api.V1.Class.StatusController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StatusView
-  alias Skoller.Classes
-  alias Skoller.ClassStatuses
+  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses, as: Statuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -15,12 +15,12 @@ defmodule SkollerWeb.Api.V1.Class.StatusController do
   plug :verify_role, %{roles: [@admin_role, @syllabus_worker_role]}
 
   def index(conn, %{}) do
-    statuses = ClassStatuses.get_statuses()
+    statuses = Statuses.get_statuses()
     render(conn, StatusView, "index.json", statuses: statuses)
   end
 
   def hub(conn, _params) do
-    statuses = Classes.get_class_status_counts()
+    statuses = ClassStatuses.get_class_status_counts()
     render(conn, StatusView, "index.json", statuses: statuses)
   end
 end

@@ -25,6 +25,7 @@ defmodule Skoller.Students do
   alias Skoller.StudentPoints
   alias Skoller.Classes.EditableClasses
   alias Skoller.Classes.Schools
+  alias Skoller.Classes.Docs
 
   import Ecto.Query
 
@@ -262,7 +263,7 @@ defmodule Skoller.Students do
   def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> join(:inner, [c, cs], d in subquery(Classes.classes_with_syllabus_subquery()), d.class_id == c.id)
+    |> join(:inner, [c, cs], d in subquery(Docs.classes_with_syllabus_subquery()), d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)

@@ -19,7 +19,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Classes
   alias Skoller.Chats
   alias Skoller.Classes.Schools
-  alias Skoller.ClassStatuses.Classes, as: StatusClasses
+  alias Skoller.Classes.ClassStatuses, as: StatusClasses
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query

@@ -11,7 +11,8 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Students
   alias Skoller.Mods
   alias Skoller.Classes.Note
-  alias Skoller.ClassStatuses
+  alias Skoller.ClassStatuses, as: Statuses
+  alias Skoller.Classes.ClassStatuses
 
   import Bamboo.Email
 
@@ -39,7 +40,7 @@ defmodule Skoller.AdminClasses do
    * A class cannot be moved from a status considered complete, to an incomplete status.
    * If a class is moved to a lower status, any locks will be destroyed (down to the new status).
    * If a class is moved back to needs syllabus, it will email students in an attempt to re-upload.
-   * If a class is completed, `Classes.evaluate_class_completion/2` is called.
+   * If a class is completed, `Skoller.Classes.ClassStatuses.evaluate_class_completion/2` is called.
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` is a map containing:
@@ -50,7 +51,7 @@ defmodule Skoller.AdminClasses do
     old_class = Classes.get_class_by_id!(class_id)
     |> Repo.preload(:class_status)
 
-    status = ClassStatuses.get_status_by_id!(status_id)
+    status = Statuses.get_status_by_id!(status_id)
 
     changeset = old_class
     |> Ecto.Changeset.change(%{class_status_id: status_id})
@@ -66,7 +67,7 @@ defmodule Skoller.AdminClasses do
         Users.get_users_in_class(class.id)
         |> Enum.each(&send_need_syllabus_email(&1, class))
       {:ok, %{class: class}} ->
-        Classes.evaluate_class_completion(old_class, class)
+        ClassStatuses.evaluate_class_completion(old_class, class)
       _ -> nil
     end
 

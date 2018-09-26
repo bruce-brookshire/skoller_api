@@ -13,6 +13,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Locks
   alias Skoller.FourDoor
   alias Skoller.MapErrors
+  alias Skoller.Classes.ClassStatuses
 
   import SkollerWeb.Plugs.Auth
 
@@ -58,7 +59,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
     case Repo.transaction(multi) do
       {:ok, %{status: class}} -> 
-        Classes.evaluate_class_completion(old_class, class)
+        ClassStatuses.evaluate_class_completion(old_class, class)
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn
