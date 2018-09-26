@@ -56,7 +56,8 @@ defmodule Skoller.Mixfile do
       {:ex_twilio, "~> 0.5.0"},
       {:csv, "~> 2.0.0"},
       {:bamboo, "~> 0.8"},
-      {:bamboo_smtp, "~> 1.4.0"}
+      {:bamboo_smtp, "~> 1.4.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 

@@ -8,6 +8,7 @@ defmodule Skoller.Schools do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Timezone
   alias Skoller.FourDoor
+  alias Skoller.Schools.Timezones
 
   import Ecto.Query
 
@@ -34,10 +35,16 @@ defmodule Skoller.Schools do
 
   def update_school(school_old, params) do
     {:ok, timezone} = get_timezone(params)
-    school_old
+    changeset = school_old
     |> School.changeset_update(params)
-    |> Ecto.Changeset.change(%{timezone: timezone})
-    |> Repo.update()
+    |> process_timezone_updates(school_old, timezone)
+
+    {:ok, results} = Ecto.Multi.new
+    |> Ecto.Multi.update(:school, changeset)
+    |> Ecto.Multi.merge(&update_school_times(&1.school, school_old))
+    |> Repo.transaction()
+
+    {:ok, results.school}
     |> add_four_door()
   end
 
@@ -66,6 +73,28 @@ defmodule Skoller.Schools do
     |> filter(filters)
     |> Repo.all()
   end
+
+  defp update_school_times(school, %{timezone: old_timezone}) do
+    require IEx
+    IEx.pry
+    case old_timezone == school.timezone do
+      true ->
+        Ecto.Multi.new()
+      false ->
+        Timezones.process_timezone_change(old_timezone, school)
+    end
+  end
+
+  defp process_timezone_updates(changeset, _school, nil), do: changeset
+  defp process_timezone_updates(changeset, %{timezone: old_timezone}, new_timezone) do
+    case old_timezone == new_timezone do
+      true -> 
+        changeset
+      false ->
+        changeset |> Ecto.Changeset.change(%{timezone: new_timezone})
+    end
+  end
+  defp process_timezone_updates(changeset, _old_school, _timezone), do: changeset
 
   # There are two of these, one for string maps and one for atom maps.
   defp get_timezone(%{adr_locality: loc, adr_country: country, adr_region: region}) do
