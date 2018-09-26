@@ -13,6 +13,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Locks
   alias Skoller.FourDoor
   alias Skoller.MapErrors
+  alias Skoller.Classes.ClassStatuses
 
   import SkollerWeb.Plugs.Auth
 
@@ -54,11 +55,11 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_class(user, params, &1))
-    |> Ecto.Multi.run(:status, &Classes.check_status(old_class, &1))
+    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(old_class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{status: class}} -> 
-        Classes.evaluate_class_completion(old_class, class)
+        ClassStatuses.evaluate_class_completion(old_class, class)
         conn |> send_resp(204, "")
       {:error, _, failed_value, _} ->
         conn

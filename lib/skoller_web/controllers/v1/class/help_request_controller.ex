@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
+  alias Skoller.Classes.ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -29,7 +30,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
     
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:help_request, changeset)
-    |> Ecto.Multi.run(:class, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
 
     case Repo.transaction(multi) do
       {:ok, %{class: class}} ->

@@ -3,12 +3,10 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Assignments.Assignment
-  alias Skoller.Repo
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.StudentAssignments
-  alias Skoller.Classes.Weights
+  alias Skoller.Assignments
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
@@ -26,17 +24,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   plug :check_lock, %{type: :assignment, using: :class_id}
 
   def create(conn, %{"class_id" => class_id} = params) do
-    params = params |> Map.put_new("weight_id", nil)
-    changeset = %Assignment{}
-                |> Assignment.changeset(params)
-                |> check_weight_id(params)
-                |> validate_class_weight(class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
-
-    case Repo.transaction(multi) do
+    case Assignments.create_assignment(class_id, params) do
       {:ok, %{assignment: assignment}} ->
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->
@@ -51,9 +39,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   end
 
   def delete(conn, %{"id" => id}) do
-    class = Repo.get!(Assignment, id)
-
-    case Repo.delete(class) do
+    case Assignments.delete_assignment(id) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
@@ -65,18 +51,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    params = params |> Map.put_new("weight_id", nil)
-    assign_old = Repo.get!(Assignment, id)
-    changeset = assign_old
-                |> Assignment.changeset(params)
-                |> check_weight_id(params)
-                |> validate_class_weight(assign_old.class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.update(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.update_assignments(&1))
-
-    case Repo.transaction(multi) do
+    case Assignments.update_assignment(id, params) do
       {:ok, %{assignment: assignment}} ->
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->
@@ -84,25 +59,4 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
         |> MultiError.render(failed_value)
     end
   end
-
-  defp check_weight_id(changeset, %{"weight_id" => nil}) do
-    changeset |> Ecto.Changeset.force_change(:weight_id, nil)
-  end
-  defp check_weight_id(changeset, _params), do: changeset
-
-  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset, class_id) do
-    weights = Weights.get_class_weights(class_id)
-
-    case weights do
-      [] -> changeset
-      _ -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight can't be null when weights exist.")
-    end
-  end
-  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) do
-    case Weights.get_class_weight_by_ids(class_id, weight_id) do
-      nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
-      _ -> changeset
-    end
-  end
-  defp validate_class_weight(changeset, _class_id), do: changeset
 end

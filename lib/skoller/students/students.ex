@@ -9,7 +9,7 @@ defmodule Skoller.Students do
   alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Classes
-  alias Skoller.Classes.Status
+  alias Skoller.ClassStatuses.Status
   alias Skoller.Professors.Professor
   alias Skoller.Periods.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
@@ -23,6 +23,10 @@ defmodule Skoller.Students do
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
+  alias Skoller.Classes.EditableClasses
+  alias Skoller.Classes.Schools
+  alias Skoller.Classes.Docs
+  alias Skoller.Classes.ClassStatuses
 
   import Ecto.Query
 
@@ -64,7 +68,7 @@ defmodule Skoller.Students do
   """
   def get_active_student_class_by_ids(class_id, student_id) do
     from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in subquery(Classes.get_editable_classes_subquery()), class.id == sc.class_id)
+    |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.one()
   end
@@ -209,7 +213,7 @@ defmodule Skoller.Students do
   def get_student_subquery(%{"school_id" => _school_id} = params) do
     from(s in Student)
     |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([s, sc], sc.is_dropped == false)
     |> distinct([s], s.id)
   end
@@ -223,7 +227,7 @@ defmodule Skoller.Students do
   """
   def get_enrolled_student_classes_subquery(params \\ %{}) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([sc], sc.is_dropped == false)
   end
 
@@ -251,8 +255,8 @@ defmodule Skoller.Students do
   """
   def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Classes.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> join(:inner, [c, cs], d in subquery(Classes.classes_with_syllabus_subquery()), d.class_id == c.id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c, cs], d in subquery(Docs.classes_with_syllabus_subquery()), d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
@@ -282,7 +286,7 @@ defmodule Skoller.Students do
   * professor_name
     * `Skoller.Professors.Professor` :name
   * class_status
-    * `Skoller.Classes.Status` :id
+    * `Skoller.ClassStatuses.Status` :id
     * For ghost classes, use 0.
   * class_name
     * `Skoller.Classes.Class` :name
@@ -373,7 +377,7 @@ defmodule Skoller.Students do
   def get_common_notification_times(num, params) do
     from(s in Student)
     |> join(:inner, [s], sc in subquery(get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], sfc in subquery(Classes.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
+    |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
     |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
     |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
     |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
@@ -726,7 +730,7 @@ defmodule Skoller.Students do
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
     |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
-    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
     |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
     |> Ecto.Multi.run(:mods, &add_public_mods(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
