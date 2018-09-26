@@ -18,6 +18,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Students
   alias Skoller.Classes
   alias Skoller.Chats
+  alias Skoller.Classes.Schools
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -176,7 +177,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp get_chat_participating_students(dates, params) do
     post_students = from(p in Post)
-    |> join(:inner, [p], c in subquery(Classes.get_school_from_class_subquery(params)), p.class_id == c.class_id)
+    |> join(:inner, [p], c in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == c.class_id)
     |> where([p], fragment("?::date", p.inserted_at) >= ^dates.date_start and fragment("?::date", p.inserted_at) <= ^dates.date_end)
     |> distinct([p], p.student_id)
     |> select([p], p.student_id)
@@ -184,7 +185,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
     comment_students = from(c in Comment)
     |> join(:inner, [c], p in Post, p.id == c.chat_post_id)
-    |> join(:inner, [c, p], cl in subquery(Classes.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
+    |> join(:inner, [c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> where([c], c.student_id not in ^post_students)
     |> distinct([c], c.student_id)
@@ -196,7 +197,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     reply_students = from(r in Reply)
     |> join(:inner, [r], c in Comment, r.chat_comment_id == c.id)
     |> join(:inner, [r, c], p in Post, p.id == c.chat_post_id)
-    |> join(:inner, [r, c, p], cl in subquery(Classes.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
+    |> join(:inner, [r, c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
     |> where([r], fragment("?::date", r.inserted_at) >= ^dates.date_start and fragment("?::date", r.inserted_at) <= ^dates.date_end)
     |> where([r], r.student_id not in ^students)
     |> distinct([r], r.student_id)
@@ -225,14 +226,14 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp get_chat_post_count(dates, params) do
     from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
     |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_chat_classes(dates, params) do
     from(cp in subquery(get_unique_chat_class(dates)))
-    |> join(:inner, [cp], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -269,7 +270,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     from(m in Mod)
     |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
     |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, act, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == true)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
@@ -280,7 +281,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     from(m in Mod)
     |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
     |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, act, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == false)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
@@ -290,7 +291,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   defp get_mod_count(dates, params) do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -298,7 +299,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   defp get_mod_type_count(type, dates, params) do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -307,7 +308,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   defp get_auto_updates(type, dates, params) do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_auto_update == true)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -316,7 +317,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   defp get_private_mod_count(type, dates, params) do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, a], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == true)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -343,7 +344,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp classes_multiple_files(dates, params) do
     from(d in Doc)
-    |> join(:inner, [d], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == d.class_id)
+    |> join(:inner, [d], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == d.class_id)
     |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
     |> group_by([d], d.class_id)
@@ -369,14 +370,14 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
 
   defp skoller_assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -384,7 +385,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp student_assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == true)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -392,7 +393,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp assign_due_date_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Classes.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
     |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> where([a], not(is_nil(a.due)))

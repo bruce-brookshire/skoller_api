@@ -19,6 +19,7 @@ defmodule Skoller.Classes do
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Syllabi
   alias Skoller.ClassNotifications
+  alias Skoller.Classes.Schools, as: ClassSchools
 
   import Ecto.Query
 
@@ -130,25 +131,6 @@ defmodule Skoller.Classes do
   end
 
   @doc """
-  Gets all class_id and school_id.
-
-  ## Params
-  `%{"school_id" => id}`, gets all classes in in school
-  """
-  def get_school_from_class_subquery(_params \\ %{})
-  def get_school_from_class_subquery(%{"school_id" => school_id}) do
-    from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> where([c, p], p.school_id == ^school_id)
-    |> select([c, p], %{class_id: c.id, school_id: p.school_id})
-  end
-  def get_school_from_class_subquery(_params) do
-    from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
-    |> select([c, p], %{class_id: c.id, school_id: p.school_id})
-  end
-
-  @doc """
   Gets a count of classes created between the dates.
 
   ## Dates
@@ -163,7 +145,7 @@ defmodule Skoller.Classes do
   """
   def get_class_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -183,7 +165,7 @@ defmodule Skoller.Classes do
   """
   def get_completed_class_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id == @completed_status)
     |> Repo.aggregate(:count, :id)
@@ -204,7 +186,7 @@ defmodule Skoller.Classes do
   """
   def get_class_in_review_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id != @completed_status and c.class_status_id >= @in_review_status)
     |> Repo.aggregate(:count, :id)
@@ -225,7 +207,7 @@ defmodule Skoller.Classes do
   """
   def student_created_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.is_student_created == true)
     |> Repo.aggregate(:count, :id)
@@ -256,7 +238,7 @@ defmodule Skoller.Classes do
   """
   def classes_completed_by_diy_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> join(:inner, [c, cs], l in Lock, l.class_id == c.id and l.class_lock_section_id == @diy_complete_lock and l.is_completed == true)
     |> join(:inner, [c, cs, l], u in User, u.id == l.user_id)
     |> join(:inner, [c, cs, l, u], r in UserRole, r.user_id == u.id)

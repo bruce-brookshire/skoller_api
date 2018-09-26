@@ -6,8 +6,8 @@ defmodule Skoller.EnrolledSchools do
   alias Skoller.Repo
   alias Skoller.Schools.School
   alias Skoller.Students
-  alias Skoller.Classes
   alias Skoller.Students.Student
+  alias Skoller.Classes.Schools
 
   import Ecto.Query
 
@@ -35,7 +35,7 @@ defmodule Skoller.EnrolledSchools do
   def get_student_schools_subquery() do
     from(student in Student)
     |> join(:inner, [student], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == student.id)
-    |> join(:inner, [student, sc], class in subquery(Classes.get_school_from_class_subquery()), sc.class_id == class.class_id)
+    |> join(:inner, [student, sc], class in subquery(Schools.get_school_from_class_subquery()), sc.class_id == class.class_id)
     |> distinct([student, sc, class], [student.id, class.school_id])
     |> select([student, sc, class], %{student_id: student.id, school_id: class.school_id})
   end

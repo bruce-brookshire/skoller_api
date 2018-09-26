@@ -24,6 +24,7 @@ defmodule Skoller.Students do
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
   alias Skoller.Classes.EditableClasses
+  alias Skoller.Classes.Schools
 
   import Ecto.Query
 
@@ -218,7 +219,7 @@ defmodule Skoller.Students do
   def get_student_subquery(%{"school_id" => _school_id} = params) do
     from(s in Student)
     |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([s, sc], sc.is_dropped == false)
     |> distinct([s], s.id)
   end
@@ -232,7 +233,7 @@ defmodule Skoller.Students do
   """
   def get_enrolled_student_classes_subquery(params \\ %{}) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([sc], sc.is_dropped == false)
   end
 
@@ -260,7 +261,7 @@ defmodule Skoller.Students do
   """
   def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Classes.get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
     |> join(:inner, [c, cs], d in subquery(Classes.classes_with_syllabus_subquery()), d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
@@ -382,7 +383,7 @@ defmodule Skoller.Students do
   def get_common_notification_times(num, params) do
     from(s in Student)
     |> join(:inner, [s], sc in subquery(get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], sfc in subquery(Classes.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
+    |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
     |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
     |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
     |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
