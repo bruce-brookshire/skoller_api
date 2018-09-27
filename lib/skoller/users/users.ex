@@ -13,10 +13,13 @@ defmodule Skoller.Users do
   alias Skoller.CustomSignups
   alias Skoller.Users.Report
   alias Skoller.MapErrors
+  alias Skoller.StudentPoints
 
   import Ecto.Query
 
   @student_role 100
+
+  @student_referral_points_name "Student Referral"
 
   @doc """
   Gets student users.
@@ -87,6 +90,7 @@ defmodule Skoller.Users do
     |> insert_user(params)
     |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
+    |> Ecto.Multi.run(:points, &add_points_to_student(&1.user))
     
     case multi |> Repo.transaction() do
       {:error, _, failed_val, _} ->
@@ -162,6 +166,12 @@ defmodule Skoller.Users do
     |> Repo.all()
   end
 
+  defp add_points_to_student(%{student: %{enrolled_by: enrolled_by}}) when not(is_nil(enrolled_by)) do
+    enrolled_by
+    |> StudentPoints.add_points_to_student(@student_referral_points_name)
+  end
+  defp add_points_to_student(_student_class), do: {:ok, nil}
+
   # Generates a verification code if admin: true is not passed in through opts.
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
     case get_opt(opts, :admin) do
@@ -190,6 +200,14 @@ defmodule Skoller.Users do
     case enrolled_by do
       nil -> u_changeset
       enrolled_by -> Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.id)})
+    end
+  end
+  # Adds enrolled_by if "enrollment_link" is present in params.
+  defp get_enrolled_by(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, %{"student" => %{"enrollment_link" => link}}) do
+    enrolled_by = Students.get_student_class_by_enrollment_link(link)
+    case enrolled_by do
+      nil -> u_changeset
+      enrolled_by -> Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.student.id)})
     end
   end
   defp get_enrolled_by(changeset, _params), do: changeset

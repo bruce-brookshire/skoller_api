@@ -13,8 +13,8 @@ defmodule Skoller.Chats do
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
-  alias Skoller.Classes
   alias Skoller.ChatPosts.Like
+  alias Skoller.Classes.Schools
 
   import Ecto.Query
 
@@ -188,7 +188,7 @@ defmodule Skoller.Chats do
   # This gets a list of classes and post count, with an optional school parameter.
   defp get_chat_activity_subquery(dates, params) do
     from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Classes.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
     |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
     |> group_by([cp], cp.class_id)
     |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})

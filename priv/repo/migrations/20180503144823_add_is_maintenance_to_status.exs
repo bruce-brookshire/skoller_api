@@ -2,7 +2,7 @@ defmodule Skoller.Repo.Migrations.AddIsMaintenanceToStatus do
   use Ecto.Migration
 
   alias Skoller.Repo
-  alias Skoller.Classes.Status
+  alias Skoller.ClassStatuses.Status
 
   def change do
     alter table(:class_statuses) do

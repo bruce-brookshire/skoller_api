@@ -4,8 +4,8 @@ defmodule Skoller.Mixfile do
   def project do
     [
       app: :skoller,
-      version: "2.1.0",
-      elixir: "~> 1.4",
+      version: "2.2.1",
+      elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
@@ -45,6 +45,7 @@ defmodule Skoller.Mixfile do
       {:arc, "~> 0.10.0"},
       {:arc_ecto, "~> 0.10.0"},
       {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.13"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
@@ -71,7 +72,8 @@ defmodule Skoller.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs", "seed.dev"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      "ecto.migrate_s": ["ecto.migrate.startup", "ecto.migrate"]
     ]
   end
 end

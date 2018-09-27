@@ -7,6 +7,7 @@ defmodule Skoller.ChangeRequests do
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Classes
   alias Skoller.Mailer
+  alias Skoller.Classes.ClassStatuses
 
   import Bamboo.Email
   
@@ -35,7 +36,7 @@ defmodule Skoller.ChangeRequests do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)
-    |> Ecto.Multi.run(:class_status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
 
     case multi do

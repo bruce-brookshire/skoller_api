@@ -3,10 +3,10 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Classes
   alias SkollerWeb.Admin.SchoolView
   alias Skoller.Schools
   alias Skoller.EnrolledSchools
+  alias Skoller.ClassStatuses.Schools, as: ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -46,6 +46,6 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
 
   defp put_class_statuses(%{school: school} = params) do
     params
-    |> Map.put(:classes, Classes.get_status_counts(school.id))
+    |> Map.put(:classes, ClassStatuses.get_status_counts(school.id))
   end
 end

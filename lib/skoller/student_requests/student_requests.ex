@@ -9,6 +9,7 @@ defmodule Skoller.StudentRequests do
   alias Skoller.Classes
   alias Skoller.MapErrors
   alias Skoller.StudentRequests.Doc
+  alias Skoller.Classes.ClassStatuses
 
   @syllabus_request 100
 
@@ -21,7 +22,7 @@ defmodule Skoller.StudentRequests do
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` has the following
    * `{:student_request, Skoller.StudentRequests.StudentRequest}`
    * `{:doc_upload, Skoller.StudentRequests.Doc}`
-   * `{:status, Skoller.Classes.check_status/2}`
+   * `{:status, Skoller.Classes.ClassStatuses.check_status/2}`
   """
   def create(user, class_id, params) do
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
@@ -31,7 +32,7 @@ defmodule Skoller.StudentRequests do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
     |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
-    |> Ecto.Multi.run(:status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
   end
 
@@ -43,7 +44,7 @@ defmodule Skoller.StudentRequests do
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where map contains
    * `{:student_request, Skoller.StudentRequests.StudentRequest}`
-   * `{:class_status, Skoller.Classes.check_status/2}`
+   * `{:class_status, Skoller.Classes.ClassStatuses.check_status/2}`
   """
   def complete(request_id) do
     student_request_old = Repo.get!(StudentRequest, request_id)
@@ -54,7 +55,7 @@ defmodule Skoller.StudentRequests do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:student_request, changeset)
-    |> Ecto.Multi.run(:class_status, &Classes.check_status(class, &1))
+    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
   end
 
