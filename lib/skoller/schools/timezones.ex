@@ -30,6 +30,7 @@ defmodule Skoller.Schools.Timezones do
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
+  defp update_assignment(%{due: nil} = assignment, _old_timezone, _new_timezone), do: {:ok, assignment}
   defp update_assignment(assignment, old_timezone, new_timezone) do
     new_date = assignment.due
     |> Timex.to_datetime(old_timezone)
