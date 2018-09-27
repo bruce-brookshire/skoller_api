@@ -72,7 +72,8 @@ defmodule Skoller.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs", "seed.dev"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      "ecto.migrate_s": ["ecto.migrate.startup", "ecto.migrate"]
     ]
   end
 end
