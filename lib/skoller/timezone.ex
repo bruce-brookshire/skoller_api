@@ -24,7 +24,14 @@ defmodule Skoller.Timezone do
           1 -> 
             zone = zones |> List.first()
             {:ok, zone["zoneName"]}
-          _num -> {:ok, nil}
+          _num -> 
+            zone = zones |> List.first()
+            case zones |> Enum.all?(& &1["zoneName"] == zone["zoneName"]) do
+              true ->
+                {:ok, zone["zoneName"]}
+              false ->
+                {:ok, nil}
+            end
         end
       {:error, error} ->
         {:error, error}
@@ -37,6 +44,8 @@ defmodule Skoller.Timezone do
     Logger.info(inspect(params))
     case Timezone.get(url, [], params: params) do
       {:ok, response} ->
+        Logger.debug("Received: ")
+        Logger.debug(inspect(response.body))
         {:ok, response.body}
       {:error, response} ->
         Logger.error("timezone call failed.")
