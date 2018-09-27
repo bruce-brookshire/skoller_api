@@ -27,6 +27,7 @@ defmodule SkollerWeb.Api.BounceController do
   def bounce(conn, params) do
     case params["SubscribeURL"] do
       nil -> 
+        Logger.error(inspect(params))
         conn |> send_resp(403, "")
       url ->
         HTTPoison.get(url)
