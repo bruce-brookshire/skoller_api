@@ -20,7 +20,7 @@ defmodule SkollerWeb.AssignmentView do
       due: assignment.due,
       name: assignment.name,
       weight_id: assignment.weight_id,
-      weight: Decimal.to_float(Decimal.round(weight, 2)),
+      weight: Decimal.to_float(Decimal.round(weight, 4)),
       posts: render_many(assignment.posts, SkollerWeb.Assignment.PostView, "post.json")
     }
   end

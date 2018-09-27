@@ -16,7 +16,7 @@ defmodule SkollerWeb.Class.WeightView do
         %{
             id: weight.id,
             name: weight.name,
-            weight: Decimal.to_float(Decimal.round(weight.weight, 2)),
+            weight: Decimal.to_float(Decimal.round(weight.weight, 4)),
             inserted_at: weight.inserted_at
         }
     end
