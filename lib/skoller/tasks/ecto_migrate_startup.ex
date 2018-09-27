@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Ecto.Migrate.Startup do
   """
   use Mix.Task
 
-  def run(args) do
+  def run(_args) do
     Mix.shell.info("Starting apps required for ecto.migrate...")
     Application.ensure_all_started(:timex)
   end
