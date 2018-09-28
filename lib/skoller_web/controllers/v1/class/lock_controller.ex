@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Class.LockView
   alias Skoller.Classes
-  alias Skoller.Users
+  alias Skoller.Locks.Users
   alias Skoller.Locks
   alias Skoller.FourDoor
   alias Skoller.MapErrors
