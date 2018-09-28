@@ -20,18 +20,6 @@ defmodule Skoller.Users do
   @student_referral_points_name "Student Referral"
 
   @doc """
-  Gets student users.
-
-  ## Returns
-  `[Skoller.Users.User]` or `[]`
-  """
-  def get_student_users() do
-    from(u in User)
-    |> where([u], not(is_nil(u.student_id)))
-    |> Repo.all()
-  end
-
-  @doc """
   Gets a user by id with `:roles` and `:student`
 
   ## Returns

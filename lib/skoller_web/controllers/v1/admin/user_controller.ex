@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Repo
   alias Skoller.Students
   alias Skoller.StudentClasses
+  alias Skoller.Users.Students, as: UserStudents
 
   import SkollerWeb.Plugs.Auth
   
