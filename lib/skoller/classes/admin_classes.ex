@@ -6,13 +6,13 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Repo
   alias Skoller.Mailer
   alias Skoller.Classes
-  alias Skoller.Users
   alias Skoller.Locks
   alias Skoller.Students
   alias Skoller.Mods
   alias Skoller.Classes.Note
   alias Skoller.ClassStatuses, as: Statuses
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.StudentClasses.Users
 
   import Bamboo.Email
 
