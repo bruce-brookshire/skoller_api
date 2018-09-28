@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Students
   alias Skoller.StudentAssignments
   alias Skoller.Mods
   alias Skoller.AutoUpdates
@@ -46,7 +45,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def show(conn, %{"id" => id}) do
-    student_assignment = Students.get_student_assignment_by_id(id, :weight)
+    student_assignment = StudentClasses.get_student_assignment_by_id(id, :weight)
     
     pending_mods = Mods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
@@ -55,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    case Students.get_student_assignment_by_id(id) do
+    case StudentClasses.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -74,7 +73,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def delete(conn, %{"id" => id} = params) do
-    case Students.get_student_assignment_by_id(id) do
+    case StudentClasses.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")

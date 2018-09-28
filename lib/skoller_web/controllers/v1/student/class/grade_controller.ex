@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias Skoller.Students
+  alias Skoller.StudentAssignments.StudentClasses
 
   import SkollerWeb.Plugs.Auth
   
@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   plug :verify_member, %{of: :student_assignment, using: :assignment_id}
 
   def create(conn, %{"assignment_id" => assignment_id} = params) do
-    case Students.get_student_assignment_by_id(assignment_id) do
+    case StudentClasses.get_student_assignment_by_id(assignment_id) do
       nil ->
         conn
         |> send_resp(401, "")
