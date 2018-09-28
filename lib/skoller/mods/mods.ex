@@ -333,7 +333,7 @@ defmodule Skoller.Mods do
   # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
   def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
     student_assignment = student_assignment |> Repo.preload(:student_class)
-    student_class = Students.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
     student_assignment
     |> find_accepted_mods_for_student_assignment()
     |> Enum.map(&process_existing_mod(&1, student_class, params))

@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias Skoller.Students
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -40,7 +41,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
 
   def show(conn, %{"student_id" => student_id, "class_id" => class_id}) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     student_class = student_class
                     |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
@@ -52,7 +53,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   end
 
   def update(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
-    old = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    old = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     case Students.update_enrolled_class(old, params) do
       {:ok, student_class} ->
@@ -65,7 +66,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   end
 
   def delete(conn, %{"student_id" => student_id, "class_id" => class_id}) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     case Students.drop_enrolled_class(student_class) do
       {:ok, _student_class} ->

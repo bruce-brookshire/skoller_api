@@ -11,6 +11,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Mods
   alias Skoller.AutoUpdates
   alias Skoller.ModNotifications
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -23,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     params = params |> Map.put("student_class_id", student_class.id)
 

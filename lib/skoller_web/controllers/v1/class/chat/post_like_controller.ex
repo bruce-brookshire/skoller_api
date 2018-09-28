@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   alias Skoller.Repo
   alias Skoller.ChatPosts.Like
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -26,7 +26,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
     case Repo.insert(changeset) do
       {:ok, like} -> 
         like = like |> Repo.preload(:chat_post)
-        sc = Students.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
+        sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
@@ -40,7 +40,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
     case Repo.delete(like) do
       {:ok, _struct} ->
         like = like |> Repo.preload(:chat_post)
-        sc = Students.get_enrolled_class_by_ids!(like.chat_post.class_id, conn.assigns[:user].student_id)
+        sc = EnrolledStudents.get_enrolled_class_by_ids!(like.chat_post.class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn

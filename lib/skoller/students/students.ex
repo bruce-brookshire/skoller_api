@@ -48,26 +48,6 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Gets a student class where the student enrolled.
-
-  ## Returns
-  `Skoller.StudentClasses.StudentClass` or `nil`
-  """
-  def get_enrolled_class_by_ids(class_id, student_id) do
-    Repo.get_by(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
-  end
-
-  @doc """
-  Gets a student class where the student enrolled.
-
-  ## Returns
-  `Skoller.StudentClasses.StudentClass` or `Ecto.NoResultsError`
-  """
-  def get_enrolled_class_by_ids!(class_id, student_id) do
-    Repo.get_by!(StudentClass, student_id: student_id, class_id: class_id, is_dropped: false)
-  end
-
-  @doc """
   Enrolls a student in a class.
 
   ## Params
