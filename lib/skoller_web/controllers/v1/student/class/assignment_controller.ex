@@ -12,6 +12,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.AutoUpdates
   alias Skoller.ModNotifications
   alias Skoller.EnrolledStudents
+  alias Skoller.StudentAssignments.StudentClasses
 
   import SkollerWeb.Plugs.Auth
   
@@ -40,7 +41,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def index(conn, %{"student_id" => student_id} = params) do
-    student_assignments = Students.get_student_assignments(student_id, params)
+    student_assignments = StudentClasses.get_student_assignments(student_id, params)
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 

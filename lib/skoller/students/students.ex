@@ -10,7 +10,6 @@ defmodule Skoller.Students do
   alias Skoller.Students.Student
   alias Skoller.ClassStatuses.Status
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Mods
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
@@ -32,29 +31,6 @@ defmodule Skoller.Students do
   """
   def get_student_by_id!(student_id) do
     Repo.get!(Student, student_id)
-  end
-
-  @doc """
-  Gets student assignments with relative weights for all completed, enrolled classes of `student_id`
-
-  ## Filters
-   * %{"class", class}, filter by class.
-   * %{"date", Date}, filter by due date.
-   * %{"is_complete", Boolean}, filter by completion.
-
-  ## Returns
-  `[%{Skoller.StudentClasses.StudentClass}]` with assignments and is_pending_mods or `[]`
-  """
-  def get_student_assignments(student_id, filters) do
-    from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
-    |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
-    |> where([sc, class, cs], cs.is_complete == true)
-    |> where_filters(filters)
-    |> Repo.all()
-    |> Enum.flat_map(&StudentAssignments.get_assignments_with_relative_weight(&1))
-    |> Enum.map(&Map.put(&1, :is_pending_mods, is_pending_mods(&1)))
-    |> get_student_assingment_filter(filters)
   end
 
   @doc """
@@ -202,48 +178,5 @@ defmodule Skoller.Students do
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
-  end
-
-  defp get_student_assingment_filter(enumerable, params) do
-    enumerable
-    |> date_filter(params)
-    |> completed_filter(params)
-  end
-
-  defp is_pending_mods(assignment) do
-    case Mods.pending_mods_for_student_assignment(assignment) do
-      [] -> false
-      _ -> true
-    end
-  end
-
-  defp date_filter(enumerable, %{"date" => date}) do
-    {:ok, date, _offset} = date |> DateTime.from_iso8601()
-    enumerable
-    |> Enum.filter(&not(is_nil(&1.due)) and DateTime.compare(&1.due, date) in [:gt, :eq] and &1.is_completed == false)
-    |> order()
-  end
-  defp date_filter(enumerable, _params), do: enumerable
-
-  defp completed_filter(enumerable, %{"is_complete" => is_complete}) do
-    enumerable
-    |> Enum.filter(& to_string(&1.is_completed) == is_complete)
-  end
-  defp completed_filter(enumerable, _params), do: enumerable
-
-  defp where_filters(query, params) do
-    query
-    |> class_filter(params)
-  end
-
-  defp class_filter(query, %{"class" => id}) do
-    query
-    |> where([sc], sc.class_id == ^id)
-  end
-  defp class_filter(query, _params), do: query
-
-  defp order(enumerable) do
-    enumerable
-    |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 end
