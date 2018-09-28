@@ -134,12 +134,12 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_students(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_notifications_enabled(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
@@ -153,28 +153,28 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_mod_notifications_enabled(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> where([s], s.is_mod_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_reminder_notifications_enabled(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> where([s], s.is_reminder_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_chat_notifications_enabled(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> where([s], s.is_chat_notifications == true)
     |> where([s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_avg_days_out(params) do
-    from(s in subquery(Students.get_student_subquery(params)))
+    from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> Repo.aggregate(:avg, :notification_days_notice)
   end
 

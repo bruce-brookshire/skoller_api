@@ -6,6 +6,7 @@ defmodule Skoller.EnrolledStudents do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Repo
   alias Skoller.Classes.Schools
+  alias Skoller.Students.Student
 
   import Ecto.Query
 
@@ -134,5 +135,33 @@ defmodule Skoller.EnrolledStudents do
     from(sc in StudentClass)
     |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
     |> where([sc], sc.is_dropped == false)
+  end
+
+  @doc """
+  Returns a subquery that provides a list of enrolled students
+
+  ## Params
+   * `%{"school_id" => school_id}`, filters on school.
+  """
+  def get_student_subquery(_params \\ %{})
+  def get_student_subquery(%{"school_id" => _school_id} = params) do
+    from(s in Student)
+    |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
+    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> where([s, sc], sc.is_dropped == false)
+    |> distinct([s], s.id)
+  end
+  def get_student_subquery(_params) do
+    from(s in Student)
+  end
+
+  @doc """
+  Returns a subquery that provides a list of `Skoller.Classes.Class`
+
+  """
+  def get_enrolled_classes_subquery() do
+    from(sc in StudentClass)
+    |> where([sc], sc.is_dropped == false)
+    |> distinct([sc], sc.class_id)
   end
 end
