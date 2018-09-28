@@ -4,7 +4,7 @@ defmodule SkollerWeb.PeriodView do
 
   alias SkollerWeb.PeriodView
   alias Skoller.Classes.Periods
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents.ClassPeriods
 
   def render("index.json", %{periods: periods}) do
     render_many(periods, PeriodView, "period.json")
@@ -20,7 +20,7 @@ defmodule SkollerWeb.PeriodView do
       name: period.name,
       inserted_at: period.inserted_at,
       class_count: Periods.get_class_count_by_period(period.id),
-      student_count: Students.get_enrollment_by_period_id(period.id)
+      student_count: ClassPeriods.get_enrollment_by_period_id(period.id)
     }
   end
 end

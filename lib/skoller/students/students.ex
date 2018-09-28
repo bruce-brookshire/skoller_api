@@ -38,24 +38,6 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Returns the count of students in a given `Skoller.Periods.ClassPeriod`.
-
-  ## Examples
-
-      iex> val = Skoller.Students.get_enrollment_by_period_id(1)
-      ...>Kernel.is_integer(val)
-      true
-
-  """
-  def get_enrollment_by_period_id(period_id) do
-    from(sc in subquery(get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
-    |> where([sc, c], c.class_period_id == ^period_id)
-    |> distinct([sc], sc.student_id)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
   Returns a subquery that provides a list of enrolled students
 
   ## Params
@@ -71,16 +53,6 @@ defmodule Skoller.Students do
   end
   def get_student_subquery(_params) do
     from(s in Student)
-  end
-
-  @doc """
-  Returns a subquery that provides a list of `Skoller.StudentClasses.StudentClass` where the classes are not dropped by `Skoller.Schools.School`
-
-  """
-  def get_enrolled_student_classes_subquery(params \\ %{}) do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
-    |> where([sc], sc.is_dropped == false)
   end
 
   @doc """
@@ -190,7 +162,7 @@ defmodule Skoller.Students do
   """
   #TODO: make this and the one argument one, one function.
   def get_student_assignment_by_id(id, :weight) do
-    from(sc in subquery(get_enrolled_student_classes_subquery()))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
     |> join(:inner, [sc, sa], class in Class, class.id == sc.class_id)
     |> join(:inner, [sc, sa, class], cs in Status, cs.id == class.class_status_id)
@@ -228,7 +200,7 @@ defmodule Skoller.Students do
   """
   def get_common_notification_times(num, params) do
     from(s in Student)
-    |> join(:inner, [s], sc in subquery(get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
+    |> join(:inner, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
     |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
     |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
     |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])

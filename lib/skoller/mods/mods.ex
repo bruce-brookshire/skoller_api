@@ -151,7 +151,7 @@ defmodule Skoller.Mods do
   """
   def get_joyriders() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_accepted == true and a.is_manual == false)
     |> distinct([a, sc], sc.student_id)
@@ -168,7 +168,7 @@ defmodule Skoller.Mods do
   """
   def get_pending() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> distinct([a, sc], sc.student_id)
@@ -185,7 +185,7 @@ defmodule Skoller.Mods do
   """
   def get_followers() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_manual == true and a.is_accepted == true)
     |> distinct([a, sc], sc.student_id)
@@ -202,7 +202,7 @@ defmodule Skoller.Mods do
   """
   def get_creators() do
     from(m in Mod)
-    |> join(:inner, [m], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
+    |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
     |> join(:inner, [m, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> distinct([m], m.student_id)
     |> Repo.aggregate(:count, :id)
@@ -865,7 +865,7 @@ defmodule Skoller.Mods do
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.
   defp mod_responses_sub() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
@@ -873,7 +873,7 @@ defmodule Skoller.Mods do
   #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
     |> join(:inner, [a, sc], s in Student, s.id == sc.student_id)
     |> join(:inner, [a, sc, s], u in User, u.student_id == s.id)
     |> where([a], a.assignment_modification_id == ^mod_id)

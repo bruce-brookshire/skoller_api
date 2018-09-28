@@ -5,6 +5,7 @@ defmodule Skoller.EnrolledStudents do
 
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Repo
+  alias Skoller.Classes.Schools
 
   import Ecto.Query
 
@@ -123,5 +124,15 @@ defmodule Skoller.EnrolledStudents do
   def get_enrollment_by_class_id_subquery(class_id) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false and sc.class_id == ^class_id)
+  end
+
+  @doc """
+  Returns a subquery that provides a list of `Skoller.StudentClasses.StudentClass` where the classes are not dropped by `Skoller.Schools.School`
+
+  """
+  def get_enrolled_student_classes_subquery(params \\ %{}) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> where([sc], sc.is_dropped == false)
   end
 end

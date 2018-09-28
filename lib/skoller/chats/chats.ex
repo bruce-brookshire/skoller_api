@@ -9,7 +9,6 @@ defmodule Skoller.Chats do
   alias Skoller.ChatComments.Comment
   alias Skoller.ChatComments.Star, as: CStar
   alias Skoller.ChatReplies.Reply
-  alias Skoller.Students
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
@@ -173,7 +172,7 @@ defmodule Skoller.Chats do
   # Gets number of students in each of student_id's classes
   defp enrollment_subquery(student_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], enroll in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
+    |> join(:inner, [sc], enroll in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end

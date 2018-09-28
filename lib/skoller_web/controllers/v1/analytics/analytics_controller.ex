@@ -21,6 +21,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Classes.Schools
   alias Skoller.Classes.ClassStatuses, as: StatusClasses
   alias Skoller.Classes.Locks
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -113,13 +114,13 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_student_classes(params) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)))
     |> Repo.aggregate(:count, :id)
   end
 
   defp get_participation(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
+    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> distinct([sa], [sa.student_class_id])
     |> Repo.aggregate(:count, :id)
@@ -127,7 +128,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp get_grades_entered(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
+    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
   end
@@ -144,7 +145,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_student_class_notifications_enabled(params) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)))
     |> join(:inner, [sc], s in Student, sc.student_id == s.id)
     |> where([sc], sc.is_notifications == true)
     |> where([sc, s], s.is_notifications == true)
@@ -326,7 +327,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp communitites(dates, params) do
-    subq = from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
+    subq = from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([sc, c, p], sc.class_id)
     |> having([sc, c, p], count(sc.id) >= @community_enrollment)
@@ -338,7 +339,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp enrollment_count(dates, params) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery(params)))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)))
     |> where([sc], fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> select([sc, c, p], count(sc.class_id, :distinct))
     |> Repo.one
@@ -365,7 +366,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
 
   defp avg_classes_subquery(dates, params) do
     from(s in Student)
-    |> join(:left, [s], sc in subquery(Students.get_enrolled_student_classes_subquery(params)), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
+    |> join(:left, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end
