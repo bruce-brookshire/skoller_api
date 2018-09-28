@@ -42,7 +42,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def csv(conn, _params) do
-    users = Users.get_student_users()
+    users = UserStudents.get_student_users()
     conn
     |> put_resp_content_type("text/csv")
     |> put_resp_header("content-disposition", "attachment; filename=\"Users-" <> to_string(DateTime.utc_now) <>  "\"")

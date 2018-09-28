@@ -12,6 +12,7 @@ defmodule Skoller.Users do
   alias Skoller.CustomSignups
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
+  alias Skoller.Users.Notifications
 
   import Ecto.Query
 
@@ -69,6 +70,9 @@ defmodule Skoller.Users do
     case multi |> Repo.transaction() do
       {:error, _, failed_val, _} ->
         {:error, failed_val}
+      {:ok, %{user: %{student: %{enrolled_by: student_id}}} = items} when not is_nil(student_id) ->
+        Task.start(Notifications, :send_link_used_notification, [student_id])
+        {:ok, items}
       {:ok, items} ->
         {:ok, items}
     end
