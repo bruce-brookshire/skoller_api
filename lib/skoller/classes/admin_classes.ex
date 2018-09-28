@@ -7,12 +7,12 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Mailer
   alias Skoller.Classes
   alias Skoller.Locks
-  alias Skoller.Students
   alias Skoller.Mods
   alias Skoller.Classes.Note
   alias Skoller.ClassStatuses, as: Statuses
   alias Skoller.Classes.ClassStatuses
   alias Skoller.StudentClasses.Users
+  alias Skoller.StudentClasses
 
   import Bamboo.Email
 
@@ -81,7 +81,7 @@ defmodule Skoller.AdminClasses do
   def get_full_class_by_id!(id) do
     Classes.get_full_class_by_id!(id)
     |> Repo.preload(:notes)
-    |> Map.put(:students, Students.get_students_by_class(id))
+    |> Map.put(:students, StudentClasses.get_studentclasses_by_class(id))
     |> Map.put(:assignments, Mods.get_mod_assignments_by_class(id))
   end
 

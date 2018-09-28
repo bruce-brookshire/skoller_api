@@ -77,4 +77,16 @@ defmodule Skoller.StudentClasses do
     |> Enum.max_by(& &1.count)
     max.school
   end
+
+  @doc """
+  Gets student classes in a class. Includes previously-enrolled students.
+
+  ## Returns
+  `[Skoller.StudentClasses.StudentClass]` or `[]`
+  """
+  def get_studentclasses_by_class(class_id) do
+    from(sc in StudentClass)
+    |> where([sc], sc.class_id == ^class_id)
+    |> Repo.all()
+  end
 end

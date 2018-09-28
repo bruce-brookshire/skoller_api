@@ -49,18 +49,6 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Gets students in a class. Includes previously-enrolled students.
-
-  ## Returns
-  `[Skoller.StudentClasses.StudentClass]` or `[]`
-  """
-  def get_students_by_class(class_id) do
-    from(sc in StudentClass)
-    |> where([sc], sc.class_id == ^class_id)
-    |> Repo.all()
-  end
-
-  @doc """
   Gets a student class where the class is editable and the student enrolled.
 
   ## Returns
