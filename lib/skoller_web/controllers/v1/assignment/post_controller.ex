@@ -8,8 +8,8 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   alias SkollerWeb.Assignment.PostView
   alias Skoller.AssignmentPostNotifications
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Students
   alias Skoller.MapErrors
+  alias Skoller.AssignmentPosts.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -55,7 +55,7 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   end
 
   defp un_read_assign(post) do
-    status = Students.un_read_assignment(post.student_id, post.assignment_id)
+    status = StudentAssignments.un_read_assignment(post.student_id, post.assignment_id)
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 end

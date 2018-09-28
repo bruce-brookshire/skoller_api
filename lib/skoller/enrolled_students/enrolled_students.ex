@@ -7,6 +7,7 @@ defmodule Skoller.EnrolledStudents do
   alias Skoller.Repo
   alias Skoller.Classes.Schools
   alias Skoller.Students.Student
+  alias Skoller.Classes.Class
 
   import Ecto.Query
 
@@ -163,5 +164,16 @@ defmodule Skoller.EnrolledStudents do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false)
     |> distinct([sc], sc.class_id)
+  end
+
+  @doc """
+  Gets the count of students enrolled in a class.
+  """
+  def count_subquery() do
+    from(c in Class)
+    |> join(:left, [c], sc in StudentClass, c.id == sc.class_id)
+    |> where([c, sc], sc.is_dropped == false)
+    |> group_by([c, sc], c.id)
+    |> select([c, sc], %{class_id: c.id, count: count(sc.id)})
   end
 end
