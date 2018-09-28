@@ -8,34 +8,24 @@ defmodule Skoller.Students do
   alias Skoller.Classes.Class
   alias Skoller.Schools.School
   alias Skoller.Students.Student
-  alias Skoller.Classes
   alias Skoller.ClassStatuses.Status
   alias Skoller.Professors.Professor
   alias Skoller.Periods.ClassPeriod
   alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Mods.Mod
-  alias Skoller.Mods.Action
   alias Skoller.Mods
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.StudentAssignments
-  alias Skoller.StudentClasses
-  alias Skoller.AutoUpdates
-  alias Skoller.MapErrors
-  alias Skoller.StudentPoints
   alias Skoller.Classes.Schools
   alias Skoller.Classes.Docs
-  alias Skoller.Classes.ClassStatuses
   alias Skoller.EnrolledStudents
+  alias Skoller.StudentClasses.EnrollmentLinks
 
   import Ecto.Query
 
   require Logger
 
   @community_threshold 2
-  @link_length 5
-
-  @class_referral_points_name "Class Referral"
 
   @doc """
   Gets a student by id.
@@ -45,26 +35,6 @@ defmodule Skoller.Students do
   """
   def get_student_by_id!(student_id) do
     Repo.get!(Student, student_id)
-  end
-
-  @doc """
-  Enrolls a student in a class.
-
-  ## Params
-   * %{"color" => color}, sets the student class color.
-
-  ## Returns
-  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
-  """
-  def enroll_in_class(student_id, class_id, params) do
-    case Repo.get_by(StudentClass, student_id: student_id, class_id: class_id) do
-      nil ->
-        enroll(student_id, class_id, params)
-      %{is_dropped: true} = sc ->
-        enroll_in_dropped_class(sc)
-      _sc ->
-        {:error, nil, %{student_class: "class taken"}, nil}
-    end
   end
 
   @doc """
@@ -330,29 +300,6 @@ defmodule Skoller.Students do
     |> having([sc], count(sc.id) >= ^threshold)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
-  
-  @doc """
-  Gets a student class from an enrollment link.
-
-  ## Returns
-  `Skoller.StudentClasses.StudentClass` with `:student` and `:class` loaded, or `Ecto.NoResultsError`
-  """
-  def get_student_class_by_enrollment_link(link) do
-    student_class_id = link |> String.split_at(@link_length) |> elem(1)
-    Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
-    |> Repo.preload([:student, :class])
-  end
-
-  @doc """
-  Enroll in a class with a student link.
-
-  Similar to enroll_in_class/3
-  """
-  def enroll_by_link(link, student_id, params) do
-    sc = get_student_class_by_enrollment_link(link)
-    params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
-    enroll(student_id, sc.class_id, params, [enrolled_by: sc.id])
-  end
 
   @doc """
   Adds a field of study to a student.
@@ -404,29 +351,13 @@ defmodule Skoller.Students do
   `{:ok, Skoller.Students.Student}` or `{:error, Ecto.Changeset}` or `{:ok, nil}` if there is already a link.
   """
   def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
-    link = generate_link(id)
+    link = EnrollmentLinks.generate_link(id)
     
     student
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
   end
   def generate_student_link(_student), do: {:ok, nil}
-
-  @doc """
-  Generates an enrollment link for a student class that does not have one yet.
-
-  ## Returns
-  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
-  """
-  def generate_enrollment_link(%StudentClass{id: id} = student_class) do
-    link = generate_link(id)
-
-    Logger.info("Generating enrollment link " <> to_string(link) <> " for student class: " <> to_string(id))
-
-    student_class
-    |> Ecto.Changeset.change(%{enrollment_link: link})
-    |> Repo.update()
-  end
 
   @doc """
   Returns the `Skoller.FieldsOfStudy.FieldOfStudy` and a count of `Skoller.Students.Student`
@@ -443,56 +374,6 @@ defmodule Skoller.Students do
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()
-  end
-
-  # Adds enrolled_by id to a student enrolling by a link.
-  defp add_enrolled_by(%Ecto.Changeset{valid?: true} = changeset, opts) do
-    case opts |> List.keytake(:enrolled_by, 0) do
-      nil -> changeset
-      val -> 
-        val = val 
-        |> elem(0) 
-        |> elem(1)
-
-        changeset |> Ecto.Changeset.change(%{enrolled_by: val})
-    end
-  end
-  defp add_enrolled_by(changeset, _opts), do: changeset
-
-  # Generates a link with @link_length random characters, with the id appended.
-  defp generate_link(id) do
-    @link_length
-    |> :crypto.strong_rand_bytes() 
-    |> Base.url_encode64 
-    |> binary_part(0, @link_length)
-    |> Kernel.<>(to_string(id))
-  end
-
-  defp auto_approve_mods(%{mods: mods}) do
-    Logger.info("Processing mod auto updates")
-    status = mods
-    |> Enum.map(&AutoUpdates.process_auto_update(&1))
-
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
-  end
-  defp auto_approve_mods(_params), do: {:ok, nil}
-
-  # Adds all non added public mods to a student enrolling in a class or re-enrolling..
-  defp add_public_mods(%{student_class: student_class}) do
-    Logger.info("Adding public mods for student class: " <> to_string(student_class.id))
-    mods = from(mod in Mod)
-    |> join(:inner, [mod], class in subquery(Mods.get_class_from_mod_subquery()), mod.id == class.mod_id)
-    |> where([mod], mod.is_private == false)
-    |> where([mod, class], class.class_id == ^student_class.class_id)
-    |> Repo.all()
-    
-    status = mods |> Enum.map(&insert_mod_action(student_class, &1))
-    
-    status |> Enum.find({:ok, mods}, &MapErrors.check_tuple(&1))
-  end
-
-  defp insert_mod_action(student_class, %Mod{} = mod) do
-    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
   end
 
   defp get_student_assingment_filter(enumerable, params) do
@@ -634,53 +515,5 @@ defmodule Skoller.Students do
   defp order(enumerable) do
     enumerable
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
-  end
-
-  # Makes sure students have less than allowed limit of non dropped classes.
-  defp check_enrollment_limit(%Ecto.Changeset{valid?: true} = changeset, student_id) do
-    case EnrolledStudents.check_enrollment_limit_for_student(student_id) do
-      true -> changeset
-      false -> changeset |> Ecto.Changeset.add_error(:student_class, "Enrollment limit reached")
-    end
-  end
-  defp check_enrollment_limit(changeset, _student_id), do: changeset
-
-  defp enroll(student_id, class_id, params, opts \\ []) do
-    Logger.info("Enrolling class: " <> to_string(class_id) <> " student: " <> to_string(student_id))
-    changeset = StudentClass.changeset(%StudentClass{}, params)
-    |> add_enrolled_by(opts)
-    |> check_enrollment_limit(student_id)
-    
-    class = Classes.get_class_by_id(class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:student_class, changeset)
-    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
-    |> Ecto.Multi.run(:mods, &add_public_mods(&1))
-    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
-    |> Ecto.Multi.run(:points, &add_points_to_student(&1.student_class))
-    
-    case multi |> Repo.transaction() do
-      {:ok, trans} -> 
-        {:ok, StudentClasses.get_student_class_by_id(trans.student_class.id)}
-      error -> error
-    end
-  end
-
-  defp add_points_to_student(%{enrolled_by: enrolled_by}) when not(is_nil(enrolled_by)) do
-    sc = StudentClasses.get_student_class_by_id!(enrolled_by)
-
-    sc.student_id
-    |> StudentPoints.add_points_to_student(@class_referral_points_name)
-  end
-  defp add_points_to_student(_student_class), do: {:ok, nil}
-
-  defp enroll_in_dropped_class(item) do
-    item
-    |> Ecto.Changeset.change(%{is_dropped: false})
-    |> check_enrollment_limit(item.student_id)
-    |> Repo.update()
   end
 end

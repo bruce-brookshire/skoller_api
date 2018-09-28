@@ -24,6 +24,16 @@ defmodule Skoller.ModActions do
   def get_actions_from_mod(_mod), do: []
 
   @doc """
+  Inserts an unanswered mod action for `student_class`
+
+  ## Returns
+  `{:ok, Skoller.Mods.Action}` or `{:error, changeset}`
+  """
+  def insert_mod_action(student_class, %Mod{} = mod) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
+  end
+
+  @doc """
   Gets all actions from a mod where the student is currently enrolled in the class.
 
   ## Returns
