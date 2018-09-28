@@ -8,20 +8,14 @@ defmodule SkollerWeb.Api.BounceController do
 
   require Logger
 
-  def bounce(conn, %{"Message" => %{"notificationType" => "Bounce", "bounce" => bounce}}) do
-    Logger.info("Recieved bounce for email " <> inspect(bounce["bouncdRecipients"]))
-
-    bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
-
-    conn |> send_resp(204, "")
-  end
-
-  def bounce(conn,  %{"Message" => %{"notificationType" => "Complaint", "complaint" => complaint}}) do
-    Logger.info("Recieved complaint for email " <> inspect(complaint["complainedRecipients"]))
-
-    complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
-
-    conn |> send_resp(204, "")
+  def bounce(conn, %{"Message" => message}) do
+    case handle_notification(message) do
+      {:ok, _result} ->
+        conn |> send_resp(204, "")
+      {:error, _reason} ->
+        Logger.error(message)
+        conn |> send_resp(403, "")
+    end
   end
 
   def bounce(conn, params) do
@@ -33,6 +27,17 @@ defmodule SkollerWeb.Api.BounceController do
         HTTPoison.get(url)
         conn |> send_resp(204, "")
     end
+  end
+
+  defp handle_notification(%{"notificationType" => "Complaint", "complaint" => complaint}) do
+    Logger.info("Recieved complaint for email " <> inspect(complaint["complainedRecipients"]))
+
+    complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
+  end
+  defp handle_notification(%{"notificationType" => "Bounce", "bounce" => bounce}) do
+    Logger.info("Recieved bounce for email " <> inspect(bounce["bouncedRecipients"]))
+
+    bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
   end
 
   defp unsubscribe_email(email) do
