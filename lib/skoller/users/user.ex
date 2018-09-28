@@ -7,7 +7,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Users.User
   alias Skoller.Students.Student
   alias Skoller.Role
-  alias Skoller.Users.Report
+  alias Skoller.UserReports.Report
 
   schema "users" do
     field :email, :string

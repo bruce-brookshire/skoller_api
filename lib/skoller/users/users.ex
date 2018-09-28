@@ -11,7 +11,6 @@ defmodule Skoller.Users do
   alias Skoller.Students.Student
   alias Skoller.Verification
   alias Skoller.CustomSignups
-  alias Skoller.Users.Report
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
 
@@ -31,18 +30,6 @@ defmodule Skoller.Users do
     from(u in User)
     |> where([u], not(is_nil(u.student_id)))
     |> Repo.all()
-  end
-
-  @doc """
-  Reports a user
-
-  ## Returns
-  `{:ok, Skoller.Users.Report}` or `{:error, Ecto.Changeset}`
-  """
-  def report_user(params) do
-    %Report{}
-    |> Report.changeset(params)
-    |> Repo.insert()
   end
 
   @doc """
