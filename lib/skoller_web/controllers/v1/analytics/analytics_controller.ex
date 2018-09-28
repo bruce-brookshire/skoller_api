@@ -22,6 +22,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Classes.ClassStatuses, as: StatusClasses
   alias Skoller.Classes.Locks
   alias Skoller.EnrolledStudents
+  alias Skoller.StudentClasses.Docs
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -60,7 +61,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
     |> Map.put(:class_in_review, StatusClasses.get_class_in_review_count(dates, params))
     |> Map.put(:completed_by_diy, completed_by_diy)
     |> Map.put(:completed_by_skoller, completed_classes - completed_by_diy)
-    |> Map.put(:enrolled_class_syllabus_count, Students.get_enrolled_class_with_syllabus_count(dates, params))
+    |> Map.put(:enrolled_class_syllabus_count, Docs.get_enrolled_class_with_syllabus_count(dates, params))
     |> Map.put(:classes_multiple_files, classes_multiple_files(dates, params))
     |> Map.put(:student_created_classes, Classes.student_created_count(dates, params))
     |> Map.put(:avg_classes, avg_classes)
