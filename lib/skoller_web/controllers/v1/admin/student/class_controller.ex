@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   alias Skoller.Students
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -20,7 +21,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   plug :verify_class_is_editable, :class_id
 
   def index(conn, %{"student_id" => student_id}) do
-    student_classes = Students.get_enrolled_classes_by_student_id(student_id)
+    student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(student_id)
     |> Enum.map(&Map.put(&1, :grade, StudentClasses.get_class_grade(&1.id)))
     |> Enum.map(&Map.put(&1, :completion, StudentAssignments.get_class_completion(&1)))
     |> Enum.map(&Map.put(&1, :enrollment, Students.get_enrollment_by_class_id(&1.class.id)))

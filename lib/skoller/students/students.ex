@@ -23,10 +23,10 @@ defmodule Skoller.Students do
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
-  alias Skoller.Classes.EditableClasses
   alias Skoller.Classes.Schools
   alias Skoller.Classes.Docs
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -34,7 +34,6 @@ defmodule Skoller.Students do
 
   @community_threshold 2
   @link_length 5
-  @enrollment_limit 15
 
   @class_referral_points_name "Class Referral"
 
@@ -46,19 +45,6 @@ defmodule Skoller.Students do
   """
   def get_student_by_id!(student_id) do
     Repo.get!(Student, student_id)
-  end
-
-  @doc """
-  Gets a student class where the class is editable and the student enrolled.
-
-  ## Returns
-  `Skoller.StudentClasses.StudentClass` or `nil`
-  """
-  def get_active_student_class_by_ids(class_id, student_id) do
-    from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), class.id == sc.class_id)
-    |> where([sc], sc.class_id == ^class_id)
-    |> Repo.one()
   end
 
   @doc """
@@ -146,31 +132,6 @@ defmodule Skoller.Students do
   def get_enrollment_by_class_id_subquery(class_id) do
     from(sc in StudentClass)
     |> where([sc], sc.is_dropped == false and sc.class_id == ^class_id)
-  end
-
-  @doc """
-  Returns `Skoller.StudentClasses.StudentClass` with `Skoller.Classes.Class` that a `Skoller.Students.Student` currently has.
-
-  ## Examples
-
-      iex> val = Skoller.Students.get_enrolled_classes_by_student_id(1)
-      [%Skoller.StudentClasses.StudentClass{class: %Skoller.Classes.Class{}}]
-
-  """
-  def get_enrolled_classes_by_student_id(student_id) do
-    #TODO: Filter ClassPeriod
-    from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> Repo.all()
-    |> Repo.preload(:class)
-  end
-
-  @doc """
-  Subquery for getting enrolled student classes by student.
-  """
-  def get_enrolled_classes_by_student_id_subquery(student_id) do
-    #TODO: Filter ClassPeriod
-    from(sc in StudentClass)
-    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
   end
 
   @doc """
@@ -307,7 +268,7 @@ defmodule Skoller.Students do
   `[%{Skoller.StudentClasses.StudentClass}]` with assignments and is_pending_mods or `[]`
   """
   def get_student_assignments(student_id, filters) do
-    from(sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
+    from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in Class, class.id == sc.class_id)
     |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
     |> where([sc, class, cs], cs.is_complete == true)
@@ -695,12 +656,9 @@ defmodule Skoller.Students do
     |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
   end
 
-  # Makes sure students have less than @enrollment_limit classes.
+  # Makes sure students have less than allowed limit of non dropped classes.
   defp check_enrollment_limit(%Ecto.Changeset{valid?: true} = changeset, student_id) do
-    class_count = from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> Repo.aggregate(:count, :id)
-
-    case class_count < @enrollment_limit do
+    case EnrolledStudents.check_enrollment_limit_for_student(student_id) do
       true -> changeset
       false -> changeset |> Ecto.Changeset.add_error(:student_class, "Enrollment limit reached")
     end

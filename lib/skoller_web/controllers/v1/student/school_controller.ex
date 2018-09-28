@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Student.SchoolController do
   use SkollerWeb, :controller
 
   alias Skoller.StudentClasses
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
   alias SkollerWeb.SchoolView
 
   import SkollerWeb.Plugs.Auth
@@ -15,7 +15,7 @@ defmodule SkollerWeb.Api.V1.Student.SchoolController do
 
   def show(conn, %{"student_id" => student_id}) do
     school = student_id
-    |> Students.get_enrolled_classes_by_student_id()
+    |> EnrolledStudents.get_enrolled_classes_by_student_id()
     |> StudentClasses.get_most_common_school()
 
     render(conn, SchoolView, "show.json", school: school)

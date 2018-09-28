@@ -6,7 +6,6 @@ defmodule Skoller.ModActions do
   alias Skoller.Repo
   alias Skoller.Mods.Action
   alias Skoller.Mods.Mod
-  alias Skoller.Students
   alias Skoller.EnrolledStudents
 
   import Ecto.Query
@@ -60,7 +59,7 @@ defmodule Skoller.ModActions do
   """
   def get_pending_mod_count_for_student(student_id) do
     from(act in Action)
-    |> join(:inner, [act], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
+    |> join(:inner, [act], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
     |> where([act], is_nil(act.is_accepted))
     |> select([act], count(act.id))
     |> Repo.one

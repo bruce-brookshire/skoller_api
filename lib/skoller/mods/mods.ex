@@ -17,6 +17,7 @@ defmodule Skoller.Mods do
   alias Skoller.StudentAssignments
   alias Skoller.MapErrors
   alias Skoller.Assignments
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -52,7 +53,7 @@ defmodule Skoller.Mods do
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> filter(params)
@@ -73,7 +74,7 @@ defmodule Skoller.Mods do
   def get_student_mod_by_id(student_id, mod_id) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> where([mod], mod.id == ^mod_id)
@@ -133,7 +134,7 @@ defmodule Skoller.Mods do
   """
   def get_classes_with_pending_mod_by_student_id(student_id) do
     from(class in Class)
-    |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
+    |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
     |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
     |> where([class, sc, act], is_nil(act.is_accepted))
     |> distinct([class], class.id)
