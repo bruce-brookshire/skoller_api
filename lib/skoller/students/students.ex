@@ -38,53 +38,6 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Updates an enrolled student in a class.
-
-  ## Params
-   * %{"color" => String}, sets the student class color.
-   * %{"is_notifications" => Boolean}, sets the notifications for this class for this student.
-
-  ## Returns
-  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
-  """
-  def update_enrolled_class(old_student_class, params) do
-    old_student_class
-    |> StudentClass.update_changeset(params)
-    |> Repo.update()
-  end
-
-  @doc """
-  Drops an enrolled student from a class.
-
-  ## Returns
-  `{:ok, Skoller.StudentClasses.StudentClass}` or `{:error, Ecto.Changeset}`
-  """
-  def drop_enrolled_class(student_class) do
-    student_class
-    |> Ecto.Changeset.change(%{is_dropped: true})
-    |> Repo.update()
-  end
-
-  @doc """
-  Gets a count of enrolled students per class
-
-  ## Returns
-  `Integer`
-  """
-  def get_enrollment_by_class_id(id) do
-    from(sc in subquery(get_enrollment_by_class_id_subquery(id)))
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
-  Subquery that gets enrolled students in a class by class id.
-  """
-  def get_enrollment_by_class_id_subquery(class_id) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false and sc.class_id == ^class_id)
-  end
-
-  @doc """
   Returns the count of students in a given `Skoller.Periods.ClassPeriod`.
 
   ## Examples
