@@ -9,7 +9,8 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"Message" => message}) do
-    case handle_notification(message) do
+    decoded_message = Poison.decode!(message)
+    case handle_notification(decoded_message) do
       {:ok, _result} ->
         conn |> send_resp(204, "")
       {:error, _reason} ->
