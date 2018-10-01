@@ -5,7 +5,6 @@ defmodule Skoller.Users.EmailPreferences do
   alias Skoller.Users.EmailPreference
   alias Skoller.Users
   alias Skoller.Repo
-  alias Skoller.EmailTypes
 
   import Ecto.Query
 
@@ -93,11 +92,9 @@ defmodule Skoller.Users.EmailPreferences do
 
   Returns true if the email can be sent, and false if not.
   """
-  def check_email_subscription_status(%{is_unsubscribed: true}, _email_type_name), do: false
-  def check_email_subscription_status(user, email_type_name) do
-    email_type = EmailTypes.get_by_name(email_type_name)
-
-    case Repo.get_by(EmailPreference, user_id: user.id, email_type_id: email_type.id) do
+  def check_email_subscription_status(%{is_unsubscribed: true}, _email_type_id), do: false
+  def check_email_subscription_status(user, email_type_id) do
+    case Repo.get_by(EmailPreference, user_id: user.id, email_type_id: email_type_id) do
       nil -> true
       email_preference -> !email_preference.is_unsubscribed
     end
