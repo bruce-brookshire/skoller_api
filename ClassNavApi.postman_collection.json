@@ -5006,6 +5006,69 @@
 			]
 		},
 		{
+			"name": "Email Types",
+			"item": [
+				{
+					"name": "Get Email Types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/email-types",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"email-types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Email Type",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"send_time\": \"10:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/email-types/100",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"email-types",
+								"100"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Fields of Study",
 			"item": [
 				{
@@ -6510,6 +6573,62 @@
 							"body": "{\"name\":\"Student\",\"id\":100}"
 						}
 					]
+				}
+			]
+		},
+		{
+			"name": "Sammi",
+			"item": [
+				{
+					"name": "Check Sammi Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/sammi",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sammi"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Train Sammi",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/sammi/train",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"sammi",
+								"train"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -11049,6 +11168,67 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "Email Preferences",
+					"item": [
+						{
+							"name": "Get Email Preferences",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/1/email-preferences",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"1",
+										"email-preferences"
+									]
+								},
+								"description": "Gets email preferences for a user."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Email Preferences",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"dev@skoller.co\",\n\t\"user_unsubscribed\": true\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/users/2/email-preferences/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"2",
+										"email-preferences",
+										""
+									]
+								},
+								"description": "Updates email preferences for a user."
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Create User",
 					"request": {
 						"method": "POST",
@@ -11101,75 +11281,7 @@
 						},
 						"description": "Gets users\n\n## Filters\n* account_type, role id (100 for student, 200 for admin, 300 for SW, 400 for Change Requests)\n* school_id, int (only usable if student account type)\n* user_name, string (only usable if student account type, searches first or last name)\n* email, string\n* is_suspended, boolean (can search explicit true or false)"
 					},
-					"response": [
-						{
-							"name": "Get Users",
-							"originalRequest": {
-								"method": "GET",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "Bearer {{token}}"
-									}
-								],
-								"body": {},
-								"url": {
-									"raw": "{{BaseUrl}}/api/v1/users",
-									"host": [
-										"{{BaseUrl}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"users"
-									]
-								}
-							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
-								{
-									"key": "cache-control",
-									"value": "max-age=0, private, must-revalidate",
-									"name": "cache-control",
-									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-								},
-								{
-									"key": "content-length",
-									"value": "313",
-									"name": "content-length",
-									"description": "The length of the response body in octets (8-bit bytes)"
-								},
-								{
-									"key": "content-type",
-									"value": "application/json; charset=utf-8",
-									"name": "content-type",
-									"description": "The mime type of this content"
-								},
-								{
-									"key": "date",
-									"value": "Tue, 28 Nov 2017 17:07:02 GMT",
-									"name": "date",
-									"description": "The date and time that the message was sent"
-								},
-								{
-									"key": "server",
-									"value": "Cowboy",
-									"name": "server",
-									"description": "A name for the server"
-								},
-								{
-									"key": "x-request-id",
-									"value": "nqq21ke9ldsf19r5ds0ov6dnatf10l3m",
-									"name": "x-request-id",
-									"description": "Custom header"
-								}
-							],
-							"cookie": [],
-							"body": "[{\"id\":1,\"email\":\"tyler@fortyau.com\"},{\"id\":2,\"email\":\"tyler@hku.edu\"},{\"id\":3,\"email\":\"dchappele@hku.edu\"},{\"id\":5,\"email\":\"dcha123ppele@hku.edu\"},{\"id\":6,\"email\":\"dcha1234ppele@hku.edu\"},{\"id\":7,\"email\":\"dcha12345ppele@hku.edu\"},{\"id\":8,\"email\":\"dcha122345ppele@hku.edu\"},{\"id\":10,\"email\":\"dchappele1@hku.edu\"}]"
-						}
-					]
+					"response": []
 				},
 				{
 					"name": "Get User by Id",
@@ -11714,62 +11826,6 @@
 								"api",
 								"v1",
 								"report"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Sammi",
-			"item": [
-				{
-					"name": "Check Sammi Status",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/sammi",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"sammi"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Train Sammi",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {},
-						"url": {
-							"raw": "{{BaseUrl}}/api/v1/sammi/train",
-							"host": [
-								"{{BaseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"sammi",
-								"train"
 							]
 						}
 					},
