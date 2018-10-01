@@ -23,4 +23,15 @@ defmodule Skoller.EmailTypes do
   def get!(id) do
     Repo.get(EmailType, id)
   end
+
+  @doc """
+  Updates an email type.
+
+  ## Returns
+  `{:ok, Skoller.EmailTypes.EmailType}` or {:error, changeset}
+  """
+  def update(old_email_type, new_email_type) do
+    EmailType.update_changeset(old_email_type, new_email_type)
+    |> Repo.update()
+  end
 end

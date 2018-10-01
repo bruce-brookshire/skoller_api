@@ -22,10 +22,20 @@ defmodule Skoller.EmailTypes.EmailType do
   @opt_fields [:category]
   @all_fields @req_fields ++ @opt_fields
 
+  @req_upd [:is_active_email, :is_active_notification, :send_time]
+  @all_upd @req_upd
+
   @doc false
   def changeset(%EmailType{} = email_type, attrs) do
     email_type
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
+  end
+
+  @doc false
+  def update_changeset(%EmailType{} = email_type, attrs) do
+    email_type
+    |> cast(attrs, @all_upd)
+    |> validate_required(@req_upd)
   end
 end
