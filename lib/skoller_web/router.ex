@@ -44,6 +44,8 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth_verified
 
     scope "/v1", V1, as: :v1 do
+      resources "/email-types", EmailTypeController, only: [:index, :update]
+
       get "/sammi", SammiController, :status
       post "/sammi/train", SammiController, :train
 
@@ -283,7 +285,6 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
-      get "/email-types", EmailTypeController, :index
       put "/users/:user_id/email-preferences", EmailPreferenceController, :update
       get "/users/:user_id/email-preferences", EmailPreferenceController, :index
       resources "/fields-of-study/list", FieldController, only: [:index]

@@ -13,11 +13,11 @@ defmodule Skoller.StudentClasses.Emails do
   EEx.function_from_file :defp, :build_no_classes_body, System.cwd() <> "/lib/skoller/student_classes/no_classes.html.eex", [:unsub_path]
 
   @from_email "noreply@skoller.co"
-  @no_classes_name "No Classes Email"
+  @no_classes_id 100
 
   def send_no_classes_emails(students) do
     students
-    |> Enum.filter(&EmailPreferences.check_email_subscription_status(List.first(&1.users), @no_classes_name))
+    |> Enum.filter(&EmailPreferences.check_email_subscription_status(List.first(&1.users), @no_classes_id))
     |> Enum.map(&build_no_classes_email(List.first(&1.users)))
     |> Enum.each(&deliver_message(&1))
   end
