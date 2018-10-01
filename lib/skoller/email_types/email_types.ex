@@ -6,13 +6,19 @@ defmodule Skoller.EmailTypes do
   alias Skoller.Repo
   alias Skoller.EmailTypes.EmailType
 
+  import Ecto.Query
+
   @doc """
   Gets all email types
 
   ## Returns
   `[Skoller.EmailTypes]` or `[]`
   """
-  def all(), do: Repo.all(EmailType)
+  def all() do
+    EmailType
+    |> order_by(asc: :id)
+    |> Repo.all()
+  end
 
   @doc """
   Gets an email type by id
