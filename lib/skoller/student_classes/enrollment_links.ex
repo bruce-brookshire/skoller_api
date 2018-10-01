@@ -6,6 +6,7 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   alias Skoller.Repo
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses
+  alias Skoller.StudentClasses.Notifications
 
   @link_length 5
 
@@ -39,10 +40,19 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   Enroll in a class with a student link.
 
   Similar to `Skoller.StudentClasses.enroll_in_class/3`
+
+  ## Returns
+  `{:ok, Skoller.StudentClasses.StudentClass}` or `nil`
   """
   def enroll_by_link(link, student_id, params) do
     sc = get_student_class_by_enrollment_link(link)
     params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
-    StudentClasses.enroll(student_id, sc.class_id, params, [enrolled_by: sc.id])
+    case StudentClasses.enroll(student_id, sc.class_id, params, [enrolled_by: sc.id]) do
+      nil -> nil
+      {:ok, %{enrolled_by: enrolled_by} = student_class} when not is_nil(enrolled_by) ->
+        Task.start(Notifications, :send_link_used_notification, [sc, sc.class])
+        {:ok, student_class}
+      {:ok, student_class} -> {:ok, student_class}
+    end
   end
 end
