@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.UpdateConstraintsOnDocs do
+  @moduledoc false
   use Ecto.Migration
 
   def change do

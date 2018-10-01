@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   alias SkollerWeb.Class.SearchView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
-  alias Skoller.Students
+  alias Skoller.StudentClasses.Classes, as: EnrolledClasses
 
   import SkollerWeb.Plugs.Auth
   
@@ -44,7 +44,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   end
 
   @doc """
-   Shows all classes through `Skoller.Students`. Can be used as a search with multiple filters.
+   Shows all classes. Can be used as a search with multiple filters.
 
    ## Filters:
   * school
@@ -64,7 +64,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   * 200 `SkollerWeb.Class.SearchView`
   """
   def index(conn, params) do
-    classes = Students.get_classes_with_enrollment(params)
+    classes = EnrolledClasses.get_classes_with_enrollment(params)
 
     render(conn, SearchView, "index.json", classes: classes)
   end

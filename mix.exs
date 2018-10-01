@@ -4,7 +4,7 @@ defmodule Skoller.Mixfile do
   def project do
     [
       app: :skoller,
-      version: "2.2.1",
+      version: "2.2.2",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -56,9 +56,10 @@ defmodule Skoller.Mixfile do
       {:kadabra, "~> 0.4.2"},
       {:ex_twilio, "~> 0.5.0"},
       {:csv, "~> 2.0.0"},
-      {:bamboo, "~> 0.8"},
-      {:bamboo_smtp, "~> 1.4.0"},
-      {:timex, "~> 3.1"}
+      {:bamboo, "~> 1.0"},
+      {:timex, "~> 3.1"},
+      {:bamboo_ses, "~> 0.1.0"},
+      {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
     ]
   end
 

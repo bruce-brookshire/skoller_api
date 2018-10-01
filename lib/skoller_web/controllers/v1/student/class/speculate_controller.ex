@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   alias Skoller.Repo
   alias Skoller.StudentAssignments.StudentAssignment
   alias SkollerWeb.Class.SpeculationView
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
   alias Skoller.StudentAssignments
 
   import SkollerWeb.Plugs.Auth
@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.SpeculateController do
   plug :verify_member, :student
 
   def speculate(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
     
     student_class = student_class |> Repo.preload(:class)
 

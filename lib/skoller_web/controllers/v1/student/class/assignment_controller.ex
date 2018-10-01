@@ -6,11 +6,12 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Students
   alias Skoller.StudentAssignments
   alias Skoller.Mods
   alias Skoller.AutoUpdates
   alias Skoller.ModNotifications
+  alias Skoller.EnrolledStudents
+  alias Skoller.StudentAssignments.StudentClasses
 
   import SkollerWeb.Plugs.Auth
   
@@ -23,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     params = params |> Map.put("student_class_id", student_class.id)
 
@@ -39,12 +40,12 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def index(conn, %{"student_id" => student_id} = params) do
-    student_assignments = Students.get_student_assignments(student_id, params)
+    student_assignments = StudentClasses.get_student_assignments(student_id, params)
     render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
   end
 
   def show(conn, %{"id" => id}) do
-    student_assignment = Students.get_student_assignment_by_id(id, :weight)
+    student_assignment = StudentClasses.get_student_assignment_by_id(id, :weight)
     
     pending_mods = Mods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
@@ -53,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    case Students.get_student_assignment_by_id(id) do
+    case StudentClasses.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")
@@ -72,7 +73,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def delete(conn, %{"id" => id} = params) do
-    case Students.get_student_assignment_by_id(id) do
+    case StudentClasses.get_student_assignment_by_id(id) do
       nil ->
         conn
         |> send_resp(401, "")

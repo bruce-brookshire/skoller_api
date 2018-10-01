@@ -10,7 +10,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.Locks.Lock
   alias Skoller.ClassDocs.Doc
   alias Skoller.Schools.School
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
   alias Skoller.ClassStatuses.Status
   alias Skoller.Locks
   alias Skoller.Settings
@@ -198,7 +198,7 @@ defmodule Skoller.Syllabi do
   defp enrolled_classes(query, opts) do
     case opts |> List.keytake(:enrolled, 0) |> elem(0) do
       {:enrolled, true} ->
-        query |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_subquery()), sc.class_id == class.id)
+        query |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_subquery()), sc.class_id == class.id)
       _ -> query
     end
   end

@@ -10,8 +10,8 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Assignment.ModView
   alias Skoller.Mods
-  alias Skoller.Students
   alias Skoller.AutoUpdates
+  alias Skoller.StudentClasses
 
   import SkollerWeb.Plugs.Auth
   
@@ -25,7 +25,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
     |> Repo.get!(id)
     |> Repo.preload(:assignment)
 
-    case Students.get_active_student_class_by_ids(mod.assignment.class_id, student_id) do
+    case StudentClasses.get_active_student_class_by_ids(mod.assignment.class_id, student_id) do
       nil ->
         conn
         |> send_resp(401, "")
