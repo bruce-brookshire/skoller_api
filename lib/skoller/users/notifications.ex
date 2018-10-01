@@ -7,7 +7,7 @@ defmodule Skoller.Users.Notifications do
   alias Skoller.Devices
   alias Services.Notification
 
-  @link_used_msg "🤩  Someone just signed up for Skoller using your link!"
+  @link_used_msg "More points earned! Someone just signed up for Skoller using your link. 🤩  "
   @link_used_category "SignupLink.Used"
 
   def send_link_used_notification(student_id) do
