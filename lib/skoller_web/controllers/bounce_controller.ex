@@ -33,12 +33,12 @@ defmodule SkollerWeb.Api.BounceController do
   defp handle_notification(%{"notificationType" => "Complaint", "complaint" => complaint}) do
     Logger.info("Recieved complaint for email " <> inspect(complaint["complainedRecipients"]))
 
-    complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
+    complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1["emailAddress"]))
   end
   defp handle_notification(%{"notificationType" => "Bounce", "bounce" => bounce}) do
     Logger.info("Recieved bounce for email " <> inspect(bounce["bouncedRecipients"]))
 
-    bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1.emailAddress))
+    bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1["emailAddress"]))
   end
 
   defp unsubscribe_email(email) do
