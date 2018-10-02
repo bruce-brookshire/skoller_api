@@ -275,17 +275,15 @@
             <td align="center" valign="top" width="600" style="width:600px;">
             <![endif]-->
             <table class="templateContainer" width="600" cellspacing="0" cellpadding="0" border="0">
-              <tbody><tr>
-                <td id="templateHeader" valign="top">
-                  <%= render SkollerWeb.EmailView, "header.html", %{} %>
-                </td>
-              </tr>
-              <%= render @view_module, @view_template, assigns %>
-              <tr>
-                <td id="templateFooter" valign="top">
-                  <%= render SkollerWeb.EmailView, "footer.html", unsub_path: @unsub_path %>
-                </td>
-              </tr></tbody>
+              <tbody>
+                <tr>
+                  <td id="templateHeader" valign="top">
+                    <%= render SkollerWeb.EmailView, "header.html", %{} %>
+                  </td>
+                </tr>
+                <%= render @view_module, @view_template, assigns %>
+                <%= render SkollerWeb.EmailView, "footer.html", unsub_path: @unsub_path %>
+              </tbody>
             </table>
             <!--[if (gte mso 9)|(IE)]>
             </td>
