@@ -1,0 +1,38 @@
+<table class="mcnTextBlock" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody><tr>
+    <td style="padding-top: 9px;" valign="top">
+      <!--[if mso]>
+      <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
+      <tr>
+      <![endif]-->
+      <!--[if mso]>
+      <td valign="top" width="600" style="width:600px;">
+      <![endif]-->
+      <table style="max-width: 100%; min-width: 100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
+        cellpadding="0" border="0" align="left">
+        <tbody><tr>
+          <td class="mcnTextContent" style="padding-top: 0; padding-right: 18px; padding-bottom: 9px; padding-left: 18px; text-align: center;"
+            valign="top">
+            <em>Copyright &copy; 2018 Skoller, Inc., All rights reserved.</em>
+            <br>
+            <br>
+            <strong>Our mailing address is:</strong><br>
+            530 Church St. Suite 301<br>
+            Nashville, TN 37219<br>
+            <br>
+            Want to change how you receive these emails?<br>
+            You can <a href="<%= @unsub_path %>">unsubscribe from this list</a>.<br>
+            <br>
+          </td>
+        </tr></tbody>
+      </table>
+      <!--[if mso]>
+      </td>
+      <![endif]-->
+      <!--[if mso]>
+      </tr>
+      </table>
+      <![endif]-->
+    </td>
+  </tr></tbody>
+</table>
