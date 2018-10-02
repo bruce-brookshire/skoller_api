@@ -49,7 +49,7 @@ defmodule Skoller.Classes.Schools do
   def get_school_from_class_subquery(%{"school_id" => school_id}) do
     get_school_from_class_by_school_subquery(school_id)
   end
-  def get_school_from_class_subquery(params) when params == %{} do
+  def get_school_from_class_subquery(params) when is_map(params) do
     from(c in Class)
     |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
     |> select([c, p], %{class_id: c.id, school_id: p.school_id})
