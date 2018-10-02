@@ -2,6 +2,7 @@ defmodule Skoller.StudentClasses.Emails do
   @moduledoc """
   Defines emails based on student classes
   """
+  use Bamboo.Phoenix, view: SkollerWeb.EmailView
 
   alias Skoller.Mailer
   alias Skoller.Users.EmailPreferences
@@ -9,8 +10,6 @@ defmodule Skoller.StudentClasses.Emails do
   import Bamboo.Email
 
   require Logger
-  require EEx
-  EEx.function_from_file :defp, :build_no_classes_body, System.cwd() <> "/lib/skoller/student_classes/no_classes.html.eex", [:unsub_path]
 
   @from_email "noreply@skoller.co"
   @no_classes_id 100
@@ -38,7 +37,9 @@ defmodule Skoller.StudentClasses.Emails do
     |> to(user.email)
     |> from(@from_email)
     |> subject("🚨 URGENT: You have no classes 🚨")
-    |> html_body(build_no_classes_body(System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id))
+    |> put_html_layout({SkollerWeb.LayoutView, "email.html"})
+    |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
+    |> render("no_classes.html")
     |> text_body("test")
 
     Map.new
