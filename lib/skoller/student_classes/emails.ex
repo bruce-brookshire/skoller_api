@@ -17,6 +17,6 @@ defmodule Skoller.StudentClasses.Emails do
   defp send_no_classes_email(user) do
     user_id = user.id |> to_string
     subject = "Sign up for your classes so you can party harder!  🍻"
-    MarketingEmail.send_email(user_id, user.email, subject, :no_classes)
+    MarketingEmail.send_email(user_id, user.email, subject, :no_classes, @no_classes_id)
   end
 end

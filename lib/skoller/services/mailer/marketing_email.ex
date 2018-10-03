@@ -5,6 +5,8 @@ defmodule Skoller.Services.MarketingEmail do
   use Bamboo.Phoenix, view: SkollerWeb.EmailView
 
   alias Skoller.Services.Mailer
+  alias Skoller.EmailLog
+  alias Skoller.Repo
 
   import Bamboo.Email
 
@@ -12,17 +14,18 @@ defmodule Skoller.Services.MarketingEmail do
 
   @from_email "noreply@skoller.co"
 
-  def send_email(user_id, email_adr, subject, template) do
+  def send_email(user_id, email_adr, subject, template, email_type_id) do
     base_email(user_id)
     |> to(email_adr)
     |> subject(subject)
     |> render(template)
-    |> deliver_message(user_id)
+    |> deliver_message(user_id, email_type_id)
   end
 
-  defp deliver_message(email, user_id) do
+  defp deliver_message(email, user_id, email_type_id) do
     try do
       Logger.info("Sending email to: " <> user_id |> to_string)
+      Repo.insert(%EmailLog{user_id: user_id |> String.to_integer(), email_type_id: email_type_id})
       Mailer.deliver_now(email)
     rescue
       error ->
