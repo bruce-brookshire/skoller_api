@@ -7,7 +7,7 @@ defmodule Skoller.ChatNotifications do
   alias Skoller.Students
   alias Skoller.Classes
   alias Skoller.Notifications
-  alias Services.Notification
+  alias Skoller.Services.Notification
   alias Skoller.Devices
 
   @class_chat_post "ClassChat.Post"

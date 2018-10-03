@@ -1,38 +1,195 @@
-<table class="mcnTextBlock" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
-  <tbody><tr>
-    <td style="padding-top: 9px;" valign="top">
-      <!--[if mso]>
-      <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
-      <tr>
-      <![endif]-->
-      <!--[if mso]>
-      <td valign="top" width="600" style="width:600px;">
-      <![endif]-->
-      <table style="max-width: 100%; min-width: 100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
-        cellpadding="0" border="0" align="left">
-        <tbody><tr>
-          <td class="mcnTextContent" style="padding-top: 0; padding-right: 18px; padding-bottom: 9px; padding-left: 18px; text-align: center;"
-            valign="top">
-            <em>Copyright &copy; 2018 Skoller, Inc., All rights reserved.</em>
-            <br>
-            <br>
-            <strong>Our mailing address is:</strong><br>
-            530 Church St. Suite 301<br>
-            Nashville, TN 37219<br>
-            <br>
-            Want to change how you receive these emails?<br>
-            You can <a href="<%= @unsub_path %>">unsubscribe from this list</a>.<br>
-            <br>
+<tr>
+  <td id="templateLowerBody" valign="top">
+    <table style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+      <tbody><tr>
+        <td style="padding: 9px" valign="top" align="center">
+          <table style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tbody><tr>
+              <td style="padding-left: 9px; padding-right: 9px;" align="center">
+                <table style="min-width: 100%; background-color: #222222;" width="100%"
+                  cellspacing="0" cellpadding="0" border="0">
+                  <tbody><tr>
+                    <td style="padding-top: 9px; padding-right: 9px; padding-left: 9px;" valign="top" align="center">
+                      <table cellspacing="0" cellpadding="0" border="0" align="center">
+                        <tbody><tr>
+                          <td valign="top" align="center">
+                            <!--[if mso]>
+                            <table align="center" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                            <![endif]-->
+                            <!--[if mso]>
+                            <td align="center" valign="top">
+                            <![endif]-->
+                            <table style="display: inline;" cellspacing="0" cellpadding="0" border="0" align="left">
+                              <tbody><tr>
+                                <td style="padding-right: 10px; padding-bottom: 9px;" valign="top">
+                                  <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                    <tbody><tr>
+                                      <td style="padding-top: 5px; padding-right: 10px; padding-bottom:5px; padding-left: 9px;"
+                                        valign="middle" align="left">
+                                        <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
+                                          <tbody><tr>
+                                            <td width="24" valign="middle" align="center">
+                                              <a href="http://www.twitter.com/skolleratme" target="_blank">
+                                                <img src="https://www.skoller.co/src/assets/email/twitter.png"
+                                                  style="display:block;" class="" width="24" height="24">
+                                              </a>
+                                            </td>
+                                          </tr></tbody>
+                                        </table>
+                                      </td>
+                                    </tr></tbody>
+                                  </table>
+                                </td>
+                              </tr></tbody>
+                            </table>
+                            <!--[if mso]>
+                            </td>
+                            <![endif]-->
+                            <!--[if mso]>
+                            <td align="center" valign="top">
+                            <![endif]-->
+                            <table style="display: inline;" cellspacing="0" cellpadding="0" border="0" align="left">
+                              <tbody><tr>
+                                <td style="padding-right: 10px; padding-bottom: 9px;" valign="top">
+                                  <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                    <tbody><tr>
+                                      <td style="padding-top: 5px; padding-right: 10px; padding-bottom: 5px; padding-left: 9px;"
+                                        valign="middle" align="left">
+                                        <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
+                                          <tbody><tr>
+                                            <td width="24" valign="middle" align="center">
+                                              <a href="http://www.facebook.com/skolleratme" target="_blank">
+                                                <img src="https://www.skoller.co/src/assets/email/facebook.png"
+                                                  style="display: block;" class="" width="24" height="24">
+                                              </a>
+                                            </td>
+                                          </tr></tbody>
+                                        </table>
+                                      </td>
+                                    </tr></tbody>
+                                  </table>
+                                </td>
+                              </tr></tbody>
+                            </table>
+                            <!--[if mso]>
+                            </td>
+                            <![endif]-->
+                            <!--[if mso]>
+                            <td align="center" valign="top">
+                            <![endif]-->
+                            <table style="display: inline;" cellspacing="0" cellpadding="0" border="0" align="left">
+                              <tbody><tr>
+                                <td style="padding-right:10px; padding-bottom:9px;" valign="top">
+                                  <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                    <tbody><tr>
+                                      <td style="padding-top:5px; padding-right:10px; padding-bottom:5px; padding-left:9px;"
+                                        valign="middle" align="left">
+                                        <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
+                                          <tbody><tr>
+                                            <td width="24" valign="middle" align="center">
+                                              <a href="http://instagram.com/skolleratme" target="_blank">
+                                                <img src="https://www.skoller.co/src/assets/email/instagram.png"
+                                                  style="display: block;" class="" width="24" height="24">
+                                              </a>
+                                            </td>
+                                          </tr></tbody>
+                                        </table>
+                                      </td>
+                                    </tr></tbody>
+                                  </table>
+                                </td>
+                              </tr></tbody>
+                            </table>
+                            <!--[if mso]>
+                            </td>
+                            <![endif]-->
+                            <!--[if mso]>
+                            <td align="center" valign="top">
+                            <![endif]-->
+                            <table style="display: inline;" cellspacing="0" cellpadding="0" border="0" align="left">
+                              <tbody><tr>
+                                <td style="padding-right: 0; padding-bottom: 9px;" valign="top">
+                                  <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                    <tbody><tr>
+                                      <td style="padding-top: 5px; padding-right: 10px; padding-bottom: 5px; padding-left: 9px;"
+                                        valign="middle" align="left">
+                                        <table width="" cellspacing="0" cellpadding="0" border="0" align="left">
+                                          <tbody><tr>
+                                            <td width="24" valign="middle" align="center">
+                                              <a href="http://www.skoller.co" target="_blank">
+                                                <img src="https://www.skoller.co/src/assets/email/sammi-circle.png"
+                                                  style="display:block;" class="" width="24" height="24">
+                                              </a>
+                                            </td>
+                                          </tr></tbody>
+                                        </table>
+                                      </td>
+                                    </tr></tbody>
+                                  </table>
+                                </td>
+                              </tr></tbody>
+                            </table>
+                            <!--[if mso]>
+                            </td>
+                            <![endif]-->
+                            <!--[if mso]>
+                            </tr>
+                            </table>
+                            <![endif]-->
+                          </td>
+                        </tr></tbody>
+                      </table>
+                    </td>
+                  </tr></tbody>
+                </table>
+              </td>
+            </tr></tbody>
+          </table>
+        </td>
+      </tr></tbody>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td id="templateFooter" valign="top">
+    <table class="mcnTextBlock" style="min-width: 100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
+      <tbody><tr>
+        <td style="padding-top: 9px;" valign="top">
+          <!--[if mso]>
+          <table align="left" border="0" cellspacing="0" cellpadding="0" width="100%" style="width:100%;">
+          <tr>
+          <![endif]-->
+          <!--[if mso]>
+          <td valign="top" width="600" style="width:600px;">
+          <![endif]-->
+          <table style="max-width: 100%; min-width: 100%;" class="mcnTextContentContainer" width="100%" cellspacing="0"
+            cellpadding="0" border="0" align="left">
+            <tbody><tr>
+              <td class="mcnTextContent" style="padding-top: 0; padding-right: 18px; padding-bottom: 9px; padding-left: 18px; text-align: center;"
+                valign="top">
+                <em>Copyright &copy; 2018 Skoller, Inc., All rights reserved.</em>
+                <br>
+                <br>
+                <strong>Our mailing address is:</strong><br>
+                530 Church St. Suite 301<br>
+                Nashville, TN 37219<br>
+                <br>
+                Want to change how you receive these emails?<br>
+                You can <a href="<%= @unsub_path %>">unsubscribe from this list</a>.<br>
+                <br>
+              </td>
+            </tr></tbody>
+          </table>
+          <!--[if mso]>
           </td>
-        </tr></tbody>
-      </table>
-      <!--[if mso]>
-      </td>
-      <![endif]-->
-      <!--[if mso]>
-      </tr>
-      </table>
-      <![endif]-->
-    </td>
-  </tr></tbody>
-</table>
+          <![endif]-->
+          <!--[if mso]>
+          </tr>
+          </table>
+          <![endif]-->
+        </td>
+      </tr></tbody>
+    </table>
+  </td>
+</tr>
