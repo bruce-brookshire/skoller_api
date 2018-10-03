@@ -1,10 +1,10 @@
-defmodule Services.Notification do
+defmodule Skoller.Services.Notification do
   @moduledoc """
   Provides Notification utilities.
   """
 
-  alias Services.Notification.Ios
-  alias Services.Notification.Android
+  alias Skoller.Services.Notification.Ios
+  alias Skoller.Services.Notification.Android
 
   require Logger
 

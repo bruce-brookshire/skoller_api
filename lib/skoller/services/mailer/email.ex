@@ -1,8 +1,9 @@
-defmodule Skoller.Mailer do
+defmodule Skoller.Services.Email do
   @moduledoc """
-  Module for sending emails using `Bamboo.Mailer`
+  A helper module for sending basic emails.
   """
-  use Bamboo.Mailer, otp_app: :skoller
+
+  import Bamboo.Email
 
   @divider "--"
   @skoller "The Skoller Team"

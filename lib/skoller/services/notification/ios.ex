@@ -1,4 +1,4 @@
-defmodule Services.Notification.Ios do
+defmodule Skoller.Services.Notification.Ios do
   @moduledoc """
   Provides Notification utilities.
   """

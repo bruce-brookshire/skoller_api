@@ -4,7 +4,7 @@ defmodule Skoller.StudentClasses.Notifications do
   """
 
   alias Skoller.Devices
-  alias Services.Notification
+  alias Skoller.Services.Notification
   alias Skoller.EmailTypes
 
   @no_classes_id 100

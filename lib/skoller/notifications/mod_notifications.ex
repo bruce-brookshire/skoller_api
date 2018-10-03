@@ -11,7 +11,7 @@ defmodule Skoller.ModNotifications do
   alias Skoller.ModActions
   alias Skoller.Dates
   alias Skoller.Students.Student
-  alias Services.Notification
+  alias Skoller.Services.Notification
   alias Skoller.Mods
 
   @name_assignment_mod 100

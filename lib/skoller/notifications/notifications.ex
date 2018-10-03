@@ -15,7 +15,7 @@ defmodule Skoller.Notifications do
   alias Skoller.ChatComments.Star, as: CommentStar
   alias Skoller.ChatComments.Comment
   alias Skoller.Notifications.ManualLog
-  alias Services.Notification
+  alias Skoller.Services.Notification
   alias Skoller.Classes.EditableClasses
   alias Skoller.Classes.ClassStatuses
 

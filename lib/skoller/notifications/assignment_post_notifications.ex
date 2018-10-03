@@ -7,7 +7,7 @@ defmodule Skoller.AssignmentPostNotifications do
   alias Skoller.Assignments
   alias Skoller.Classes
   alias Skoller.Notifications
-  alias Services.Notification
+  alias Skoller.Services.Notification
 
   @assignment_post "Assignment.Post"
   
