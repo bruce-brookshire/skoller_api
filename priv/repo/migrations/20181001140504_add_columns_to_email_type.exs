@@ -11,7 +11,6 @@ defmodule Skoller.Repo.Migrations.AddColumnsToEmailType do
 
     flush()
 
-    Skoller.Repo.delete_all(Skoller.EmailTypes.EmailType)
     Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
       id: 100,
       name: "No Classes Email",
