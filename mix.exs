@@ -36,6 +36,7 @@ defmodule Skoller.Mixfile do
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:phoenix, "~> 1.3.0"},
+      {:phoenix_html, "~> 2.2"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
@@ -56,9 +57,10 @@ defmodule Skoller.Mixfile do
       {:kadabra, "~> 0.4.2"},
       {:ex_twilio, "~> 0.5.0"},
       {:csv, "~> 2.0.0"},
-      {:bamboo, "~> 0.8"},
-      {:bamboo_smtp, "~> 1.4.0"},
-      {:timex, "~> 3.1"}
+      {:bamboo, "~> 1.0"},
+      {:timex, "~> 3.1"},
+      {:bamboo_ses, "~> 0.1.0"},
+      {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
     ]
   end
 

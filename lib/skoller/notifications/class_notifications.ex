@@ -5,7 +5,7 @@ defmodule Skoller.ClassNotifications do
 
   alias Skoller.Repo
   alias Skoller.Notifications
-  alias Services.Notification
+  alias Skoller.Services.Notification
   alias Skoller.Devices
 
   @class_complete_category "Class.Complete"

@@ -51,7 +51,7 @@ config :pigeon, :fcm,
   }
 
 #this is for local email
-config :skoller, Skoller.Mailer,
+config :skoller, Skoller.Services.Mailer,
   adapter: Bamboo.LocalAdapter
 
 # Import environment specific config. This must remain at the bottom

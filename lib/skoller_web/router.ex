@@ -10,6 +10,10 @@ defmodule SkollerWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :sns do
+    plug :accepts, ["json", "text"]
+  end
+
   pipeline :api_auth_verified do
     plug :accepts, ["json"]
     plug Guardian.Plug.Pipeline, module: Skoller.Auth,
@@ -32,7 +36,7 @@ defmodule SkollerWeb.Router do
   end
 
   if Mix.env == :dev do
-    forward "/sent_emails", Bamboo.EmailPreviewPlug
+    forward "/sent_emails", Bamboo.SentEmailViewerPlug
   end
 
   # Other scopes may use custom stacks.
@@ -40,6 +44,8 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth_verified
 
     scope "/v1", V1, as: :v1 do
+      resources "/email-types", Admin.EmailTypeController, only: [:index, :update]
+
       get "/sammi", SammiController, :status
       post "/sammi/train", SammiController, :train
 
@@ -268,15 +274,24 @@ defmodule SkollerWeb.Router do
   end
 
   scope "/api", SkollerWeb.Api do
+    pipe_through :sns
+
+    post "/bounce", BounceController, :bounce
+  end
+
+  scope "/api", SkollerWeb.Api do
     pipe_through :api
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
       resources "/users", NewUserController, only: [:create]
+      put "/users/:user_id/email-preferences", EmailPreferenceController, :update
+      get "/users/:user_id/email-preferences", EmailPreferenceController, :index
       resources "/fields-of-study/list", FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
       get "/enrollment-link/:token", Student.Class.LinkController, :show
+      get "/email-types/list", EmailTypeController, :index
     end
   end
 end

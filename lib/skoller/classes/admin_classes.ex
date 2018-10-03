@@ -4,7 +4,7 @@ defmodule Skoller.AdminClasses do
   """
 
   alias Skoller.Repo
-  alias Skoller.Mailer
+  alias Skoller.Services.Mailer
   alias Skoller.Classes
   alias Skoller.Users
   alias Skoller.Locks
@@ -13,6 +13,7 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Classes.Note
   alias Skoller.ClassStatuses, as: Statuses
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.Services.Email
 
   import Bamboo.Email
 
@@ -118,7 +119,7 @@ defmodule Skoller.AdminClasses do
     @upload_correct_syllabus <> "<br />" <>
     "<br />" <>
     @syllabus_ending <> "</p>" <> 
-    Mailer.signature()
+    Email.signature()
   end
 
   defp syllabus_text_body(class) do
@@ -128,7 +129,7 @@ defmodule Skoller.AdminClasses do
     "\n" <>
     @syllabus_ending <> "\n" <>
     "\n" <>
-    Mailer.text_signature()
+    Email.text_signature()
   end
 
   defp compare_class_status_completion(changeset, true, false) do

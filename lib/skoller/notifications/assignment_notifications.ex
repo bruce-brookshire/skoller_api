@@ -5,13 +5,14 @@ defmodule Skoller.AssignmentNotifications do
 
   alias Skoller.Assignments
   alias Skoller.Notifications
-  alias Services.Notification
+  alias Skoller.Services.Notification
 
   @assignment_reminder_today_category 100
   @assignment_reminder_tomorrow_category 200
   @assignment_reminder_future_category 300
 
-  def send_assignment_reminder_notifications(time) do
+  def send_assignment_reminder_notifications(datetime) do
+    time = datetime |> DateTime.to_time()
     time 
     |> Notifications.get_assignment_reminders(:today)
     |> Enum.each(&send_notifications(&1, :today))
