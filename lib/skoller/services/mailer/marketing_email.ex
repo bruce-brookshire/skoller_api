@@ -12,12 +12,11 @@ defmodule Skoller.Services.MarketingEmail do
 
   @from_email "noreply@skoller.co"
 
-  def send_email(user_id, email_adr, subject, template, text_body) do
+  def send_email(user_id, email_adr, subject, template) do
     base_email(user_id)
     |> to(email_adr)
     |> subject(subject)
     |> render(template)
-    |> text_body(text_body)
     |> deliver_message(user_id)
   end
 
@@ -34,7 +33,7 @@ defmodule Skoller.Services.MarketingEmail do
   defp base_email(user_id) do
     new_email()
     |> from(@from_email)
-    |> put_html_layout({SkollerWeb.LayoutView, "email.html"})
+    |> put_layout({SkollerWeb.LayoutView, :email})
     |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
   end
 end
