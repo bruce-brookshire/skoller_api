@@ -1,4 +1,4 @@
-defmodule Services.Notification.Android do
+defmodule Skoller.Services.Notification.Android do
   @moduledoc """
   Provides Notification utilities.
   """

@@ -6,8 +6,9 @@ defmodule Skoller.ChangeRequests do
   alias Skoller.Repo
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Classes
-  alias Skoller.Mailer
+  alias Skoller.Services.Mailer
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.Services.Email
 
   import Bamboo.Email
   
@@ -55,8 +56,8 @@ defmodule Skoller.ChangeRequests do
     |> to(user.email)
     |> from(@from_email)
     |> subject(class.name <> @change_approved)
-    |> html_body("<p>" <> user.student.name_first <> ",<br /><br >" <> @we_approved_change <> class.name <> "<br /><br />" <> @ending <> "</p>" <> Mailer.signature())
-    |> text_body(user.student.name_first <> ",\n \n" <> @we_approved_change <> class.name <> "\n \n" <> @ending <> "\n \n" <> Mailer.text_signature())
+    |> html_body("<p>" <> user.student.name_first <> ",<br /><br >" <> @we_approved_change <> class.name <> "<br /><br />" <> @ending <> "</p>" <> Email.signature())
+    |> text_body(user.student.name_first <> ",\n \n" <> @we_approved_change <> class.name <> "\n \n" <> @ending <> "\n \n" <> Email.text_signature())
     |> Mailer.deliver_later
   end
 end

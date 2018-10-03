@@ -5,7 +5,7 @@ defmodule Skoller.Users.Notifications do
 
   alias Skoller.Users.Students
   alias Skoller.Devices
-  alias Services.Notification
+  alias Skoller.Services.Notification
 
   @link_used_msg "More points earned! Someone just signed up for Skoller using your link. 🤩  "
   @link_used_category "SignupLink.Used"

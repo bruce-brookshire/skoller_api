@@ -92,5 +92,5 @@ config :pigeon, :apns,
   }
 
 # This is for emails
-config :skoller, Skoller.Mailer,
+config :skoller, Skoller.Services.Mailer,
   adapter: Bamboo.SesAdapter

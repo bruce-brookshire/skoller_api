@@ -133,6 +133,24 @@
         line-height: 150%;
         text-align: left;
       }
+      #templateBody {
+        background-color: #FFFFFF;
+        background-image: none;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        border-top: 0;
+        border-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      #templateBody .mcnTextContent, #templateBody .mcnTextContent p {
+        color: #202020;
+        font-family: Helvetica;
+        font-size: 16px;
+        line-height: 150%;
+        text-align: left;
+      }
       #templateColumns {
         background-color: #FFFFFF;
         background-image: none;
@@ -165,7 +183,7 @@
         background-position: center;
         background-size: cover;
         border-top: 0;
-        border-bottom: 2px solid #EAEAEA;
+        border-bottom: 0;
         padding-top: 0;
         padding-bottom: 9px;
       }

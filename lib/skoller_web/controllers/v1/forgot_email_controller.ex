@@ -5,10 +5,11 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
 
   alias Skoller.Users
   alias Skoller.Repo
-  alias Skoller.Mailer
+  alias Skoller.Services.Mailer
   alias Skoller.Token
   alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.AuthView
+  alias Skoller.Services.Email
 
   import Bamboo.Email
 
@@ -56,7 +57,7 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
     |> to(user.email)
     |> from(@from_email)
     |> subject("Forgot Password")
-    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Mailer.signature())
-    |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Mailer.text_signature())
+    |> html_body("<p>" <> @forgot_email_text1 <> "<a href=" <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> ">" <> @this_link <> "</a>" <> @forgot_email_text2 <> "</p>" <> Email.signature())
+    |> text_body(@forgot_email_text1 <> to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token <> @forgot_email_text2 <> "\n" <> "\n" <> Email.text_signature())
   end
 end
