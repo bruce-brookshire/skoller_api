@@ -11,6 +11,7 @@ defmodule SkollerWeb.Api.BounceController do
   def bounce(conn, %{"Message" => message}) do
     decoded_message = Poison.decode!(message)
     handle_notification(decoded_message)
+    conn |> send_resp(204, "")
   end
 
   def bounce(conn, params) do

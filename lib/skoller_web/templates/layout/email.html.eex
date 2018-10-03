@@ -133,6 +133,24 @@
         line-height: 150%;
         text-align: left;
       }
+      #templateBody {
+        background-color: #FFFFFF;
+        background-image: none;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        border-top: 0;
+        border-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      #templateBody .mcnTextContent, #templateBody .mcnTextContent p {
+        color: #202020;
+        font-family: Helvetica;
+        font-size: 16px;
+        line-height: 150%;
+        text-align: left;
+      }
       #templateColumns {
         background-color: #FFFFFF;
         background-image: none;
@@ -165,7 +183,7 @@
         background-position: center;
         background-size: cover;
         border-top: 0;
-        border-bottom: 2px solid #EAEAEA;
+        border-bottom: 0;
         padding-top: 0;
         padding-bottom: 9px;
       }
@@ -275,17 +293,15 @@
             <td align="center" valign="top" width="600" style="width:600px;">
             <![endif]-->
             <table class="templateContainer" width="600" cellspacing="0" cellpadding="0" border="0">
-              <tbody><tr>
-                <td id="templateHeader" valign="top">
-                  <%= render SkollerWeb.EmailView, "header.html", %{} %>
-                </td>
-              </tr>
-              <%= render @view_module, @view_template, assigns %>
-              <tr>
-                <td id="templateFooter" valign="top">
-                  <%= render SkollerWeb.EmailView, "footer.html", unsub_path: @unsub_path %>
-                </td>
-              </tr></tbody>
+              <tbody>
+                <tr>
+                  <td id="templateHeader" valign="top">
+                    <%= render SkollerWeb.EmailView, "header.html", %{} %>
+                  </td>
+                </tr>
+                <%= render @view_module, @view_template, assigns %>
+                <%= render SkollerWeb.EmailView, "footer.html", unsub_path: @unsub_path %>
+              </tbody>
             </table>
             <!--[if (gte mso 9)|(IE)]>
             </td>
