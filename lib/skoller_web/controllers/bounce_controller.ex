@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.BounceController do
 
   require Logger
 
-  def bounce(conn, %{"Message" => message}) do
+  def bounce(conn, %{"Message" => message} = params) do
     case params["SubscribeURL"] do
       nil -> 
         decoded_message = Poison.decode!(message)
