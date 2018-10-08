@@ -3,12 +3,18 @@ defmodule Skoller.AutoUpdates do
   The context module for auto updates.
   """
 
+  alias Skoller.Mods.Mod
   alias Skoller.Repo
   alias Skoller.Settings
   alias Skoller.ModActions
   alias Skoller.ModNotifications
   alias Skoller.Mods
   alias Skoller.MapErrors
+  alias Skoller.Mods.Action
+  alias Skoller.EnrolledStudents
+  alias Skoller.Students
+
+  import Ecto.Query
 
   require Logger
 
@@ -69,6 +75,73 @@ defmodule Skoller.AutoUpdates do
         |> Repo.transaction()
       {:error, _msg} -> {:ok, nil}
     end
+  end
+
+  @doc """
+  Gets the count of joyriders.
+
+  Joyriders are students in communities that have autoupdated mods.
+
+  ## Returns
+  `Integer`
+  """
+  def get_joyriders() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], a.is_accepted == true and a.is_manual == false)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Gets the count of pending students.
+
+  Pending students are students in communities with mods that they have not responded to yet.
+
+  ## Returns
+  `Integer`
+  """
+  def get_pending() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], is_nil(a.is_accepted))
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Gets the count of followers.
+
+  Followers are students in communities with mods that they accepted.
+
+  ## Returns
+  `Integer`
+  """
+  def get_followers() do
+    from(a in Action)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> where([a], a.is_manual == true and a.is_accepted == true)
+    |> distinct([a, sc], sc.student_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Gets the count of creators.
+
+  Creators are students in communities that creates a mod.
+
+  ## Returns
+  `Integer`
+  """
+  def get_creators() do
+    from(m in Mod)
+    |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
+    |> join(:inner, [m, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> distinct([m], m.student_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   defp auto_update_count_needed(count) do

@@ -7,7 +7,7 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Services.Mailer
   alias Skoller.Classes
   alias Skoller.Locks
-  alias Skoller.Mods
+  alias Skoller.Assignments.Mods
   alias Skoller.Classes.Note
   alias Skoller.ClassStatuses, as: Statuses
   alias Skoller.Classes.ClassStatuses

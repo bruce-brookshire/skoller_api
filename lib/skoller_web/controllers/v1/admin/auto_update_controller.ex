@@ -10,10 +10,10 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
   alias Skoller.Mods.Mod
   alias SkollerWeb.Admin.ForecastView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Mods
   alias Skoller.Students
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
+  alias Skoller.ModActions
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -85,7 +85,7 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
     settings = Settings.get_auto_update_settings()
     enrollment_threshold = get_setting(settings, @auto_upd_enrollment_threshold) |> String.to_integer
 
-    Mods.get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold)
+    ModActions.get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold)
     |> Enum.filter(&compare_shared(&1, settings))
     |> Enum.filter(&compare_responses(&1, settings))
     |> Enum.each(&auto_update_mod(&1))
@@ -141,16 +141,16 @@ defmodule SkollerWeb.Api.V1.Admin.AutoUpdateController do
 
   defp get_people() do
     Map.new()
-    |> Map.put(:creators, Mods.get_creators())
-    |> Map.put(:followers, Mods.get_followers())
-    |> Map.put(:pending, Mods.get_pending())
-    |> Map.put(:joyriders, Mods.get_joyriders())
+    |> Map.put(:creators, AutoUpdates.get_creators())
+    |> Map.put(:followers, AutoUpdates.get_followers())
+    |> Map.put(:pending, AutoUpdates.get_pending())
+    |> Map.put(:joyriders, AutoUpdates.get_joyriders())
   end
 
   defp get_metrics(settings) do
     eligible_communities = get_eligible_communities()
-    shared_mods = Mods.get_shared_mods()
-    responded_mods = Mods.get_responded_mods()
+    shared_mods = ModActions.get_shared_mods()
+    responded_mods = ModActions.get_responded_mods()
 
     approval_threshold = responded_mods |> Enum.filter(&compare_responses(&1, settings))
     response_threshold = shared_mods |> Enum.filter(&compare_shared(&1, settings))
