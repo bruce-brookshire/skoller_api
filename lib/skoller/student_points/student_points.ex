@@ -46,7 +46,7 @@ defmodule Skoller.StudentPoints do
   def check_1000_point_threshold(student_id) do
     points = get_points_by_student_id(student_id)
     if points >= 1000 do
-      Emails.send_one_thousand_points_email(student_id)
+      Task.start(Emails, :send_one_thousand_points_email, [student_id])
     end
   end
 end
