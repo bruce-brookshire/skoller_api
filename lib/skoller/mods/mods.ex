@@ -678,10 +678,12 @@ defmodule Skoller.Mods do
     |> Repo.all
   end
 
+  # TODO: Fix when data is fixed to be Repo.one()
   defp find_mod(%{assignment_mod_type_id: @new_assignment_mod} = mod) do
     from(mod in Mod)
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
-    |> Repo.one()
+    |> Repo.all()
+    |> List.first()
   end
   defp find_mod(mod) do
     from(mod in Mod)
