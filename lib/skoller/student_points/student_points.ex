@@ -6,6 +6,7 @@ defmodule Skoller.StudentPoints do
   alias Skoller.StudentPoints.StudentPoint
   alias Skoller.StudentPoints.PointType
   alias Skoller.Repo
+  alias Skoller.StudentPoints.Emails
 
   import Ecto.Query
 
@@ -33,6 +34,19 @@ defmodule Skoller.StudentPoints do
   def add_points_to_student(student_id, point_name) do
     point_type = Repo.get_by!(PointType, name: point_name)
 
-    Repo.insert(%StudentPoint{student_id: student_id, student_point_type_id: point_type.id, value: point_type.value})
+    case Repo.insert(%StudentPoint{student_id: student_id, student_point_type_id: point_type.id, value: point_type.value}) do
+      {:ok, points} ->
+        check_1000_point_threshold(student_id) 
+        {:ok, points}
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  def check_1000_point_threshold(student_id) do
+    points = get_points_by_student_id(student_id)
+    if points > 1000 do
+      Emails.send_one_thousand_points_email(points.student_id)
+    end
   end
 end

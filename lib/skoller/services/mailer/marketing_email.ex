@@ -5,7 +5,7 @@ defmodule Skoller.Services.MarketingEmail do
   use Bamboo.Phoenix, view: SkollerWeb.EmailView
 
   alias Skoller.Services.Mailer
-  alias Skoller.EmailLog
+  alias Skoller.EmailLogs.EmailLog
   alias Skoller.Repo
 
   import Bamboo.Email
