@@ -8,21 +8,15 @@ defmodule SkollerWeb.Api.BounceController do
 
   require Logger
 
-  def bounce(conn, %{"Message" => message}) do
-    decoded_message = Poison.decode!(message)
-    handle_notification(decoded_message)
-    conn |> send_resp(204, "")
-  end
-
-  def bounce(conn, params) do
+  def bounce(conn, %{"Message" => message} = params) do
     case params["SubscribeURL"] do
       nil -> 
-        Logger.error(inspect(params))
-        conn |> send_resp(403, "")
+        decoded_message = Poison.decode!(message)
+        handle_notification(decoded_message)
       url ->
         HTTPoison.get(url)
-        conn |> send_resp(204, "")
     end
+    conn |> send_resp(204, "")
   end
 
   defp handle_notification(%{"notificationType" => "Complaint", "complaint" => complaint}) do
