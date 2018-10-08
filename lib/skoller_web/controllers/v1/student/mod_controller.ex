@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Assignment.ModView
   alias Skoller.Mods
+  alias Skoller.Mods.Students
   alias Skoller.AutoUpdates
   alias Skoller.StudentClasses
 
@@ -41,7 +42,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   end
 
   def index(conn, %{"student_id" => student_id} = params) do
-    mods = Mods.get_student_mods(student_id, params)
+    mods = Students.get_student_mods(student_id, params)
     conn |> render(ModView, "index.json", mods: mods)
   end
 
