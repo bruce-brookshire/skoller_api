@@ -37,7 +37,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   end
 
   def show(conn, %{"student_id" => student_id, "id" => id}) do
-    mod = Mods.get_student_mod_by_id(student_id, id)
+    mod = Students.get_student_mod_by_id(student_id, id)
     conn |> render(ModView, "show.json", mod: mod)
   end
 

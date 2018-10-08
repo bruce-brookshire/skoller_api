@@ -13,6 +13,21 @@ defmodule Skoller.Mods.Students do
 
   @due_assignment_mod 300
   @new_assignment_mod 400
+
+  @doc """
+  Gets a mod by student id and mod id.
+
+  Student must still be enrolled in class.
+
+  ## Returns
+  `%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
+  student_assignment: Skoller.StudentAssignments.StudentAssignment}`, `nil`, or raises if more than one
+  """
+  def get_student_mod_by_id(student_id, mod_id) do
+    from(mod in student_mod_base_query(student_id))
+    |> where([mod], mod.id == ^mod_id)
+    |> Repo.one()
+  end
   
   @doc """
   Gets all the mods for a student that are due today or in the future.
@@ -26,6 +41,12 @@ defmodule Skoller.Mods.Students do
   student_assignment: Skoller.StudentAssignments.StudentAssignment}]` or `[]`
   """
   def get_student_mods(student_id, params \\ %{}) do
+    from(mod in student_mod_base_query(student_id, params))
+    |> Repo.all()
+    |> Enum.filter(&filter_due_date(&1, DateTime.utc_now()))
+  end
+
+  defp student_mod_base_query(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
     |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
@@ -33,8 +54,6 @@ defmodule Skoller.Mods.Students do
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id != @new_assignment_mod and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id == @new_assignment_mod))
     |> filter(params)
     |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
-    |> Repo.all()
-    |> Enum.filter(&filter_due_date(&1, DateTime.utc_now()))
   end
 
   defp filter(query, params) do

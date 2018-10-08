@@ -10,6 +10,7 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   alias Skoller.StudentAssignments
   alias Skoller.Mods
   alias Skoller.StudentAssignments.StudentAssignment
+  alias Skoller.StudentClasses.StudentClass
 
   import Ecto.Query
 

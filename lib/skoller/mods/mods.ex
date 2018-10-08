@@ -28,26 +28,6 @@ defmodule Skoller.Mods do
   @delete_assignment_mod 500
 
   @doc """
-  Gets a mod by student id and mod id.
-
-  Student must still be enrolled in class.
-
-  ## Returns
-  `%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
-  student_assignment: Skoller.StudentAssignments.StudentAssignment}`, `nil`, or raises if more than one
-  """
-  def get_student_mod_by_id(student_id, mod_id) do
-    from(mod in Mod)
-    |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
-    |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
-    |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
-    |> where([mod], mod.id == ^mod_id)
-    |> select([mod, action, sc, sa], %{mod: mod, action: action, student_assignment: sa})
-    |> Repo.one()
-  end
-
-  @doc """
   Gets assignments with mod count and student count by class id.
 
   ## Returns
