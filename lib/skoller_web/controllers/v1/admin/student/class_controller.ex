@@ -28,9 +28,9 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
 
   defp add_student_class_details(student_class) do
     student_class
-    |> Map.put(:grade, &StudentClasses.get_class_grade(&1.id))
-    |> Map.put(:completion, &StudentAssignments.get_class_completion(&1))
-    |> Map.put(:enrollment, &EnrolledStudents.get_enrollment_by_class_id(&1.class.id))
-    |> Map.put(:new_assignments, &Mods.get_new_assignment_mods(&1))
+    |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
+    |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
+    |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(student_class.class.id))
+    |> Map.put(:new_assignments, Mods.get_new_assignment_mods(student_class))
   end
 end
