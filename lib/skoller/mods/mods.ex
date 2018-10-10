@@ -74,12 +74,12 @@ defmodule Skoller.Mods do
   # The assignment is original, and should not have a mod.
   def insert_new_mod(%{assignment: %Assignment{from_mod: false}}, _student_id, _is_private), do: {:ok, nil}
   # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
-  def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
+  def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, student_id, is_private) do
     student_assignment = student_assignment |> Repo.preload(:student_class)
-    student_class = EnrolledStudents.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, student_id)
     student_assignment
     |> find_accepted_mods_for_student_assignment()
-    |> Enum.map(&process_existing_mod(&1, student_class, params))
+    |> Enum.map(&process_existing_mod(&1, student_class, is_private))
     |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
   end
 
@@ -104,9 +104,9 @@ defmodule Skoller.Mods do
    * `{:ok, nil}`
    * `{:ok, %{self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   """
-  def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, params) do
+  def insert_update_mod(%{student_assignment: student_assignment}, %Ecto.Changeset{changes: changes}, is_private) do
     student_assignment = student_assignment |> Repo.preload(:assignment)
-    status = changes |> Enum.map(&check_change(&1, student_assignment, params))
+    status = changes |> Enum.map(&check_change(&1, student_assignment, is_private))
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
@@ -272,27 +272,27 @@ defmodule Skoller.Mods do
   end
 
   #compare new change with original assignment. If original, dismiss mods. Otherwise, create mod.
-  defp check_change({:weight_id, weight_id}, %{assignment: %{weight_id: old_weight_id}} = student_assignment, params) do
+  defp check_change({:weight_id, weight_id}, %{assignment: %{weight_id: old_weight_id}} = student_assignment, is_private) do
     case old_weight_id == weight_id do
-      false -> weight_id |> insert_weight_mod(student_assignment, params)
+      false -> weight_id |> insert_weight_mod(student_assignment, is_private)
       true -> dismiss_mods(student_assignment, @weight_assignment_mod)
     end
   end
-  defp check_change({:due, due}, %{assignment: %{due: old_due}} = student_assignment, params) do
+  defp check_change({:due, due}, %{assignment: %{due: old_due}} = student_assignment, is_private) do
     case compare_dates(old_due, due) do
       :eq -> dismiss_mods(student_assignment, @due_assignment_mod)
-      _ -> due |> insert_due_mod(student_assignment, params)
+      _ -> due |> insert_due_mod(student_assignment, is_private)
     end
   end
-  defp check_change({:name, name}, %{assignment: %{name: old_name}} = student_assignment, params) do
+  defp check_change({:name, name}, %{assignment: %{name: old_name}} = student_assignment, is_private) do
     case old_name == name do
-      false -> name |> insert_name_mod(student_assignment, params)
+      false -> name |> insert_name_mod(student_assignment, is_private)
       true -> dismiss_mods(student_assignment, @name_assignment_mod)
     end
   end
   defp check_change(_tuple, _student_assignment, _params), do: {:ok, :no_mod}
 
-  defp insert_weight_mod(weight_id, %{} = student_assignment, params) do
+  defp insert_weight_mod(weight_id, %{} = student_assignment, is_private) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
 
     mod = %{
@@ -300,7 +300,7 @@ defmodule Skoller.Mods do
         weight_id: weight_id
       },
       assignment_mod_type_id: @weight_assignment_mod,
-      is_private: is_private(params["is_private"]),
+      is_private: is_private(is_private),
       student_id: student_class.student_id,
       assignment_id: student_assignment.assignment.id
     }
@@ -319,7 +319,7 @@ defmodule Skoller.Mods do
     end
   end
 
-  defp insert_due_mod(due, %{} = student_assignment, params) do
+  defp insert_due_mod(due, %{} = student_assignment, is_private) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
 
     now = DateTime.utc_now()
@@ -327,7 +327,7 @@ defmodule Skoller.Mods do
     #Due dates being set to the past are automatically private.
     is_private = case DateTime.compare(now, due) do
       :gt -> true
-      _ -> is_private(params["is_private"])
+      _ -> is_private(is_private)
     end
 
     mod = %{
@@ -354,7 +354,7 @@ defmodule Skoller.Mods do
     end
   end
 
-  defp insert_name_mod(name, %{} = student_assignment, params) do
+  defp insert_name_mod(name, %{} = student_assignment, is_private) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
 
     mod = %{
@@ -362,7 +362,7 @@ defmodule Skoller.Mods do
         name: name
       },
       assignment_mod_type_id: @name_assignment_mod,
-      is_private: is_private(params["is_private"]),
+      is_private: is_private(is_private),
       student_id: student_class.student_id,
       assignment_id: student_assignment.assignment.id
     }
@@ -472,17 +472,16 @@ defmodule Skoller.Mods do
     |> Repo.transaction()
   end
 
-  defp process_existing_mod(mod, %StudentClass{} = student_class, params) do
-    case mod.is_private == true and is_private(params["is_private"]) == false do
-      true ->
-        mod |> publish_mod(student_class)
-      false -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id, :manual))
-        |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
-        |> Repo.transaction()
-    end
+  defp process_existing_mod(%{is_private: true} = mod, %StudentClass{} = student_class, false) do
+    mod |> publish_mod(student_class)
   end
+  defp process_existing_mod(mod, %StudentClass{} = student_class, _is_private) do
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
+    |> Repo.transaction()
+  end
+  
 
   defp insert_backlogged_actions([], _student_class_id), do: {:ok, nil}
   defp insert_backlogged_actions(enumerable, student_class_id) do

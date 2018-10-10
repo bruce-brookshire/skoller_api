@@ -171,7 +171,6 @@ defmodule Skoller.AutoUpdates do
     end
   end
 
-  defp auto_update_acted_ratio_needed({:error, msg}, _count), do: {:error, msg}
   defp auto_update_acted_ratio_needed({:ok, count}, actions) do
     acted = actions
     |> Enum.filter(& not(is_nil(&1.is_accepted)))
@@ -186,8 +185,8 @@ defmodule Skoller.AutoUpdates do
       false -> {:ok, acted}
     end
   end
+  defp auto_update_acted_ratio_needed(result, _count), do: result
 
-  defp auto_update_copied_ratio_needed({:error, msg}), do: {:error, msg}
   defp auto_update_copied_ratio_needed({:ok, acted}) do
     count = acted |> Enum.count()
 
@@ -202,6 +201,7 @@ defmodule Skoller.AutoUpdates do
       false -> {:ok, nil}
     end
   end
+  defp auto_update_copied_ratio_needed(result), do: result
 
   defp update_mod(mod, _) do
     Mods.update_mod(mod, %{is_auto_update: true})

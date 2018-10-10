@@ -81,7 +81,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       student_assignment -> 
         multi = Ecto.Multi.new
         |> Ecto.Multi.delete(:student_assignment, student_assignment)
-        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params))
+        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params["is_private"]))
 
         case Repo.transaction(multi) do
           {:ok, %{mod: mod}} ->

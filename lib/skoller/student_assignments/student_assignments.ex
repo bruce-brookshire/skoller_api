@@ -194,7 +194,7 @@ defmodule Skoller.StudentAssignments do
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, changeset)
-    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params))
+    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params["is_private"]))
     |> Repo.transaction()
   end
 
