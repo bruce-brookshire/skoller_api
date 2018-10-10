@@ -13,6 +13,7 @@ defmodule Skoller.AutoUpdates do
   alias Skoller.Mods.Action
   alias Skoller.EnrolledStudents
   alias Skoller.Students
+  alias Skoller.StudentClasses
 
   import Ecto.Query
 
@@ -21,20 +22,6 @@ defmodule Skoller.AutoUpdates do
   @auto_upd_enrollment_threshold "auto_upd_enroll_thresh"
   @auto_upd_response_threshold "auto_upd_response_thresh"
   @auto_upd_approval_threshold "auto_upd_approval_thresh"
-
-  @doc """
-  See `process_auto_update/1`. Also sends notificaitons on success.
-
-  For use in a Task.
-  """
-  def process_auto_update(mod, :notification) do
-    case mod |> process_auto_update() do
-      {:ok, nil} -> {:ok, nil}
-      {:ok, %{actions: actions}} -> 
-        Logger.info("Preparing auto update notifications for mod: " <> to_string(mod.id))
-        ModNotifications.send_auto_update_notification(actions)
-    end
-  end
 
   @doc """
   Processes auto updates if a mod meets the right criteria.
@@ -54,25 +41,15 @@ defmodule Skoller.AutoUpdates do
    * `{:ok, nil}` if there is no auto update needed
    * `{:ok, %{mod: Skoller.Mods.Mod, mods: [], actions: [Skoller.Mods.Action]}}`
   """
-  def process_auto_update(mod) do
+  def process_auto_update(mod, opts \\ []) do
     Logger.info("Beginning auto update check for mod: " <> to_string(mod.id))
-    actions = mod |> ModActions.get_enrolled_actions_from_mod()
-
-    update = actions 
-    |> Enum.count()
-    |> auto_update_count_needed()
-    |> auto_update_acted_ratio_needed(actions)
-    |> auto_update_copied_ratio_needed()
-
-    case update do
+    case check_auto_update_criteria(mod) do
       {:ok, _} ->
         Logger.info("Beginning auto update for mod: " <> to_string(mod.id))
-        actions = mod |> ModActions.get_actions_from_mod()
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
-        |> Ecto.Multi.run(:mods, &Mods.apply_mods(actions, &1))
-        |> Ecto.Multi.run(:actions, &update_actions(actions, &1))
-        |> Repo.transaction()
+        result = mod
+        |> auto_update_mod()
+        |> check_notification(opts)
+        result
       {:error, _msg} -> {:ok, nil}
     end
   end
@@ -144,6 +121,48 @@ defmodule Skoller.AutoUpdates do
     |> Repo.aggregate(:count, :id)
   end
 
+  defp auto_update_mod(mod) do
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
+    |> Ecto.Multi.run(:actions, &apply_mod_from_actions(&1.mod))
+    |> Repo.transaction()
+  end
+
+  defp check_auto_update_criteria(mod) do
+    actions = mod |> ModActions.get_enrolled_actions_from_mod()
+
+    actions
+    |> Enum.count()
+    |> auto_update_count_needed()
+    |> auto_update_acted_ratio_needed(actions)
+    |> auto_update_copied_ratio_needed()
+  end
+
+  defp check_notification({:ok, %{actions: actions, mod: mod}}, opts) do
+    if Keyword.get(opts, :notification, false) do
+      Logger.info("Preparing auto update notifications for mod: " <> to_string(mod.id))
+      Task.start(ModNotifications, :send_auto_update_notification, [actions])
+    end
+  end
+  defp check_notification(_results, _opts), do: {:ok, nil}
+
+  # Applies all actions that are currently nil for mod.
+  defp apply_mod_from_actions(mod) do
+    status = mod
+    |> ModActions.get_actions_from_mod()
+    |> Enum.filter(&is_nil(&1.is_accepted))
+    |> Enum.map(&apply_mod_from_action(&1, mod))
+    
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  end
+
+  defp apply_mod_from_action(action, mod) do
+    student_class = StudentClasses.get_student_class_by_id!(action.student_class_id)
+    mod
+    |> Mods.apply_mod(student_class, :auto)
+    |> Repo.transaction()
+  end
+
   defp auto_update_count_needed(count) do
     threshold = Settings.get_setting_by_name!(@auto_upd_enrollment_threshold).value |> String.to_integer
     case count < threshold do
@@ -182,14 +201,6 @@ defmodule Skoller.AutoUpdates do
       true -> {:error, :not_enough_copied}
       false -> {:ok, nil}
     end
-  end
-
-  defp update_actions(actions, _) do
-    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
-    
-    status = nil_actions |> Enum.map(&ModActions.update_action(&1, %{is_accepted: true, is_manual: false}))
-    
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   defp update_mod(mod, _) do

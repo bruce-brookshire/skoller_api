@@ -177,7 +177,7 @@ defmodule Skoller.StudentAssignments do
     Ecto.Multi.new
     |> Ecto.Multi.run(:assignment, &insert_or_get_assignment(&1, changeset))
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(&1, params))
-    |> Ecto.Multi.run(:mod, &Mods.insert_new_mod(&1, params))
+    |> Ecto.Multi.run(:mod, &Mods.insert_new_mod(&1, params["student_id"], params["is_private"]))
     |> Repo.transaction()
   end
 

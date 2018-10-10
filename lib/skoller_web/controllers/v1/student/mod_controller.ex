@@ -49,7 +49,7 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   defp process_mod(conn, %Mod{} = mod, %{} = student_class, %{"is_accepted" => true}) do
     case Repo.transaction(Mods.apply_mod(mod, student_class)) do
       {:ok, %{student_assignment: student_assignment}} ->
-        Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+        Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
         conn
         |> render(StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->

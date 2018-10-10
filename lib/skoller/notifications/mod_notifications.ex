@@ -73,7 +73,7 @@ defmodule Skoller.ModNotifications do
     actions |> Enum.each(&build_auto_update_notification(&1))
   end
 
-  defp build_auto_update_notification({:ok, action}) do
+  defp build_auto_update_notification({:ok, %{self_action: action}}) do
     mod = ModActions.get_mod_from_action(action)
           |> Repo.preload(:assignment)
     class = Classes.get_class_from_mod_id(mod.id)

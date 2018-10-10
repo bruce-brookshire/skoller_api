@@ -24,6 +24,15 @@ defmodule Skoller.Mods do
   @delete_assignment_mod 500
 
   @doc """
+  Gets a mod by id.
+
+  Raises `Ecto.NoResultsError` if not found
+  """
+  def get!(id) do
+    Repo.get!(Mod, id)
+  end
+
+  @doc """
   This creates a new assignment mod from an assignment or a student assignment. It should
   be used when a new assignment or student assignment is created.
 
@@ -43,42 +52,27 @@ defmodule Skoller.Mods do
    * `{:ok, nil}` if the assignment is original and no mod is needed, or if a student assignment is used.
    * `{:ok, %{backlog: [Skoller.Mods.Action], self_action: Skoller.Mods.Action}}`
   """
-  def insert_new_mod(%{assignment: %Assignment{} = assignment}, params) do
-    mod = %{
-      data: %{
-        assignment: %{
-          name: assignment.name,
-          due: assignment.due,
-          class_id: assignment.class_id,
-          weight_id: assignment.weight_id,
-          id: assignment.id
-        }
-      },
-      assignment_mod_type_id: @new_assignment_mod,
-      is_private: is_private(params["is_private"]),
-      student_id: params["student_id"],
-      assignment_id: assignment.id
-    }
+  def insert_new_mod(%{assignment: %Assignment{from_mod: true} = assignment}, student_id, is_private) do
+    mod = build_raw_mod(@new_assignment_mod, assignment, %{student_id: student_id, is_private: is_private})
     existing_mod = mod |> find_mod()
+    student_class = StudentClasses.get_student_class_by_student_and_class(assignment.class_id, student_id)
     cond do
-      is_nil(existing_mod) and assignment.from_mod == true ->
+      is_nil(existing_mod) ->
         # The assignment is not an original assignment, and needs a mod.
-        mod |> insert_mod(StudentClasses.get_student_class_by_student_and_class(assignment.class_id, params["student_id"]))
-      is_nil(existing_mod) and assignment.from_mod == false -> 
-        # The assignment is original, and should not have a mod.
-        {:ok, existing_mod}
+        mod |> insert_mod(student_class)
       existing_mod.is_private == true and mod.is_private == false ->
         # The assignment has a mod that needs to be published.
-        mod |> publish_mod(StudentClasses.get_student_class_by_student_and_class(assignment.class_id, params["student_id"]))
+        mod |> publish_mod(student_class)
       true -> 
         # The assignment has a mod already, and needs no changes 
-        student_class = StudentClasses.get_student_class_by_student_and_class(assignment.class_id, params["student_id"])
         Ecto.Multi.new
         |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
         |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
         |> Repo.transaction()
     end
   end
+  # The assignment is original, and should not have a mod.
+  def insert_new_mod(%{assignment: %Assignment{from_mod: false}}, _student_id, _is_private), do: {:ok, nil}
   # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
   def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
     student_assignment = student_assignment |> Repo.preload(:student_class)
@@ -127,15 +121,7 @@ defmodule Skoller.Mods do
   """
   def insert_delete_mod(%{student_assignment: student_assignment}, params) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
-
-    mod = %{
-      data: %{},
-      assignment_mod_type_id: @delete_assignment_mod,
-      is_private: is_private(params["is_private"]),
-      student_id: student_class.student_id,
-      assignment_id: student_assignment.assignment_id
-    }
-
+    mod = build_raw_mod(@delete_assignment_mod, student_assignment, %{is_private: params["is_private"], student_id: student_class.student_id})
     existing_mod = mod |> find_mod()
     cond do
       is_nil(existing_mod) -> 
@@ -148,22 +134,6 @@ defmodule Skoller.Mods do
         |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
         |> Repo.transaction()
     end
-  end
-
-  @doc """
-  Applies all actions that are currently nil in `actions`.
-
-  See `apply_mod/3`.
-
-  ## Returns
-  `{:ok, [t]}` where `t` is the result of `apply_mod/3`
-  """
-  def apply_mods(actions, _) do
-    nil_actions = actions |> Enum.filter(&is_nil(&1.is_accepted))
-
-    status = nil_actions |> Enum.map(&apply_action_mods(&1))
-    
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   @doc """
@@ -231,10 +201,26 @@ defmodule Skoller.Mods do
     |> Repo.all()
   end
 
-  defp apply_action_mods(action) do
-    student_class = StudentClasses.get_student_class_by_id!(action.student_class_id)
-    mod = Repo.get!(Mod, action.assignment_modification_id)
-    Repo.transaction(apply_mod(mod, student_class, :auto))
+  defp build_raw_mod(assignment_mod_type_id, map, params)
+  defp build_raw_mod(@new_assignment_mod, assignment, params) do
+    %{
+      data: %{
+        assignment: Map.from_struct(assignment)
+      },
+      assignment_mod_type_id: @new_assignment_mod,
+      is_private: is_private(params.is_private),
+      student_id: params.student_id,
+      assignment_id: assignment.id
+    }
+  end
+  defp build_raw_mod(@delete_assignment_mod, assignment, params) do
+    %{
+      data: %{},
+      assignment_mod_type_id: @delete_assignment_mod,
+      is_private: is_private(params.is_private),
+      student_id: params.student_id,
+      assignment_id: assignment.assignment_id
+    }
   end
 
   defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
