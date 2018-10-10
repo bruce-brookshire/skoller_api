@@ -10,8 +10,11 @@ defmodule Skoller.ModActions do
   alias Skoller.Students
   alias Skoller.Assignments.Assignment
   alias Skoller.MapErrors
+  alias Skoller.StudentClasses.StudentClass
 
   import Ecto.Query
+
+  @new_assignment_mod 400
 
   @doc """
   Gets an action by `assignment_modification_id` and `student_class_id`
@@ -42,7 +45,7 @@ defmodule Skoller.ModActions do
   ## Returns
   `{:ok, Skoller.Mods.Action}` or `{:error, changeset}`
   """
-  def insert_mod_action(student_class_id, mod_id) do
+  def insert_nil_mod_action(student_class_id, mod_id) do
     Repo.insert(%Action{is_accepted: nil, student_class_id: student_class_id, assignment_modification_id: mod_id})
   end
 
@@ -52,7 +55,7 @@ defmodule Skoller.ModActions do
   def insert_mod_action_for_mods([], _student_class_id), do: {:ok, nil}
   def insert_mod_action_for_mods(mods, student_class_id) do
     mods
-    |> Enum.map(&insert_mod_action(student_class_id, &1.mod))
+    |> Enum.map(&insert_nil_mod_action(student_class_id, &1.mod))
     |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
   end
 
@@ -80,6 +83,20 @@ defmodule Skoller.ModActions do
     action_old
     |> Ecto.Changeset.change(params)
     |> Repo.update()
+  end
+
+  @doc """
+  Updates an action.
+
+  Raises on error
+
+  ## Returns
+  `%Skoller.Mods.Action{}` or `Ecto.ChangeError`
+  """
+  def update_action!(action_old, params) do
+    action_old
+    |> Ecto.Changeset.change(params)
+    |> Repo.update!()
   end
 
   @doc """
@@ -171,6 +188,53 @@ defmodule Skoller.ModActions do
         |> Ecto.Changeset.change(%{is_accepted: true, is_manual: manual})
         |> Repo.update()
     end
+  end
+
+  @doc """
+  Inserts mod actions for a student class. Generally used when a new mod is made to make it available for others.
+
+  ## Returns
+  `{:ok, actions}` or `{:error, errors}`
+  """
+  def insert_mod_actions_for_class(%Mod{is_private: true}, _student_class), do: {:ok, nil}
+  def insert_mod_actions_for_class(mod, student_class) do
+    actions = mod
+    |> get_student_class_missing_actions_by_mod(student_class)
+    |> Enum.map(&insert_nil_mod_action(&1.id, mod.id))
+
+    status = actions |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
+    case status do
+      {:ok, nil} -> {:ok, actions}
+      {:error, val} -> {:error, val}
+    end
+  end
+
+  @doc """
+  Dismisses mod actions by setting `is_accepted` to false.
+
+  ## Returns
+  {:ok, [Skoller.Mods.Actions]}
+  """
+  def dismiss_actions([]), do: {:ok, nil}
+  def dismiss_actions(actions) do
+    items = actions |> Enum.map(&update_action!(&1, %{is_accepted: false, is_manual: false}))
+    {:ok, items}
+  end
+
+  defp get_student_class_missing_actions_by_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class) do
+    from(sc in StudentClass)
+    |> join(:left, [sc], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
+    |> where([sc, act], is_nil(act.id))
+    |> Repo.all()
+  end
+  defp get_student_class_missing_actions_by_mod(%Mod{} = mod, student_class) do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], assign in StudentAssignment, assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
+    |> join(:left, [sc, assign], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> where([sc, assign, act], is_nil(act.id))
+    |> where([sc], sc.id != ^student_class.id)
+    |> Repo.all()
   end
 
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.

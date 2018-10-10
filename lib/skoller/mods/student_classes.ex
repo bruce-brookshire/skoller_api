@@ -27,7 +27,7 @@ defmodule Skoller.Mods.StudentClasses do
     |> where([mod, class], class.class_id == ^student_class.class_id)
     |> Repo.all()
     
-    status = mods |> Enum.map(&ModActions.insert_mod_action(student_class.id, &1.id))
+    status = mods |> Enum.map(&ModActions.insert_nil_mod_action(student_class.id, &1.id))
     
     status |> Enum.find({:ok, mods}, &MapErrors.check_tuple(&1))
   end
