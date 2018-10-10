@@ -49,12 +49,24 @@ defmodule Skoller.Students do
   end
 
   @doc """
-  Gets students in a class. Includes previously-enrolled students.
+  Gets students in a class.
+
+  ## Returns
+  `[Skoller.Students.Student]` or `[]`
+  """
+  def get_students_by_class(class_id) do
+    from(s in Student)
+    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)), s.id == sc.student_id)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets student classes in a class. Includes previously-enrolled students.
 
   ## Returns
   `[Skoller.StudentClasses.StudentClass]` or `[]`
   """
-  def get_students_by_class(class_id) do
+  def get_student_classes_by_class(class_id) do
     from(sc in StudentClass)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.all()

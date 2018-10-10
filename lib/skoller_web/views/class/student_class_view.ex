@@ -9,6 +9,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Assignment.ModView
   alias Skoller.StudentAssignments
+  alias SkollerWeb.StudentView
 
   @enrollment_path "/e/"
 
@@ -18,6 +19,18 @@ defmodule SkollerWeb.Class.StudentClassView do
 
   def render("show.json", %{student_class: student_class}) do
     render_one(student_class, StudentClassView, "student_class.json")
+  end
+
+  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
+    student_class
+    |> base_student_class()
+    |> Map.merge(%{
+      grade: Decimal.to_float(Decimal.round(grade, 2)),
+      completion: Decimal.to_float(Decimal.round(completion, 2)),
+      enrollment: enrollment,
+      new_assignments: render_many(new_assignments, ModView, "mod.json"),
+      students: render_many(students, StudentView, "student-short.json")
+    })
   end
 
   def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do

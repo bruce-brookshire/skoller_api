@@ -54,6 +54,7 @@ defmodule SkollerWeb.StudentView do
       name_last: student.name_last,
       organization: student.organization,
       bio: student.bio,
+      points: Skoller.StudentPoints.get_points_by_student_id(student.id),
       user: render_one(student.users |> List.first(), UserView, "user.json")
     }
   end
