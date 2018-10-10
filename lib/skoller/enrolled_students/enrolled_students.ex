@@ -14,6 +14,18 @@ defmodule Skoller.EnrolledStudents do
   @enrollment_limit 15
 
   @doc """
+  Gets students in a class.
+
+  ## Returns
+  `[Skoller.Students.Student]` or `[]`
+  """
+  def get_students_by_class(class_id) do
+    from(s in Student)
+    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)), s.id == sc.student_id)
+    |> Repo.all()
+  end
+
+  @doc """
   Subquery that gets enrolled students in a class
 
   Returns subquery with `Skoller.StudentClasses.StudentClass`.
