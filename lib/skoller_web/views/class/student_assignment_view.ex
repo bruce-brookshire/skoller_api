@@ -19,7 +19,7 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
     student_assignment = student_assignment |> Repo.preload([:assignment, :student_class])
 
     student_assignment
-    |> render_one(AssignmentView, "assignment.json")
+    |> render_one(AssignmentView, "assignment-short.json")
     |> Map.merge(%{
       id: student_assignment.id,
       student_id: student_assignment.student_class.student_id,
