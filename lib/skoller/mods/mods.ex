@@ -148,12 +148,15 @@ defmodule Skoller.Mods do
    * Delete mod: `[:student_assignment, :self_action, :dismissed]`
    * Change mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
   """
-  def apply_mod(%Mod{} = mod, %StudentClass{} = student_class, atom \\ :manual) do
-    case mod.assignment_mod_type_id do
-      @delete_assignment_mod -> apply_delete_mod(mod, student_class, atom)
-      @new_assignment_mod -> apply_new_mod(mod, student_class, atom)
-      _ -> apply_change_mod(mod, student_class, atom)
-    end
+  def apply_mod(mod, student_class, atom \\ :manual)
+  def apply_mod(%Mod{assignment_mod_type_id: @delete_assignment_mod} = mod, student_class, atom) do
+    apply_delete_mod(mod, student_class, atom)
+  end
+  def apply_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class, atom) do
+    apply_new_mod(mod, student_class, atom)
+  end
+  def apply_mod(%Mod{} = mod, student_class, atom) do
+    apply_change_mod(mod, student_class, atom)
   end
 
   @doc """
@@ -166,39 +169,6 @@ defmodule Skoller.Mods do
     mod_old
     |> Ecto.Changeset.change(params)
     |> Repo.update()
-  end
-
-  @doc """
-  Gets unanswered mods for a student assignment.
-
-  An unanswered mod is when `is_accepted` is `nil`
-
-  ## Returns
-  `[Skoller.Mods.Mod]` or `[]`
-  """
-  def pending_mods_for_student_assignment(%{student_class_id: student_class_id, assignment_id: assignment_id}) do
-    from(m in Mod)
-    |> join(:inner, [m], act in Action, m.id == act.assignment_modification_id and act.student_class_id == ^student_class_id)
-    |> where([m], m.assignment_id == ^assignment_id)
-    |> where([m, act], is_nil(act.is_accepted))
-    |> Repo.all
-  end
-
-  @doc """
-  Gets new assignment mods for a student that are unanswered.
-
-  An unanswered mod is when `is_accepted` is `nil`
-
-  ## Returns
-  `[Skoller.Assignments.Assignment]` or `[]`
-  """
-  def get_new_assignment_mods(%StudentClass{} = student_class) do
-    from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
-    |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
-    |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
-    |> where([mod, act], is_nil(act.is_accepted))
-    |> Repo.all()
   end
 
   defp build_raw_mod(assignment_mod_type_id, map, params)

@@ -9,8 +9,12 @@ defmodule Skoller.Mods.Assignments do
   alias Skoller.EnrolledStudents
   alias Skoller.Users.User
   alias Skoller.Students.Student
+  alias Skoller.StudentClasses.StudentClass
+  alias Skoller.Assignments.Assignment
   
   import Ecto.Query
+
+  @new_assignment_mod 400
 
   @doc """
   Gets all the mods for an assignment.
@@ -22,6 +26,23 @@ defmodule Skoller.Mods.Assignments do
     |> where([m], m.assignment_id == ^assignment_id)
     |> Repo.all()
     |> Enum.map(&Map.put(&1, :action, add_action_details(&1.id)))
+  end
+
+  @doc """
+  Gets new assignment mods for a student that are unanswered.
+
+  An unanswered mod is when `is_accepted` is `nil`
+
+  ## Returns
+  `[Skoller.Assignments.Assignment]` or `[]`
+  """
+  def get_new_assignment_mods(%StudentClass{} = student_class) do
+    from(mod in Mod)
+    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
+    |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
+    |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
+    |> where([mod, act], is_nil(act.is_accepted))
+    |> Repo.all()
   end
 
   #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
