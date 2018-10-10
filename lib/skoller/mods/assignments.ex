@@ -45,6 +45,20 @@ defmodule Skoller.Mods.Assignments do
     |> Repo.all()
   end
 
+  @doc """
+  Gets other mods for the assignment.
+
+  ## Returns
+  A list of mods or `[]`
+  """
+  def get_other_mods_for_assignment_by_mod(mod) do
+    from(mod in Mod)
+    |> where([mod], mod.assignment_id == ^mod.assignment_id)
+    |> where([mod], mod.is_private == false)
+    |> where([mod], mod.id != ^mod.id)
+    |> Repo.all()
+  end
+
   #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)

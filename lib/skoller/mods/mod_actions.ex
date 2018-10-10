@@ -9,8 +9,19 @@ defmodule Skoller.ModActions do
   alias Skoller.EnrolledStudents
   alias Skoller.Students
   alias Skoller.Assignments.Assignment
+  alias Skoller.MapErrors
 
   import Ecto.Query
+
+  @doc """
+  Gets an action by `assignment_modification_id` and `student_class_id`
+
+  ## Returns
+  `Skoller.Mods.Action` or `nil`
+  """
+  def get_action_by_mod_and_student(assignment_modification_id, student_class_id) do
+    Repo.get_by(Action, assignment_modification_id: assignment_modification_id, student_class_id: student_class_id)
+  end
 
   @doc """
   Gets all actions from a mod.
@@ -31,8 +42,18 @@ defmodule Skoller.ModActions do
   ## Returns
   `{:ok, Skoller.Mods.Action}` or `{:error, changeset}`
   """
-  def insert_mod_action(student_class, %Mod{} = mod) do
-    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
+  def insert_mod_action(student_class_id, mod_id) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class_id, assignment_modification_id: mod_id})
+  end
+
+  @doc """
+  Inserts actions for a `student_class_id` for multiple `mods`
+  """
+  def insert_mod_action_for_mods([], _student_class_id), do: {:ok, nil}
+  def insert_mod_action_for_mods(mods, student_class_id) do
+    mods
+    |> Enum.map(&insert_mod_action(student_class_id, &1.mod))
+    |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
   end
 
   @doc """
@@ -134,6 +155,22 @@ defmodule Skoller.ModActions do
     |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
     |> select([m, act], act)
     |> Repo.all()
+  end
+
+  @doc """
+  Accepts a mod action.
+
+  ## Returns
+  `{:ok, Skoller.Mods.Action}`
+  """
+  def accept_action(mod_id, student_class_id, opts \\ []) do
+    manual = Keyword.get(opts, :manual, true)
+    case get_action_by_mod_and_student(mod_id, student_class_id) do
+      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true, is_manual: manual})
+      val -> val
+        |> Ecto.Changeset.change(%{is_accepted: true, is_manual: manual})
+        |> Repo.update()
+    end
   end
 
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.

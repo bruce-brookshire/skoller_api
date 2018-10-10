@@ -14,6 +14,8 @@ defmodule Skoller.Mods do
   alias Skoller.MapErrors
   alias Skoller.Assignments
   alias Skoller.EnrolledStudents
+  alias Skoller.Mods.Assignments, as: ModAssignments
+  alias Skoller.ModActions
 
   import Ecto.Query
 
@@ -65,10 +67,7 @@ defmodule Skoller.Mods do
         mod |> publish_mod(student_class)
       true -> 
         # The assignment has a mod already, and needs no changes 
-        Ecto.Multi.new
-        |> Ecto.Multi.run(:backlog, &insert_backlogged_mods(existing_mod, student_class, &1))
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
-        |> Repo.transaction()
+        existing_mod |> add_mods_and_actions_for_existing_assignment(student_class)
     end
   end
   # The assignment is original, and should not have a mod.
@@ -130,7 +129,7 @@ defmodule Skoller.Mods do
         mod |> publish_mod(student_class, student_assignment)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:self_action, &accept_action(existing_mod.id, student_class.id, &1, [manual: true]))
         |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
         |> Repo.transaction()
     end
@@ -148,15 +147,16 @@ defmodule Skoller.Mods do
    * Delete mod: `[:student_assignment, :self_action, :dismissed]`
    * Change mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
   """
-  def apply_mod(mod, student_class, atom \\ :manual)
-  def apply_mod(%Mod{assignment_mod_type_id: @delete_assignment_mod} = mod, student_class, atom) do
-    apply_delete_mod(mod, student_class, atom)
+  def apply_mod(mod, student_class, opts \\ [manual: true])
+  def apply_mod(%Mod{assignment_mod_type_id: @delete_assignment_mod} = mod, student_class, opts) do
+    student_assignment = StudentAssignments.get_assignment_by_ids(mod.assignment_id, student_class.id)
+    apply_delete_mod(mod, student_assignment, opts)
   end
-  def apply_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class, atom) do
-    apply_new_mod(mod, student_class, atom)
+  def apply_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class, opts) do
+    apply_new_mod(mod, student_class, opts)
   end
-  def apply_mod(%Mod{} = mod, student_class, atom) do
-    apply_change_mod(mod, student_class, atom)
+  def apply_mod(%Mod{} = mod, student_class, opts) do
+    apply_change_mod(mod, student_class, opts)
   end
 
   @doc """
@@ -193,37 +193,32 @@ defmodule Skoller.Mods do
     }
   end
 
-  defp apply_delete_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
-    case StudentAssignments.get_assignment_by_ids(mod.assignment_id, id) do
-      nil ->
-        Ecto.Multi.new
-      student_assignment -> 
-        Ecto.Multi.new
-        |> Ecto.Multi.delete(:student_assignment, student_assignment)
-        |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id, atom))
-        |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
-    end
+  defp apply_delete_mod(_mod, nil, _atom), do: Ecto.Multi.new
+  defp apply_delete_mod(mod, student_assignment, opts) do
+    Ecto.Multi.new
+    |> Ecto.Multi.delete(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
   end
 
-  defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, atom) do
+  defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, opts) do
     student_assignment = Assignments.get_assignment_by_id!(mod.assignment_id)
     |> StudentAssignments.convert_assignment(student_class)
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
     |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
-    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id, atom))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(&1.student_assignment, @delete_assignment_mod))
   end
 
-  defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}, atom) do
+  defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}, opts) do
     student_assignment = StudentAssignments.get_assignment_by_ids!(mod.assignment_id, id)
-
     mod_change = mod |> get_data()
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
-    |> Ecto.Multi.run(:self_action, &process_self_action(mod, &1.student_assignment.student_class_id, atom))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id))
   end
 
@@ -283,7 +278,7 @@ defmodule Skoller.Mods do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:self_action, &accept_action(existing_mod.id, student_class.id, &1, [manual: true]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -318,7 +313,7 @@ defmodule Skoller.Mods do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:self_action, &accept_action(existing_mod.id, student_class.id, &1, [manual: true]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -345,7 +340,7 @@ defmodule Skoller.Mods do
         mod |> publish_mod(student_class)
       true -> 
         Ecto.Multi.new
-        |> Ecto.Multi.run(:self_action, &process_self_action(existing_mod, student_class.id, &1, :manual))
+        |> Ecto.Multi.run(:self_action, &accept_action(existing_mod.id, student_class.id, &1, [manual: true]))
         |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(existing_mod, student_class.id, &1))
         |> Repo.transaction()
     end
@@ -404,7 +399,7 @@ defmodule Skoller.Mods do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(&1.mod.id, student_class.id, [manual: true]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
@@ -415,7 +410,7 @@ defmodule Skoller.Mods do
     Ecto.Multi.new
     |> Ecto.Multi.update(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(&1.mod.id, student_class.id, [manual: true]))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(&1.mod, student_class.id))
     |> Repo.transaction()
   end
@@ -426,7 +421,7 @@ defmodule Skoller.Mods do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(&1.mod.id, student_class.id, [manual: true]))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
     |> Repo.transaction()
   end
@@ -437,7 +432,7 @@ defmodule Skoller.Mods do
     Ecto.Multi.new
     |> Ecto.Multi.update(:mod, changeset)
     |> Ecto.Multi.run(:actions, &insert_public_mod_action(&1.mod, student_class))
-    |> Ecto.Multi.run(:self_action, &process_self_action(&1.mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:self_action, &ModActions.accept_action(&1.mod.id, student_class.id, [manual: true]))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
     |> Repo.transaction()
   end
@@ -447,36 +442,22 @@ defmodule Skoller.Mods do
   end
   defp process_existing_mod(mod, %StudentClass{} = student_class, _is_private) do
     Ecto.Multi.new
-    |> Ecto.Multi.run(:self_action, process_self_action(mod, student_class.id, :manual))
+    |> Ecto.Multi.run(:self_action, ModActions.accept_action(mod.id, student_class.id, [manual: true]))
     |> Ecto.Multi.run(:dismissed, dismiss_prior_mods(mod, student_class.id))
     |> Repo.transaction()
   end
   
-
-  defp insert_backlogged_actions([], _student_class_id), do: {:ok, nil}
-  defp insert_backlogged_actions(enumerable, student_class_id) do
-    enumerable
-    |> Enum.map(& &1 = Action.changeset(%Action{}, %{is_accepted: nil, assignment_modification_id: &1.id, student_class_id: student_class_id}))
-    |> Enum.map(&Repo.insert!(&1))
-    |> Enum.find({:ok, nil}, &MapErrors.check_tuple(&1))
+  defp add_mods_and_actions_for_existing_assignment(existing_mod, student_class) do
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:backlog, &insert_mods_for_existing_assignment(existing_mod, student_class.id, &1))
+    |> Ecto.Multi.run(:self_action, &accept_action(existing_mod.id, student_class.id, &1, [manual: true]))
+    |> Repo.transaction()
   end
 
-  defp insert_backlogged_mods(mod, %StudentClass{} = sc, _) do
-    insert_backlogged_mods(mod, sc)
-  end
-
-  defp insert_backlogged_mods(mod, %StudentClass{id: id}) do
+  defp insert_mods_for_existing_assignment(mod, student_class_id, _) do
     mod
-    |> get_backlogged_mods()
-    |> insert_backlogged_actions(id)
-  end
-
-  defp get_backlogged_mods(mod) do
-    from(mod in Mod)
-    |> where([mod], mod.assignment_id == ^mod.assignment_id)
-    |> where([mod], mod.is_private == false)
-    |> where([mod], mod.id != ^mod.id)
-    |> Repo.all()
+    |> ModAssignments.get_other_mods_for_assignment_by_mod()
+    |> ModActions.insert_mod_action_for_mods(student_class_id)
   end
 
   defp insert_public_mod_action(%Mod{is_private: false} = mod, %StudentClass{} = student_class) do
@@ -508,28 +489,9 @@ defmodule Skoller.Mods do
     |> Repo.all()
   end
 
-  defp process_self_action(%Mod{} = mod, student_class_id, _, atom) do
-    process_self_action(mod, student_class_id, atom)
+  defp accept_action(mod_id, student_class_id, _, opts) do
+    ModActions.accept_action(mod_id, student_class_id, opts)
   end
-
-  defp process_self_action(%Mod{id: mod_id}, student_class_id, :manual) do
-    case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
-      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true, is_manual: true})
-      val -> val
-              |> Ecto.Changeset.change(%{is_accepted: true, is_manual: true})
-              |> Repo.update()
-    end
-  end
-
-  defp process_self_action(%Mod{id: mod_id}, student_class_id, _atom) do
-    case Repo.get_by(Action, assignment_modification_id: mod_id, student_class_id: student_class_id) do
-      nil -> Repo.insert(%Action{assignment_modification_id: mod_id, student_class_id: student_class_id, is_accepted: true})
-      val -> val
-              |> Ecto.Changeset.change(%{is_accepted: true, is_manual: false})
-              |> Repo.update()
-    end
-  end
-
 
   defp dismiss_prior_mods(%Mod{} = mod, student_class_id, _) do
     dismiss_prior_mods(mod, student_class_id)
@@ -555,12 +517,14 @@ defmodule Skoller.Mods do
     end
   end
 
-  defp get_data(mod) do
-    case mod.assignment_mod_type_id do
-      @weight_assignment_mod -> %{weight_id: mod.data |> Map.get("weight_id")}
-      @due_assignment_mod -> %{due: mod.data |> Map.get("due") |> get_due_date()}
-      @name_assignment_mod -> %{name: mod.data |> Map.get("name")}
-    end
+  defp get_data(%{assignment_mod_type_id: @weight_assignment_mod, data: data}) do
+    %{weight_id: data |> Map.get("weight_id")}
+  end
+  defp get_data(%{assignment_mod_type_id: @due_assignment_mod, data: data}) do
+    %{weight_id: data |> Map.get("due") |> get_due_date()}
+  end
+  defp get_data(%{assignment_mod_type_id: @name_assignment_mod, data: data}) do
+    %{weight_id: data |> Map.get("name")}
   end
 
   defp get_due_date(nil), do: nil
