@@ -242,7 +242,7 @@ defmodule Skoller.Mods do
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(student_assignment, &1))
     |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
     |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
-    |> Ecto.Multi.run(:dismissed, &dismiss_mods(&1.student_assignment, @new_assignment_mod))
+    |> Ecto.Multi.run(:dismissed, &dismiss_mods(&1.student_assignment, mod.assignment_mod_type_id, nil))
   end
 
   defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}, opts) do
