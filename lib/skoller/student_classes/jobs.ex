@@ -27,7 +27,7 @@ defmodule Skoller.StudentClasses.Jobs do
           students |> Emails.send_no_classes_emails()
         end
         if email_type.is_active_notification do
-          students |> Notifications.send_no_classes_notification()
+          students |> Notifications.send_no_classes_notification(email_type)
         end
       _ -> nil
     end
@@ -44,7 +44,7 @@ defmodule Skoller.StudentClasses.Jobs do
           students |> Emails.send_needs_setup_emails()
         end
         if email_type.is_active_notification do
-          # students |> Notifications.send_no_classes_notification()
+          students |> Notifications.send_needs_setup_notification(email_type)
         end
       _ -> nil
     end
