@@ -15,16 +15,11 @@ defmodule Skoller.StudentClasses.Jobs do
   require Logger
 
   @no_classes_id 100
+  @needs_setup_id 200
 
   def send_no_classes_messages(datetime) do
-    converted_datetime = datetime |> Timex.Timezone.convert("America/Chicago")
-    {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
-
     email_type = EmailTypes.get!(@no_classes_id)
-
-    email_time = email_type.send_time |> Time.from_iso8601!()
-
-    case Time.compare(time, email_time) do
+    case check_sending_time(datetime, email_type) do
       :eq ->
         Logger.info("Sending no classes emails and notifications.")
         students = UnenrolledStudents.get_unenrolled_students()
@@ -36,5 +31,31 @@ defmodule Skoller.StudentClasses.Jobs do
         end
       _ -> nil
     end
+  end
+
+  def send_needs_setup_messages(datetime) do
+    email_type = EmailTypes.get!(@needs_setup_id)
+    case check_sending_time(datetime, email_type) do
+      :eq ->
+        Logger.info("Sending needs setup emails and notifications.")
+        # students = UnenrolledStudents.get_unenrolled_students()
+        students = []
+        if email_type.is_active_email do
+          students |> Emails.send_needs_setup_emails()
+        end
+        if email_type.is_active_notification do
+          # students |> Notifications.send_no_classes_notification()
+        end
+      _ -> nil
+    end
+  end
+
+  defp check_sending_time(datetime, email_type) do
+    converted_datetime = datetime |> Timex.Timezone.convert("America/Chicago")
+    {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
+
+    email_time = email_type.send_time |> Time.from_iso8601!()
+
+    Time.compare(time, email_time)
   end
 end
