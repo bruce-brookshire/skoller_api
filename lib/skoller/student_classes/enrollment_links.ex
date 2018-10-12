@@ -52,7 +52,7 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
       {:ok, %{enrolled_by: enrolled_by} = student_class} when not is_nil(enrolled_by) ->
         Task.start(Notifications, :send_link_used_notification, [sc, sc.class])
         {:ok, student_class}
-      {:ok, student_class} -> {:ok, student_class}
+      resp -> resp
     end
   end
 end
