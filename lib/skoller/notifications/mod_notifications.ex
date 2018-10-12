@@ -47,7 +47,7 @@ defmodule Skoller.ModNotifications do
 
   def send_mod_update_notifications({:ok, %Action{} = action}) do
     user = Notifications.get_user_from_student_class(action.student_class_id)
-    devices = user.user.id |> Devices.get_devices_by_user_id()
+    devices = user |>  get_devices_from_user()
     case devices do
       [] -> :ok
       _ -> action |> build_notifications(user, devices)
@@ -193,5 +193,10 @@ defmodule Skoller.ModNotifications do
                       |> List.foldl(@c_and_s <> tail.name, & ", " <> &1.name <> &2)
         head.name <> str
     end
+  end
+
+  defp get_devices_from_user(nil), do: []
+  defp get_devices_from_user(%{user: user}) do
+    user.id |> Devices.get_devices_by_user_id()
   end
 end

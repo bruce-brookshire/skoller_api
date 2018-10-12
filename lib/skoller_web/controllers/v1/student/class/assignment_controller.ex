@@ -29,9 +29,11 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     params = params |> Map.put("student_class_id", student_class.id)
 
     case StudentAssignments.create_student_assignment(params) do
-      {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+      {:ok, %{student_assignment: student_assignment, mod: %{mod: mod}}} ->
         Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
         Task.start(ModNotifications, :send_mod_update_notifications, [mod])
+        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+      {:ok, %{student_assignment: student_assignment}} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, _, failed_value, _} ->
         conn
