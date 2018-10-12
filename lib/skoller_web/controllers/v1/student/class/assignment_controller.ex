@@ -29,9 +29,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     params = params |> Map.put("student_class_id", student_class.id)
 
     case StudentAssignments.create_student_assignment(params) do
-      {:ok, %{student_assignment: student_assignment, mod: %{mod: mod}}} ->
+      {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
         Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-        Task.start(ModNotifications, :send_mod_update_notifications, [mod])
+        Task.start(ModNotifications, :send_mod_update_notifications, [actions])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:ok, %{student_assignment: student_assignment}} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
@@ -63,9 +63,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
         |> halt()
       student_assignment -> 
         case StudentAssignments.update_student_assignment(student_assignment, params) do
-          {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+          {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
             Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-            Task.start(ModNotifications, :send_mod_update_notifications, [mod])
+            Task.start(ModNotifications, :send_mod_update_notifications, [actions])
             render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
           {:error, _, failed_value, _} ->
             conn
@@ -86,9 +86,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
         |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params))
 
         case Repo.transaction(multi) do
-          {:ok, %{mod: mod}} ->
+          {:ok, %{mod: mod, actions: actions}} ->
             Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-            Task.start(ModNotifications, :send_mod_update_notifications, [mod])
+            Task.start(ModNotifications, :send_mod_update_notifications, [actions])
             conn
             |> send_resp(200, "")
           {:error, _, failed_value, _} ->
