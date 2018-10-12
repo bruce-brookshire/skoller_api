@@ -33,6 +33,21 @@ defmodule SkollerWeb.Class.StudentClassView do
     })
   end
 
+  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do
+    student_class
+    |> base_detail_student_class()
+    |> Map.merge(%{
+      grade: Decimal.to_float(Decimal.round(grade, 2)),
+      completion: Decimal.to_float(Decimal.round(completion, 2)),
+      enrollment: enrollment,
+      new_assignments: render_many(new_assignments, ModView, "mod.json")
+    })
+  end
+
+  def render("student_class-detail.json", %{student_class: student_class}) do
+    base_detail_student_class(student_class)
+  end
+
   def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
     student_class
     |> base_student_class()
