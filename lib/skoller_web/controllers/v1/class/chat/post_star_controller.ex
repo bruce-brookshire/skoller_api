@@ -62,7 +62,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostStarController do
 
     update = case Repo.get_by(Star, chat_post_id: post_id, student_id: conn.assigns[:user].student_id) do
       nil -> cstar
-      star -> cstar ++ star |> List.wrap()
+      star -> cstar ++ (star |> List.wrap())
     end
 
     status = update
