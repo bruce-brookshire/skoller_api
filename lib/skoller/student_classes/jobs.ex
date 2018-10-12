@@ -11,6 +11,7 @@ defmodule Skoller.StudentClasses.Jobs do
   alias Skoller.StudentClasses.Notifications
   alias Skoller.StudentClasses.Emails
   alias Skoller.EmailTypes
+  alias Skoller.EnrolledStudents.ClassStatuses
 
   require Logger
 
@@ -38,8 +39,7 @@ defmodule Skoller.StudentClasses.Jobs do
     case check_sending_time(datetime, email_type) do
       :eq ->
         Logger.info("Sending needs setup emails and notifications.")
-        # students = UnenrolledStudents.get_unenrolled_students()
-        students = []
+        students = ClassStatuses.get_students_needs_setup_classes()
         if email_type.is_active_email do
           students |> Emails.send_needs_setup_emails()
         end
