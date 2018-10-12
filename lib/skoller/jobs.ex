@@ -14,6 +14,7 @@ defmodule Skoller.Jobs do
     now |> AssignmentNotifications.send_assignment_reminder_notifications()
 
     now |> SCJobs.send_no_classes_messages()
+    now |> SCJobs.send_needs_setup_messages()
 
     Locks.clear_locks(@open_lock_mins)
   end
