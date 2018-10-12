@@ -19,6 +19,26 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
     student_assignment = student_assignment |> Repo.preload([:assignment, :student_class])
 
     student_assignment
+    |> render_one(AssignmentView, "assignment.json")
+    |> Map.merge(%{
+      id: student_assignment.id,
+      student_id: student_assignment.student_class.student_id,
+      class_id: student_assignment.student_class.class_id,
+      grade: get_grade(student_assignment),
+      assignment_id: student_assignment.assignment_id,
+      is_completed: is_completed(student_assignment.is_completed),
+      is_reminder_notifications: student_assignment.is_reminder_notifications,
+      is_post_notifications: student_assignment.is_post_notifications,
+      notes: student_assignment.notes,
+      is_read: student_assignment.is_read
+    })
+    |> Map.merge(get_pending_mods(student_assignment))
+  end
+
+  def render("student_assignment-short.json", %{student_assignment: student_assignment}) do
+    student_assignment = student_assignment |> Repo.preload([:assignment, :student_class])
+
+    student_assignment
     |> render_one(AssignmentView, "assignment-short.json")
     |> Map.merge(%{
       id: student_assignment.id,
