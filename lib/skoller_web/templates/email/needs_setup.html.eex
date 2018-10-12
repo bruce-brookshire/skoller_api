@@ -1,5 +1,5 @@
 <tr>
-  <td class="bodyContainer" valign="top">
+  <td id="templateBody" class="bodyContainer" valign="top">
     <table class="mcnTextBlock" style="min-width:100%;" width="100%" cellspacing="0" cellpadding="0" border="0">
       <tbody class="mcnTextBlockOuter"><tr>
         <td class="mcnTextBlockInner" style="padding-top:9px;" valign="top">
@@ -14,7 +14,7 @@
           <table style="max-width:100%; min-width:100%;" class="mcnTextContentContainer" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
             <tbody><tr>
               <td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;" valign="top">
-                <h1><span style="color:#57b9e4">You are so close to the easiest semester of your life!</span></h1>
+                <h1 style="text-align:center; line-height:150%;"><span style="color:#57b9e4; font-size:40px">You are so close to the easiest semester of your life!</span></h1>
               </td>
             </tr></tbody>
           </table>
@@ -72,7 +72,7 @@
           <![endif]-->
           <table style="max-width:100%; min-width:100%;" class="mcnTextContentContainer" width="100%" cellspacing="0" cellpadding="0" border="0" align="left">
             <tbody><tr>
-              <td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;" valign="top">
+              <td class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;" valign="top">
                 <div style="text-align: center;"><span style="font-size:24px"><span style="color:#000000"><strong>All you need to do is set up your classes...</strong></span></span></div>
               </td>
             </tr></tbody>
