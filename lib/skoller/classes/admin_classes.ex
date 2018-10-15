@@ -6,7 +6,6 @@ defmodule Skoller.AdminClasses do
   alias Skoller.Repo
   alias Skoller.Services.Mailer
   alias Skoller.Classes
-  alias Skoller.Locks
   alias Skoller.Mods
   alias Skoller.Classes.Note
   alias Skoller.ClassStatuses, as: Statuses
@@ -44,9 +43,7 @@ defmodule Skoller.AdminClasses do
    * If a class is completed, `Skoller.Classes.ClassStatuses.evaluate_class_completion/2` is called.
 
   ## Returns
-  `{:ok, Map}` or `{:error, _, _, _}` where `Map` is a map containing:
-   * `{:class, Skoller.Classes.Class}`
-   * `{:class_locks, Tuple}`
+  `{:ok, class}` or `{:error, changeset}`
   """
   def update_status(class_id, status_id) do
     old_class = Classes.get_class_by_id!(class_id)
@@ -54,25 +51,21 @@ defmodule Skoller.AdminClasses do
 
     status = Statuses.get_status_by_id!(status_id)
 
-    changeset = old_class
+    update_result = old_class
     |> Ecto.Changeset.change(%{class_status_id: status_id})
     |> compare_class_status_completion(old_class.class_status.is_complete, status.is_complete)
+    |> Repo.update()
 
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.update(:class, changeset)
-    |> Ecto.Multi.run(:class_locks, &Locks.delete_locks(&1.class, status))
-    |> Repo.transaction()
-
-    case multi do
-      {:ok, %{class: %{class_status_id: @syllabus_status} = class}} ->
+    case update_result do
+      {:ok, %{class_status_id: @syllabus_status} = class} ->
         Users.get_users_in_class(class.id)
         |> Enum.each(&send_need_syllabus_email(&1, class))
-      {:ok, %{class: class}} ->
+      {:ok, class} ->
         ClassStatuses.evaluate_class_completion(old_class, class)
       _ -> nil
     end
 
-    multi
+    update_result
   end
 
   @doc """

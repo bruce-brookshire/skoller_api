@@ -96,19 +96,6 @@ defmodule Skoller.Locks do
     end
   end
 
-  @doc """
-  Deletes locks for a class based on the new status.
-
-  ## Returns
-  `{:ok, Tuple}` or `{:ok, nil}`
-  """
-  def delete_locks(class, new_status)
-  def delete_locks(_class, %{is_complete: true}), do: {:ok, nil}
-  def delete_locks(_class, %{is_maintenance: true}), do: {:ok, nil}
-  def delete_locks(class, _status) do
-    {:ok, delete_class_locks(class)}
-  end
-
   # Gets locks that are incomplete after `min` minutes.
   defp get_incomplete_locks(min) do
     from(lock in Lock)
@@ -152,12 +139,6 @@ defmodule Skoller.Locks do
       user_id: user_id,
       class_lock_subsection: subsection
     }) |> Repo.insert()
-  end
-
-  defp delete_class_locks(class) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^class.id)
-    |> Repo.delete_all()
   end
 
   defp delete_lock(lock) do
