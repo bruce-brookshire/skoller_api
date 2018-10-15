@@ -15,6 +15,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.Locks
   alias Skoller.Settings
   alias Skoller.FourDoor.FourDoorOverride
+  alias Skoller.Locks.Users
 
   import Ecto.Query
 
@@ -36,7 +37,7 @@ defmodule Skoller.Syllabi do
    * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
   """
   def serve_class(user, lock_type \\ nil, status_type \\ nil) do
-    case find_existing_lock(user, lock_type) do
+    case Users.get_user_lock(user, lock_type) do
       [] -> 
         workers = get_workers(lock_type)
         class = workers |> get_class(lock_type, status_type)
@@ -180,13 +181,6 @@ defmodule Skoller.Syllabi do
     sum = enumerable |> Enum.reduce(0, & &1.count + &2)
     
     enumerable |> Enum.map(&Map.put(&1, :ratio, &1.count / sum))
-  end
-
-  defp find_existing_lock(user, type) do
-    from(lock in Lock)
-    |> where([lock], lock.user_id == ^user.id and lock.is_completed == false)
-    |> where_lock_type(type)
-    |> Repo.all()
   end
 
   # If opts are passed in with enrolled: true, then add a join to only get enrolled classes.
