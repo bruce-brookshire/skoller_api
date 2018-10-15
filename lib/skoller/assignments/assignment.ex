@@ -14,6 +14,9 @@ defmodule Skoller.Assignments.Assignment do
     field :weight_id, :id
     field :class_id, :id
     field :from_mod, :boolean, default: false
+    field :created_by, :id
+    field :updated_by, :id
+    field :created_on, :string
     belongs_to :class, Class, define_field: false
     belongs_to :weight, Weight, define_field: false
     has_many :student_assignments, StudentAssignment
