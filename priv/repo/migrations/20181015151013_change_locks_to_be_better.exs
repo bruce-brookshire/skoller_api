@@ -9,7 +9,8 @@ defmodule Skoller.Repo.Migrations.ChangeLocksToBeBetter do
 
   def change do
     locks = from(l in Lock)
-    |> where([l], l.is_completed == true)
+    |> where([l], fragment("is_completed = true"))
+    |> select([l], %{id: l.id, class_lock_section_id: l.class_lock_section_id, user_id: l.user_id, class_id: l.class_id})
     |> Repo.all()
 
     alter table(:class_locks) do
@@ -37,6 +38,9 @@ defmodule Skoller.Repo.Migrations.ChangeLocksToBeBetter do
     end
 
     drop table(:class_abandoned_locks)
+    drop unique_index(:class_locks, [:class_id, :class_lock_section_id])
+
+    create unique_index(:class_locks, [:class_id, :class_lock_section_id, :class_lock_subsection], name: :unique_class_user_section_lock_idx)
 
     flush()
     locks |> Enum.each(&process_lock(&1))
@@ -48,7 +52,8 @@ defmodule Skoller.Repo.Migrations.ChangeLocksToBeBetter do
     |> update(set: [created_by: ^user_id, updated_by: ^user_id, created_on: "Web"])
     |> Repo.update_all([])
 
-    lock |> Repo.delete!()
+    Repo.get!(Lock, lock.id)
+    |> Repo.delete!()
   end
   defp process_lock(%{class_lock_section_id: 200, user_id: user_id} = lock) do
     from(a in Assignment)
@@ -56,7 +61,8 @@ defmodule Skoller.Repo.Migrations.ChangeLocksToBeBetter do
     |> update(set: [created_by: ^user_id, updated_by: ^user_id, created_on: "Web"])
     |> Repo.update_all([])
 
-    lock |> Repo.delete!()
+    Repo.get!(Lock, lock.id)
+    |> Repo.delete!()
   end
-  defp process_lock(lock), do: lock |> Repo.delete!()
+  defp process_lock(lock), do: Repo.get!(Lock, lock.id) |> Repo.delete!()
 end
