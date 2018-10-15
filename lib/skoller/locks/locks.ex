@@ -6,7 +6,6 @@ defmodule Skoller.Locks do
   alias Skoller.Repo
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
-  alias Skoller.Locks.AbandonedLock
   alias Skoller.MapErrors
   alias Skoller.Classes.Weights
 
@@ -73,17 +72,14 @@ defmodule Skoller.Locks do
   @doc """
   Unlocks a class.
 
-  ## Params
-   * `%{"is_completed" => Boolean}`, if true, will complete locks and advance status. If false, will abandon locks.
-
   ## Returns
   `[{:ok, Skoller.Locks.Lock}]`
   """
-  def unlock_locks(class_id, user_id, params) do
+  def unlock_locks(class_id, user_id) do
     from(l in Lock)
-    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id)
     |> Repo.all()
-    |> Enum.map(&unlock_lock(&1, params))
+    |> Enum.map(&delete_lock(&1))
   end
 
   @doc """
@@ -96,7 +92,7 @@ defmodule Skoller.Locks do
     case get_incomplete_locks(min) do
       [] -> {:ok, nil}
       locks -> 
-        locks |> Enum.map(&unlock_lock(&1, %{}))
+        locks |> Enum.map(&delete_lock(&1))
     end
   end
 
@@ -116,7 +112,6 @@ defmodule Skoller.Locks do
   # Gets locks that are incomplete after `min` minutes.
   defp get_incomplete_locks(min) do
     from(lock in Lock)
-    |> where([lock], lock.is_completed == false)
     |> where([lock], lock.inserted_at < ago(^min, "minute"))
     |> Repo.all()
   end
@@ -157,20 +152,6 @@ defmodule Skoller.Locks do
       user_id: user_id,
       class_lock_subsection: subsection
     }) |> Repo.insert()
-  end
-  
-  defp unlock_lock(lock_old, %{"is_completed" => true}) do
-    changeset = Lock.changeset(lock_old, %{is_completed: true})
-    Repo.update(changeset)
-  end
-
-  defp unlock_lock(lock_old, %{}) do
-    Repo.insert!(%AbandonedLock{
-      class_lock_section_id: lock_old.class_lock_section_id,
-      class_id: lock_old.class_id,
-      user_id: lock_old.user_id
-    })
-    delete_lock(lock_old)
   end
 
   defp delete_class_locks(class) do

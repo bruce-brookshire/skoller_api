@@ -122,8 +122,8 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     end
   end
 
-  defp unlock_class(user, %{"class_id" => class_id} = params, _) do
-    status = Locks.unlock_locks(class_id, user.id, params)
+  defp unlock_class(user, %{"class_id" => class_id}, _) do
+    status = Locks.unlock_locks(class_id, user.id)
 
     status
     |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
