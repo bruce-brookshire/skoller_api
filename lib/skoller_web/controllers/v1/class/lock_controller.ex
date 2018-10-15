@@ -38,8 +38,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   Returns a 409 when another user has the class locked already unless the user is an admin.
   """
   def lock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
-    lock = lock_class(user, class_id)
-    case lock do
+    case lock_class(user, class_id) do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, _error} ->
         conn
@@ -73,8 +72,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   Returns a 409 when another user has the class locked already unless the user is an admin.
   """
   def weights(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
-    lock = lock_class(user, class_id, :weights)
-    case lock do
+    case lock_class(user, class_id, :weights) do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, _error} ->
         conn
@@ -91,8 +89,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   Returns a 409 when another user has the class locked already unless the user is an admin.
   """
   def assignments(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
-    lock = lock_class(user, class_id, :assignments)
-    case lock do
+    case lock_class(user, class_id, :assignments) do
       {:ok, _lock} -> conn |> send_resp(204, "")
       {:error, _error} ->
         conn
