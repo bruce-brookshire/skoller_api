@@ -78,7 +78,7 @@ defmodule Skoller.Syllabi do
     |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
-  defp lock_class(nil, _conn, _type), do: class
+  defp lock_class(nil, _conn, _type), do: nil
   defp lock_class(%{id: id}, user, type) do
     Locks.lock_class(id, user.id, type)
   end
