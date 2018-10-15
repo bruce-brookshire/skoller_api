@@ -40,31 +40,33 @@ defmodule Skoller.Locks do
   @doc """
   Locks a full class for a user.
 
+  If section is passed, will lock an individual section.
+
+  ## Opts
+   * subsection: Denotes a subsection to lock.
+
   ## Returns
   `{:ok, %{sections: Skoller.Locks.Section}}` or `{:error, _, _, _}`
   """
-  def lock_class(class_id, user_id, nil) do
-    sections = from(sect in Section)
-    |> where([sect], sect.is_diy == true)
-    |> Repo.all()
+  def lock_class(class_id, user_id, section \\ nil, opts \\ [])
+  def lock_class(class_id, user_id, nil, _opts) do
+    sections = Repo.all(Section)
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:sections, &lock_sections(sections, class_id, user_id, &1))
     |> Repo.transaction()
   end
-  def lock_class(class_id, user_id, :weights) do
-    case lock_section(class_id, user_id, @weight_lock) do
-      {:ok, section} -> 
-        map = Map.new() |> Map.put(:sections, List.wrap(section))
-        {:ok, map}
+  def lock_class(class_id, user_id, :weights, _opts) do
+    case lock_section(class_id, user_id, @weight_lock, nil) do
+      {:ok, sections} -> 
+        {:ok, %{sections: sections}}
       {:error, error} -> {:error, nil, error, nil}
     end
   end
-  def lock_class(class_id, user_id, :assignments) do
-    case lock_section(class_id, user_id, @assignment_lock) do
-      {:ok, section} -> 
-        map = Map.new() |> Map.put(:sections, List.wrap(section))
-        {:ok, map}
+  def lock_class(class_id, user_id, :assignments, opts) do
+    case lock_section(class_id, user_id, @assignment_lock, Keyword.get(opts, :subsection)) do
+      {:ok, sections} -> 
+        {:ok, %{sections: sections}}
       {:error, error} -> {:error, nil, error, nil}
     end
   end

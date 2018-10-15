@@ -78,14 +78,10 @@ defmodule Skoller.Syllabi do
     |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
-  # TODO: this can probably get moved to Skoller.Locks
-  defp lock_class(%{id: id}, user, nil) do
-    Locks.lock_class(id, user.id, nil)
-  end
+  defp lock_class(nil, _conn, _type), do: class
   defp lock_class(%{id: id}, user, type) do
-    Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: id, is_completed: false})
+    Locks.lock_class(id, user.id, type)
   end
-  defp lock_class(class, _conn, _type), do: class
 
   # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
   defp get_class(workers, lock_type, status_type) do
