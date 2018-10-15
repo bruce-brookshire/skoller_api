@@ -15,10 +15,9 @@ defmodule Skoller.Locks do
 
   @weight_lock 100
   @assignment_lock 200
-  # @review_lock 300
 
   @doc """
-  Finds an existing, incomplete lock for the class and user.
+  Finds an existing lock for the class and user.
 
   ## Returns
   `Skoller.Locks.Lock` or `nil`
@@ -27,8 +26,7 @@ defmodule Skoller.Locks do
     Repo.get_by(Lock,
       class_id: class_id,
       class_lock_section_id: lock_section,
-      user_id: user_id,
-      is_completed: false)
+      user_id: user_id)
   end
 
   @doc """
