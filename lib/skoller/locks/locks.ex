@@ -17,16 +17,24 @@ defmodule Skoller.Locks do
   @assignment_lock 200
 
   @doc """
-  Finds an existing lock for the class and user.
+  Finds existing locks for the class and user.
 
   ## Returns
-  `Skoller.Locks.Lock` or `nil`
+  `[Skoller.Locks.Lock]` or `[]`
   """
-  def find_lock(class_id, lock_section, user_id) do
+  def find_lock(class_id, lock_section, user_id, subsection \\ nil)
+  def find_lock(class_id, lock_section, user_id, nil) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.class_lock_section_id == ^lock_section and l.user_id == ^user_id)
+    |> Repo.all()
+  end
+  def find_lock(class_id, lock_section, user_id, subsection) do
     Repo.get_by(Lock,
       class_id: class_id,
       class_lock_section_id: lock_section,
-      user_id: user_id)
+      user_id: user_id,
+      class_lock_subsection: subsection)
+    |> List.wrap()
   end
 
   @doc """

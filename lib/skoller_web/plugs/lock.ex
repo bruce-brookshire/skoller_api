@@ -35,7 +35,7 @@ defmodule SkollerWeb.Plugs.Lock do
       true ->
         weight = Weights.get!(conn.params["id"])
         case Locks.find_lock(weight.class_id, @weight_lock, user.id) do
-          nil -> conn |> check_maintenance(weight.class_id)
+          [] -> conn |> check_maintenance(weight.class_id)
           _ -> conn
         end
       false -> conn
@@ -46,7 +46,7 @@ defmodule SkollerWeb.Plugs.Lock do
     case conn.params |> check_using(:weight, :class_id) do
       true ->
         case Locks.find_lock(conn.params["class_id"], @weight_lock, user.id) do
-          nil -> conn |> check_maintenance(conn.params["class_id"])
+          [] -> conn |> check_maintenance(conn.params["class_id"])
           _ -> conn
         end
       false -> conn
@@ -58,7 +58,7 @@ defmodule SkollerWeb.Plugs.Lock do
       true ->
         assign = Assignments.get_assignment_by_id!(conn.params["id"])
         case Locks.find_lock(assign.class_id, @assignment_lock, user.id) do
-          nil -> conn |> check_maintenance(assign.class_id)
+          [] -> conn |> check_maintenance(assign.class_id)
           _ -> conn
         end
       false -> conn
@@ -69,7 +69,7 @@ defmodule SkollerWeb.Plugs.Lock do
     case conn.params |> check_using(:assignment, :class_id) do
       true ->
         case Locks.find_lock(conn.params["class_id"], @assignment_lock, user.id) do
-          nil -> conn |> check_maintenance(conn.params["class_id"])
+          [] -> conn |> check_maintenance(conn.params["class_id"])
           _ -> conn
         end
       false -> conn
