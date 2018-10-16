@@ -39,8 +39,7 @@ defmodule Skoller.Syllabi do
   def serve_class(user, lock_type \\ nil, status_type \\ nil) do
     case Users.get_user_lock(user, lock_type) do
       [] -> 
-        workers = get_workers(lock_type)
-        class = workers |> get_class(lock_type, status_type)
+        class = get_workers(lock_type) |> get_class(lock_type, status_type)
         class |> lock_class(user, lock_type)
         class
       list -> Classes.get_class_by_id!(List.first(list).class_id)
@@ -159,12 +158,12 @@ defmodule Skoller.Syllabi do
     t
   end
 
+  # TODO: Verify that having multiple locks per class only counts a user once (doubt it does.)
   # Gets a ratio of currently working users per school over total workers.
   defp get_workers(type) do
     t = from(lock in Lock)
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
     |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
-    |> where([lock], lock.is_completed == false)
     |> where_lock_type(type)
     |> group_by([lock, class, period], period.school_id)
     |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
@@ -227,12 +226,13 @@ defmodule Skoller.Syllabi do
 
   # Finds the biggest need in schools.
   defp biggest_difference(needed, workers) do
-    needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
-    max = needed |> Enum.reduce(%{need: 0, school: 0}, &
-      case &1.need >= &2.need do
-        true -> &1
-        false -> &2
-      end)
+    max = needed
+    |> Enum.map(&Map.put(&1, :need, get_difference(&1, workers)))
+    |> Enum.reduce(%{need: 0, school: 0}, &
+        case &1.need >= &2.need do
+          true -> &1
+          false -> &2
+        end)
     Logger.info("biggest_difference")
     Logger.info(inspect(max))
     max.school
