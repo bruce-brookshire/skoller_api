@@ -24,7 +24,7 @@ defmodule Skoller.Weights do
   """
   def insert(user_id, params) do
     Weight.changeset_insert(%Weight{}, params)
-    |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, method: params["method"]})
+    |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, created_on: params["created_on"]})
     |> Repo.insert()
   end
 

@@ -62,7 +62,7 @@ defmodule Skoller.Assignments do
       |> Assignment.changeset(params)
       |> check_weight_id(params)
       |> validate_class_weight(class_id)
-      |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, method: params["method"]})
+      |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, created_on: params["created_on"]})
 
     Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
