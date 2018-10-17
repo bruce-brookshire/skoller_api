@@ -78,10 +78,10 @@ defmodule SkollerWeb.Api.V1.ClassController do
   * 401
   * 200 `SkollerWeb.ClassView`
   """
-  def update(conn, %{"id" => id} = params) do
+  def update(%{assigns: %{user: user}} = conn, %{"id" => id} = params) do
     class_old = Classes.get_class_by_id!(id)
 
-    case Classes.update_class(class_old, params) do
+    case Classes.update_class(class_old, params, user.id) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
