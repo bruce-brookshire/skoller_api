@@ -4,7 +4,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.ClassView
-  alias SkollerWeb.Responses.MultiError
   alias Skoller.AdminClasses
 
   import SkollerWeb.Plugs.Auth
@@ -16,11 +15,12 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
 
   def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
     case AdminClasses.update_status(class_id, id) do
-      {:ok, %{class: class}} ->
+      {:ok, class} ->
         render(conn, ClassView, "show.json", class: class)
-      {:error, _, failed_value, _} ->
+      {:error, changeset} ->
         conn
-        |> MultiError.render(failed_value)
+        |> put_status(:unprocessable_entity)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 end

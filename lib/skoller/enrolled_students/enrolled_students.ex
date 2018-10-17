@@ -14,6 +14,14 @@ defmodule Skoller.EnrolledStudents do
   @enrollment_limit 15
 
   @doc """
+  This is a preload function for when needing to preload enrolled classes from a student.
+  """
+  def preload_enrolled_classes(student_id) do
+    from(c in Class)
+    |> join(:inner, [c], sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == c.id)
+  end
+
+  @doc """
   Gets students in a class.
 
   ## Returns

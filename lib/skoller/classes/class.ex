@@ -42,6 +42,9 @@ defmodule Skoller.Classes.Class do
     field :campus, :string, default: ""
     field :class_upload_key, :string
     field :is_student_created, :boolean, default: false
+    field :created_by, :id
+    field :updated_by, :id
+    field :created_on, :string
     has_many :docs, Doc
     belongs_to :professor, Professor, define_field: false
     belongs_to :class_period, ClassPeriod, define_field: false

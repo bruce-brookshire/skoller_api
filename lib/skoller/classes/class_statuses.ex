@@ -222,7 +222,7 @@ defmodule Skoller.Classes.ClassStatuses do
   # A class has been fully unlocked. Get the highest lock
   defp cl_check_status(%Class{} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock
-    |> Enum.filter(& elem(&1, 1).is_completed and elem(&1, 1).class_id == class.id)
+    |> Enum.filter(&elem(&1, 1).class_id == class.id)
     |> Enum.reduce(0, &case elem(&1, 1).class_lock_section_id > &2 do
         true -> elem(&1, 1).class_lock_section_id
         false -> &2
@@ -235,21 +235,21 @@ defmodule Skoller.Classes.ClassStatuses do
     end
   end
   # A class has been unlocked in the weights status.
-  defp cl_check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@assignment_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
   # A class has been unlocked in the assignments status.
-  defp cl_check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@review_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end
   # A class has been unlocked from the review status.
-  defp cl_check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock, is_completed: true} = unlock}) do
+  defp cl_check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@completed_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}

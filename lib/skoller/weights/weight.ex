@@ -11,6 +11,9 @@ defmodule Skoller.Weights.Weight do
     field :name, :string
     field :weight, :decimal
     field :class_id, :id
+    field :created_by, :id
+    field :updated_by, :id
+    field :created_on, :string
     belongs_to :class, Class, define_field: false
 
     timestamps()
