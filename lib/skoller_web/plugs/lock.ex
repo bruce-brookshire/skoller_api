@@ -57,7 +57,7 @@ defmodule SkollerWeb.Plugs.Lock do
     case conn.params |> check_using(:assignment, :id) do
       true ->
         assign = Assignments.get_assignment_by_id!(conn.params["id"])
-        case Locks.find_lock(assign.class_id, @assignment_lock, user.id) do
+        case Locks.find_lock(assign.class_id, @assignment_lock, user.id, assign.weight_id) do
           [] -> conn |> check_maintenance(assign.class_id)
           _ -> conn
         end
@@ -65,6 +65,16 @@ defmodule SkollerWeb.Plugs.Lock do
     end
   end
 
+  defp get_lock(%{assigns: %{user: user}, method: "POST"} = conn, %{type: :assignment, using: :class_id}) do
+    case conn.params |> check_using(:assignment, :class_id) do
+      true ->
+        case Locks.find_lock(conn.params["class_id"], @assignment_lock, user.id, conn.params["weight_id"]) do
+          [] -> conn |> check_maintenance(conn.params["class_id"])
+          _ -> conn
+        end
+      false -> conn
+    end
+  end
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :assignment, using: :class_id}) do
     case conn.params |> check_using(:assignment, :class_id) do
       true ->
