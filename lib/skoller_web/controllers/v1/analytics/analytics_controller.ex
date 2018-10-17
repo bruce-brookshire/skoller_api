@@ -17,12 +17,12 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Students
   alias Skoller.Classes
-  alias Skoller.Chats
   alias Skoller.Classes.Schools
   alias Skoller.Classes.ClassStatuses, as: StatusClasses
   alias Skoller.Classes.DIY
   alias Skoller.EnrolledStudents
   alias Skoller.StudentClasses.Docs
+  alias Skoller.Chats.Schools, as: ChatSchools
 
   import SkollerWeb.Plugs.Auth
   import Ecto.Query
@@ -213,7 +213,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   end
 
   defp get_max_chat_activity(dates, params) do
-    Chats.get_max_chat_activity(dates, params)
+    ChatSchools.get_max_chat_activity(dates, params)
     |> create_max_chat_activity_map()
   end
 
