@@ -162,7 +162,7 @@ defmodule Skoller.Classes do
 
   defp add_created_by_fields(changeset, nil, _created_on), do: changeset |> Ecto.Changeset.change(%{created_on: "System"})
   defp add_created_by_fields(changeset, user, created_on) do
-    changeset |> Ecto.Changeset.change(%{created_by: user.id, updated_by: user.id, created_on: method})
+    changeset |> Ecto.Changeset.change(%{created_by: user.id, updated_by: user.id, created_on: created_on})
   end
 
   defp add_updated_by_fields(changeset, nil), do: changeset
