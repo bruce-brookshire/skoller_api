@@ -37,4 +37,16 @@ defmodule Skoller.Locks.Users do
     |> where([lock], lock.class_lock_section_id == ^type)
     |> Repo.all()
   end
+
+  @doc """
+  Gets locks by class and user.
+
+  ## Returns
+  `[Skoller.Locks.Lock]` or `[]`
+  """
+  def get_locks_by_class_and_user(class_id, user_id) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id)
+    |> Repo.all()
+  end
 end

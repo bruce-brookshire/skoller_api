@@ -8,6 +8,8 @@ defmodule Skoller.Locks do
   alias Skoller.Locks.Section
   alias Skoller.MapErrors
   alias Skoller.Classes.Weights
+  alias Skoller.Locks.Users
+  alias Skoller.Classes.ClassStatuses
 
   import Ecto.Query
 
@@ -72,14 +74,18 @@ defmodule Skoller.Locks do
   @doc """
   Unlocks a class.
 
+  If the class `is_completed` it will update the class status accordingly.
+
   ## Returns
-  `[{:ok, Skoller.Locks.Lock}]`
+  `{:ok, %{unlock: unlocked locks, status: ClassStatuses.check_status/2}}` or an Ecto.Multi error
   """
-  def unlock_locks(class_id, user_id) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id)
-    |> Repo.all()
-    |> Enum.map(&delete_lock(&1))
+  def unlock_class(old_class, user_id, is_completed) do
+    locks = Users.get_locks_by_class_and_user(old_class.id, user_id)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:unlock, &unlock_locks(locks, &1))
+    |> Ecto.Multi.run(:status, &check_class_status(&1, old_class, is_completed))
+    |> Repo.transaction()
   end
 
   @doc """
@@ -92,8 +98,21 @@ defmodule Skoller.Locks do
     case get_incomplete_locks(min) do
       [] -> {:ok, nil}
       locks -> 
-        locks |> Enum.map(&delete_lock(&1))
+        locks |> unlock_locks()
     end
+  end
+
+  defp check_class_status(multi_params, old_class, is_completed) when is_completed == true do
+    ClassStatuses.check_status(old_class, multi_params)
+  end
+  defp check_class_status(_multi_params, _old_class, _is_completed), do: {:ok, nil}
+
+  defp unlock_locks(locks, _), do: unlock_locks(locks)
+  defp unlock_locks(locks) do
+    status = locks |> Enum.map(&delete_lock(&1))
+
+    status
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   # Gets locks that are incomplete after `min` minutes.
