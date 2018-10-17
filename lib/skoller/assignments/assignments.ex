@@ -55,12 +55,14 @@ defmodule Skoller.Assignments do
     ## Returns
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
-  def create_assignment(class_id, params) do
-    params = params |> Map.put_new("weight_id", nil)
+  def create_assignment(class_id, user_id, params) do
+    params = params
+    |> Map.put_new("weight_id", nil)
     changeset = %Assignment{}
       |> Assignment.changeset(params)
       |> check_weight_id(params)
       |> validate_class_weight(class_id)
+      |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, method: params["method"]})
 
     Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
@@ -76,13 +78,14 @@ defmodule Skoller.Assignments do
     ## Returns
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
-  def update_assignment(id, params) do
+  def update_assignment(id, user_id, params) do
     params = params |> Map.put_new("weight_id", nil)
     assign_old = get_assignment_by_id!(id)
     changeset = assign_old
       |> Assignment.changeset(params)
       |> check_weight_id(params)
       |> validate_class_weight(assign_old.class_id)
+      |> Ecto.Changeset.change(%{updated_by: user_id})
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:assignment, changeset)
