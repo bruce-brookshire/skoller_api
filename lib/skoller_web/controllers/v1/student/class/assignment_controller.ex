@@ -68,7 +68,11 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
             render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
           {:ok, %{student_assignment: student_assignment, mod: mod}} ->
             mod_results = Keyword.get(mod, :ok)
-            student_assignment_update_success(mod_results.mod, mod_results.actions)
+            case mod_results do
+              %{mod: mod, actions: actions} ->
+                student_assignment_update_success(mod, actions)
+              _ -> {:ok, nil}
+            end
             render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
           {:error, _, failed_value, _} ->
             conn
