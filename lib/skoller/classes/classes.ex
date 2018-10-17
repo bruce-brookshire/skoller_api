@@ -165,8 +165,8 @@ defmodule Skoller.Classes do
     changeset |> Ecto.Changeset.change(%{created_by: user.id, updated_by: user.id, method: method})
   end
 
-  defp add_updated_by_fields(changeset, nil, _method), do: changeset
-  defp add_updated_by_fields(changeset, user_id, method) do
-    changeset |> Ecto.Changeset.change(%{updated_by: user.id})
+  defp add_updated_by_fields(changeset, nil), do: changeset
+  defp add_updated_by_fields(changeset, user_id) do
+    changeset |> Ecto.Changeset.change(%{updated_by: user_id})
   end
 end
