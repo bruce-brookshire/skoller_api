@@ -127,7 +127,7 @@ defmodule Skoller.Locks do
   #Locks the section if it is not already locked.
   defp lock_section(class_id, user_id, class_lock_section_id, subsection) do
     case find_lock(class_id, class_lock_section_id, user_id, subsection) do
-      nil -> create_new_lock(class_id, user_id, class_lock_section_id, subsection)
+      [] -> create_new_lock(class_id, user_id, class_lock_section_id, subsection)
       lock -> {:ok, lock} 
     end
   end
