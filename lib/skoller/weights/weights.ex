@@ -22,8 +22,9 @@ defmodule Skoller.Weights do
   ## Returns
   `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
   """
-  def insert(params) do
+  def insert(user_id, params) do
     Weight.changeset_insert(%Weight{}, params)
+    |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, method: params["method"]})
     |> Repo.insert()
   end
 
@@ -33,8 +34,9 @@ defmodule Skoller.Weights do
   ## Returns
   `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
   """
-  def update(weight_old, params) do
+  def update(user_id, weight_old, params) do
     Weight.changeset_update(weight_old, params)
+    |> Ecto.Changeset.change(%{updated_by: user_id})
     |> Repo.update()
   end
 
