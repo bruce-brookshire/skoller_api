@@ -69,6 +69,7 @@ defmodule Skoller.Classes do
     |> Schools.get_school_from_period()
     |> get_create_changeset(params)
     |> add_student_created_class_fields(user)
+    |> add_created_by_fields(user, params["created_on"])
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:class, changeset)
@@ -85,10 +86,11 @@ defmodule Skoller.Classes do
       {:ok, %{class: %Skoller.Classes.Class{}, class_status: %Skoller.Classes.Class{}}}
 
   """
-  def update_class(class_old, params) do
+  def update_class(class_old, params, user_id \\ nil) do
     changeset = class_old.class_period_id
     |> Schools.get_school_from_period()
     |> get_update_changeset(params, class_old)
+    |> add_updated_by_fields(user_id)
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:class, changeset)
@@ -157,4 +159,14 @@ defmodule Skoller.Classes do
     changeset |> Ecto.Changeset.change(%{is_student_created: true})
   end
   defp add_student_created_class_fields(changeset, _user), do: changeset
+
+  defp add_created_by_fields(changeset, nil, _created_on), do: changeset |> Ecto.Changeset.change(%{created_on: "System"})
+  defp add_created_by_fields(changeset, user, created_on) do
+    changeset |> Ecto.Changeset.change(%{created_by: user.id, updated_by: user.id, created_on: created_on})
+  end
+
+  defp add_updated_by_fields(changeset, nil), do: changeset
+  defp add_updated_by_fields(changeset, user_id) do
+    changeset |> Ecto.Changeset.change(%{updated_by: user_id})
+  end
 end
