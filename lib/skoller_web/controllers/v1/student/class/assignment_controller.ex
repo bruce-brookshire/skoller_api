@@ -64,8 +64,11 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       student_assignment -> 
         case StudentAssignments.update_student_assignment(student_assignment, params) do
           {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
-            Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-            Task.start(ModNotifications, :send_mod_update_notifications, [actions])
+            student_assignment_update_success(mod, actions)
+            render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+          {:ok, %{student_assignment: student_assignment, mod: mod}} ->
+            mod_results = Keyword.get(mod, :ok)
+            student_assignment_update_success(mod_results.mod, mod_results.actions)
             render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
           {:error, _, failed_value, _} ->
             conn
@@ -96,5 +99,10 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
             |> MultiError.render(failed_value)
         end
     end
+  end
+
+  defp student_assignment_update_success(mod, actions) do
+    Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+    Task.start(ModNotifications, :send_mod_update_notifications, [actions])
   end
 end
