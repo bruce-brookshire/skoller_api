@@ -158,10 +158,9 @@ defmodule Skoller.Syllabi do
     t
   end
 
-  # TODO: Verify that having multiple locks per class only counts a user once (doubt it does.)
   # Gets a ratio of currently working users per school over total workers.
   defp get_workers(type) do
-    t = from(lock in Lock)
+    t = from(lock in subquery(unique_class_locks()))
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
     |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
     |> where_lock_type(type)
@@ -172,6 +171,11 @@ defmodule Skoller.Syllabi do
     Logger.info("get workers")
     Logger.info(inspect(t))
     t
+  end
+
+  defp unique_class_locks() do
+    from(lock in Lock)
+    |> distinct([lock], lock.user_id)
   end
 
   # Takes in an enum where each element has a count, and returns
