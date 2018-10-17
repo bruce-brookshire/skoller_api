@@ -18,12 +18,13 @@ defmodule Skoller.EmailTypes.EmailType do
     timestamps()
   end
 
-  @req_fields [:id, :name, :is_active_email, :is_active_notification, :send_time]
-  @opt_fields [:category]
+  @req_fields [:id, :name, :is_active_email, :is_active_notification]
+  @opt_fields [:category, :send_time]
   @all_fields @req_fields ++ @opt_fields
 
-  @req_upd [:is_active_email, :is_active_notification, :send_time]
-  @all_upd @req_upd
+  @req_upd [:is_active_email, :is_active_notification]
+  @opt_upd [:send_time]
+  @all_upd @req_upd ++ @opt_upd
 
   @doc false
   def changeset(%EmailType{} = email_type, attrs) do

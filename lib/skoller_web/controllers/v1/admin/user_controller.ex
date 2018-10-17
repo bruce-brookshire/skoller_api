@@ -8,8 +8,9 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
-  alias Skoller.Students
   alias Skoller.StudentClasses
+  alias Skoller.Users.Students
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -41,7 +42,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def csv(conn, _params) do
-    users = Users.get_student_users()
+    users = Students.get_student_users()
     conn
     |> put_resp_content_type("text/csv")
     |> put_resp_header("content-disposition", "attachment; filename=\"Users-" <> to_string(DateTime.utc_now) <>  "\"")
@@ -76,7 +77,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   defp get_row_data(user) do
     user = user |> Repo.preload(:student)
-    student_classes = Students.get_enrolled_classes_by_student_id(user.student_id)
+    student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
     [user.email, user.student.name_first, user.student.name_last, format_phone(user.student.phone),
       format_date(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
       get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]

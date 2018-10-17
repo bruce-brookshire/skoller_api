@@ -10,9 +10,9 @@ defmodule Skoller.Assignments do
   alias Skoller.Assignments.Assignment
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Classes.Class
-  alias Skoller.Students
   alias Skoller.StudentAssignments
   alias Skoller.Classes.Weights
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -116,7 +116,7 @@ defmodule Skoller.Assignments do
     from(post in Post)
     |> join(:inner, [post], assign in Assignment, assign.id == post.assignment_id)
     |> join(:inner, [post, assign], sa in StudentAssignment, sa.assignment_id == assign.id)
-    |> join(:inner, [post, assign, sa], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == sa.student_class_id)
+    |> join(:inner, [post, assign, sa], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == sa.student_class_id)
     |> join(:inner, [post, assign, sa, sc], class in Class, class.id == assign.class_id)
     |> where([post, assign, sa], sa.is_post_notifications == true)
     |> where([post], post.student_id != ^student_id)

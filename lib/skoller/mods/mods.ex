@@ -17,6 +17,7 @@ defmodule Skoller.Mods do
   alias Skoller.StudentAssignments
   alias Skoller.MapErrors
   alias Skoller.Assignments
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -43,6 +44,7 @@ defmodule Skoller.Mods do
 
   ## Params
    * `%{"is_new_assignments" => "true"}`, :boolean, returns only new assignment mods for a student
+   * `%{"class_id" => class_id}`, :id, returns only mods in class with `class_id`
 
   ## Returns
   `[%{mod: Skoller.Mods.Mod, action: Skoller.Mods.Action, 
@@ -51,7 +53,7 @@ defmodule Skoller.Mods do
   def get_student_mods(student_id, params \\ %{}) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> filter(params)
@@ -72,7 +74,7 @@ defmodule Skoller.Mods do
   def get_student_mod_by_id(student_id, mod_id) do
     from(mod in Mod)
     |> join(:inner, [mod], action in Action, action.assignment_modification_id == mod.id)
-    |> join(:inner, [mod, action], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
+    |> join(:inner, [mod, action], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == action.student_class_id)
     |> join(:left, [mod, action, sc], sa in StudentAssignment, sc.id == sa.student_class_id and mod.assignment_id == sa.assignment_id)
     |> where([mod, action, sc, sa], (mod.assignment_mod_type_id not in [@new_assignment_mod] and not is_nil(sa.id)) or (is_nil(sa.id) and mod.assignment_mod_type_id in [@new_assignment_mod]))
     |> where([mod], mod.id == ^mod_id)
@@ -132,7 +134,7 @@ defmodule Skoller.Mods do
   """
   def get_classes_with_pending_mod_by_student_id(student_id) do
     from(class in Class)
-    |> join(:inner, [class], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
+    |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == class.id)
     |> join(:inner, [class, sc], act in Action, act.student_class_id == sc.id)
     |> where([class, sc, act], is_nil(act.is_accepted))
     |> distinct([class], class.id)
@@ -149,7 +151,7 @@ defmodule Skoller.Mods do
   """
   def get_joyriders() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_accepted == true and a.is_manual == false)
     |> distinct([a, sc], sc.student_id)
@@ -166,7 +168,7 @@ defmodule Skoller.Mods do
   """
   def get_pending() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> distinct([a, sc], sc.student_id)
@@ -183,7 +185,7 @@ defmodule Skoller.Mods do
   """
   def get_followers() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_manual == true and a.is_accepted == true)
     |> distinct([a, sc], sc.student_id)
@@ -200,7 +202,7 @@ defmodule Skoller.Mods do
   """
   def get_creators() do
     from(m in Mod)
-    |> join(:inner, [m], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
+    |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
     |> join(:inner, [m, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
     |> distinct([m], m.student_id)
     |> Repo.aggregate(:count, :id)
@@ -331,7 +333,7 @@ defmodule Skoller.Mods do
   # Takes a Student Assignment for student a and applies the mods that created that assignment to student b.
   def insert_new_mod(%{assignment: %StudentAssignment{} = student_assignment}, params) do
     student_assignment = student_assignment |> Repo.preload(:student_class)
-    student_class = Students.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(student_assignment.student_class.class_id, params["student_id"])
     student_assignment
     |> find_accepted_mods_for_student_assignment()
     |> Enum.map(&process_existing_mod(&1, student_class, params))
@@ -852,6 +854,7 @@ defmodule Skoller.Mods do
   defp filter(query, params) do
     query
     |> filter_new_assign_mods(params)
+    |> filter_class(params)
   end
 
   defp filter_new_assign_mods(query, %{"is_new_assignments" => "true"}) do
@@ -860,10 +863,16 @@ defmodule Skoller.Mods do
   end
   defp filter_new_assign_mods(query, _params), do: query
 
+  defp filter_class(query, %{"class_id" => class_id}) do
+    query
+    |> where([mod, action, sc], sc.class_id == ^class_id)
+  end
+  defp filter_class(query, _params), do: query
+
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.
   defp mod_responses_sub() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end
@@ -871,7 +880,7 @@ defmodule Skoller.Mods do
   #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(Students.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
     |> join(:inner, [a, sc], s in Student, s.id == sc.student_id)
     |> join(:inner, [a, sc, s], u in User, u.student_id == s.id)
     |> where([a], a.assignment_modification_id == ^mod_id)

@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Admin.Users
+  alias Skoller.UserReports
   alias SkollerWeb.ReportView
 
   import SkollerWeb.Plugs.Auth
@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   plug :verify_role, %{role: @admin_role}
 
   def complete(conn, %{"id" => id}) do
-    case Users.complete_report(id) do
+    case UserReports.complete_report(id) do
       {:ok, report} ->
         render(conn, ReportView, "show.json", report: report)
       {:error, changeset} ->
@@ -24,7 +24,7 @@ defmodule SkollerWeb.Api.V1.Admin.ReportUserController do
   end
 
   def index(conn, _params) do
-    reports = Users.get_incomplete_reports()
+    reports = UserReports.get_incomplete_reports()
     render(conn, ReportView, "index.json", reports: reports)
   end
 end

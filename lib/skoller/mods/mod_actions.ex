@@ -6,7 +6,6 @@ defmodule Skoller.ModActions do
   alias Skoller.Repo
   alias Skoller.Mods.Action
   alias Skoller.Mods.Mod
-  alias Skoller.Students
   alias Skoller.EnrolledStudents
 
   import Ecto.Query
@@ -23,6 +22,16 @@ defmodule Skoller.ModActions do
     |> Repo.all()
   end
   def get_actions_from_mod(_mod), do: []
+
+  @doc """
+  Inserts an unanswered mod action for `student_class`
+
+  ## Returns
+  `{:ok, Skoller.Mods.Action}` or `{:error, changeset}`
+  """
+  def insert_mod_action(student_class, %Mod{} = mod) do
+    Repo.insert(%Action{is_accepted: nil, student_class_id: student_class.id, assignment_modification_id: mod.id})
+  end
 
   @doc """
   Gets all actions from a mod where the student is currently enrolled in the class.
@@ -60,7 +69,7 @@ defmodule Skoller.ModActions do
   """
   def get_pending_mod_count_for_student(student_id) do
     from(act in Action)
-    |> join(:inner, [act], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
+    |> join(:inner, [act], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
     |> where([act], is_nil(act.is_accepted))
     |> select([act], count(act.id))
     |> Repo.one

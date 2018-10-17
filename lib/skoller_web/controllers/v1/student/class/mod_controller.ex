@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.ModController do
 
   alias Skoller.Mods
   alias SkollerWeb.Assignment.ModView
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.ModController do
   plug :verify_member, :student
 
   def index(conn, %{"class_id" => class_id, "student_id" => student_id}) do
-    student_class = Students.get_enrolled_class_by_ids!(class_id, student_id)
+    student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     mods = student_class |> Mods.get_new_assignment_mods()
 

@@ -7,43 +7,19 @@ defmodule Skoller.Users do
   alias Skoller.Users.User
   alias Skoller.UserRole
   alias Skoller.Students
-  alias Skoller.Locks.Lock
   alias Skoller.Students.Student
   alias Skoller.Verification
   alias Skoller.CustomSignups
-  alias Skoller.Users.Report
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
+  alias Skoller.Users.Notifications
+  alias Skoller.StudentClasses.EnrollmentLinks
 
   import Ecto.Query
 
   @student_role 100
 
   @student_referral_points_name "Student Referral"
-
-  @doc """
-  Gets student users.
-
-  ## Returns
-  `[Skoller.Users.User]` or `[]`
-  """
-  def get_student_users() do
-    from(u in User)
-    |> where([u], not(is_nil(u.student_id)))
-    |> Repo.all()
-  end
-
-  @doc """
-  Reports a user
-
-  ## Returns
-  `{:ok, Skoller.Users.Report}` or `{:error, Ecto.Changeset}`
-  """
-  def report_user(params) do
-    %Report{}
-    |> Report.changeset(params)
-    |> Repo.insert()
-  end
 
   @doc """
   Gets a user by id with `:roles` and `:student`
@@ -95,6 +71,9 @@ defmodule Skoller.Users do
     case multi |> Repo.transaction() do
       {:error, _, failed_val, _} ->
         {:error, failed_val}
+      {:ok, %{user: %{student: %{enrolled_by: student_id}}} = items} when not is_nil(student_id) ->
+        Task.start(Notifications, :send_link_used_notification, [student_id])
+        {:ok, items}
       {:ok, items} ->
         {:ok, items}
     end
@@ -139,33 +118,6 @@ defmodule Skoller.Users do
     |> Repo.update()
   end
 
-  @doc """
-  Gets the users enrolled in a class.
-  
-  ## Returns
-  `[Skoller.Users.User]` or `[]`
-  """
-  def get_users_in_class(class_id) do
-    from(u in User)
-    |> join(:inner, [u], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == u.student_id)
-    |> where([u, sc], sc.class_id == ^class_id)
-    |> Repo.all()
-  end
-
-  @doc """
-  Gets the locks by class.
-
-  ## Returns
-  `[%{lock: Skoller.Locks.Lock, user: Skoller.Users.User}]` or `[]`
-  """
-  def get_user_locks_by_class(class_id) do
-    from(l in Lock)
-    |> join(:inner, [l], u in User, l.user_id == u.id)
-    |> where([l], l.class_id == ^class_id)
-    |> select([l, u], %{lock: l, user: u})
-    |> Repo.all()
-  end
-
   defp add_points_to_student(%{student: %{enrolled_by: enrolled_by}}) when not(is_nil(enrolled_by)) do
     enrolled_by
     |> StudentPoints.add_points_to_student(@student_referral_points_name)
@@ -204,7 +156,7 @@ defmodule Skoller.Users do
   end
   # Adds enrolled_by if "enrollment_link" is present in params.
   defp get_enrolled_by(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, %{"student" => %{"enrollment_link" => link}}) do
-    enrolled_by = Students.get_student_class_by_enrollment_link(link)
+    enrolled_by = EnrollmentLinks.get_student_class_by_enrollment_link(link)
     case enrolled_by do
       nil -> u_changeset
       enrolled_by -> Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.student.id)})

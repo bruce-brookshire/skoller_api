@@ -9,12 +9,12 @@ defmodule Skoller.Chats do
   alias Skoller.ChatComments.Comment
   alias Skoller.ChatComments.Star, as: CStar
   alias Skoller.ChatReplies.Reply
-  alias Skoller.Students
   alias Skoller.Classes.Class
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.ChatPosts.Like
   alias Skoller.Classes.Schools
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -40,7 +40,7 @@ defmodule Skoller.Chats do
   """
   def get_chat_notifications(student_id) do
     posts = from(p in Post)
-    |> join(:inner, [p], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
+    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
     |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
     |> join(:inner, [p, sc, s], c in subquery(distinct_post_id(student_id)), c.chat_post_id == p.id)
     |> join(:inner, [p, sc, s, c], cl in Class, cl.id == p.class_id)
@@ -54,7 +54,7 @@ defmodule Skoller.Chats do
   
     comments = from(c in Comment)
     |> join(:inner, [c], p in Post, c.chat_post_id == p.id)
-    |> join(:inner, [c, p], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
+    |> join(:inner, [c, p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
     |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
     |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
     |> join(:left, [c, p, sc, s, r], ps in PStar, ps.chat_post_id == p.id and ps.student_id == ^student_id)
@@ -102,7 +102,7 @@ defmodule Skoller.Chats do
   """
   def get_student_chat(student_id, filters) do
     from(p in Post)
-    |> join(:inner, [p], sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
+    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
     |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), enroll.class_id == sc.class_id)
     |> join(:inner, [p, sc, enroll], c in Class, c.id == p.class_id)
     |> join(:inner, [p, sc, enroll, c], cp in ClassPeriod, cp.id == c.class_period_id)
@@ -162,7 +162,7 @@ defmodule Skoller.Chats do
 
   # Gets the number of likes for each post in student_id's classes.
   defp like_subquery(student_id) do
-    from(sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)))
+    from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], p in Post, sc.class_id == p.class_id)
     |> join(:left, [sc, p], l in Like, l.chat_post_id == p.id)
     |> group_by([sc, p], p.id)
@@ -171,8 +171,8 @@ defmodule Skoller.Chats do
 
   # Gets number of students in each of student_id's classes
   defp enrollment_subquery(student_id) do
-    from(sc in subquery(Students.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], enroll in subquery(Students.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
+    from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
+    |> join(:inner, [sc], enroll in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end

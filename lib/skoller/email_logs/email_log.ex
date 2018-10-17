@@ -1,4 +1,4 @@
-defmodule Skoller.EmailLog do
+defmodule Skoller.EmailLogs.EmailLog do
   @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset

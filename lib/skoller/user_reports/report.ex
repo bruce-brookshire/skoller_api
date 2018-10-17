@@ -1,10 +1,10 @@
-defmodule Skoller.Users.Report do
+defmodule Skoller.UserReports.Report do
   @moduledoc false
   
   use Ecto.Schema
   import Ecto.Changeset
   alias Skoller.Users.User
-  alias Skoller.Users.Report
+  alias Skoller.UserReports.Report
 
   schema "user_reports" do
     field :context, :string

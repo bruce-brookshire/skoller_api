@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.ReportUserController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Users
+  alias Skoller.UserReports
 
   import SkollerWeb.Plugs.Auth
   
@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.ReportUserController do
 
   def create(conn, params) do
     params = params |> Map.put("reported_by", conn.assigns[:user].id)
-    case Users.report_user(params) do
+    case UserReports.report_user(params) do
       {:ok, _} ->
         conn |> send_resp(204, "")
       {:error, changeset} ->

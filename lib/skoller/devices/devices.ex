@@ -31,6 +31,16 @@ defmodule Skoller.Devices do
   end
 
   @doc """
+  Gets a device by udid, type, and user.
+
+  ## Returns
+  `Skoller.Devices.Device` or `nil`
+  """
+  def get_device_by_attributes(udid, type, user_id) do
+    Repo.get_by(Device, udid: udid, type: type, user_id: user_id)
+  end
+
+  @doc """
   Creates a device
 
   ## Returns
@@ -50,5 +60,16 @@ defmodule Skoller.Devices do
   """
   def delete_device!(%Device{} = device) do
     device |> Repo.delete!()
+  end
+
+
+  @doc """
+  Deregisters a device for other users when a new user signs in.
+  """
+  def deregister_device_for_other_users_by_udid_and_type(device) do
+    from(dev in Device)
+    |> where([dev, user], dev.udid == ^device.udid and dev.type == ^device.type and dev.user_id != ^device.user_id)
+    |> Repo.all
+    |> Enum.each(&delete_device!(&1))
   end
 end

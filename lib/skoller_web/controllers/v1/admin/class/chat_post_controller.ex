@@ -4,9 +4,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   use SkollerWeb, :controller
   
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.Students
   alias Skoller.ChatPosts
   alias SkollerWeb.ChangesetView
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -50,14 +50,14 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   end
 
   defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts, class_id) do
-    sc = Students.get_enrolled_class_by_ids!(class_id, id)
+    sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, id)
     render(conn, ChatPostView, "index.json", %{chat_posts: %{chat_posts: posts, color: sc.color}, current_student_id: id})
   end
   defp render_index_view(conn, posts, _class_id) do
     render(conn, ChatPostView, "index.json", chat_posts: posts)
   end
   defp render_show_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, post) do
-    sc = Students.get_enrolled_class_by_ids!(post.class_id, id)
+    sc = EnrolledStudents.get_enrolled_class_by_ids!(post.class_id, id)
     render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: id})
   end
   defp render_show_view(conn, post) do

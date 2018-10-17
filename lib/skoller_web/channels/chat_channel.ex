@@ -45,14 +45,14 @@ defmodule SkollerWeb.ChatChannel do
   alias Skoller.ChatReplies.Reply
   alias Skoller.Classes
   alias Skoller.Schools
-  alias Skoller.Students
+  alias Skoller.EnrolledStudents
 
   @doc false
   # Joins a class after checking that the class has chat enabled and the student is enrolled.
   def join("chat:" <> class_id, _params, socket) do
     case get_class_enabled(class_id) do
       {:ok, _val} ->
-        case Students.get_enrolled_class_by_ids(class_id, socket.assigns.user.student.id) do
+        case EnrolledStudents.get_enrolled_class_by_ids(class_id, socket.assigns.user.student.id) do
           nil -> {:reply, %{error: "unauthorized"}}
           _ -> {:ok, socket}
         end

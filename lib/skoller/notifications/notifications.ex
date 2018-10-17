@@ -7,7 +7,6 @@ defmodule Skoller.Notifications do
   alias Skoller.Students.Student
   alias Skoller.Users.User
   alias Skoller.Devices.Device
-  alias Skoller.Students
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Assignments.Assignment
@@ -18,6 +17,7 @@ defmodule Skoller.Notifications do
   alias Skoller.Services.Notification
   alias Skoller.Classes.EditableClasses
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -48,7 +48,7 @@ defmodule Skoller.Notifications do
   `%{user: Skoller.Users.User, student: Skoller.Students.Student}` or `nil`
   """
   def get_user_from_student_class(student_class_id) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
     |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
     |> join(:inner, [sc, stu, usr], class in subquery(EditableClasses.get_editable_classes_subquery()), sc.class_id == class.id)
@@ -72,7 +72,7 @@ defmodule Skoller.Notifications do
     from(d in Device)
     |> join(:inner, [d], u in User, d.user_id == u.id)
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
     |> where([d, u, s], s.is_chat_notifications == true and s.is_notifications == true and s.id != ^student_id)
     |> where([d, u, s, sc], sc.class_id == ^class_id)
     |> Repo.all()
@@ -91,7 +91,7 @@ defmodule Skoller.Notifications do
     from(d in Device)
     |> join(:inner, [d], u in User, u.id == d.user_id)
     |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
     |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
     |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
     |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
@@ -197,7 +197,7 @@ defmodule Skoller.Notifications do
   def get_notification_enabled_needs_syllabus_users() do
     from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
-    |> join(:inner, [u, s], sc in subquery(Students.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
     |> join(:inner, [u, s, sc], c in subquery(ClassStatuses.need_syllabus_status_class_subquery()), c.id == sc.class_id)
     |> where([u, s], s.is_notifications == true)
     |> distinct([u], u.id)
@@ -211,7 +211,7 @@ defmodule Skoller.Notifications do
   `[Skoller.Users.User]` or `[]`
   """
   def get_users_from_class(class_id) do
-    from(sc in subquery(Students.get_enrollment_by_class_id_subquery(class_id)))
+    from(sc in subquery(EnrolledStudents.get_enrollment_by_class_id_subquery(class_id)))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
     |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
     |> where([sc, user, stu], stu.is_notifications == true)
@@ -226,7 +226,7 @@ defmodule Skoller.Notifications do
   `[Skoller.Users.User]` or `[]`
   """
   def get_users_from_student_class(id) do
-    from(sc in subquery(Students.get_enrolled_student_classes_subquery()))
+    from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
     |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
     |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
     |> where([sc, user], sc.id == ^id)

@@ -5,9 +5,9 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
 
   alias SkollerWeb.Class.StudentClassView
   alias Skoller.Mods
-  alias Skoller.Students
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
+  alias Skoller.EnrolledStudents
 
   import SkollerWeb.Plugs.Auth
   
@@ -20,16 +20,17 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   plug :verify_class_is_editable, :class_id
 
   def index(conn, %{"student_id" => student_id}) do
-    student_classes = Students.get_enrolled_classes_by_student_id(student_id)
-    |> Enum.map(&Map.put(&1, :grade, StudentClasses.get_class_grade(&1.id)))
-    |> Enum.map(&Map.put(&1, :completion, StudentAssignments.get_class_completion(&1)))
-    |> Enum.map(&Map.put(&1, :enrollment, Students.get_enrollment_by_class_id(&1.class.id)))
-    |> Enum.map(&Map.put(&1, :new_assignments, get_new_class_assignments(&1)))
+    student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(student_id)
+    |> Enum.map(&add_student_class_details(&1))
 
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
 
-  defp get_new_class_assignments(%{} = student_class) do
-    student_class |> Mods.get_new_assignment_mods()
+  defp add_student_class_details(student_class) do
+    student_class
+    |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
+    |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
+    |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(student_class.class.id))
+    |> Map.put(:new_assignments, Mods.get_new_assignment_mods(student_class))
   end
 end
