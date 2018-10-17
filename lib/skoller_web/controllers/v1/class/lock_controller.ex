@@ -54,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.run(:unlock, &unlock_class(user, params, &1))
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(old_class, &1))
+    |> Ecto.Multi.run(:status, &check_class_status(&1, old_class, params))
 
     case Repo.transaction(multi) do
       {:ok, %{status: class}} -> 
@@ -65,6 +65,11 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
         |> MultiError.render(failed_value)
     end
   end
+
+  defp check_class_status(multi_params, old_class, %{"is_completed" => true}) do
+    ClassStatuses.check_status(old_class, multi_params)
+  end
+  defp check_class_status(_multi_params, _old_class, _params), do: {:ok, nil}
 
   @doc """
   Locks a class's weights to the current user.
