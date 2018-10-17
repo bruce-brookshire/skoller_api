@@ -3,7 +3,7 @@ defmodule SkollerWeb.Api.V1.Assignment.ReminderController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Assignments
+  alias Skoller.AssignmentReminders
   alias SkollerWeb.Assignment.ReminderNotificationView
 
   import SkollerWeb.Plugs.Auth
@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Assignment.ReminderController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, params) do
-    case Assignments.add_assignment_message(params) do
+    case AssignmentReminders.add_assignment_message(params) do
       {:ok, reminder_notification} ->
         conn |> render(ReminderNotificationView, "show.json", reminder_notification: reminder_notification)
       {:error, changeset} ->
@@ -24,12 +24,12 @@ defmodule SkollerWeb.Api.V1.Assignment.ReminderController do
   end
 
   def index(conn, _params) do
-    rn = Assignments.get_assignment_messages()
+    rn = AssignmentReminders.get_assignment_messages()
     conn |> render(ReminderNotificationView, "index.json", reminder_notifications: rn)
   end
 
   def delete(conn, %{"id" => id}) do
-    case Assignments.delete_assignment_messages(id) do
+    case AssignmentReminders.delete_assignment_messages(id) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
