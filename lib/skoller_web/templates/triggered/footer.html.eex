@@ -1,0 +1,5 @@
+<h3 style='margin-bottom: 0'>--</h3>
+<h3 style='margin: 0'>The Skoller Team</h3>
+<a href="<%= @web_home_path %>" >
+  <img src="https://www.skoller.co/src/assets/images/logo-wide-blue@1x.png" alt = logo style='width: 120px'>
+</a>
