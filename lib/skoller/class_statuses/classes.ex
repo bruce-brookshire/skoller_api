@@ -36,6 +36,12 @@ defmodule Skoller.ClassStatuses.Classes do
   @ghost_name "Ghost"
 
   @doc """
+  Returns whether or not a class needs setup.
+  """
+  def class_needs_setup?(%{class_status_id: @needs_syllabus_status}), do: true
+  def class_needs_setup?(_class), do: false
+
+  @doc """
   A subquery to get classes in the needs setup status.
   """
   def needs_setup_classes_subquery() do
