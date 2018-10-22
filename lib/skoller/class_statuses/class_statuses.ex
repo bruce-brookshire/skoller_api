@@ -9,7 +9,7 @@ defmodule Skoller.ClassStatuses do
   alias Skoller.ClassStatuses.Emails
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
 
-  @syllabus_status 200
+  @needs_setup_status 1100
 
   @doc """
   Gets a class status by status id
@@ -58,7 +58,7 @@ defmodule Skoller.ClassStatuses do
     |> Repo.update()
 
     case update_result do
-      {:ok, %{class_status_id: @syllabus_status} = class} ->
+      {:ok, %{class_status_id: @needs_setup_status} = class} ->
         Emails.send_need_syllabus_email(class)
       {:ok, class} ->
         ClassStatuses.evaluate_class_completion(old_class, class)

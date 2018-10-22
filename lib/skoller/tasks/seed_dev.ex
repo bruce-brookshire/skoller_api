@@ -175,7 +175,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   is_syllabus: true,
                   grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
                   class_period_id: period.id,
-                  class_status_id: 700,
+                  class_status_id: 1400,
                   is_ghost: false
     })
 
@@ -191,7 +191,7 @@ defmodule Mix.Tasks.Seed.Dev do
                 is_syllabus: true,
                 grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
                 class_period_id: period.id,
-                class_status_id: 300,
+                class_status_id: 1200,
                 is_ghost: false
     })
 
@@ -207,7 +207,7 @@ defmodule Mix.Tasks.Seed.Dev do
       is_syllabus: true,
       grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
       class_period_id: period2.id,
-      class_status_id: 300,
+      class_status_id: 1200,
       is_ghost: false
     })
 
@@ -223,7 +223,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
-    class_status_id: 300,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -236,10 +236,10 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_end_time: "12:00:00",
     seat_count: 200,
     is_editable: true,
-    is_syllabus: true,
+    is_syllabus: false,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -255,7 +255,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -271,7 +271,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 300,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -287,7 +287,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 
