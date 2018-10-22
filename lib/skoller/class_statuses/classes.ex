@@ -11,6 +11,7 @@ defmodule Skoller.ClassStatuses.Classes do
   alias Skoller.Syllabi
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
+  alias Skoller.Classes
 
   import Ecto.Query
 
@@ -19,7 +20,6 @@ defmodule Skoller.ClassStatuses.Classes do
   @needs_syllabus_status 200
   @weight_status 300
   @assignment_status 400
-  @review_status 500
   @help_status 600
   @completed_status 700
   @change_status 800
@@ -34,6 +34,11 @@ defmodule Skoller.ClassStatuses.Classes do
   @maint_name "Under Maintenance"
 
   @ghost_name "Ghost"
+
+  def class_in_request?(class_id) do
+    class = Classes.get_class_by_id!(class_id)
+    class.class_status_id in [@help_status, @change_status]
+  end
 
   @doc """
   Returns whether or not a class needs setup.
@@ -114,7 +119,7 @@ defmodule Skoller.ClassStatuses.Classes do
   def get_class_status_counts() do
     statuses = from(status in Status)
     |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
-    |> where([status], status.id in [@weight_status, @assignment_status, @review_status])
+    |> where([status], status.id in [@weight_status, @assignment_status])
     |> group_by([status], [status.id, status.name, status.is_complete])
     |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
     |> Repo.all()
@@ -252,20 +257,6 @@ defmodule Skoller.ClassStatuses.Classes do
   defp cl_check_status(%Class{class_status_id: @weight_status} = class, %{unlock: %{class_lock_section_id: @weight_lock} = unlock}) do
     case unlock.class_id == class.id do
       true -> class |> set_status(@assignment_status)
-      false -> {:error, %{class_id: "Class and lock do not match"}}
-    end
-  end
-  # A class has been unlocked in the assignments status.
-  defp cl_check_status(%Class{class_status_id: @assignment_status} = class, %{unlock: %{class_lock_section_id: @assignment_lock} = unlock}) do
-    case unlock.class_id == class.id do
-      true -> class |> set_status(@review_status)
-      false -> {:error, %{class_id: "Class and lock do not match"}}
-    end
-  end
-  # A class has been unlocked from the review status.
-  defp cl_check_status(%Class{class_status_id: @review_status} = class, %{unlock: %{class_lock_section_id: @review_lock} = unlock}) do
-    case unlock.class_id == class.id do
-      true -> class |> set_status(@completed_status)
       false -> {:error, %{class_id: "Class and lock do not match"}}
     end
   end

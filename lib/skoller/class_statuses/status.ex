@@ -4,7 +4,6 @@ defmodule Skoller.ClassStatuses.Status do
   # @syllabus_status 200
   # @weight_status 300
   # @assignment_status 400
-  # @review_status 500
   # @help_status 600
   # @complete_status 700
   # @change_status 800
