@@ -16,7 +16,7 @@ defmodule Skoller.Notifications do
   alias Skoller.Notifications.ManualLog
   alias Skoller.Services.Notification
   alias Skoller.Classes.EditableClasses
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes
   alias Skoller.EnrolledStudents
 
   import Ecto.Query
@@ -198,7 +198,7 @@ defmodule Skoller.Notifications do
     from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
     |> join(:inner, [u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [u, s, sc], c in subquery(ClassStatuses.need_syllabus_status_class_subquery()), c.id == sc.class_id)
+    |> join(:inner, [u, s, sc], c in subquery(Classes.need_syllabus_status_class_subquery()), c.id == sc.class_id)
     |> where([u, s], s.is_notifications == true)
     |> distinct([u], u.id)
     |> Repo.all()

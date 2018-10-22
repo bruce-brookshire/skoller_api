@@ -5,7 +5,7 @@ defmodule Skoller.ChangeRequests do
 
   alias Skoller.Repo
   alias Skoller.ChangeRequests.ChangeRequest
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes
   alias Skoller.ChangeRequests.Emails
 
   @doc """
@@ -27,7 +27,7 @@ defmodule Skoller.ChangeRequests do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)
-    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(change_request_old.class, &1))
+    |> Ecto.Multi.run(:class_status, &Classes.check_status(change_request_old.class, &1))
     |> Repo.transaction()
 
     case multi do

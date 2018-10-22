@@ -9,7 +9,7 @@ defmodule Skoller.Classes do
   alias Skoller.Universities
   alias Skoller.HighSchools
   alias Skoller.Classes.Schools, as: ClassSchools
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.Mods
   alias Skoller.StudentClasses
 

@@ -7,7 +7,7 @@ defmodule Skoller.ClassStatuses do
   alias Skoller.ClassStatuses.Status
   alias Skoller.Classes
   alias Skoller.ClassStatuses.Emails
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
 
   @syllabus_status 200
 
@@ -41,7 +41,7 @@ defmodule Skoller.ClassStatuses do
    * A class cannot be moved from a status considered complete, to an incomplete status.
    * If a class is moved to a lower status, any locks will be destroyed (down to the new status).
    * If a class is moved back to needs syllabus, it will email students in an attempt to re-upload.
-   * If a class is completed, `Skoller.Classes.ClassStatuses.evaluate_class_completion/2` is called.
+   * If a class is completed, `Skoller.ClassStatuses.Classes.evaluate_class_completion/2` is called.
 
   ## Returns
   `{:ok, class}` or `{:error, changeset}`

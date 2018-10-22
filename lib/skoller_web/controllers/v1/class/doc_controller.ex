@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   alias Skoller.ClassDocs
   alias Skoller.Sammi
   alias Skoller.Classes
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
 
   import Ecto.Query
   import SkollerWeb.Plugs.Auth

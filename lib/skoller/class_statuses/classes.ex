@@ -1,4 +1,4 @@
-defmodule Skoller.Classes.ClassStatuses do
+defmodule Skoller.ClassStatuses.Classes do
   @moduledoc """
     Context module for classes and class statuses.
   """

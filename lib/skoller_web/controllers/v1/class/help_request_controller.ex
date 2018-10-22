@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
