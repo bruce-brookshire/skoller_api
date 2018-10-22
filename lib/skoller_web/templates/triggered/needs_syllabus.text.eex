@@ -1,0 +1,8 @@
+Hi there, 
+
+
+Our team has noticed that the wrong syllabus was submitted for <%= @class_name %>.
+No biggie, we all goof up every now and then! We deleted the wrong syllabus. You should now be able to sign in here <%= @web_home_path  %> and upload the correct syllabus when you're ready!
+
+
+We hope you and your classmates have a great semester!
