@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.ClassView
-  alias Skoller.AdminClasses
+  alias Skoller.ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StatusController do
   plug :verify_role, %{roles: [@admin_role, @help_role]}
 
   def update(conn, %{"class_id" => class_id, "class_status_id" => id}) do
-    case AdminClasses.update_status(class_id, id) do
+    case ClassStatuses.update_status(class_id, id) do
       {:ok, class} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
