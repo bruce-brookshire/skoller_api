@@ -10,6 +10,8 @@ defmodule Skoller.Classes do
   alias Skoller.HighSchools
   alias Skoller.Classes.Schools, as: ClassSchools
   alias Skoller.Classes.ClassStatuses
+  alias Skoller.Mods
+  alias Skoller.StudentClasses
 
   import Ecto.Query
 
@@ -46,7 +48,9 @@ defmodule Skoller.Classes do
 
   def get_full_class_by_id!(id) do
     Repo.get!(Class, id)
-    |> Repo.preload([:weights])
+    |> Repo.preload([:weights, :notes])
+    |> Map.put(:students, StudentClasses.get_studentclasses_by_class(id))
+    |> Map.put(:assignments, Mods.get_mod_assignments_by_class(id))
   end
 
   @doc """
