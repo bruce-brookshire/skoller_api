@@ -36,6 +36,14 @@ defmodule Skoller.ClassStatuses.Classes do
   @ghost_name "Ghost"
 
   @doc """
+  A subquery to get classes in the needs setup status.
+  """
+  def needs_setup_classes_subquery() do
+    from(c in Class)
+    |> where([c], c.class_status_id == @needs_syllabus_status)
+  end
+
+  @doc """
   Gets a count of completed classes created between the dates.
 
   ## Dates

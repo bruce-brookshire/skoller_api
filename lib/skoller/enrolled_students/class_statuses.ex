@@ -5,12 +5,10 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
 
   alias Skoller.Repo
   alias Skoller.Students.Student
-  alias Skoller.Classes.Class
   alias Skoller.EnrolledStudents
+  alias Skoller.ClassStatuses.Classes
 
   import Ecto.Query
-
-  @needs_syllabus_status 200
 
   @doc """
   Gets a list of students that have classes that need setup.
@@ -18,8 +16,7 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
   def get_students_needs_setup_classes() do
     from(s in Student)
     |> join(:inner, [s], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in Class, sc.class_id == c.id)
-    |> where([s, sc, c], c.class_status_id == @needs_syllabus_status)
+    |> join(:inner, [s, sc], c in subquery(Classes.needs_setup_classes_subquery()), sc.class_id == c.id)
     |> preload([s], [:users])
     |> distinct([s], s.id)
     |> Repo.all()
