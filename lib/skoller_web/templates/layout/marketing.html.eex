@@ -296,11 +296,11 @@
               <tbody>
                 <tr>
                   <td id="templateHeader" valign="top">
-                    <%= render SkollerWeb.EmailView, "header.html", %{} %>
+                    <%= render SkollerWeb.MarketingView, "header.html", %{} %>
                   </td>
                 </tr>
                 <%= render @view_module, @view_template, assigns %>
-                <%= render SkollerWeb.EmailView, "footer.html", unsub_path: @unsub_path %>
+                <%= render SkollerWeb.MarketingView, "footer.html", unsub_path: @unsub_path %>
               </tbody>
             </table>
             <!--[if (gte mso 9)|(IE)]>
