@@ -13,12 +13,14 @@ defmodule Skoller.Services.MarketingEmail do
   require Logger
 
   @from_email "noreply@skoller.co"
+  @reply_to_email "support@skoller.co"
 
   def send_email(user_id, email_adr, subject, template, email_type_id) do
     base_email(user_id)
     |> to(email_adr)
     |> subject(subject)
     |> render(template)
+    |> put_header("Reply-To", @reply_to_email)
     |> deliver_message(user_id, email_type_id)
   end
 
@@ -35,7 +37,7 @@ defmodule Skoller.Services.MarketingEmail do
 
   defp base_email(user_id) do
     new_email()
-    |> from(@from_email)
+    |> from({"Skoller", @from_email})
     |> put_layout({SkollerWeb.LayoutView, :email})
     |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
   end

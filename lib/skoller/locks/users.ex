@@ -22,4 +22,31 @@ defmodule Skoller.Locks.Users do
     |> select([l, u], %{lock: l, user: u})
     |> Repo.all()
   end
+
+  @doc """
+    Gets a user's locks. If no type is passed, it will return all locks for a user.
+  """
+  def get_user_lock(user, nil) do
+    from(lock in Lock)
+    |> where([lock], lock.user_id == ^user.id)
+    |> Repo.all()
+  end
+  def get_user_lock(user, type) do
+    from(lock in Lock)
+    |> where([lock], lock.user_id == ^user.id)
+    |> where([lock], lock.class_lock_section_id == ^type)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets locks by class and user.
+
+  ## Returns
+  `[Skoller.Locks.Lock]` or `[]`
+  """
+  def get_locks_by_class_and_user(class_id, user_id) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id)
+    |> Repo.all()
+  end
 end

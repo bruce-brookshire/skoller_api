@@ -7,6 +7,7 @@ defmodule SkollerWeb.Plugs.Auth do
   alias Skoller.Users
   alias Skoller.Assignments
   alias Skoller.Classes.EditableClasses
+  alias Skoller.EnrolledStudents
 
   import Plug.Conn
 
@@ -138,7 +139,7 @@ defmodule SkollerWeb.Plugs.Auth do
   defp get_items(%{assigns: %{user: user}}, :user), do: user.id
   defp get_items(%{assigns: %{user: %{student: nil}}}, _atom), do: nil
   defp get_items(%{assigns: %{user: %{student: student}}}, :class) do
-    student = student |> Repo.preload(:classes)
+    student = student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
     student.classes
   end
   defp get_items(%{assigns: %{user: %{student: student}}}, :student), do: student.id
@@ -147,7 +148,7 @@ defmodule SkollerWeb.Plugs.Auth do
     student.student_assignments
   end
   defp get_items(%{assigns: %{user: %{student: student}}}, :class_assignment) do
-    student = student |> Repo.preload(:classes)
+    student = student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
     student.classes
   end
 

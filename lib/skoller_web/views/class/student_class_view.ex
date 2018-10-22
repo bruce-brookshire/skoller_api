@@ -9,6 +9,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias SkollerWeb.Class.StudentAssignmentView
   alias SkollerWeb.Assignment.ModView
   alias Skoller.StudentAssignments
+  alias SkollerWeb.StudentView
 
   @enrollment_path "/e/"
 
@@ -17,7 +18,46 @@ defmodule SkollerWeb.Class.StudentClassView do
   end
 
   def render("show.json", %{student_class: student_class}) do
-    render_one(student_class, StudentClassView, "student_class.json")
+    render_one(student_class, StudentClassView, "student_class-detail.json")
+  end
+
+  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
+    student_class
+    |> base_detail_student_class()
+    |> Map.merge(%{
+      grade: Decimal.to_float(Decimal.round(grade, 2)),
+      completion: Decimal.to_float(Decimal.round(completion, 2)),
+      enrollment: enrollment,
+      new_assignments: render_many(new_assignments, ModView, "mod.json"),
+      students: render_many(students, StudentView, "student-short.json")
+    })
+  end
+
+  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do
+    student_class
+    |> base_detail_student_class()
+    |> Map.merge(%{
+      grade: Decimal.to_float(Decimal.round(grade, 2)),
+      completion: Decimal.to_float(Decimal.round(completion, 2)),
+      enrollment: enrollment,
+      new_assignments: render_many(new_assignments, ModView, "mod.json")
+    })
+  end
+
+  def render("student_class-detail.json", %{student_class: student_class}) do
+    base_detail_student_class(student_class)
+  end
+
+  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
+    student_class
+    |> base_student_class()
+    |> Map.merge(%{
+      grade: Decimal.to_float(Decimal.round(grade, 2)),
+      completion: Decimal.to_float(Decimal.round(completion, 2)),
+      enrollment: enrollment,
+      new_assignments: render_many(new_assignments, ModView, "mod.json"),
+      students: render_many(students, StudentView, "student-short.json")
+    })
   end
 
   def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do
@@ -35,7 +75,7 @@ defmodule SkollerWeb.Class.StudentClassView do
     base_student_class(student_class)
   end
 
-  defp base_student_class(student_class) do
+  defp base_detail_student_class(student_class) do
     student_class = student_class |> Repo.preload([:class, :student_assignments])
     class = student_class.class |> Repo.preload(:weights)
     %{
@@ -43,6 +83,20 @@ defmodule SkollerWeb.Class.StudentClassView do
       color: student_class.color,
       is_notifications: student_class.is_notifications,
       assignments: render_many(get_ordered_assignments(student_class), StudentAssignmentView, "student_assignment.json"),
+      weights: render_many(class.weights, WeightView, "weight.json"),
+      enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
+    } 
+    |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
+  end
+
+  defp base_student_class(student_class) do
+    student_class = student_class |> Repo.preload([:class, :student_assignments])
+    class = student_class.class |> Repo.preload(:weights)
+    %{
+      student_id: student_class.student_id,
+      color: student_class.color,
+      is_notifications: student_class.is_notifications,
+      assignments: render_many(get_ordered_assignments(student_class), StudentAssignmentView, "student_assignment-short.json"),
       weights: render_many(class.weights, WeightView, "weight.json"),
       enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
     } 

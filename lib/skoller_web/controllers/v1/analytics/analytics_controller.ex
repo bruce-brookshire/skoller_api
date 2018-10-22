@@ -20,7 +20,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
   alias Skoller.Chats
   alias Skoller.Classes.Schools
   alias Skoller.Classes.ClassStatuses, as: StatusClasses
-  alias Skoller.Classes.Locks
+  alias Skoller.Classes.DIY
   alias Skoller.EnrolledStudents
   alias Skoller.StudentClasses.Docs
 
@@ -47,7 +47,7 @@ defmodule SkollerWeb.Api.V1.Analytics.AnalyticsController do
             |> Map.put(:date_end, end_date)
 
     completed_classes = StatusClasses.get_completed_class_count(dates, params)
-    completed_by_diy = Locks.classes_completed_by_diy_count(dates, params)
+    completed_by_diy = DIY.classes_completed_by_diy_count(dates, params)
     avg_classes = avg_classes(dates, params)
     avg_days_out = get_avg_days_out(params) |> convert_to_float()
     notifications_enabled = get_notifications_enabled(params)
