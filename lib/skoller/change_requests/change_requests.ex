@@ -32,8 +32,8 @@ defmodule Skoller.ChangeRequests do
 
     case multi do
       {:ok, %{change_request: change_request}} ->
-        change_request = change_request |> Repo.preload([:user])
-        change_request.user |> Emails.send_request_completed_email(change_request_old.class)
+        change_request = change_request |> Repo.preload([user: :student])
+        change_request.user.email |> Emails.send_request_completed_email(change_request.user.student, change_request_old.class)
       _ -> nil
     end
 
