@@ -3,12 +3,9 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.HelpRequests.HelpRequest
-  alias Skoller.Repo
+  alias Skoller.HelpRequests
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Classes
-  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -20,19 +17,8 @@ defmodule SkollerWeb.Api.V1.Class.HelpRequestController do
   plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
-
-    class = Classes.get_class_by_id!(class_id)
-    class = class |> Repo.preload(:class_status)
-
     params = params |> Map.put("user_id", conn.assigns[:user].id)
-
-    changeset = HelpRequest.changeset(%HelpRequest{}, params)
-    
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:help_request, changeset)
-    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
-
-    case Repo.transaction(multi) do
+    case HelpRequests.create(class_id, params) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->

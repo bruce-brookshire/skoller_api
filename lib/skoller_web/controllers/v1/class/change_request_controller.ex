@@ -3,12 +3,9 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.ChangeRequests.ChangeRequest
-  alias Skoller.Repo
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Classes
-  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
+  alias Skoller.ChangeRequests
 
   import SkollerWeb.Plugs.Auth
 
@@ -19,18 +16,9 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
   plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
-
-    class = Classes.get_class_by_id!(class_id)
-
     params = params |> Map.put("user_id", conn.assigns[:user].id)
 
-    changeset = ChangeRequest.changeset(%ChangeRequest{}, params)
-    
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:change_request, changeset)
-    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
-
-    case Repo.transaction(multi) do
+    case ChangeRequests.create(class_id, params) do
       {:ok, %{class: class}} ->
         render(conn, ClassView, "show.json", class: class)
       {:error, _, failed_value, _} ->
