@@ -12,6 +12,7 @@ defmodule Skoller.ClassStatuses.Classes do
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Classes
+  alias Skoller.Classes.Assignments
 
   import Ecto.Query
 
@@ -228,7 +229,8 @@ defmodule Skoller.ClassStatuses.Classes do
         false -> &2
       end)
     case max_lock do
-      @assignment_lock -> class |> set_status(@class_complete_status)
+      @assignment_lock ->
+        check_assignments_exist_for_all_weights(class)
       _ -> {:ok, nil}
     end
   end
@@ -278,4 +280,16 @@ defmodule Skoller.ClassStatuses.Classes do
 
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_name
   defp get_status(%{class_status: status}), do: status.name
+
+  defp check_assignments_exist_for_all_weights(class) do
+    case Assignments.get_assignment_count_by_weight(class.id) do
+      [] -> class |> set_status(@needs_student_input_status)
+      weights ->
+        case Enum.filter(weights, & &1.count == 0) do
+          [] -> class |> set_status(@class_complete_status)
+          _weights_with_no_assignments ->
+            {:ok, nil}
+        end
+    end
+  end
 end
