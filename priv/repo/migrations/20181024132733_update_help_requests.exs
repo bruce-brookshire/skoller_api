@@ -12,6 +12,8 @@ defmodule Skoller.Repo.Migrations.UpdateHelpRequests do
     alter table(:class_help_requests) do
       remove :is_completed
     end
+
+    Repo.get(Skoller.Locks.Section, 300) |> delete()
   end
 
   defp delete(nil), do: nil

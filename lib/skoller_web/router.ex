@@ -246,9 +246,6 @@ defmodule SkollerWeb.Router do
       post "/fields-of-study/csv", CSVController, :fos
 
       #Syllabus Worker routes
-      # post "/syllabus-workers/weights", SyllabusWorkerController, :weights
-      # post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
-      # post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
       post "/syllabus-workers", SyllabusWorkerController, :class
 
       post "/notifications/syllabus-needed", NotificationController, :syllabus
