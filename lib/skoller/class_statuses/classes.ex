@@ -239,7 +239,7 @@ defmodule Skoller.ClassStatuses.Classes do
   # A student enrolled into a ghost class.
   defp cl_check_status(%Class{is_ghost: true} = class, %{student_class: _sc}), do: class |> remove_ghost()
   # A student created a student request.
-  defp cl_check_status(%Class{} = class, %{student_request: %{is_completed: false}}), do: class |> set_request_status()
+  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{student_request: %{is_completed: false}}), do: class |> set_status(@class_issue_status)
   defp cl_check_status(_class, _params), do: {:ok, nil}
 
   defp set_status(class, status) do
@@ -271,13 +271,6 @@ defmodule Skoller.ClassStatuses.Classes do
     class
     |> Ecto.Changeset.change(%{is_ghost: false})
     |> Repo.update()
-  end
-
-  defp set_request_status(%{class_status: %{is_complete: true}} = class) do
-    class |> set_status(@class_issue_status)
-  end
-  defp set_request_status(%{class_status: %{is_complete: false}} = class) do
-    class |> set_status(@needs_student_input_status)
   end
 
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_name
