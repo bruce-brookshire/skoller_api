@@ -25,9 +25,7 @@ Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 700, name: "Complete", is
 Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 800, name: "Change", is_complete: true})
 
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 100, name: "This is the wrong syllabus"})
-Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 200, name: "This syllabus is confusing"})
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 300, name: "Issues viewing the file"})
-Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 400, name: "Other"})
 
 Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 100, name: "Grade Scale"})
 Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 200, name: "Weights"})

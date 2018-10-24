@@ -206,6 +206,7 @@ defmodule Skoller.ClassStatuses.Classes do
   defp match_params(%Class{id: id}, %{student_request: %{class_id: class_id}}) when id != class_id, do: :error
   defp match_params(%Class{id: id}, %{help_request: %{class_id: class_id}}) when id != class_id, do: :error
   defp match_params(%Class{id: id}, %{student_class: %{class_id: class_id}}) when id != class_id, do: :error
+  defp match_params(_class, _params), do: :ok
 
   defp cl_check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params), do: class |> set_status(@needs_student_input_status)
   defp cl_check_status(%Class{class_status: %{is_complete: false}, is_syllabus: false} = class, _params), do: class |> set_status(@needs_student_input_status)
