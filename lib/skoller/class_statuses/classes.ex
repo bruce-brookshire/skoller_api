@@ -33,6 +33,7 @@ defmodule Skoller.ClassStatuses.Classes do
 
   @wrong_syllabus_type 100
   @bad_file_type 300
+  @no_weights_or_assign_type 500
 
   def class_in_request?(class_id) do
     class = Classes.get_class_by_id!(class_id)
@@ -220,6 +221,7 @@ defmodule Skoller.ClassStatuses.Classes do
   defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{change_request: %{is_completed: false}}), do: class |> set_status(@class_issue_status)
   # A class has a help request created.
   defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{help_request_type_id: type_id}}) when type_id in [@bad_file_type, @wrong_syllabus_type], do: class |> set_status(@needs_setup_status)
+  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{help_request_type_id: @no_weights_or_assign_type}}), do: class |> set_status(@needs_student_input_status)
   # A class has been fully unlocked. Get the highest lock
   defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{unlock: unlock}) when is_list(unlock) do
     max_lock = unlock

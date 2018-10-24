@@ -16,7 +16,6 @@ defmodule Skoller.HelpRequests do
   """
   def create(class_id, attrs) do
     changeset = HelpRequest.changeset(%HelpRequest{}, attrs)
-    |> Ecto.Changeset.change(%{is_completed: true})
 
     class = Classes.get_class_by_id!(class_id) |> Repo.preload(:class_status)
     
