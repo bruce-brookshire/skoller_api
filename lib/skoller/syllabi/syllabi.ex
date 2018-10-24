@@ -22,6 +22,8 @@ defmodule Skoller.Syllabi do
   require Logger
 
   @syllabus_processing_setting "is_auto_syllabus"
+
+  @syllabus_submitted_status 1200
   
   @doc """
   Serves a class to a syllabus worker.
@@ -36,7 +38,7 @@ defmodule Skoller.Syllabi do
    * The default is to serve a class regardless of status or lock.
    * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
   """
-  def serve_class(user, lock_type \\ nil, status_type \\ nil) do
+  def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] -> 
         class = get_workers(lock_type) |> get_class(lock_type, status_type)
