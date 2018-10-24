@@ -33,6 +33,7 @@ defmodule Skoller.StudentRequests do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
     |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
+    |> Ecto.Multi.run(:doc_removal, &remove_docs_from_same_uploader(&1, class))
     |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
   end
@@ -89,4 +90,12 @@ defmodule Skoller.StudentRequests do
 
   defp complete_by_class_status(changeset, %{class_status: %{is_complete: false}}), do: changeset |> Ecto.Changeset.change(%{is_completed: true})
   defp complete_by_class_status(changeset, _class), do: changeset
+
+  defp remove_docs_from_same_uploader(%{student_request: %{user_id: nil}}, _class), do: {:ok, nil}
+  defp remove_docs_from_same_uploader(%{student_request: %{user_id: user_id, class_student_request_type_id: @syllabus_request}, doc_upload: upload}, class) when not is_nil(upload) do
+    class = class |> Repo.preload(:docs)
+    class.docs
+    |> Enum.filter(&user_id == &1.user_id and &1.is_syllabus == true)
+    |> Repo.delete_all()
+  end
 end
