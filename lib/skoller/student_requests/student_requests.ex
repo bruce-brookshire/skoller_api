@@ -25,10 +25,11 @@ defmodule Skoller.StudentRequests do
    * `{:status, Skoller.ClassStatuses.Classes.check_status/2}`
   """
   def create(user, class_id, params) do
+    class = Classes.get_class_by_id!(class_id) |> Repo.preload(:class_status)
+
     changeset = StudentRequest.changeset(%StudentRequest{}, params)
-    
-    class = Classes.get_class_by_id!(class_id)
-    
+    |> complete_by_class_status(class)
+
     Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
     |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
@@ -85,4 +86,7 @@ defmodule Skoller.StudentRequests do
 
   defp get_is_syllabus(%{class_student_request_type_id: @syllabus_request}), do: true
   defp get_is_syllabus(_params), do: false
+
+  defp complete_by_class_status(changeset, %{class_status: %{is_complete: false}}), do: changeset |> Ecto.Changeset.change(%{is_completed: true})
+  defp complete_by_class_status(changeset, _class), do: changeset
 end
