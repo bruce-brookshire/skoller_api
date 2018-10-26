@@ -136,7 +136,7 @@ defmodule Skoller.Locks do
     status = Weights.get_class_weights(class_id)
     |> Enum.map(&lock_section(class_id, user_id, @assignment_lock, &1.id))
 
-    status ++ lock_section(class_id, user_id, @assignment_lock, nil)
+    status = status ++ lock_section(class_id, user_id, @assignment_lock, nil)
 
     status
     |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))

@@ -35,4 +35,15 @@ defmodule Skoller.ChatReplies do
   def delete(%Reply{} = reply) do
     Repo.delete(reply)
   end
+
+  @doc """
+  Creates a chat reply
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def create(attrs) do
+    Reply.changeset(%Reply{}, attrs)
+    |> Repo.insert()
+  end
 end

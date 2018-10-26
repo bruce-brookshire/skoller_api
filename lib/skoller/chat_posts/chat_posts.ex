@@ -49,4 +49,15 @@ defmodule Skoller.ChatPosts do
     |> where([p], p.class_id == ^class_id)
     |> Repo.all()
   end
+
+  @doc """
+  Creates a chat post
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def create(attrs) do
+    Post.changeset(%Post{}, attrs)
+    |> Repo.insert()
+  end
 end

@@ -35,4 +35,15 @@ defmodule Skoller.ChatComments do
   def delete(%Comment{} = comment) do
     Repo.delete(comment)
   end
+
+  @doc """
+  Creates a chat comment
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def create(attrs) do
+    Comment.changeset(%Comment{}, attrs)
+    |> Repo.insert()
+  end
 end

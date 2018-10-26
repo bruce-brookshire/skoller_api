@@ -39,13 +39,12 @@ defmodule SkollerWeb.ChatChannel do
   # Testing this is really difficult. Try to find a websocket client.
   use Phoenix.Channel
 
-  alias Skoller.Repo
-  alias Skoller.ChatPosts.Post
-  alias Skoller.ChatComments.Comment
-  alias Skoller.ChatReplies.Reply
   alias Skoller.Classes
   alias Skoller.Schools
   alias Skoller.EnrolledStudents
+  alias Skoller.ChatPosts
+  alias Skoller.ChatComments
+  alias Skoller.ChatReplies
 
   @doc false
   # Joins a class after checking that the class has chat enabled and the student is enrolled.
@@ -66,8 +65,7 @@ defmodule SkollerWeb.ChatChannel do
   # Broadcast will send an update to all users.
   def handle_in("post", %{"body" => body}, socket) do
     "chat:" <> class_id = socket.topic
-    changeset = Post.changeset(%Post{}, %{class_id: class_id, student_id: socket.assigns.user.student.id, post: body})
-    case Repo.insert(changeset) do
+    case ChatPosts.create(%{class_id: class_id, student_id: socket.assigns.user.student.id, post: body}) do
       {:ok, _post} ->
         broadcast! socket, "post", %{body: body}
         {:noreply, socket}
@@ -76,8 +74,7 @@ defmodule SkollerWeb.ChatChannel do
     end
   end
   def handle_in("comment", %{"body" => body, "post_id" => post_id}, socket) do
-    changeset = Comment.changeset(%Comment{}, %{chat_post_id: post_id, student_id: socket.assigns.user.student.id, comment: body})
-    case Repo.insert(changeset) do
+    case ChatComments.create(%{chat_post_id: post_id, student_id: socket.assigns.user.student.id, comment: body}) do
       {:ok, _comment} ->
         broadcast! socket, "comment", %{body: body, post_id: post_id}
         {:noreply, socket}
@@ -86,8 +83,7 @@ defmodule SkollerWeb.ChatChannel do
     end
   end
   def handle_in("reply", %{"body" => body, "comment_id" => comment_id}, socket) do
-    changeset = Reply.changeset(%Reply{}, %{chat_comment_id: comment_id, student_id: socket.assigns.user.student.id, reply: body})
-    case Repo.insert(changeset) do
+    case ChatReplies.create(%{chat_comment_id: comment_id, student_id: socket.assigns.user.student.id, reply: body}) do
       {:ok, _reply} ->
         broadcast! socket, "reply", %{body: body, comment_id: comment_id}
         {:noreply, socket}
