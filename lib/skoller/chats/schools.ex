@@ -6,7 +6,8 @@ defmodule Skoller.Chats.Schools do
   alias Skoller.Classes.Class
   alias Skoller.Repo
   alias Skoller.ChatPosts.Post
-  alias Skoller.Classes.Schools
+  alias Skoller.Classes.Schools, as: ClassSchools
+  alias Skoller.Schools
 
   import Ecto.Query
 
@@ -29,6 +30,19 @@ defmodule Skoller.Chats.Schools do
     |> Repo.one()
   end
 
+  @doc """
+  Checks if a school's chat is enabled by the class period id
+
+  Returns a boolean.
+  """
+  def check_school_chat_enabled_by_period(class_period_id) do
+    Schools.get_school_from_period(class_period_id)
+    |> check_school()
+  end
+
+  defp check_school(%{is_chat_enabled: true}), do: true
+  defp check_school(_school), do: false
+
   # Gets the top class_id and the count of posts in the class.
   defp get_max_chat_activity_subquery(dates, params) do
     from(cp in subquery(get_chat_activity_subquery(dates, params)))
@@ -40,7 +54,7 @@ defmodule Skoller.Chats.Schools do
   # This gets a list of classes and post count, with an optional school parameter.
   defp get_chat_activity_subquery(dates, params) do
     from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(ClassSchools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
     |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
     |> group_by([cp], cp.class_id)
     |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})

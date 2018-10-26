@@ -39,17 +39,16 @@ defmodule SkollerWeb.ChatChannel do
   # Testing this is really difficult. Try to find a websocket client.
   use Phoenix.Channel
 
-  alias Skoller.Classes
-  alias Skoller.Schools
   alias Skoller.EnrolledStudents
   alias Skoller.ChatPosts
   alias Skoller.ChatComments
   alias Skoller.ChatReplies
+  alias Skoller.Chats.Classes
 
   @doc false
   # Joins a class after checking that the class has chat enabled and the student is enrolled.
   def join("chat:" <> class_id, _params, socket) do
-    case get_class_enabled(class_id) do
+    case Classes.check_class_chat_enabled(class_id) do
       {:ok, _val} ->
         case EnrolledStudents.get_enrolled_class_by_ids(class_id, socket.assigns.user.student.id) do
           nil -> {:reply, %{error: "unauthorized"}}
@@ -89,30 +88,6 @@ defmodule SkollerWeb.ChatChannel do
         {:noreply, socket}
       {:error, _changeset} ->
         {:reply, %{error: "Failed to reply"}}
-    end
-  end
-
-  defp get_class_enabled (class_id) do
-    {:ok, Map.new}
-    |> get_class(class_id)
-    |> get_school()
-  end
-
-  defp get_class({:ok, map}, class_id) do
-    case Classes.get_class_by_id(class_id) do
-      %{is_chat_enabled: true} = class -> 
-        {:ok, map |> Map.put(:class, class)}
-      _ -> {:error, map}
-    end
-  end
-
-  defp get_school({:error, _nil} = map), do: map
-  defp get_school({:ok, %{class: %{class_period_id: class_period_id}} = map}) do
-    case Schools.get_school_from_period(class_period_id) do
-      %{is_chat_enabled: true} = school -> 
-        {:ok, map |> Map.put(:school, school)}
-      _ -> 
-        {:error, map}
     end
   end
 end
