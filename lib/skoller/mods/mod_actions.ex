@@ -7,7 +7,6 @@ defmodule Skoller.ModActions do
   alias Skoller.Mods.Action
   alias Skoller.Mods.Mod
   alias Skoller.EnrolledStudents
-  alias Skoller.Students
   alias Skoller.Assignments.Assignment
   alias Skoller.MapErrors
   alias Skoller.StudentClasses.StudentClass
@@ -134,7 +133,7 @@ defmodule Skoller.ModActions do
   def get_responded_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(Students.get_communities()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id)) #Get mods with a response that is not from the creator.
@@ -151,7 +150,7 @@ defmodule Skoller.ModActions do
   def get_shared_mods() do
     from(m in Mod)
     |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(Students.get_communities()), sc.class_id == a.class_id)
+    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), sc.class_id == a.class_id)
     |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, audience: act.audience})
@@ -164,7 +163,7 @@ defmodule Skoller.ModActions do
   ## Returns
   `[%{assignment_modification_id: Id, responses: Integer, audience: Integer, accepted: Integer}]` or `[]`
   """
-  def get_non_auto_update_mods_in_enrollment_threshold(enrollment_threshold) do
+  def get_non_auto_update_mod_actions_in_enrollment_threshold(enrollment_threshold) do
     from(m in Mod)
     |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
     |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)

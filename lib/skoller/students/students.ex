@@ -4,7 +4,6 @@ defmodule Skoller.Students do
   """
   
   alias Skoller.Repo
-  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Students.FieldOfStudy, as: StudentField
@@ -17,7 +16,6 @@ defmodule Skoller.Students do
 
   require Logger
 
-  @community_threshold 2
 
   @doc """
   Gets a student by id.
@@ -48,22 +46,6 @@ defmodule Skoller.Students do
     |> order_by([s], desc: count(s.notification_time))
     |> limit([s], ^num)
     |> Repo.all()
-  end
-
-  @doc """
-  Gets communities with a count of students.
-
-  Communities are students with at least `threshold` enrolled students
-
-  ## Returns
-  `%{class_id: Id, count: Integer}`
-  """
-  def get_communities(threshold \\ @community_threshold) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= ^threshold)
-    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 
   @doc """

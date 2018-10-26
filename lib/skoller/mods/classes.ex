@@ -37,4 +37,13 @@ defmodule Skoller.Mods.Classes do
     |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
     |> select([mod, assign], %{class_id: assign.class_id, mod_id: mod.id})
   end
+
+  def get_count_of_mods_in_classes(mods, classes) do
+    from(m in Mod)
+    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
+    |> where([m, a], a.class_id in ^classes)
+    |> where([m], m.id in ^mods)
+    |> select([m], count(m.id))
+    |> Repo.one()
+  end
 end

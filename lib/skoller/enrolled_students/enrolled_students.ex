@@ -13,6 +13,8 @@ defmodule Skoller.EnrolledStudents do
 
   @enrollment_limit 15
 
+  @community_threshold 2
+
   @doc """
   This is a preload function for when needing to preload enrolled classes from a student.
   """
@@ -195,5 +197,20 @@ defmodule Skoller.EnrolledStudents do
     |> where([c, sc], sc.is_dropped == false)
     |> group_by([c, sc], c.id)
     |> select([c, sc], %{class_id: c.id, count: count(sc.id)})
+  end
+
+  @doc """
+  Gets communities with a count of students.
+
+  Communities are students with at least `threshold` enrolled students
+
+  ## Returns
+  `%{class_id: Id, count: Integer}`
+  """
+  def get_communities(threshold \\ @community_threshold) do
+    from(sc in enrolled_student_class_subquery())
+    |> group_by([sc], sc.class_id)
+    |> having([sc], count(sc.id) >= ^threshold)
+    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 end

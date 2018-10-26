@@ -46,4 +46,19 @@ defmodule Skoller.Mods.StudentClasses do
     |> distinct([class], class.id)
     |> Repo.all()
   end
+
+  @doc """
+  Gets a list of communities that have a mod.
+
+  ## Returns
+  `Skoller.EnrolledStudents.get_communities`
+  """
+  def get_communities_with_mods(threshold \\ nil) do
+    from(sc in subquery(get_communities(threshold)))
+    |> where([sc], fragment("exists(select 1 from assignment_modifications am inner join assignments a on a.id = am.assignment_id where am.is_private = false and a.class_id = ?)", sc.class_id))
+    |> Repo.all()
+  end
+
+  defp get_communities(nil), do: EnrolledStudents.get_communities()
+  defp get_communities(threshold), do: EnrolledStudents.get_communities(threshold)
 end

@@ -3,6 +3,8 @@ defmodule Skoller.AutoUpdates do
   The context module for auto updates.
   """
 
+  # TODO: Combine auto update logic into one set of functions instead of the current two.
+
   alias Skoller.Mods.Mod
   alias Skoller.Repo
   alias Skoller.Settings
@@ -12,8 +14,9 @@ defmodule Skoller.AutoUpdates do
   alias Skoller.MapErrors
   alias Skoller.Mods.Action
   alias Skoller.EnrolledStudents
-  alias Skoller.Students
   alias Skoller.StudentClasses
+  alias Skoller.Mods.StudentClasses, as: ModStudentClasses
+  alias Skoller.Mods.Classes
 
   import Ecto.Query
 
@@ -65,7 +68,7 @@ defmodule Skoller.AutoUpdates do
   def get_joyriders() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_accepted == true and a.is_manual == false)
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -82,7 +85,7 @@ defmodule Skoller.AutoUpdates do
   def get_pending() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -99,7 +102,7 @@ defmodule Skoller.AutoUpdates do
   def get_followers() do
     from(a in Action)
     |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
     |> where([a], a.is_manual == true and a.is_accepted == true)
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -116,9 +119,136 @@ defmodule Skoller.AutoUpdates do
   def get_creators() do
     from(m in Mod)
     |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
-    |> join(:inner, [m, sc], cm in subquery(Students.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [m, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
     |> distinct([m], m.student_id)
     |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Gets metrics on auto updates based on `settings`.
+
+  ## Returns
+  `%{metrics: %{max_metrics, actual_metrics, summary}, people: %{creators, followers, pending, joyriders}, settings}`
+  """
+  def get_auto_update_metrics(settings) do
+    metrics = get_metrics(settings)
+
+    people = Map.new()
+    |> Map.put(:creators, get_creators())
+    |> Map.put(:followers, get_followers())
+    |> Map.put(:pending, get_pending())
+    |> Map.put(:joyriders, get_joyriders())
+
+    Map.new()
+    |> Map.put(:metrics, metrics)
+    |> Map.put(:people, people)
+    |> Map.put(:settings, settings)
+  end
+
+  @doc """
+  Processes auto updates on all mods, and sends notifications if any are updated.
+  """
+  def process_auto_updates_all_mods() do
+    settings = Settings.get_auto_update_settings()
+    enrollment_threshold = get_setting_value(settings, @auto_upd_enrollment_threshold) |> String.to_integer
+
+    ModActions.get_non_auto_update_mod_actions_in_enrollment_threshold(enrollment_threshold)
+    |> Enum.filter(&compare_shared(&1, settings))
+    |> Enum.filter(&compare_responses(&1, settings))
+    |> Enum.each(&get_and_auto_update_mod(&1))
+  end
+
+  @doc """
+  Gets auto update settings by params. If there are missing params, defaults are fetched.
+  """
+  def get_settings_from_params_or_default(params) do
+    get_enroll_thresh(params) ++ get_response_thresh(params) ++ get_approval_thresh(params)
+  end
+
+  defp get_approval_thresh(%{@auto_upd_approval_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_approval_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_approval_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_approval_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_approval_threshold).value)
+    |> List.wrap()
+  end
+
+  defp get_response_thresh(%{@auto_upd_response_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_response_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_response_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_response_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_response_threshold).value)
+    |> List.wrap()
+  end
+
+  defp get_enroll_thresh(%{@auto_upd_enrollment_threshold => val}) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_enrollment_threshold)
+    |> Map.put(:value, val)
+    |> List.wrap()
+  end
+  defp get_enroll_thresh(_params) do
+    Map.new()
+    |> Map.put(:name, @auto_upd_enrollment_threshold)
+    |> Map.put(:value, Settings.get_setting_by_name!(@auto_upd_enrollment_threshold).value)
+    |> List.wrap()
+  end
+
+  defp get_and_auto_update_mod(mod) do
+    Mods.get!(mod.assignment_modification_id)
+    |> process_auto_update([notification: true])
+  end
+
+  defp get_metrics(settings) do
+    eligible_communities = ModStudentClasses.get_communities_with_mods()
+    shared_mods = ModActions.get_shared_mods()
+    responded_mods = ModActions.get_responded_mods()
+
+    approval_threshold = responded_mods |> Enum.filter(&compare_responses(&1, settings))
+    response_threshold = shared_mods |> Enum.filter(&compare_shared(&1, settings))
+    enrollment_threshold = settings 
+                          |> get_setting_value(@auto_upd_enrollment_threshold)
+                          |> String.to_integer()
+                          |> ModStudentClasses.get_communities_with_mods()
+
+    max_metrics = Map.new()
+    |> Map.put(:eligible_communities, eligible_communities |> Enum.count())
+    |> Map.put(:shared_mods, shared_mods |> Enum.count())
+    |> Map.put(:responded_mods, responded_mods |> Enum.count())
+
+    actual_metrics = Map.new()
+    |> Map.put(:eligible_communities, enrollment_threshold |> Enum.count())
+    |> Map.put(:shared_mods, response_threshold |> Enum.count())
+    |> Map.put(:responded_mods, approval_threshold |> Enum.count())
+
+    summary = get_summary(enrollment_threshold, response_threshold, approval_threshold)
+
+    Map.new()
+    |> Map.put(:max_metrics, max_metrics)
+    |> Map.put(:actual_metrics, actual_metrics)
+    |> Map.put(:summary, summary)
+  end
+
+  defp get_summary(communities, responses, approvals) do
+    # Gets a list of mod ids from approvals cross checked by responses.
+    mods = approvals 
+    |> Enum.filter(&Enum.any?(responses, fn(x) -> x.mod.id == &1.mod.id end))
+    |> List.foldl([], & &2 ++ [&1.mod.id])
+
+    # Gets a list of class ids from communities.
+    classes = communities |> List.foldl([], & &2 ++ [&1.class_id])
+
+    Classes.get_count_of_mods_in_classes(mods, classes)
   end
 
   defp auto_update_mod(mod) do
@@ -205,5 +335,18 @@ defmodule Skoller.AutoUpdates do
 
   defp update_mod(mod, _) do
     Mods.update_mod(mod, %{is_auto_update: true})
+  end
+
+  defp compare_responses(item, settings) do
+    item.accepted / item.responses >= get_setting_value(settings, @auto_upd_approval_threshold) |> Float.parse() |> Kernel.elem(0)
+  end
+
+  defp compare_shared(item, settings) do
+    item.responses / item.audience >= get_setting_value(settings, @auto_upd_response_threshold) |> Float.parse() |> Kernel.elem(0)
+  end
+
+  defp get_setting_value(settings, key) do
+    setting = settings |> Enum.find(nil, &key == &1.name)
+    setting.value
   end
 end
