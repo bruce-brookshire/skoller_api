@@ -36,6 +36,15 @@ defmodule Skoller.Periods do
     |> Repo.insert()
   end
 
+  def update_period(period_old, params) do
+    ClassPeriod.changeset_update(period_old, params)
+    |> Repo.update()
+  end
+
+  def get_period!(id) do
+    Repo.get!(ClassPeriod, id)
+  end
+
   defp filter(query, params) do
     query
     |> filter_name(params)

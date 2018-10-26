@@ -3,9 +3,8 @@ defmodule SkollerWeb.Api.V1.Admin.PeriodController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Periods.ClassPeriod
-  alias Skoller.Repo
   alias SkollerWeb.PeriodView
+  alias Skoller.Periods
   
   import SkollerWeb.Plugs.Auth
   
@@ -14,15 +13,13 @@ defmodule SkollerWeb.Api.V1.Admin.PeriodController do
   plug :verify_role, %{role: @admin_role}
 
   def show(conn, %{"id" => id}) do
-    period = Repo.get!(ClassPeriod, id)
+    period = Periods.get_period!(id)
     render(conn, PeriodView, "show.json", period: period)
   end
 
   def update(conn, %{"id" => id} = params) do
-    period_old = Repo.get!(ClassPeriod, id)
-    changeset = ClassPeriod.changeset_update(period_old, params)
-
-    case Repo.update(changeset) do
+    period_old = Periods.get_period!(id)
+    case Periods.update_period(period_old, params) do
       {:ok, period} ->
         render(conn, PeriodView, "show.json", period: period)
       {:error, changeset} ->
