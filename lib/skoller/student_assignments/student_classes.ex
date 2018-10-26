@@ -8,9 +8,9 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   alias Skoller.ClassStatuses.Status
   alias Skoller.Repo
   alias Skoller.StudentAssignments
-  alias Skoller.Mods
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
+  alias Skoller.Mods.StudentAssignments, as: StudentAssignmentMods
 
   import Ecto.Query
 
@@ -84,7 +84,7 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   defp class_filter(query, _params), do: query
 
   defp is_pending_mods(assignment) do
-    case Mods.pending_mods_for_student_assignment(assignment) do
+    case StudentAssignmentMods.pending_mods_for_student_assignment(assignment) do
       [] -> false
       _ -> true
     end

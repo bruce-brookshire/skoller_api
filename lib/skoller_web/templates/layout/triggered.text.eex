@@ -1,0 +1,5 @@
+
+<%= render @view_module, @view_template, assigns %>
+
+
+<%= render SkollerWeb.TriggeredView, "footer.text", web_home_path: @web_home_path %>

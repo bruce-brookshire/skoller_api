@@ -16,18 +16,8 @@ Skoller.Repo.insert!(%Skoller.Role{id: 300, name: "Syllabus Worker"})
 Skoller.Repo.insert!(%Skoller.Role{id: 400, name: "Change Requests"})
 Skoller.Repo.insert!(%Skoller.Role{id: 500, name: "Help Requests"})
 
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 200, name: "Needs Syllabus", is_complete: false})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 300, name: "Weights", is_complete: false})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 400, name: "Assignments", is_complete: false})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 500, name: "Review", is_complete: false})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 600, name: "Help", is_complete: false})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 700, name: "Complete", is_complete: true})
-Skoller.Repo.insert!(%Skoller.ClassStatuses.Status{id: 800, name: "Change", is_complete: true})
-
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 100, name: "This is the wrong syllabus"})
-Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 200, name: "This syllabus is confusing"})
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 300, name: "Issues viewing the file"})
-Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 400, name: "Other"})
 
 Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 100, name: "Grade Scale"})
 Skoller.Repo.insert!(%Skoller.ChangeRequests.Type{id: 200, name: "Weights"})
@@ -42,7 +32,6 @@ Skoller.Repo.insert!(%Skoller.Mods.Type{id: 500, name: "Delete Assignment"})
 
 Skoller.Repo.insert!(%Skoller.Locks.Section{id: 100, name: "Weights", is_diy: true})
 Skoller.Repo.insert!(%Skoller.Locks.Section{id: 200, name: "Assignments", is_diy: true})
-Skoller.Repo.insert!(%Skoller.Locks.Section{id: 300, name: "Review", is_diy: false})
 
 pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
 user = Skoller.Repo.insert!(%Skoller.Users.User{email: "dev_admin@skoller.co", 

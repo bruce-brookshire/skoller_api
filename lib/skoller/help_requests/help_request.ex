@@ -10,7 +10,6 @@ defmodule Skoller.HelpRequests.HelpRequest do
 
   schema "class_help_requests" do
     field :note, :string
-    field :is_completed, :boolean, default: false
     field :class_id, :id
     field :class_help_type_id, :id
     field :user_id, :id
@@ -22,7 +21,7 @@ defmodule Skoller.HelpRequests.HelpRequest do
   end
 
   @req_fields [:class_id, :class_help_type_id]
-  @opt_fields [:note, :is_completed, :user_id]
+  @opt_fields [:note, :user_id]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false

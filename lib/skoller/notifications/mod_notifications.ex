@@ -12,7 +12,8 @@ defmodule Skoller.ModNotifications do
   alias Skoller.Dates
   alias Skoller.Students.Student
   alias Skoller.Services.Notification
-  alias Skoller.Mods
+  alias Skoller.Mods.Classes
+  alias Skoller.Mods.StudentClasses
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -72,10 +73,10 @@ defmodule Skoller.ModNotifications do
     actions |> Enum.each(&build_auto_update_notification(&1))
   end
 
-  defp build_auto_update_notification({:ok, action}) do
+  defp build_auto_update_notification({:ok, %{self_action: action}}) do
     mod = ModActions.get_mod_from_action(action)
           |> Repo.preload(:assignment)
-    class = Mods.get_class_from_mod_id(mod.id)
+    class = Classes.get_class_from_mod_id(mod.id)
     case class.is_editable do
       true -> 
         title = case mod.assignment_mod_type_id do
@@ -111,7 +112,7 @@ defmodule Skoller.ModNotifications do
 
   defp one_pending_mod_notification(action) do
     mod = ModActions.get_mod_from_action(action) |> Repo.preload(:assignment)
-    class = Mods.get_class_from_mod_id(mod.id)
+    class = Classes.get_class_from_mod_id(mod.id)
     cond do
       mod.assignment_mod_type_id == @new_assignment_mod -> @a_classmate_has <> @added <> mod_add_notification_text(mod, class)
       mod.assignment_mod_type_id == @delete_assignment_mod -> @a_classmate_has <> @removed <> mod_delete_notification_text(mod, class)
@@ -178,7 +179,7 @@ defmodule Skoller.ModNotifications do
   end
 
   defp class_list(%Student{} = student) do
-    Mods.get_classes_with_pending_mod_by_student_id(student.id)
+    StudentClasses.get_classes_with_pending_mod_by_student_id(student.id)
     |> format_list()
   end
 

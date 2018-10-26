@@ -179,7 +179,6 @@ defmodule SkollerWeb.Router do
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
         post "/student-request/:class_student_request_type_id", Class.StudentRequestController, :create
       end
-      post "/help/:id/complete", Admin.Class.HelpRequestController, :complete
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
       post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
@@ -247,9 +246,6 @@ defmodule SkollerWeb.Router do
       post "/fields-of-study/csv", CSVController, :fos
 
       #Syllabus Worker routes
-      # post "/syllabus-workers/weights", SyllabusWorkerController, :weights
-      # post "/syllabus-workers/assignments", SyllabusWorkerController, :assignments
-      # post "/syllabus-workers/reviews", SyllabusWorkerController, :reviews
       post "/syllabus-workers", SyllabusWorkerController, :class
 
       post "/notifications/syllabus-needed", NotificationController, :syllabus

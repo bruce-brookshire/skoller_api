@@ -21,13 +21,21 @@ defmodule Skoller.Users.Students do
   @doc """
   Gets student users.
 
+  ## Preloads
+  `:student` relationship
+
   ## Returns
   `[Skoller.Users.User]` or `[]`
   """
   def get_student_users() do
     from(u in User)
     |> where([u], not(is_nil(u.student_id)))
+    |> preload([s], [:student])
     |> Repo.all()
+  end
+
+  def preload_student(user) do
+    user |> Repo.preload([:student, :reports], force: true)
   end
 end
 

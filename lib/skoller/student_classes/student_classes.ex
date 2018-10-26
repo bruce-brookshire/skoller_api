@@ -11,11 +11,10 @@ defmodule Skoller.StudentClasses do
   alias Skoller.Classes.EditableClasses
   alias Skoller.EnrolledStudents
   alias Skoller.Classes
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.StudentAssignments
   alias Skoller.Mods.StudentClasses, as: StudentClassMods
   alias Skoller.StudentClasses.EnrollmentLinks
-  alias Skoller.Classes.ClassStatuses
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
   alias Skoller.StudentPoints

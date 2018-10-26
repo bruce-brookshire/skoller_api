@@ -8,8 +8,8 @@ defmodule SkollerWeb.Plugs.Lock do
 
   alias Skoller.Locks
   alias Skoller.Assignments
-  alias Skoller.Classes
   alias Skoller.Weights
+  alias Skoller.ClassStatuses.Classes
 
   import Plug.Conn
 
@@ -19,9 +19,6 @@ defmodule SkollerWeb.Plugs.Lock do
 
   @weight_lock 100
   @assignment_lock 200
-
-  @help_status 600
-  @change_status 800
 
   def check_lock(conn, params) do
     case conn |> is_admin() do
@@ -89,8 +86,7 @@ defmodule SkollerWeb.Plugs.Lock do
   defp check_maintenance(conn, class_id) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id in[@change_req_role, @help_req_role]) do
       true -> 
-        class = Classes.get_class_by_id!(class_id)
-        case class.class_status_id in [@help_status, @change_status] do
+        case Classes.class_in_request?(class_id) do
           true -> conn
           false -> conn |> unauth()
         end

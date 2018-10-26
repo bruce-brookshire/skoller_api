@@ -5,17 +5,23 @@ defmodule Skoller.HelpRequests do
 
   alias Skoller.Repo
   alias Skoller.HelpRequests.HelpRequest
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
+  alias Skoller.Classes
+
+  # @wrong_syllabus_type 100
+  # @bad_file_type 300
 
   @doc """
-  Completes a help request.
-
-  ## Returns
-  `{:ok, Skoller.HelpRequests.HelpRequest}` or `{:error, Ecto.Changeset}`
+  Creates a help request and moves class to the appropriate status.
   """
-  def complete(request_id) do
-    HelpRequest
-    |> Repo.get!(request_id)
-    |> HelpRequest.changeset(%{is_completed: true})
-    |> Repo.update()
+  def create(class_id, attrs) do
+    changeset = HelpRequest.changeset(%HelpRequest{}, attrs)
+
+    class = Classes.get_class_by_id!(class_id) |> Repo.preload(:class_status)
+    
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:help_request, changeset)
+    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
+    |> Repo.transaction()
   end
 end

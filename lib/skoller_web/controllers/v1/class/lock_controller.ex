@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   alias Skoller.Classes
   alias Skoller.Locks.Users
   alias Skoller.Locks
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.Locks.DIY
 
   import SkollerWeb.Plugs.Auth

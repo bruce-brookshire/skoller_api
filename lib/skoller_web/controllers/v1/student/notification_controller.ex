@@ -5,8 +5,8 @@ defmodule SkollerWeb.Api.V1.Student.NotificationController do
 
   alias SkollerWeb.Student.NotificationView
   alias Skoller.Chats
-  alias Skoller.Mods
-  alias Skoller.Assignments
+  alias Skoller.Mods.Students
+  alias Skoller.AssignmentPosts
 
   import SkollerWeb.Plugs.Auth
 
@@ -18,9 +18,9 @@ defmodule SkollerWeb.Api.V1.Student.NotificationController do
   def notifications(conn, %{"student_id" => student_id}) do
     inbox = Chats.get_chat_notifications(student_id)
             |> Enum.map(&Map.put(%{}, :inbox, &1))
-    mods = Mods.get_student_mods(student_id)
+    mods = Students.get_student_mods(student_id)
             |> Enum.map(&Map.put(%{}, :mod, &1))
-    assignment_posts = Assignments.get_assignment_post_notifications(student_id)
+    assignment_posts = AssignmentPosts.get_assignment_post_notifications(student_id)
             |> Enum.map(&Map.put(%{}, :assignment_post, &1))
 
     notifications = inbox ++ mods ++ assignment_posts |> Enum.sort(&DateTime.compare(get_date(&1), get_date(&2)) in [:gt, :eq])

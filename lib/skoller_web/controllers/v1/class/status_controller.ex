@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Class.StatusController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StatusView
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.ClassStatuses, as: Statuses
 
   import SkollerWeb.Plugs.Auth

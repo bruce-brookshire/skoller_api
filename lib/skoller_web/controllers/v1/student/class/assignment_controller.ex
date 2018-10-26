@@ -12,6 +12,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   alias Skoller.ModNotifications
   alias Skoller.EnrolledStudents
   alias Skoller.StudentAssignments.StudentClasses
+  alias Skoller.Mods.StudentAssignments, as: StudentAssignmentMods
 
   import SkollerWeb.Plugs.Auth
   
@@ -30,7 +31,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
 
     case StudentAssignments.create_student_assignment(params) do
       {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
-        Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+        Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
         Task.start(ModNotifications, :send_mod_update_notifications, [actions])
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:ok, %{student_assignment: student_assignment}} ->
@@ -49,7 +50,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   def show(conn, %{"id" => id}) do
     student_assignment = StudentClasses.get_student_assignment_by_id(id, :weight)
     
-    pending_mods = Mods.pending_mods_for_student_assignment(student_assignment)
+    pending_mods = StudentAssignmentMods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
 
     render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
@@ -90,11 +91,11 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       student_assignment -> 
         multi = Ecto.Multi.new
         |> Ecto.Multi.delete(:student_assignment, student_assignment)
-        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params))
+        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params["is_private"]))
 
         case Repo.transaction(multi) do
           {:ok, %{mod: mod, actions: actions}} ->
-            Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+            Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
             Task.start(ModNotifications, :send_mod_update_notifications, [actions])
             conn
             |> send_resp(200, "")
@@ -106,7 +107,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   defp student_assignment_update_success(mod, actions) do
-    Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+    Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
     Task.start(ModNotifications, :send_mod_update_notifications, [actions])
   end
 end

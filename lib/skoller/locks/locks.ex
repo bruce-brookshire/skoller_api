@@ -9,7 +9,7 @@ defmodule Skoller.Locks do
   alias Skoller.MapErrors
   alias Skoller.Classes.Weights
   alias Skoller.Locks.Users
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes
 
   import Ecto.Query
 
@@ -103,7 +103,7 @@ defmodule Skoller.Locks do
   end
 
   defp check_class_status(multi_params, old_class, is_completed) when is_completed == true do
-    ClassStatuses.check_status(old_class, multi_params)
+    Classes.check_status(old_class, multi_params)
   end
   defp check_class_status(_multi_params, _old_class, _is_completed), do: {:ok, nil}
 
@@ -135,6 +135,8 @@ defmodule Skoller.Locks do
   defp lock_full_section(class_id, user_id, @assignment_lock) do
     status = Weights.get_class_weights(class_id)
     |> Enum.map(&lock_section(class_id, user_id, @assignment_lock, &1.id))
+
+    status ++ lock_section(class_id, user_id, @assignment_lock, nil)
 
     status
     |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))

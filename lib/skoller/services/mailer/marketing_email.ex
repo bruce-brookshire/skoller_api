@@ -2,7 +2,7 @@ defmodule Skoller.Services.MarketingEmail do
   @moduledoc """
   A helper module for sending marketing emails
   """
-  use Bamboo.Phoenix, view: SkollerWeb.EmailView
+  use Bamboo.Phoenix, view: SkollerWeb.MarketingView
 
   alias Skoller.Services.Mailer
   alias Skoller.EmailLogs.EmailLog
@@ -38,7 +38,7 @@ defmodule Skoller.Services.MarketingEmail do
   defp base_email(user_id) do
     new_email()
     |> from({"Skoller", @from_email})
-    |> put_layout({SkollerWeb.LayoutView, :email})
+    |> put_layout({SkollerWeb.LayoutView, :marketing})
     |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
   end
 end

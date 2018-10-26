@@ -4,10 +4,10 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StudentClassView
-  alias Skoller.Mods
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
   alias Skoller.EnrolledStudents
+  alias Skoller.Mods.Assignments
 
   import SkollerWeb.Plugs.Auth
   
@@ -31,6 +31,6 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
     |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
     |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
     |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(student_class.class.id))
-    |> Map.put(:new_assignments, Mods.get_new_assignment_mods(student_class))
+    |> Map.put(:new_assignments, Assignments.get_new_assignment_mods(student_class))
   end
 end

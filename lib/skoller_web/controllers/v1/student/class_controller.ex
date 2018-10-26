@@ -5,11 +5,11 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
   alias SkollerWeb.Class.StudentClassView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.Mods
   alias Skoller.StudentClasses
   alias Skoller.StudentAssignments
   alias Skoller.EnrolledStudents
   alias Skoller.StudentClasses.EnrollmentLinks
+  alias Skoller.Mods.Assignments
 
   import SkollerWeb.Plugs.Auth
   
@@ -80,6 +80,6 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   end
 
   defp get_new_class_assignments(%{} = student_class) do
-    student_class |> Mods.get_new_assignment_mods()
+    student_class |> Assignments.get_new_assignment_mods()
   end
 end
