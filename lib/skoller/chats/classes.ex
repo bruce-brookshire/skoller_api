@@ -9,10 +9,7 @@ defmodule Skoller.Chats.Classes do
   @doc """
   Gets if a class has chat enabled.
 
-  Returns class and school if it does.
-
-  ## Returns
-  `%{class: class, school: school}` or `{:error, map}`
+  Returns a boolean
   """
   def check_class_chat_enabled(class_id) do
     class = Classes.get_class_by_id(class_id)
