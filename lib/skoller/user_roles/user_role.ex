@@ -1,9 +1,9 @@
-defmodule Skoller.UserRole do
+defmodule Skoller.UserRoles.UserRole do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Users.User
   alias Skoller.Role
 

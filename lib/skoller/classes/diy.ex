@@ -7,7 +7,7 @@ defmodule Skoller.Classes.DIY do
   alias Skoller.Repo
   alias Skoller.Classes.Schools
   alias Skoller.Users.User
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Assignments.Assignment
 
   import Ecto.Query

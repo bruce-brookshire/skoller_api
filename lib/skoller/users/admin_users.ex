@@ -5,7 +5,7 @@ defmodule Skoller.Admin.Users do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Students.Student
   alias Skoller.EnrolledSchools
 

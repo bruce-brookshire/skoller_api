@@ -36,8 +36,8 @@ Skoller.Repo.insert!(%Skoller.Locks.Section{id: 200, name: "Assignments", is_diy
 pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
 user = Skoller.Repo.insert!(%Skoller.Users.User{email: "dev_admin@skoller.co", 
                               password_hash: pass.password_hash})
-Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 200})
-Skoller.Repo.insert!(%Skoller.UserRole{user_id: user.id, role_id: 300})
+Skoller.Repo.insert!(%Skoller.UserRoles.UserRole{user_id: user.id, role_id: 200})
+Skoller.Repo.insert!(%Skoller.UserRoles.UserRole{user_id: user.id, role_id: 300})
 
 Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 100, name: "The wrong syllabus has been uploaded for this class"})
 Skoller.Repo.insert!(%Skoller.StudentRequests.Type{id: 200, name: "Need to submit an additional/revised assignment schedule"})

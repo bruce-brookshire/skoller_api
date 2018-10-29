@@ -5,7 +5,6 @@ defmodule Skoller.Users do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Students.Student
   alias Skoller.Verification
@@ -14,8 +13,7 @@ defmodule Skoller.Users do
   alias Skoller.StudentPoints
   alias Skoller.Users.Notifications
   alias Skoller.StudentClasses.EnrollmentLinks
-
-  import Ecto.Query
+  alias Skoller.UserRoles
 
   @student_role 100
 
@@ -54,7 +52,7 @@ defmodule Skoller.Users do
    * `[admin: true]`, will verify without text.
 
   # Returns
-  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRole], field_of_study: Skoller.Students.FieldOfStudy, custom_link: Skoller.CustomSignups.Signup || {:ok, nil}, link: String}}`
+  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, custom_link: Skoller.CustomSignups.Signup || {:ok, nil}, link: String}}`
   or `{:error, failed_val}`
   """
   def create_user(params, opts \\ []) do
@@ -83,7 +81,7 @@ defmodule Skoller.Users do
   Updates a user, with student if included in params.
 
   # Returns
-  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
+  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
   or `{:error, _, failed_val, _}`
   """
   def update_user(user_old, params) do
@@ -210,28 +208,18 @@ defmodule Skoller.Users do
   defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
     user = user |> Repo.preload(:roles)
     case user.roles |> Enum.any?(& &1.id == @student_role) do
-      false -> Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+      false -> UserRoles.add_role(%{user_id: user.id, role_id: @student_role})
       true -> {:ok, nil}
     end
   end
   defp add_roles_preloaded(user, %{"roles" => roles}) do
-    delete_roles(user.id)
+    UserRoles.delete_roles_for_user(user.id)
     status = roles
-    |> Enum.map(&add_role(user, &1))
+    |> Enum.map(&UserRoles.add_role!(%{user_id: user.id, role_id: &1}))
     
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
   defp add_roles_preloaded(_map, _params), do: {:ok, nil}
-
-  defp add_role(user, role) do
-    Repo.insert!(%UserRole{user_id: user.id, role_id: role})
-  end
-
-  defp delete_roles(id) do
-    from(role in UserRole)
-    |> where([role], role.user_id == ^id)
-    |> Repo.delete_all()
-  end
 
   defp delete_fields_of_study(id) do
     Students.delete_fields_of_study_by_student_id(id)

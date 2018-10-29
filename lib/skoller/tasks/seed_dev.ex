@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Repo
   alias Skoller.Users.User
   alias Skoller.ClassDocs.Doc
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Schools.School
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Classes.Class
