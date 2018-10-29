@@ -6,6 +6,7 @@ defmodule Skoller.Schools.School do
 
   alias Skoller.Schools.School
   alias Skoller.Periods.ClassPeriod
+  alias Skoller.Schools.EmailDomain
 
   schema "schools" do
     field :adr_country, :string
@@ -25,6 +26,7 @@ defmodule Skoller.Schools.School do
     field :is_university, :boolean, default: true
     has_many :class_periods, ClassPeriod
     has_many :classes, through: [:class_periods, :classes]
+    has_many :email_domains, EmailDomain
 
     timestamps()
   end

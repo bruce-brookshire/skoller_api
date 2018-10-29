@@ -9,6 +9,7 @@ defmodule Skoller.Schools do
   alias Skoller.Timezone
   alias Skoller.FourDoor
   alias Skoller.Schools.Timezones
+  alias Skoller.Schools.EmailDomain
 
   import Ecto.Query
 
@@ -72,6 +73,100 @@ defmodule Skoller.Schools do
     from(school in School)
     |> filter(filters)
     |> Repo.all()
+  end
+
+  @doc """
+  Returns the list of school_email_domains.
+
+  ## Examples
+
+      iex> list_school_email_domains()
+      [%EmailDomain{}, ...]
+
+  """
+  def list_school_email_domains do
+    Repo.all(EmailDomain)
+  end
+
+  @doc """
+  Gets a single email_domain.
+
+  Raises `Ecto.NoResultsError` if the Email domain does not exist.
+
+  ## Examples
+
+      iex> get_email_domain!(123)
+      %EmailDomain{}
+
+      iex> get_email_domain!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_email_domain!(id), do: Repo.get!(EmailDomain, id)
+
+  @doc """
+  Creates a email_domain.
+
+  ## Examples
+
+      iex> create_email_domain(%{field: value})
+      {:ok, %EmailDomain{}}
+
+      iex> create_email_domain(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_email_domain(attrs \\ %{}) do
+    %EmailDomain{}
+    |> EmailDomain.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a email_domain.
+
+  ## Examples
+
+      iex> update_email_domain(email_domain, %{field: new_value})
+      {:ok, %EmailDomain{}}
+
+      iex> update_email_domain(email_domain, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_email_domain(%EmailDomain{} = email_domain, attrs) do
+    email_domain
+    |> EmailDomain.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a EmailDomain.
+
+  ## Examples
+
+      iex> delete_email_domain(email_domain)
+      {:ok, %EmailDomain{}}
+
+      iex> delete_email_domain(email_domain)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_email_domain(%EmailDomain{} = email_domain) do
+    Repo.delete(email_domain)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking email_domain changes.
+
+  ## Examples
+
+      iex> change_email_domain(email_domain)
+      %Ecto.Changeset{source: %EmailDomain{}}
+
+  """
+  def change_email_domain(%EmailDomain{} = email_domain) do
+    EmailDomain.changeset(email_domain, %{})
   end
 
   defp update_school_times(school, %{timezone: nil}) do
