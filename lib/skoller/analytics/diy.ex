@@ -1,6 +1,6 @@
-defmodule Skoller.Classes.DIY do
+defmodule Skoller.Analytics.DIY do
   @moduledoc """
-  A context module for class locks
+  A context module for diy analytics
   """
 
   alias Skoller.Classes.Class

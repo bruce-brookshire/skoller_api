@@ -1,4 +1,4 @@
-defmodule Skoller.StudentClasses.Docs do
+defmodule Skoller.Analytics.Docs do
   @moduledoc """
   A context module for enrolled classes with docs.
   """
@@ -7,6 +7,7 @@ defmodule Skoller.StudentClasses.Docs do
   alias Skoller.Classes.Class
   alias Skoller.Classes.Schools
   alias Skoller.Classes.Docs
+  alias Skoller.ClassDocs.Doc
 
   import Ecto.Query
 
@@ -29,5 +30,29 @@ defmodule Skoller.StudentClasses.Docs do
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Get a count of classes with multiple files and at least one student between the dates.
+
+  ## Dates
+   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
+
+  ## Params
+  * `Map`, `%{"school_id" => Id}` filters by school
+
+  ## Returns
+  `Integer`
+  """
+  def classes_multiple_files(dates, params) do
+    from(d in Doc)
+    |> join(:inner, [d], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == d.class_id)
+    |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
+    |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
+    |> group_by([d], d.class_id)
+    |> having([d], count(d.class_id) > 1)
+    |> select([d], count(d.class_id, :distinct))
+    |> Repo.all()
+    |> Enum.count()
   end
 end
