@@ -279,7 +279,13 @@ defmodule Skoller.ClassStatuses.Classes do
 
   defp check_assignments_exist_for_all_weights(class) do
     case Assignments.get_assignment_count_by_weight(class.id) do
-      [] -> class |> set_status(@needs_student_input_status)
+      [] ->
+        case Assignments.get_assignments_with_no_weight(class.id) do
+          [] ->
+            class |> set_status(@needs_student_input_status)
+          _assignments_with_no_weight ->
+            class |> set_status(@class_complete_status)
+        end 
       weights ->
         case Enum.filter(weights, & &1.count == 0) do
           [] -> class |> set_status(@class_complete_status)
