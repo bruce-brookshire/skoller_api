@@ -8,12 +8,9 @@ defmodule Skoller.Classes do
   alias Skoller.Schools
   alias Skoller.Universities
   alias Skoller.HighSchools
-  alias Skoller.Classes.Schools, as: ClassSchools
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.Assignments.Mods
   alias Skoller.StudentClasses
-
-  import Ecto.Query
 
   @doc """
   Gets a `Skoller.Classes.Class` by id.
@@ -100,47 +97,6 @@ defmodule Skoller.Classes do
     |> Ecto.Multi.update(:class, changeset)
     |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(&1.class, nil))
     |> Repo.transaction()
-  end
-
-  @doc """
-  Gets a count of classes created between the dates.
-
-  ## Dates
-   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
-
-  ## Params
-   * `Map`, `%{"school_id" => Id}` filters by school
-
-  ## Returns
-  `Integer`
-  
-  """
-  def get_class_count(%{date_start: date_start, date_end: date_end}, params) do
-    from(c in Class)
-    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
-    |> Repo.aggregate(:count, :id)
-  end
-
-  @doc """
-  Gets a count of student created classes created between the dates.
-
-  ## Dates
-   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
-
-  ## Params
-   * `Map`, `%{"school_id" => Id}` filters by school
-
-  ## Returns
-  `Integer`
-  
-  """
-  def student_created_count(%{date_start: date_start, date_end: date_end}, params) do
-    from(c in Class)
-    |> join(:inner, [c], cs in subquery(ClassSchools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
-    |> where([c], c.is_student_created == true)
-    |> Repo.aggregate(:count, :id)
   end
 
   defp get_create_changeset(%{is_university: true}, params) do

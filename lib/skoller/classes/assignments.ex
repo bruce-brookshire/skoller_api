@@ -20,4 +20,14 @@ defmodule Skoller.Classes.Assignments do
     |> select([w, a], %{count: count(a.id), weight_id: w.id})
     |> Repo.all()
   end
+
+  @doc """
+  Gets a list of assignments for a class that have no weight
+  """
+  def get_assignments_with_no_weight(class_id) do
+    from(a in Assignment)
+    |> where([a], is_nil(a.weight_id))
+    |> where([a], a.class_id == ^class_id)
+    |> Repo.all()
+  end
 end

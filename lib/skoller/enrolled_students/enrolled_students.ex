@@ -137,8 +137,8 @@ defmodule Skoller.EnrolledStudents do
   ## Returns
   `Integer`
   """
-  def get_enrollment_by_class_id(id) do
-    from(sc in subquery(get_enrollment_by_class_id_subquery(id)))
+  def get_enrollment_by_class_id(class_id) do
+    from(sc in subquery(get_enrollment_by_class_id_subquery(class_id)))
     |> Repo.aggregate(:count, :id)
   end
 
