@@ -3,8 +3,15 @@ defmodule Skoller.Repo.Migrations.UpdateHelpRequests do
 
   alias Skoller.Repo
   alias Skoller.HelpRequests.Type
+  alias Skoller.HelpRequests.HelpRequest
+
+  import Ecto.Query
 
   def change do
+    from(h in HelpRequest)
+    |> where([h], h.class_help_type_id in [200, 400])
+    |> Repo.delete_all()
+
     Repo.get(Type, 200) |> delete()
     Repo.get(Type, 400) |> delete()
     Repo.insert!(%Type{id: 500, name: "No weights or assignments"})
