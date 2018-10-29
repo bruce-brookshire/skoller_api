@@ -4,6 +4,12 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
   alias Skoller.Schools
   alias Skoller.Schools.EmailDomain
 
+  import SkollerWeb.Plugs.Auth
+  
+  @admin_role 200
+
+  plug :verify_role, %{role: @admin_role}
+
   def index(conn, _params) do
     school_email_domains = Schools.list_school_email_domains()
     render(conn, "index.json", school_email_domains: school_email_domains)
