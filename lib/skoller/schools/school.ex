@@ -19,6 +19,7 @@ defmodule Skoller.Schools.School do
     field :name, :string
     field :timezone, :string
     field :short_name, :string
+    field :color, :string
     field :is_chat_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
     field :is_university, :boolean, default: true
@@ -29,7 +30,7 @@ defmodule Skoller.Schools.School do
   end
 
   @req_fields [:name, :adr_locality, :adr_region, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country]
-  @opt_fields [:adr_line_1, :adr_line_2, :adr_zip, :is_readonly, :adr_line_3, :short_name, :timezone]
+  @opt_fields [:adr_line_1, :adr_line_2, :adr_zip, :is_readonly, :adr_line_3, :short_name, :timezone, :color]
   @all_fields @req_fields ++ @opt_fields
   @upd_fields @all_fields
 

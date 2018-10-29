@@ -26,7 +26,8 @@ defmodule SkollerWeb.SchoolView do
       timezone: school.timezone,
       adr_region: school.adr_region,
       adr_locality: school.adr_locality,
-      is_university: school.is_university
+      is_university: school.is_university,
+      color: school.color
     }
   end
 
@@ -39,7 +40,8 @@ defmodule SkollerWeb.SchoolView do
       timezone: school.timezone,
       adr_region: school.adr_region,
       adr_locality: school.adr_locality,
-      is_university: school.is_university
+      is_university: school.is_university,
+      color: school.color
     }
   end
 end
