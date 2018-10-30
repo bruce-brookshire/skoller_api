@@ -9,6 +9,8 @@ defmodule Skoller.ChatComments do
   alias Skoller.ChatComments.Notifications
   alias Skoller.ChatPosts
 
+  import Ecto.Query
+
   @doc """
   Gets a comment by id
 
@@ -75,6 +77,17 @@ defmodule Skoller.ChatComments do
   def update(comment_old, attrs) do
     Comment.changeset_update(comment_old, attrs)
     |> Repo.update()
+  end
+
+  @doc """
+  Unreads comments for all other `student_id` in the class.
+  """
+  def unread_comments(chat_comment_id, student_id) do
+    items = from(s in Star)
+    |> where([s], s.is_read == true and s.student_id != ^student_id)
+    |> where([s], s.chat_comment_id == ^chat_comment_id)
+    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
+    {:ok, items}
   end
 
   defp insert_star(comment, student_id) do

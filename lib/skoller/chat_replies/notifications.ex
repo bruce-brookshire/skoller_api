@@ -1,4 +1,4 @@
-defmodule Skoller.ChatNotifications do
+defmodule Skoller.ChatReplies.Notifications do
   @moduledoc """
   The context module for chat notifications.
   """

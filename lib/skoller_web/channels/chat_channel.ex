@@ -82,7 +82,7 @@ defmodule SkollerWeb.ChatChannel do
     end
   end
   def handle_in("reply", %{"body" => body, "comment_id" => comment_id}, socket) do
-    case ChatReplies.create(%{chat_comment_id: comment_id, student_id: socket.assigns.user.student.id, reply: body}) do
+    case ChatReplies.create(%{chat_comment_id: comment_id, student_id: socket.assigns.user.student.id, reply: body}, socket.assigns.user.student.id) do
       {:ok, _reply} ->
         broadcast! socket, "reply", %{body: body, comment_id: comment_id}
         {:noreply, socket}
