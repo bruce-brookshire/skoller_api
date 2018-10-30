@@ -64,7 +64,7 @@ defmodule SkollerWeb.ChatChannel do
   # Broadcast will send an update to all users.
   def handle_in("post", %{"body" => body}, socket) do
     "chat:" <> class_id = socket.topic
-    case ChatPosts.create(%{class_id: class_id, student_id: socket.assigns.user.student.id, post: body}) do
+    case ChatPosts.create(%{class_id: class_id, student_id: socket.assigns.user.student.id, post: body}, socket.assigns.user.student.id) do
       {:ok, _post} ->
         broadcast! socket, "post", %{body: body}
         {:noreply, socket}

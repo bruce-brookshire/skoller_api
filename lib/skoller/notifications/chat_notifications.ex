@@ -4,26 +4,15 @@ defmodule Skoller.ChatNotifications do
   """
 
   alias Skoller.Repo
-  alias Skoller.Students
-  alias Skoller.Classes
   alias Skoller.Notifications
   alias Skoller.Services.Notification
   alias Skoller.Devices
 
-  @class_chat_post "ClassChat.Post"
   @class_chat_reply "ClassChat.Reply"
 
   @replied_yours " replied to your comment."
   @replied " replied to a comment you follow."
   @replied_post " replied in a post you follow"
-  @posted_s " posted in "
-
-  def send_new_post_notification(post, student_id) do
-    student = Students.get_student_by_id!(student_id)
-    class = Classes.get_class_by_id!(post.class_id)
-    Notifications.get_class_chat_devices_by_class_id(student_id, post.class_id)
-    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, build_chat_post_notification(post, student, class), @class_chat_post))
-  end
 
   def send_new_reply_notification(reply, student_id) do
     reply = reply |> Repo.preload([:student, :chat_comment])
@@ -42,10 +31,6 @@ defmodule Skoller.ChatNotifications do
     users 
     |> Enum.reduce([], &put_user_devices(&1) ++ &2)
     |> Enum.each(&Notification.create_notification(&1.udid, &1.type, &1.msg, @class_chat_reply))
-  end
-
-  defp build_chat_post_notification(post, student, class) do
-    student.name_first <> " " <> student.name_last <> @posted_s <> class.name <> ": " <> post.post
   end
 
   defp get_chat_reply_msg(user, reply) do

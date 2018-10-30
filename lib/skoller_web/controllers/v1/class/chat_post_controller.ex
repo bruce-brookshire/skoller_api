@@ -6,9 +6,8 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   alias Skoller.Repo
   alias Skoller.ChatPosts.Post
   alias SkollerWeb.Class.ChatPostView
-  alias Skoller.ChatPosts.Star
   alias Skoller.EnrolledStudents
-  alias Skoller.ChatNotifications
+  alias Skoller.ChatPosts
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -20,18 +19,10 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
-
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    changeset = Post.changeset(%Post{}, params)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:post, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.post, conn.assigns[:user].student_id))
-
-    case Repo.transaction(multi) do
-      {:ok, %{post: post}} -> 
-        Task.start(ChatNotifications, :send_new_post_notification, [post, conn.assigns[:user].student_id])
+    case ChatPosts.create(params, conn.assigns[:user].student_id) do
+      {:ok, post} -> 
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
@@ -56,11 +47,5 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
         |> put_status(:unprocessable_entity)
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  defp insert_star(post, student_id) do
-    %Star{}
-    |> Star.changeset(%{chat_post_id: post.id, student_id: student_id})
-    |> Repo.insert()
   end
 end

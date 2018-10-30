@@ -13,6 +13,10 @@ defmodule Skoller.ChatComments.Notifications do
   @commented " commented on a post you follow."
   @commented_yours " commented on your post."
 
+  @doc """
+  Sends a notification to all students in the class except for `student_id` that
+  there is a new comment on a post.
+  """
   def send_new_comment_notification(comment, student_id) do
     comment = comment |> Repo.preload([:student, :chat_post])
 
