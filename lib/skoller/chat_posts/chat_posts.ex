@@ -5,6 +5,7 @@ defmodule Skoller.ChatPosts do
 
   alias Skoller.Repo
   alias Skoller.ChatPosts.Post
+  alias Skoller.ChatPosts.Star
 
   import Ecto.Query
 
@@ -59,5 +60,18 @@ defmodule Skoller.ChatPosts do
   def create(attrs) do
     Post.changeset(%Post{}, attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Unreads posts for all other `student_id` in the class.
+
+  ## Returns
+  `{:ok, Repo.update_all result}`
+  """
+  def unread_posts(chat_post_id, student_id) do
+    items = from(s in Star)
+    |> where([s], s.id == ^chat_post_id and s.is_read == true and s.student_id != ^student_id)
+    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
+    {:ok, items}
   end
 end
