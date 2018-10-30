@@ -6,7 +6,7 @@ defmodule Skoller.ChatComments do
   alias Skoller.Repo
   alias Skoller.ChatComments.Comment
   alias Skoller.ChatComments.Star
-  alias Skoller.ChatNotifications
+  alias Skoller.ChatComments.Notifications
   alias Skoller.ChatPosts
 
   @doc """
@@ -59,7 +59,7 @@ defmodule Skoller.ChatComments do
 
     case result do
       {:ok, %{comment: comment}} -> 
-        Task.start(ChatNotifications, :send_new_comment_notification, [comment, student_id])
+        Task.start(Notifications, :send_new_comment_notification, [comment, student_id])
         {:ok, comment}
       {:error, _, field, _} ->
         {:error, field}
