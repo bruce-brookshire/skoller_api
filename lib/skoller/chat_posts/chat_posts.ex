@@ -90,6 +90,17 @@ defmodule Skoller.ChatPosts do
     {:ok, items}
   end
 
+  @doc """
+  Updates a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def update(post_old, attrs) do
+    Post.changeset_update(post_old, attrs)
+    |> Repo.update()
+  end
+
   defp insert_star(post, student_id) do
     %Star{}
     |> Star.changeset(%{chat_post_id: post.id, student_id: student_id})

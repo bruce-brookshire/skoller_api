@@ -2,9 +2,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   @moduledoc false
   
   use SkollerWeb, :controller
-  
-  alias Skoller.Repo
-  alias Skoller.ChatPosts.Post
+
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.EnrolledStudents
   alias Skoller.ChatPosts
@@ -33,12 +31,9 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   end
 
   def update(conn, %{"id" => id, "class_id" => class_id} = params) do
+    post_old = ChatPosts.get_post_by_student_and_id!(conn.assigns[:user].student_id, id)
 
-    post_old = Repo.get_by!(Post, id: id, student_id: conn.assigns[:user].student_id)
-
-    changeset = Post.changeset_update(post_old, params)
-
-    case Repo.update(changeset) do
+    case ChatPosts.update(post_old, params) do
       {:ok, post} -> 
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
