@@ -9,6 +9,7 @@ defmodule Skoller.AssignmentPosts do
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.EnrolledStudents
   alias Skoller.Classes.Class
+  alias Skoller.AssignmentPosts.StudentAssignments
 
   import Ecto.Query
 
@@ -40,6 +41,32 @@ defmodule Skoller.AssignmentPosts do
   """
   def delete(%Post{} = post) do
     Repo.delete(post)
+  end
+
+  @doc """
+  Creates an assignment post and unreads the assignment for all other students.
+
+  ## Returns
+  `{:ok, %{post: post, student_assignment: [{:ok, StudentAssignment}]}}` or an ecto multi error.
+  """
+  def create(attrs) do
+    changeset = Post.changeset(%Post{}, attrs)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:post, changeset)
+    |> Ecto.Multi.run(:student_assignment, &StudentAssignments.un_read_assignment(&1.post.student_id, &1.post.assignment_id))
+    |> Repo.transaction()
+  end
+
+  @doc """
+  Updates an assignment post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def update(post_old, attrs) do
+    Post.changeset_update(post_old, attrs)
+    |> Repo.update()
   end
 
   @doc """
