@@ -3,12 +3,11 @@ defmodule SkollerWeb.Api.V1.Chat.SortAlgorithmController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
   alias SkollerWeb.Chat.AlgorithmView
-  alias Skoller.Chats.Algorithm
+  alias Skoller.Chats
 
   def index(conn, _params) do
-    algorithms = Repo.all(Algorithm)
+    algorithms = Chats.get_algorithms()
     render(conn, AlgorithmView, "index.json", algorithms: algorithms)
   end
 end
