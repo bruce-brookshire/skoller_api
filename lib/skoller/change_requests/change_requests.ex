@@ -8,6 +8,7 @@ defmodule Skoller.ChangeRequests do
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.ChangeRequests.Emails
   alias Skoller.Classes
+  alias Skoller.ChangeRequests.Type
 
   @doc """
   Creates a change request and checks the class status.
@@ -55,6 +56,11 @@ defmodule Skoller.ChangeRequests do
 
     multi
   end
+
+  @doc """
+  Gets a list of the change request types.
+  """
+  def get_types(), do: Repo.all(Type)
 
   # Checks if a class is compatible with a change request
   defp can_have_change_request?(changeset, %{class_status: %{is_complete: true}}), do: changeset
