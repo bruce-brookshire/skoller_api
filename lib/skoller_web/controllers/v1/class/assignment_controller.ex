@@ -5,8 +5,8 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
 
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.StudentAssignments
   alias Skoller.Assignments
+  alias Skoller.Assignments.Classes
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
@@ -34,7 +34,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    assignments = StudentAssignments.get_assignments(%{class_id: class_id})
+    assignments = Classes.get_assignments_by_class(class_id)
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
 

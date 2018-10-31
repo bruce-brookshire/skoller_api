@@ -11,7 +11,7 @@ defmodule Skoller.ClassStatuses.Classes do
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Classes
-  alias Skoller.Classes.Assignments
+  alias Skoller.Assignments.Classes, as: ClassAssignments
 
   import Ecto.Query
 
@@ -190,7 +190,7 @@ defmodule Skoller.ClassStatuses.Classes do
       end)
     case max_lock do
       @assignment_lock ->
-        check_assignments_exist_for_all_weights(class)
+        check_assignments_exist_for_class(class)
       _ -> {:ok, nil}
     end
   end
@@ -234,21 +234,12 @@ defmodule Skoller.ClassStatuses.Classes do
   defp get_status(%{class_status: %{is_complete: false}, is_ghost: true}), do: @ghost_name
   defp get_status(%{class_status: status}), do: status.name
 
-  defp check_assignments_exist_for_all_weights(class) do
-    case Assignments.get_assignment_count_by_weight(class.id) do
+  defp check_assignments_exist_for_class(class) do
+    case ClassAssignments.get_assignments_by_class(class.id) do
       [] ->
-        case Assignments.get_assignments_with_no_weight(class.id) do
-          [] ->
-            class |> set_status(@needs_student_input_status)
-          _assignments_with_no_weight ->
-            class |> set_status(@class_complete_status)
-        end 
-      weights ->
-        case Enum.filter(weights, & &1.count == 0) do
-          [] -> class |> set_status(@class_complete_status)
-          _weights_with_no_assignments ->
-            {:ok, nil}
-        end
+        class |> set_status(@needs_student_input_status)
+      _assignments ->
+        class |> set_status(@class_complete_status)
     end
   end
 end

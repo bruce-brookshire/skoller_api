@@ -11,6 +11,7 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.Mods
   alias Skoller.StudentClasses
   alias Skoller.Classes.Weights
+  alias Skoller.Assignments.Classes
 
   import Ecto.Query
 
@@ -52,7 +53,7 @@ defmodule Skoller.StudentAssignments do
   def insert_assignments(student_class_or_assignment_struct)
   def insert_assignments(%{student_class: %StudentClass{} = student_class}) do
     Logger.info("inserting assignments for student class: " <> to_string(student_class.id))
-    case get_assignments(%{class_id: student_class.class_id}) do
+    case Classes.get_assignments_by_class(student_class.class_id) do
       [] -> {:ok, nil}
       assignments -> convert_and_insert(assignments, student_class)
     end
@@ -96,40 +97,6 @@ defmodule Skoller.StudentAssignments do
       student_class_id: id,
       due: assignment.due
     }
-  end
-
-  @doc """
-  Gets a student's assignments, gets student's assignments by id, or gets class assignments
-
-  ## Behavior
-   * If passed a student class, gets all student assignments for that student class.
-   * If passed an assignment, gets all student assignments for that assignment.
-   * If passed a map containing `%{class_id: class_id}`, gets all assignments for that class.
-
-  ## Returns
-  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
-  """
-  # TODO: I made this when I first started Elixir. This is absolutely awful.
-  # This is the single worst piece of code.
-  # Anyways. This needs help. This should not do 3 different things.
-  def get_assignments(%StudentClass{id: id}) do
-    query = (from assign in StudentAssignment)
-    query
-    |> where([assign], assign.student_class_id == ^id)
-    |> Repo.all()
-  end
-  def get_assignments(%Assignment{id: id}) do
-    query = (from assign in StudentAssignment)
-    query
-    |> where([assign], assign.assignment_id == ^id)
-    |> Repo.all()
-  end
-  def get_assignments(%{class_id: class_id}) do
-    query = (from assign in Assignment)
-    query
-    |> where([assign], assign.class_id == ^class_id)
-    |> where([assign], assign.from_mod == false)
-    |> Repo.all()
   end
 
   @doc """
@@ -196,6 +163,32 @@ defmodule Skoller.StudentAssignments do
     |> Ecto.Multi.update(:student_assignment, changeset)
     |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params["is_private"]))
     |> Repo.transaction()
+  end
+
+  # Gets a student's assignments, gets student's assignments by id, or gets class assignments
+
+  # ## Behavior
+  #  * If passed a student class, gets all student assignments for that student class.
+  #  * If passed an assignment, gets all student assignments for that assignment.
+  #  * If passed a map containing `%{class_id: class_id}`, gets all assignments for that class.
+
+  # ## Returns
+  # `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
+  
+  # TODO: I made this when I first started Elixir. This is absolutely awful.
+  # This is the single worst piece of code.
+  # Anyways. This needs help. This should not do 3 different things.
+  defp get_assignments(%StudentClass{id: id}) do
+    query = (from assign in StudentAssignment)
+    query
+    |> where([assign], assign.student_class_id == ^id)
+    |> Repo.all()
+  end
+  defp get_assignments(%Assignment{id: id}) do
+    query = (from assign in StudentAssignment)
+    query
+    |> where([assign], assign.assignment_id == ^id)
+    |> Repo.all()
   end
 
   # 1. Check for existing base Assignment, pass to next multi call.
