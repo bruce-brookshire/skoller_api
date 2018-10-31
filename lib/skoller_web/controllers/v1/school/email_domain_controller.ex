@@ -3,6 +3,7 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
 
   alias Skoller.Schools
   alias Skoller.Schools.EmailDomain
+  alias SkollerWeb.EmailDomainView
 
   import SkollerWeb.Plugs.Auth
   
@@ -12,7 +13,7 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
 
   def index(conn, _params) do
     school_email_domains = Schools.list_school_email_domains()
-    render(conn, "index.json", school_email_domains: school_email_domains)
+    render(conn, SkollerWeb.EmailDomainView, "index.json", school_email_domains: school_email_domains)
   end
 
   def create(conn, params) do
@@ -28,7 +29,7 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
 
   def show(conn, %{"id" => id}) do
     email_domain = Schools.get_email_domain!(id)
-    render(conn, "show.json", email_domain: email_domain)
+    render(conn, SkollerWeb.EmailDomainView, "show.json", email_domain: email_domain)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -36,7 +37,7 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
 
     case Schools.update_email_domain(email_domain, params) do
       {:ok, %EmailDomain{} = email_domain} ->
-        conn |> render("show.json", email_domain: email_domain)
+        conn |> render(SkollerWeb.EmailDomainView, "show.json", email_domain: email_domain)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
