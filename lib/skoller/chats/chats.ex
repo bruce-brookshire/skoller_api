@@ -15,6 +15,9 @@ defmodule Skoller.Chats do
   alias Skoller.ChatPosts.Like
   alias Skoller.EnrolledStudents
   alias Skoller.Chats.Algorithm
+  alias Skoller.ChatComments
+  alias Skoller.ChatPosts
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -117,6 +120,25 @@ defmodule Skoller.Chats do
   Gets a list of chat algorithms.
   """
   def get_algorithms(), do: Repo.all(Algorithm)
+
+  @doc """
+  Reads an entire post for a student.
+
+  This includes all comments nested inside the post.
+
+  All comment and post stars under `post_id` will be marked as read.
+  """
+  def read_chat(post_id, student_id) do
+    cstar = ChatComments.get_student_comment_stars_by_post(post_id, student_id)
+    pstar = ChatPosts.get_star_by_student_and_id(student_id, post_id) |> List.wrap()
+
+    update = cstar ++ pstar
+
+    status = update
+    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: true})))
+    
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1)) 
+  end
 
   defp sort_by_params(enum, %{"sort" => @sort_hot}) do
     enum

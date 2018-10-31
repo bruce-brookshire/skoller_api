@@ -66,7 +66,7 @@ defmodule Skoller.ChatPosts do
 
     results = Ecto.Multi.new
     |> Ecto.Multi.insert(:post, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.post, student_id))
+    |> Ecto.Multi.run(:star, &insert_star(&1.post.id, student_id))
     |> Repo.transaction()
 
     case results do
@@ -120,8 +120,14 @@ defmodule Skoller.ChatPosts do
     end
   end
 
+  @doc """
+  Unlikes a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
   def unlike_post(post_id, student_id) do
-    result = Repo.get_by!(Like, chat_post_id: post_id, student_id: student_id)
+    result = get_like_by_student_and_id!(student_id, post_id)
     |> Repo.delete()
 
     case result do
@@ -132,9 +138,57 @@ defmodule Skoller.ChatPosts do
     end
   end
 
-  defp insert_star(post, student_id) do
+  @doc """
+  Stars a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def star_post(post_id, student_id) do
+    case insert_star(post_id, student_id) do
+      {:ok, _star} -> 
+        {:ok, get!(post_id)}
+      result ->
+        result
+    end
+  end
+
+  @doc """
+  Unstars a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def unstar_post(post_id, student_id) do
+    result = get_star_by_student_and_id!(student_id, post_id)
+    |> Repo.delete()
+
+    case result do
+      {:ok, _star} -> 
+        {:ok, get!(post_id)}
+      result ->
+        result
+    end
+  end
+
+  @doc """
+  Gets a post star by student and post id.
+  """
+  def get_star_by_student_and_id(student_id, post_id) do
+    Repo.get_by(Star, student_id: student_id, id: post_id)
+  end
+
+  defp get_star_by_student_and_id!(student_id, post_id) do
+    Repo.get_by!(Star, student_id: student_id, id: post_id)
+  end
+
+  defp get_like_by_student_and_id!(student_id, post_id) do
+    Repo.get_by!(Like, student_id: student_id, id: post_id)
+  end
+
+  defp insert_star(post_id, student_id) do
     %Star{}
-    |> Star.changeset(%{chat_post_id: post.id, student_id: student_id})
+    |> Star.changeset(%{chat_post_id: post_id, student_id: student_id})
     |> Repo.insert()
   end
 end

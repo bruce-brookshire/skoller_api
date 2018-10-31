@@ -156,6 +156,17 @@ defmodule Skoller.ChatComments do
     end
   end
 
+  @doc """
+  Gets all comment stars on comments by `post_id` and `student_id`
+  """
+  def get_student_comment_stars_by_post(post_id, student_id) do
+    from(cs in Star)
+    |> join(:inner, [cs], c in Comment, cs.chat_comment_id == c.id)
+    |> where([cs], cs.is_read == false and cs.student_id == ^student_id)
+    |> where([cs, c], c.chat_post_id == ^post_id)
+    |> Repo.all()
+  end
+
   defp get_like_by_student_and_id!(student_id, comment_id) do
     Repo.get_by!(Like, student_id: student_id, id: comment_id)
   end
