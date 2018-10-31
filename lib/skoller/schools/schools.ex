@@ -80,12 +80,14 @@ defmodule Skoller.Schools do
 
   ## Examples
 
-      iex> list_school_email_domains()
+      iex> get_email_domains_by_school()
       [%EmailDomain{}, ...]
 
   """
-  def list_school_email_domains do
-    Repo.all(EmailDomain)
+  def get_email_domains_by_school(school_id) do
+    from(e in EmailDomain)
+    |> where([e], e.school_id == ^school_id)
+    |> Repo.all()
   end
 
   @doc """

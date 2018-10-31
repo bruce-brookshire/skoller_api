@@ -11,8 +11,8 @@ defmodule SkollerWeb.Api.V1.EmailDomainController do
 
   plug :verify_role, %{role: @admin_role}
 
-  def index(conn, _params) do
-    school_email_domains = Schools.list_school_email_domains()
+  def index(conn, %{"school_id" => school_id} = params) do
+    school_email_domains = Schools.get_email_domains_by_school(school_id)
     render(conn, EmailDomainView, "index.json", school_email_domains: school_email_domains)
   end
 
