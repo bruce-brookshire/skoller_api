@@ -28,7 +28,7 @@ defmodule Skoller.Services.MarketingEmail do
     try do
       Logger.info("Sending email to: " <> user_id |> to_string)
       Repo.insert(%EmailLog{user_id: user_id |> String.to_integer(), email_type_id: email_type_id})
-      Mailer.deliver_later(email)
+      Mailer.deliver_now(email)
     rescue
       error ->
         Logger.error(inspect(error))
