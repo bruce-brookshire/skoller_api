@@ -6,6 +6,7 @@ defmodule Skoller.ChatComments do
   alias Skoller.Repo
   alias Skoller.ChatComments.Comment
   alias Skoller.ChatComments.Star
+  alias Skoller.ChatComments.Like
   alias Skoller.ChatComments.Notifications
   alias Skoller.ChatPosts
 
@@ -88,6 +89,40 @@ defmodule Skoller.ChatComments do
     |> where([s], s.chat_comment_id == ^chat_comment_id)
     |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
     {:ok, items}
+  end
+
+  @doc """
+  Likes a comment.
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def like_comment(attrs) do
+    result = Like.changeset(%Like{}, attrs)
+    |> Repo.insert()
+
+    case result do
+      {:ok, like} ->
+        {:ok, get!(like.chat_comment_id)}
+      result -> result
+    end
+  end
+
+  @doc """
+  Unlike a comment.
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def unlike_comment(comment_id, student_id) do
+    result = get_comment_by_student_and_id!(student_id, comment_id)
+    |> Repo.delete()
+
+    case result do
+      {:ok, _like} ->
+        {:ok, get!(comment_id)}
+      result -> result
+    end
   end
 
   defp insert_star(comment, student_id) do
