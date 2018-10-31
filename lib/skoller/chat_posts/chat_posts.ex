@@ -6,6 +6,7 @@ defmodule Skoller.ChatPosts do
   alias Skoller.Repo
   alias Skoller.ChatPosts.Post
   alias Skoller.ChatPosts.Star
+  alias Skoller.ChatPosts.Like
   alias Skoller.ChatPosts.Notifications
 
   import Ecto.Query
@@ -99,6 +100,36 @@ defmodule Skoller.ChatPosts do
   def update(post_old, attrs) do
     Post.changeset_update(post_old, attrs)
     |> Repo.update()
+  end
+
+  @doc """
+  Likes a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def like_post(attrs) do
+    result = Like.changeset(%Like{}, attrs)
+    |> Repo.insert()
+
+    case result do
+      {:ok, like} -> 
+        {:ok, get!(like.chat_post_id)}
+      result ->
+        result
+    end
+  end
+
+  def unlike_post(post_id, student_id) do
+    result = Repo.get_by!(Like, chat_post_id: post_id, student_id: student_id)
+    |> Repo.delete()
+
+    case result do
+      {:ok, _struct} ->
+        {:ok, get!(post_id)}
+      result ->
+        result
+    end
   end
 
   defp insert_star(post, student_id) do
