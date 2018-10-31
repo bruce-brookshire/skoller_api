@@ -3,12 +3,11 @@ defmodule SkollerWeb.Api.V1.Class.Change.TypeController do
 
   use SkollerWeb, :controller
   
-  alias Skoller.ChangeRequests.Type
-  alias Skoller.Repo
+  alias Skoller.ChangeRequests
   alias SkollerWeb.Class.Change.TypeView
 
   def index(conn, _) do
-    types = Repo.all(Type)
+    types = ChangeRequests.get_types()
     render(conn, TypeView, "index.json", types: types)
   end
 end

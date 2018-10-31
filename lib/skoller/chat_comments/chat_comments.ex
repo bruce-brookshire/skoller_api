@@ -5,6 +5,11 @@ defmodule Skoller.ChatComments do
 
   alias Skoller.Repo
   alias Skoller.ChatComments.Comment
+  alias Skoller.ChatComments.Star
+  alias Skoller.ChatComments.Notifications
+  alias Skoller.ChatPosts
+
+  import Ecto.Query
 
   @doc """
   Gets a comment by id
@@ -37,13 +42,57 @@ defmodule Skoller.ChatComments do
   end
 
   @doc """
-  Creates a chat comment
+  Creates a chat comment.
+
+  On comment creation, the comment will be starred for the creator, and all other students
+  will see the post as unread. A notification will also be sent.
 
   ## Returns
   `{:ok, comment}` or `{:error, changeset}`
   """
-  def create(attrs) do
-    Comment.changeset(%Comment{}, attrs)
+  def create(attrs, student_id) do
+    changeset = Comment.changeset(%Comment{}, attrs)
+
+    result = Ecto.Multi.new
+    |> Ecto.Multi.insert(:comment, changeset)
+    |> Ecto.Multi.run(:star, &insert_star(&1.comment, student_id))
+    |> Ecto.Multi.run(:unread, &ChatPosts.unread_posts(&1.comment.chat_post_id, student_id))
+    |> Repo.transaction()
+
+    case result do
+      {:ok, %{comment: comment}} -> 
+        Task.start(Notifications, :send_new_comment_notification, [comment, student_id])
+        {:ok, comment}
+      {:error, _, field, _} ->
+        {:error, field}
+    end
+  end
+
+  @doc """
+  Updates a comment
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def update(comment_old, attrs) do
+    Comment.changeset_update(comment_old, attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Unreads comments for all other `student_id` in the class.
+  """
+  def unread_comments(chat_comment_id, student_id) do
+    items = from(s in Star)
+    |> where([s], s.is_read == true and s.student_id != ^student_id)
+    |> where([s], s.chat_comment_id == ^chat_comment_id)
+    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
+    {:ok, items}
+  end
+
+  defp insert_star(comment, student_id) do
+    %Star{}
+    |> Star.changeset(%{chat_comment_id: comment.id, student_id: student_id})
     |> Repo.insert()
   end
 end

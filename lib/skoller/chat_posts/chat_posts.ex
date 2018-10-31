@@ -5,6 +5,8 @@ defmodule Skoller.ChatPosts do
 
   alias Skoller.Repo
   alias Skoller.ChatPosts.Post
+  alias Skoller.ChatPosts.Star
+  alias Skoller.ChatPosts.Notifications
 
   import Ecto.Query
 
@@ -51,13 +53,57 @@ defmodule Skoller.ChatPosts do
   end
 
   @doc """
-  Creates a chat post
+  Creates a chat post.
+
+  Will star the post for the creator, and send notifications to members in the class with notifications enabled.
 
   ## Returns
   `{:ok, post}` or `{:error, changeset}`
   """
-  def create(attrs) do
-    Post.changeset(%Post{}, attrs)
+  def create(attrs, student_id) do
+    changeset = Post.changeset(%Post{}, attrs)
+
+    results = Ecto.Multi.new
+    |> Ecto.Multi.insert(:post, changeset)
+    |> Ecto.Multi.run(:star, &insert_star(&1.post, student_id))
+    |> Repo.transaction()
+
+    case results do
+      {:ok, %{post: post}} ->
+        Task.start(Notifications, :send_new_post_notification, [post, student_id])
+        {:ok, post}
+      {:error, _, field, _} ->
+        {:error, field}
+    end
+  end
+
+  @doc """
+  Unreads posts for all other `student_id` in the class.
+
+  ## Returns
+  `{:ok, Repo.update_all result}`
+  """
+  def unread_posts(chat_post_id, student_id) do
+    items = from(s in Star)
+    |> where([s], s.id == ^chat_post_id and s.is_read == true and s.student_id != ^student_id)
+    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
+    {:ok, items}
+  end
+
+  @doc """
+  Updates a chat post.
+
+  ## Returns
+  `{:ok, post}` or `{:error, changeset}`
+  """
+  def update(post_old, attrs) do
+    Post.changeset_update(post_old, attrs)
+    |> Repo.update()
+  end
+
+  defp insert_star(post, student_id) do
+    %Star{}
+    |> Star.changeset(%{chat_post_id: post.id, student_id: student_id})
     |> Repo.insert()
   end
 end

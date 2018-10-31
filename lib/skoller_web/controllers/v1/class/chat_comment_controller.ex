@@ -2,18 +2,12 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   @moduledoc false
   
   use SkollerWeb, :controller
-  
-  alias Skoller.Repo
-  alias Skoller.ChatComments.Comment
+
   alias SkollerWeb.Class.ChatCommentView
-  alias Skoller.ChatComments.Star
-  alias Skoller.ChatPosts.Star, as: PostStar
-  alias SkollerWeb.Responses.MultiError
-  alias Skoller.ChatNotifications
+  alias Skoller.ChatComments
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
-  import Ecto.Query
 
   @student_role 100
 
@@ -22,33 +16,10 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   plug :verify_member, :class
 
   def create(conn, params) do
-
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    changeset = Comment.changeset(%Comment{}, params)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:comment, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.comment, conn.assigns[:user].student_id))
-    |> Ecto.Multi.run(:unread, &unread_posts(&1.comment, conn.assigns[:user].student_id))
-
-    case Repo.transaction(multi) do
-      {:ok, %{comment: comment}} -> 
-        Task.start(ChatNotifications, :send_new_comment_notification, [comment, conn.assigns[:user].student_id])
-        render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
-      {:error, _, failed_value, _} ->
-        conn
-        |> MultiError.render(failed_value)
-    end
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    comment_old = Repo.get_by!(Comment, id: id, student_id: conn.assigns[:user].student_id)
-
-    changeset = Comment.changeset_update(comment_old, params)
-
-    case Repo.update(changeset) do
-      {:ok, comment} ->
+    case ChatComments.create(params, conn.assigns[:user].student_id) do
+      {:ok, comment} -> 
         render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
@@ -57,16 +28,16 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
     end
   end
 
-  defp unread_posts(comment, student_id) do
-    items = from(s in PostStar)
-    |> where([s], s.id == ^comment.chat_post_id and s.is_read == true and s.student_id != ^student_id)
-    |> Repo.update_all(set: [is_read: false, updated_at: DateTime.utc_now])
-    {:ok, items}
-  end
+  def update(conn, %{"id" => id} = params) do
+    comment_old = ChatComments.get_comment_by_student_and_id!(conn.assigns[:user].student_id, id)
 
-  defp insert_star(comment, student_id) do
-    %Star{}
-    |> Star.changeset(%{chat_comment_id: comment.id, student_id: student_id})
-    |> Repo.insert()
+    case ChatComments.update(comment_old, params) do
+      {:ok, comment} ->
+        render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 end

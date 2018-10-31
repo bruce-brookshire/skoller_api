@@ -1,4 +1,4 @@
-defmodule Skoller.AssignmentPostNotifications do
+defmodule Skoller.AssignmentPosts.Notifications do
   @moduledoc """
   A context module for assignment post notificaitons
   """

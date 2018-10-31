@@ -14,6 +14,7 @@ defmodule Skoller.Chats do
   alias Skoller.Schools.School
   alias Skoller.ChatPosts.Like
   alias Skoller.EnrolledStudents
+  alias Skoller.Chats.Algorithm
 
   import Ecto.Query
 
@@ -111,6 +112,11 @@ defmodule Skoller.Chats do
     chat_item_enum |> Repo.preload(:likes)
     chat_item_enum.likes |> Enum.any?(& to_string(&1.student_id) == to_string(student_id))
   end
+
+  @doc """
+  Gets a list of chat algorithms.
+  """
+  def get_algorithms(), do: Repo.all(Algorithm)
 
   defp sort_by_params(enum, %{"sort" => @sort_hot}) do
     enum
