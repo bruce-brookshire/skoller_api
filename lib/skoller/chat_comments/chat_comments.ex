@@ -56,7 +56,7 @@ defmodule Skoller.ChatComments do
 
     result = Ecto.Multi.new
     |> Ecto.Multi.insert(:comment, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.comment, student_id))
+    |> Ecto.Multi.run(:star, &insert_star(&1.comment.id, student_id))
     |> Ecto.Multi.run(:unread, &ChatPosts.unread_posts(&1.comment.chat_post_id, student_id))
     |> Repo.transaction()
 
@@ -115,7 +115,7 @@ defmodule Skoller.ChatComments do
   `{:ok, comment}` or `{:error, changeset}`
   """
   def unlike_comment(comment_id, student_id) do
-    result = get_comment_by_student_and_id!(student_id, comment_id)
+    result = get_like_by_student_and_id!(student_id, comment_id)
     |> Repo.delete()
 
     case result do
@@ -125,9 +125,48 @@ defmodule Skoller.ChatComments do
     end
   end
 
-  defp insert_star(comment, student_id) do
+  @doc """
+  Stars a comment.
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def star_comment(comment_id, student_id) do
+    case insert_star(comment_id, student_id) do
+      {:ok, _star} ->
+        {:ok, get!(comment_id)}
+      result -> result
+    end
+  end
+
+  @doc """
+  Unstars a comment.
+
+  ## Returns
+  `{:ok, comment}` or `{:error, changeset}`
+  """
+  def unstar_comment(comment_id, student_id) do
+    result = get_star_by_student_and_id!(student_id, comment_id)
+    |> Repo.delete()
+
+    case result do
+      {:ok, _star} ->
+        {:ok, get!(comment_id)}
+      result -> result
+    end
+  end
+
+  defp get_like_by_student_and_id!(student_id, comment_id) do
+    Repo.get_by!(Like, student_id: student_id, id: comment_id)
+  end
+
+  defp get_star_by_student_and_id!(student_id, comment_id) do
+    Repo.get_by!(Star, student_id: student_id, id: comment_id)
+  end
+
+  defp insert_star(comment_id, student_id) do
     %Star{}
-    |> Star.changeset(%{chat_comment_id: comment.id, student_id: student_id})
+    |> Star.changeset(%{chat_comment_id: comment_id, student_id: student_id})
     |> Repo.insert()
   end
 end

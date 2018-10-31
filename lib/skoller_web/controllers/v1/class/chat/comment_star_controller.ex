@@ -3,8 +3,7 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
-  alias Skoller.ChatComments.Star
+  alias Skoller.ChatComments
   alias SkollerWeb.Class.ChatCommentView
 
   import SkollerWeb.Plugs.Auth
@@ -16,16 +15,10 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def create(conn, params) do
-
-    params = params |> Map.put("student_id", conn.assigns[:user].student_id)
-
-    changeset = Star.changeset(%Star{}, params)
-
-    case Repo.insert(changeset) do
-      {:ok, star} -> 
-        star = star |> Repo.preload(:chat_comment)
-        render(conn, ChatCommentView, "show.json", %{chat_comment: star.chat_comment, current_student_id: conn.assigns[:user].student_id})
+  def create(conn, %{"chat_comment_id" => comment_id}) do
+    case ChatComments.star_comment(comment_id, conn.assigns[:user].student_id) do
+      {:ok, chat_comment} -> 
+        render(conn, ChatCommentView, "show.json", %{chat_comment: chat_comment, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -34,11 +27,9 @@ defmodule SkollerWeb.Api.V1.Class.Chat.CommentStarController do
   end
 
   def delete(conn, %{"chat_comment_id" => comment_id}) do
-    star = Repo.get_by!(Star, chat_comment_id: comment_id, student_id: conn.assigns[:user].student_id)
-    case Repo.delete(star) do
-      {:ok, _struct} ->
-        star = star |> Repo.preload(:chat_comment)
-        render(conn, ChatCommentView, "show.json", %{chat_comment: star.chat_comment, current_student_id: conn.assigns[:user].student_id})
+    case ChatComments.unstar_comment(comment_id, conn.assigns[:user].student_id) do
+      {:ok, chat_comment} ->
+        render(conn, ChatCommentView, "show.json", %{chat_comment: chat_comment, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
