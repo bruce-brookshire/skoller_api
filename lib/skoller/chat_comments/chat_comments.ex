@@ -168,11 +168,11 @@ defmodule Skoller.ChatComments do
   end
 
   defp get_like_by_student_and_id!(student_id, comment_id) do
-    Repo.get_by!(Like, student_id: student_id, id: comment_id)
+    Repo.get_by!(Like, student_id: student_id, chat_comment_id: comment_id)
   end
 
   defp get_star_by_student_and_id!(student_id, comment_id) do
-    Repo.get_by!(Star, student_id: student_id, id: comment_id)
+    Repo.get_by!(Star, student_id: student_id, chat_comment_id: comment_id)
   end
 
   defp insert_star(comment_id, student_id) do

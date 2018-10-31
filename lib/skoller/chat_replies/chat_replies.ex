@@ -5,6 +5,7 @@ defmodule Skoller.ChatReplies do
 
   alias Skoller.Repo
   alias Skoller.ChatReplies.Reply
+  alias Skoller.ChatReplies.Like
   alias Skoller.ChatReplies.Notifications
   alias Skoller.ChatComments
   alias Skoller.ChatPosts
@@ -76,6 +77,44 @@ defmodule Skoller.ChatReplies do
   def update(reply_old, attrs) do
     Reply.changeset_update(reply_old, attrs)
     |> Repo.update()
+  end
+
+  @doc """
+  Likes a reply
+
+  ## Returns
+  `{:ok, reply}` or `{:error, changeset}`
+  """
+  def like_reply(attrs) do
+    result = Like.changeset(%Like{}, attrs)
+    |> Repo.insert()
+
+    case result do
+      {:ok, like} ->
+        {:ok, get!(like.chat_reply_id)}
+      result -> result
+    end
+  end
+
+  @doc """
+  Unlike a reply.
+
+  ## Returns
+  `{:ok, reply}` or `{:error, changeset}`
+  """
+  def unlike_reply(reply_id, student_id) do
+    result = get_like_by_student_and_id!(student_id, reply_id)
+    |> Repo.delete()
+
+    case result do
+      {:ok, _like} ->
+        {:ok, get!(reply_id)}
+      result -> result
+    end
+  end
+
+  defp get_like_by_student_and_id!(student_id, reply_id) do
+    Repo.get_by!(Like, student_id: student_id, chat_reply_id: reply_id)
   end
 
   defp unread_post(reply, student_id) do

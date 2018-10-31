@@ -175,15 +175,15 @@ defmodule Skoller.ChatPosts do
   Gets a post star by student and post id.
   """
   def get_star_by_student_and_id(student_id, post_id) do
-    Repo.get_by(Star, student_id: student_id, id: post_id)
+    Repo.get_by(Star, student_id: student_id, chat_post_id: post_id)
   end
 
   defp get_star_by_student_and_id!(student_id, post_id) do
-    Repo.get_by!(Star, student_id: student_id, id: post_id)
+    Repo.get_by!(Star, student_id: student_id, chat_post_id: post_id)
   end
 
   defp get_like_by_student_and_id!(student_id, post_id) do
-    Repo.get_by!(Like, student_id: student_id, id: post_id)
+    Repo.get_by!(Like, student_id: student_id, chat_post_id: post_id)
   end
 
   defp insert_star(post_id, student_id) do
