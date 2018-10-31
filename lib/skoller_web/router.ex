@@ -111,7 +111,10 @@ defmodule SkollerWeb.Router do
 
         # School Period routes
         resources "/periods", PeriodController, only: [:index, :create]
+
+        resources "/email_domains", EmailDomainController, only: [:index, :create]
       end
+      resources "/email_domains", EmailDomainController, only: [:show, :update, :delete]
 
       # Class Period routes
       resources "/periods", Admin.PeriodController, only: [:update, :show] do
