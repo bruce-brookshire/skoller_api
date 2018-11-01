@@ -8,11 +8,12 @@ defmodule Skoller.EnrolledSchools do
   alias Skoller.Students.Student
   alias Skoller.Classes.Schools
   alias Skoller.EnrolledStudents
+  alias Skoller.ClassStatuses.Schools, as: ClassStatuses
 
   import Ecto.Query
 
   @doc """
-  Returns the `Skoller.Schools.School` and a count of `Skoller.Students.Student`
+  Returns the `Skoller.Schools.School` and a count of `Skoller.Students.Student` as well as the count of classes in each status
 
   ## Examples
 
@@ -26,6 +27,7 @@ defmodule Skoller.EnrolledSchools do
     |> filter(filter)
     |> select([school, student], %{school: school, students: fragment("coalesce(?, 0)", student.count)})
     |> Repo.all()
+    |> Enum.map(&Map.put(&1, :classes, ClassStatuses.get_status_counts(&1.school.id)))
   end
 
   @doc """

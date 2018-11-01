@@ -20,9 +20,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
-    case Users.create_user(params) do
-      {:ok, %{user: user}} ->
-        user = user |> Students.preload_student()
+    case Users.create_user(params, [admin: true]) do
+      {:ok, user} ->
         render(conn, UserView, "show.json", user: user)
       {:error, failed_value} ->
         conn

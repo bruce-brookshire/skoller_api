@@ -19,7 +19,7 @@ defmodule Skoller.Students.Student do
     field :name_last, :string
     field :phone, :string
     field :verification_code, :string
-    field :is_verified, :boolean
+    field :is_verified, :boolean, default: false
     field :notification_time, :time
     field :future_reminder_notification_time, :time
     field :notification_days_notice, :integer, default: 1

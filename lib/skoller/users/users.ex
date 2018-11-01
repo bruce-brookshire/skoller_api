@@ -14,6 +14,8 @@ defmodule Skoller.Users do
   alias Skoller.Users.Notifications
   alias Skoller.StudentClasses.EnrollmentLinks
   alias Skoller.UserRoles
+  alias Skoller.Users.Students, as: StudentUsers
+  alias Skoller.Sms
 
   @student_role 100
 
@@ -52,11 +54,10 @@ defmodule Skoller.Users do
    * `[admin: true]`, will verify without text.
 
   # Returns
-  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, custom_link: Skoller.CustomSignups.Signup || {:ok, nil}, link: String}}`
-  or `{:error, failed_val}`
+  `{:ok, Skoller.Users.User}` or `{:error, changeset}`
   """
   def create_user(params, opts \\ []) do
-    multi = %User{}
+    result = %User{}
     |> User.changeset_insert(params)
     |> verify_student(opts)
     |> verification_code(opts)
@@ -65,15 +66,16 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Ecto.Multi.run(:points, &add_points_to_student(&1.user))
-    
-    case multi |> Repo.transaction() do
+    |> Repo.transaction()
+    |> send_link_used_notification()
+    |> send_verification_text()
+
+    case result do
+      {:ok, %{user: user}} ->
+        user = user |> StudentUsers.preload_student() |> Repo.preload(:roles)
+        {:ok, user}
       {:error, _, failed_val, _} ->
         {:error, failed_val}
-      {:ok, %{user: %{student: %{enrolled_by: student_id}}} = items} when not is_nil(student_id) ->
-        Task.start(Notifications, :send_link_used_notification, [student_id])
-        {:ok, items}
-      {:ok, items} ->
-        {:ok, items}
     end
   end
 
@@ -116,6 +118,18 @@ defmodule Skoller.Users do
     |> Repo.update()
   end
 
+  defp send_link_used_notification({:ok, %{user: %{student: %{enrolled_by: student_id}}}} = result) when not is_nil(student_id) do
+    Task.start(Notifications, :send_link_used_notification, [student_id])
+    result
+  end
+  defp send_link_used_notification(result), do: result
+
+  defp send_verification_text({:ok, %{user: %{student: %{is_verified: false} = student}}} = result) do
+    student.phone |> Sms.verify_phone(student.verification_code)
+    result
+  end
+  defp send_verification_text(result), do: result
+
   defp add_points_to_student(%{student: %{enrolled_by: enrolled_by}}) when not(is_nil(enrolled_by)) do
     enrolled_by
     |> StudentPoints.add_points_to_student(@student_referral_points_name)
@@ -124,8 +138,8 @@ defmodule Skoller.Users do
 
   # Generates a verification code if admin: true is not passed in through opts.
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case get_opt(opts, :admin) do
-      "true" -> 
+    case Keyword.get(opts, :admin, false) do
+      true -> 
         u_changeset
       _ ->
         Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, Verification.generate_verify_code)})
@@ -135,8 +149,8 @@ defmodule Skoller.Users do
 
   # Verifies a student if admin: true passed in though opts.
   defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case get_opt(opts, :admin) do
-      "true" -> 
+    case Keyword.get(opts, :admin, false) do
+      true -> 
         Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :is_verified, true)})
       _ -> 
         u_changeset
@@ -223,13 +237,5 @@ defmodule Skoller.Users do
 
   defp delete_fields_of_study(id) do
     Students.delete_fields_of_study_by_student_id(id)
-  end
-
-  # Parses a keylist and gets the value of the atom.
-  defp get_opt(opts, atom) do
-    case opts |> List.keytake(atom, 0) do
-      nil -> nil
-      val -> val |> elem(0) |> elem(1)
-    end
   end
 end
