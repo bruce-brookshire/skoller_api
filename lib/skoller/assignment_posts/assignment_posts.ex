@@ -10,6 +10,7 @@ defmodule Skoller.AssignmentPosts do
   alias Skoller.EnrolledStudents
   alias Skoller.Classes.Class
   alias Skoller.AssignmentPosts.StudentAssignments
+  alias Skoller.AssignmentPosts.Notifications
 
   import Ecto.Query
 
@@ -19,7 +20,7 @@ defmodule Skoller.AssignmentPosts do
   ## Returns
   `%Skoller.AssignmentPosts.Post{}` or `Ecto.NoResultsError`
   """
-  def get!(post_id) do
+  def get_assignment_post!(post_id) do
     Repo.get!(Post, post_id)
   end
 
@@ -49,13 +50,21 @@ defmodule Skoller.AssignmentPosts do
   ## Returns
   `{:ok, %{post: post, student_assignment: [{:ok, StudentAssignment}]}}` or an ecto multi error.
   """
-  def create(attrs) do
+  def create_assignment_post(attrs) do
     changeset = Post.changeset(%Post{}, attrs)
 
-    Ecto.Multi.new()
+    result = Ecto.Multi.new()
     |> Ecto.Multi.insert(:post, changeset)
     |> Ecto.Multi.run(:student_assignment, &StudentAssignments.un_read_assignment(&1.post.student_id, &1.post.assignment_id))
     |> Repo.transaction()
+
+    case result do
+      {:ok, %{post: post}} ->
+        Task.start(Notifications, :send_assignment_post_notification, [post, post.student_id])
+        {:ok, post}
+      {:error, _, failed_value, _} ->
+        {:error, failed_value}
+    end
   end
 
   @doc """
@@ -64,7 +73,7 @@ defmodule Skoller.AssignmentPosts do
   ## Returns
   `{:ok, post}` or `{:error, changeset}`
   """
-  def update(post_old, attrs) do
+  def update_assignment_post(post_old, attrs) do
     Post.changeset_update(post_old, attrs)
     |> Repo.update()
   end

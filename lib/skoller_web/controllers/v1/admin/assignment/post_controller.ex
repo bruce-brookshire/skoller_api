@@ -34,6 +34,6 @@ defmodule SkollerWeb.Api.V1.Admin.Assignment.PostController do
     AssignmentPosts.get_post_by_student_and_id!(student_id, id)
   end
   defp get_post(_conn, id) do
-    AssignmentPosts.get!(id)
+    AssignmentPosts.get_assignment_post!(id)
   end
 end

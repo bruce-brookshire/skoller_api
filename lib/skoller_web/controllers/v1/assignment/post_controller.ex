@@ -4,8 +4,6 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   use SkollerWeb, :controller
   
   alias SkollerWeb.Assignment.PostView
-  alias Skoller.AssignmentPosts.Notifications
-  alias SkollerWeb.Responses.MultiError
   alias Skoller.AssignmentPosts
 
   import SkollerWeb.Plugs.Auth
@@ -20,20 +18,20 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   def create(conn, params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    case AssignmentPosts.create(params) do
-      {:ok, %{post: post}} ->
-        Task.start(Notifications, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
+    case AssignmentPosts.create_assignment_post(params) do
+      {:ok, post} ->
         render(conn, PostView, "show.json", %{post: post})
-      {:error, _, failed_value, _} ->
+      {:error, changeset} ->
         conn
-        |> MultiError.render(failed_value)
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
   def update(conn, %{"id" => id} = params) do
     post_old = AssignmentPosts.get_post_by_student_and_id!(conn.assigns[:user].student_id, id)
 
-    case AssignmentPosts.update(post_old, params) do
+    case AssignmentPosts.update_assignment_post(post_old, params) do
       {:ok, post} ->
         render(conn, PostView, "show.json", %{post: post})
       {:error, changeset} ->
