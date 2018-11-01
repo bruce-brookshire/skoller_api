@@ -36,7 +36,7 @@ defmodule Skoller.ChangeRequests do
    * `{:change_request, Skoller.ChangeRequests.ChangeRequest}`
    * `{:class_status, Skoller.Classes.Class}`
   """
-  def complete(id) do
+  def complete_change_request(id) do
     change_request_old = Repo.get!(ChangeRequest, id)
     |> Repo.preload(:class)
     

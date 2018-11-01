@@ -39,7 +39,7 @@ defmodule Skoller.AssignmentPosts do
   ## Returns
   `{:ok, %Skoller.AssignmentPosts.Post{}}` or `{:error, %Ecto.Changeset{}}`
   """
-  def delete(%Post{} = post) do
+  def delete_assignment_post(%Post{} = post) do
     Repo.delete(post)
   end
 

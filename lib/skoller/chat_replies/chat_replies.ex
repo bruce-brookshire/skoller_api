@@ -118,7 +118,7 @@ defmodule Skoller.ChatReplies do
   end
 
   defp unread_post(reply, student_id) do
-    comment = ChatComments.get!(reply.chat_comment_id)
+    comment = ChatComments.get_comment!(reply.chat_comment_id)
     
     ChatPosts.unread_posts(comment.chat_post_id, student_id)
   end

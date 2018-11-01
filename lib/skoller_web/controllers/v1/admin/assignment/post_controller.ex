@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Admin.Assignment.PostController do
 
   def delete(conn, %{"id" => id}) do
     post = conn |> get_post(id)
-    case AssignmentPosts.delete(post) do
+    case AssignmentPosts.delete_assignment_post(post) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

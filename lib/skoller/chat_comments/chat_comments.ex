@@ -18,7 +18,7 @@ defmodule Skoller.ChatComments do
   ## Returns
   `%Skoller.ChatComments.Comment{}` or `Ecto.NoResultsError`
   """
-  def get!(comment_id) do
+  def get_comment!(comment_id) do
     Repo.get!(Comment, comment_id)
   end
 
@@ -38,7 +38,7 @@ defmodule Skoller.ChatComments do
   ## Returns
   `{:ok, %Skoller.ChatComments.Comment{}}` or `{:error, %Ecto.Changeset{}}`
   """
-  def delete(%Comment{} = comment) do
+  def delete_comment(%Comment{} = comment) do
     Repo.delete(comment)
   end
 
@@ -103,7 +103,7 @@ defmodule Skoller.ChatComments do
 
     case result do
       {:ok, like} ->
-        {:ok, get!(like.chat_comment_id)}
+        {:ok, get_comment!(like.chat_comment_id)}
       result -> result
     end
   end
@@ -120,7 +120,7 @@ defmodule Skoller.ChatComments do
 
     case result do
       {:ok, _like} ->
-        {:ok, get!(comment_id)}
+        {:ok, get_comment!(comment_id)}
       result -> result
     end
   end
@@ -134,7 +134,7 @@ defmodule Skoller.ChatComments do
   def star_comment(comment_id, student_id) do
     case insert_star(comment_id, student_id) do
       {:ok, _star} ->
-        {:ok, get!(comment_id)}
+        {:ok, get_comment!(comment_id)}
       result -> result
     end
   end
@@ -151,7 +151,7 @@ defmodule Skoller.ChatComments do
 
     case result do
       {:ok, _star} ->
-        {:ok, get!(comment_id)}
+        {:ok, get_comment!(comment_id)}
       result -> result
     end
   end

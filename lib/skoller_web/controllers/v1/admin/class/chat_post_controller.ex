@@ -20,7 +20,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
 
   def delete(conn, %{"id" => id}) do
     post = conn |> get_post(id)
-    case ChatPosts.delete(post) do
+    case ChatPosts.delete_post(post) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
@@ -37,7 +37,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
   end
 
   def show(conn, %{"id" => id}) do
-    post = ChatPosts.get!(id)
+    post = ChatPosts.get_post!(id)
     conn |> render_show_view(post)
   end
 
@@ -46,7 +46,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatPostController do
     ChatPosts.get_post_by_student_and_id!(student_id, id)
   end
   defp get_post(_conn, id) do
-    ChatPosts.get!(id)
+    ChatPosts.get_post!(id)
   end
 
   defp render_index_view(%{assigns: %{user: %{student: %{id: id}}}} = conn, posts, class_id) do

@@ -17,7 +17,7 @@ defmodule Skoller.ChatPosts do
   ## Returns
   `%Skoller.ChatPosts.Post{}` or `Ecto.NoResultsError`
   """
-  def get!(post_id) do
+  def get_post!(post_id) do
     Repo.get!(Post, post_id)
   end
 
@@ -37,7 +37,7 @@ defmodule Skoller.ChatPosts do
   ## Returns
   `{:ok, %Skoller.ChatPosts.Post{}}` or `{:error, %Ecto.Changeset{}}`
   """
-  def delete(%Post{} = post) do
+  def delete_post(%Post{} = post) do
     Repo.delete(post)
   end
 
@@ -114,7 +114,7 @@ defmodule Skoller.ChatPosts do
 
     case result do
       {:ok, like} -> 
-        {:ok, get!(like.chat_post_id)}
+        {:ok, get_post!(like.chat_post_id)}
       result ->
         result
     end
@@ -132,7 +132,7 @@ defmodule Skoller.ChatPosts do
 
     case result do
       {:ok, _struct} ->
-        {:ok, get!(post_id)}
+        {:ok, get_post!(post_id)}
       result ->
         result
     end
@@ -147,7 +147,7 @@ defmodule Skoller.ChatPosts do
   def star_post(post_id, student_id) do
     case insert_star(post_id, student_id) do
       {:ok, _star} -> 
-        {:ok, get!(post_id)}
+        {:ok, get_post!(post_id)}
       result ->
         result
     end
@@ -165,7 +165,7 @@ defmodule Skoller.ChatPosts do
 
     case result do
       {:ok, _star} -> 
-        {:ok, get!(post_id)}
+        {:ok, get_post!(post_id)}
       result ->
         result
     end
