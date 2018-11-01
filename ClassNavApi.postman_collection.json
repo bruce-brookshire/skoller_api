@@ -1344,7 +1344,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"name\": \"assign 3\",\n  \"due\": \"2017-10-12T00:00:00Z\",\n  \"weight_id\": 1\n}"
+									"raw": "{\n  \"name\": \"assign 323\",\n  \"due\": \"2017-10-12T00:00:00Z\",\n  \"weight_id\": 1,\n  \"created_on\": \"POSTMAN\"\n}"
 								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
@@ -5065,6 +5065,32 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Email Types Min",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/email-types/list",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"email-types",
+								"list"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -7259,6 +7285,136 @@
 									"body": "[{\"phone\":null,\"office_location\":null,\"office_availability\":null,\"name_last\":\"Jimbo\",\"name_first\":\"Jimmy\",\"id\":1,\"email\":\"jimjim@jim.edu\"}]"
 								}
 							]
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Email Domain",
+					"item": [
+						{
+							"name": "Get Email Domains",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/email_domains",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"email_domains"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Email Domain",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"body": {},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/schools/1/email_domains",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"schools",
+										"1",
+										"email_domains"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Emai Domain",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email_domain\": \"uw21.edu\"\n}"
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/email_domains/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"email_domains",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Email Domain",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/email_domains/1",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"email_domains",
+										"1"
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"_postman_isSubFolder": true
