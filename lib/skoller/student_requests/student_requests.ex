@@ -48,7 +48,7 @@ defmodule Skoller.StudentRequests do
    * `{:student_request, Skoller.StudentRequests.StudentRequest}`
    * `{:class_status, Skoller.ClassStatuses.Classes.check_status/2}`
   """
-  def complete(request_id) do
+  def complete_student_request(request_id) do
     student_request_old = Repo.get!(StudentRequest, request_id)
 
     changeset = StudentRequest.changeset(student_request_old, %{is_completed: true})

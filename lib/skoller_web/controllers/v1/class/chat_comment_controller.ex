@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   def create(conn, params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    case ChatComments.create(params, conn.assigns[:user].student_id) do
+    case ChatComments.create_comment(params, conn.assigns[:user].student_id) do
       {:ok, comment} -> 
         render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->

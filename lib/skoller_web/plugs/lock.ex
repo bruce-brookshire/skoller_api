@@ -30,7 +30,7 @@ defmodule SkollerWeb.Plugs.Lock do
   defp get_lock(%{assigns: %{user: user}} = conn, %{type: :weight, using: :id}) do
     case conn.params |> check_using(:weight, :id) do
       true ->
-        weight = Weights.get!(conn.params["id"])
+        weight = Weights.get_weight!(conn.params["id"])
         case Locks.find_lock(weight.class_id, @weight_lock, user.id) do
           [] -> conn |> check_maintenance(weight.class_id)
           _ -> conn

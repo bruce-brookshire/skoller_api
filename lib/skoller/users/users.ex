@@ -208,14 +208,14 @@ defmodule Skoller.Users do
   defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
     user = user |> Repo.preload(:roles)
     case user.roles |> Enum.any?(& &1.id == @student_role) do
-      false -> UserRoles.add_role(%{user_id: user.id, role_id: @student_role})
+      false -> UserRoles.add_role(user.id, @student_role)
       true -> {:ok, nil}
     end
   end
   defp add_roles_preloaded(user, %{"roles" => roles}) do
     UserRoles.delete_roles_for_user(user.id)
     status = roles
-    |> Enum.map(&UserRoles.add_role!(%{user_id: user.id, role_id: &1}))
+    |> Enum.map(&UserRoles.add_role(user.id, &1))
     
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end

@@ -50,7 +50,7 @@ defmodule Skoller.ChatReplies do
   ## Returns
   `{:ok, reply}` or `{:error, changeset}`
   """
-  def create(attrs, student_id) do
+  def create_reply(attrs, student_id) do
     changeset = Reply.changeset(%Reply{}, attrs)
 
     result = Ecto.Multi.new

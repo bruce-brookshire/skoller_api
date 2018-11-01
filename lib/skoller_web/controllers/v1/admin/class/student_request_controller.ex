@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.StudentRequestController do
   plug :verify_role, %{roles: [@change_req_role, @help_req_role, @admin_role]}
 
   def complete(conn, %{"id" => id}) do
-    case StudentRequests.complete(id) do
+    case StudentRequests.complete_student_request(id) do
       {:ok, %{student_request: student_request}} ->
         render(conn, StudentRequestView, "show.json", student_request: student_request)
       {:error, _, failed_value, _} ->

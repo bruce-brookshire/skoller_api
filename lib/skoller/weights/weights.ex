@@ -12,7 +12,7 @@ defmodule Skoller.Weights do
   ## Returns
   `Skoller.Weights.Weight` or `Ecto.NoResultsError`
   """
-  def get!(id) do
+  def get_weight!(id) do
     Repo.get!(Weight, id)
   end
 
@@ -22,7 +22,7 @@ defmodule Skoller.Weights do
   ## Returns
   `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
   """
-  def insert(user_id, params) do
+  def insert_weight(user_id, params) do
     Weight.changeset_insert(%Weight{}, params)
     |> Ecto.Changeset.change(%{created_by: user_id, updated_by: user_id, created_on: params["created_on"]})
     |> Repo.insert()
@@ -34,7 +34,7 @@ defmodule Skoller.Weights do
   ## Returns
   `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
   """
-  def update(user_id, weight_old, params) do
+  def update_weight(user_id, weight_old, params) do
     Weight.changeset_update(weight_old, params)
     |> Ecto.Changeset.change(%{updated_by: user_id})
     |> Repo.update()
@@ -46,7 +46,7 @@ defmodule Skoller.Weights do
   ## Returns
   `{:ok, %Skoller.Weights.Weight{}` or `{:error, Ecto.Changeset}``
   """
-  def delete(%Weight{} = weight) do
+  def delete_weight(%Weight{} = weight) do
     Repo.delete(weight)
   end
 end

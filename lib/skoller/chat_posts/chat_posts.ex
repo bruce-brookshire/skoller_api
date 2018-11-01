@@ -61,7 +61,7 @@ defmodule Skoller.ChatPosts do
   ## Returns
   `{:ok, post}` or `{:error, changeset}`
   """
-  def create(attrs, student_id) do
+  def create_post(attrs, student_id) do
     changeset = Post.changeset(%Post{}, attrs)
 
     results = Ecto.Multi.new

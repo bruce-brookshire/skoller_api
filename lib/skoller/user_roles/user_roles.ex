@@ -10,19 +10,9 @@ defmodule Skoller.UserRoles do
 
   @doc """
   Adds a role to a user.
-
-  Raises on failure.
   """
-  def add_role!(attrs) do
-    UserRole.changeset(%UserRole{}, attrs)
-    |> Repo.insert!()
-  end
-
-  @doc """
-  Adds a role to a user.
-  """
-  def add_role(attrs) do
-    UserRole.changeset(%UserRole{}, attrs)
+  def add_role(user_id, role_id) do
+    UserRole.changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
     |> Repo.insert()
   end
 

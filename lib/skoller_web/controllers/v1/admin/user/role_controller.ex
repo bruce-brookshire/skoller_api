@@ -12,7 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.User.RoleController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{"user_id" => user_id, "id" => role_id}) do
-    case UserRoles.add_role(%{user_id: user_id, role_id: role_id}) do
+    case UserRoles.add_role(user_id, role_id) do
       {:ok, user_role} ->
         render(conn, UserRoleView, "show.json", user_role: user_role)
       {:error, changeset} ->

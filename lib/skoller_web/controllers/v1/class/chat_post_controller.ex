@@ -19,7 +19,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   def create(conn, %{"class_id" => class_id} = params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    case ChatPosts.create(params, conn.assigns[:user].student_id) do
+    case ChatPosts.create_post(params, conn.assigns[:user].student_id) do
       {:ok, post} -> 
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
         render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})

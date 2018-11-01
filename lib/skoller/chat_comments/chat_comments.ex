@@ -51,7 +51,7 @@ defmodule Skoller.ChatComments do
   ## Returns
   `{:ok, comment}` or `{:error, changeset}`
   """
-  def create(attrs, student_id) do
+  def create_comment(attrs, student_id) do
     changeset = Comment.changeset(%Comment{}, attrs)
 
     result = Ecto.Multi.new

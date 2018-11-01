@@ -20,7 +20,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   plug :check_lock, %{type: :weight, using: :class_id}
 
   def create(%{assigns: %{user: user}} = conn, params) do
-    case Weights.insert(user.id, params) do
+    case Weights.insert_weight(user.id, params) do
       {:ok, weight} ->
         render(conn, WeightView, "show.json", weight: weight)
       {:error, changeset} ->
@@ -31,9 +31,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   end
 
   def update(%{assigns: %{user: user}} = conn, %{"id" => id} = params) do
-    weight_old = Weights.get!(id)
+    weight_old = Weights.get_weight!(id)
 
-    case Weights.update(user.id, weight_old, params) do
+    case Weights.update_weight(user.id, weight_old, params) do
       {:ok, weight} ->
         render(conn, WeightView, "show.json", weight: weight)
       {:error, changeset} ->
@@ -44,9 +44,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   end
 
   def delete(conn, %{"id" => id}) do
-    weight = Weights.get!(id)
+    weight = Weights.get_weight!(id)
 
-    case Weights.delete(weight) do
+    case Weights.delete_weight(weight) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

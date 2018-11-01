@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   def create(conn, params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
     
-    case ChatReplies.create(params, conn.assigns[:user].student_id) do
+    case ChatReplies.create_reply(params, conn.assigns[:user].student_id) do
       {:ok, reply} -> 
         render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->

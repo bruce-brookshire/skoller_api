@@ -26,6 +26,7 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
 
+  #TODO: Find way to wrap this into a context in a way that makes sense.
   defp add_student_class_details(student_class) do
     student_class
     |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
