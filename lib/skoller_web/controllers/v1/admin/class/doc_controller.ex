@@ -16,7 +16,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.DocController do
 
   def delete(conn, %{"id" => id}) do
     doc = ClassDocs.get_doc_by_id!(id)
-    case ClassDocs.delete(doc) do
+    case ClassDocs.delete_doc(doc) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

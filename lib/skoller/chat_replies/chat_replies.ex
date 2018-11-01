@@ -16,7 +16,7 @@ defmodule Skoller.ChatReplies do
   ## Returns
   `%Skoller.ChatReplies.Reply{}` or `Ecto.NoResultsError`
   """
-  def get!(reply_id) do
+  def get_reply!(reply_id) do
     Repo.get!(Reply, reply_id)
   end
 
@@ -36,7 +36,7 @@ defmodule Skoller.ChatReplies do
   ## Returns
   `{:ok, %Skoller.ChatReplies.Reply{}}` or `{:error, %Ecto.Changeset{}}`
   """
-  def delete(%Reply{} = reply) do
+  def delete_reply(%Reply{} = reply) do
     Repo.delete(reply)
   end
 
@@ -91,7 +91,7 @@ defmodule Skoller.ChatReplies do
 
     case result do
       {:ok, like} ->
-        {:ok, get!(like.chat_reply_id)}
+        {:ok, get_reply!(like.chat_reply_id)}
       result -> result
     end
   end
@@ -108,7 +108,7 @@ defmodule Skoller.ChatReplies do
 
     case result do
       {:ok, _like} ->
-        {:ok, get!(reply_id)}
+        {:ok, get_reply!(reply_id)}
       result -> result
     end
   end

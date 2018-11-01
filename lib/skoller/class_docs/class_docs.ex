@@ -9,6 +9,8 @@ defmodule Skoller.ClassDocs do
   alias Skoller.ClassDocs.Doc
   alias Skoller.MapErrors
   alias Skoller.ClassStatuses.Classes
+  alias Skoller.Sammi
+  alias Skoller.Classes.Periods
 
   require Logger
 
@@ -49,7 +51,7 @@ defmodule Skoller.ClassDocs do
   ## Returns
   `{:ok, %Skoller.ClassDocs.Doc{}}` or `{:error, %Ecto.Changeset{}}`
   """
-  def delete(%Doc{} = doc) do
+  def delete_doc(%Doc{} = doc) do
     Repo.delete(doc)
   end
 
@@ -65,16 +67,29 @@ defmodule Skoller.ClassDocs do
   end
 
   @doc """
-  Inserts a doc into multiple classes.
+  Inserts syllabi into multiple classes using a `class_hash` (class upload key) that is generated from the Scraper.
 
   May cause class status updates.
+
+  Will run `Skoller.Sammi` on the file for each class.
 
   ## Returns
   `{:ok, Map}` or `{:error, _, _, _}` where `Map` contains
    * `{:doc, [Skoller.ClassDocs.Doc]}`
    * `{:status, [Skoller.ClassStatuses.Status]}`
   """
-  def multi_insert_docs(classes, params) do
+  def insert_multiple_syllabi_from_hash(class_hash, period_id, file, user_id) do
+    classes = Periods.get_class_from_hash(class_hash, period_id)
+    location = file |> upload_class_doc()
+
+    classes |> Enum.each(&Task.start(Sammi, :sammi, [%{"is_syllabus" => "true", "class_id" => &1.id}, location]))
+
+    params = Map.new() 
+    |> Map.put("path", location)
+    |> Map.put("name", file.filename)
+    |> Map.put("is_syllabus", true)
+    |> Map.put("user_id", user_id)
+
     Ecto.Multi.new
     |> Ecto.Multi.run(:doc, &insert_class_doc(classes, params, &1))
     |> Ecto.Multi.run(:status, &check_statuses(classes, &1.doc))

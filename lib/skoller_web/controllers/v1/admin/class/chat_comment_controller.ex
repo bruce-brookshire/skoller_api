@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
 
   def delete_comment(conn, %{"id" => id}) do
     comment = conn |> get_comment(id)
-    case ChatComments.delete(comment) do
+    case ChatComments.delete_comment(comment) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
