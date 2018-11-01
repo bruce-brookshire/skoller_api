@@ -19,7 +19,7 @@ defmodule SkollerWeb.StudentView do
   end
 
   def render("student.json", %{student: student}) do
-    student = student |> Repo.preload([:fields_of_study, :schools])
+    student = student |> Repo.preload([:fields_of_study, :schools, :primary_school])
     %{
       id: student.id,
       name_first: student.name_first,
@@ -42,7 +42,8 @@ defmodule SkollerWeb.StudentView do
       enrollment_link: System.get_env("WEB_URL") <> @signup_path <> student.enrollment_link,
       schools: render_many(student.schools, SchoolView, "school.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
-      points: Skoller.StudentPoints.get_points_by_student_id(student.id)
+      points: Skoller.StudentPoints.get_points_by_student_id(student.id),
+      primary_school: render_one(student.primary_school, SchoolView, "school.json")
     }
   end
 
