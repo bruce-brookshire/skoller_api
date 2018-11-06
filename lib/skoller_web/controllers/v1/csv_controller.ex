@@ -3,15 +3,14 @@ defmodule SkollerWeb.Api.V1.CSVController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
   alias Skoller.FieldsOfStudy
   alias SkollerWeb.CSVView
-  alias Skoller.CSVUpload  
   alias Skoller.Classes
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
   alias Skoller.Periods
+  alias Skoller.CSVUploads
   
   import SkollerWeb.Plugs.Auth
   
@@ -22,8 +21,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   plug :verify_role, %{role: @admin_role}
 
   def fos(conn, %{"file" => file}) do
-    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
-    case Repo.insert(changeset) do
+    case CSVUploads.create_csv_upload(file.filename) do
       {:ok, _} ->
         uploads = file.path 
         |> File.stream!()
@@ -49,8 +47,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   def class(conn, %{"file" => file, "period_id" => period_id}) do
-    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
-    case Repo.insert(changeset) do
+    case CSVUploads.create_csv_upload(file.filename) do
       {:ok, _} ->
         period_id = period_id |> String.to_integer
         uploads = file.path 

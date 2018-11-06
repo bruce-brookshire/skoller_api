@@ -10,6 +10,7 @@ defmodule Skoller.StudentRequests do
   alias Skoller.MapErrors
   alias Skoller.StudentRequests.Doc
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
+  alias Skoller.StudentRequests.Type
 
   @syllabus_request 100
 
@@ -59,6 +60,13 @@ defmodule Skoller.StudentRequests do
     |> Ecto.Multi.update(:student_request, changeset)
     |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
+  end
+
+  @doc """
+  Gets a list of student request types
+  """
+  def get_student_request_types() do
+    Repo.all(Type)
   end
 
   defp upload_class_docs(user, %{"files" => files} = params, student_request) do 

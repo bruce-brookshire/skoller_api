@@ -5,6 +5,7 @@ defmodule Skoller.HelpRequests do
 
   alias Skoller.Repo
   alias Skoller.HelpRequests.HelpRequest
+  alias Skoller.HelpRequests.Type
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.Classes
 
@@ -23,5 +24,12 @@ defmodule Skoller.HelpRequests do
     |> Ecto.Multi.insert(:help_request, changeset)
     |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
     |> Repo.transaction()
+  end
+
+  @doc """
+  Returns a list of help request types
+  """
+  def get_help_request_types() do
+    Repo.all(Type)
   end
 end

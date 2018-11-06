@@ -1,9 +1,9 @@
-defmodule Skoller.CSVUpload do
+defmodule Skoller.CSVUploads.CSVUpload do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.CSVUpload
+  alias Skoller.CSVUploads.CSVUpload
 
   schema "csv_uploads" do
     field :name, :string
