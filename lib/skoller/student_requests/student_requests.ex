@@ -72,16 +72,7 @@ defmodule Skoller.StudentRequests do
   end
 
   defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
-    location = ClassDocs.upload_class_doc(file)
-
-    {:ok, doc} = %{} 
-    |> Map.put("path", location)
-    |> Map.put("name", file.filename)
-    |> Map.put("user_id", user.id)
-    |> Map.put("is_syllabus", get_is_syllabus(student_request))
-    |> Map.put("class_id", class_id)
-    |> ClassDocs.insert()
-
+    {:ok, doc} = ClassDocs.upload_doc(file, user.id, class_id, get_is_syllabus(student_request))
     Repo.insert(%Doc{doc_id: doc.id, class_student_request_id: student_request.id})
   end
 

@@ -6,7 +6,6 @@ defmodule Skoller.Analytics.Docs do
   alias Skoller.Repo
   alias Skoller.Classes.Class
   alias Skoller.Classes.Schools
-  alias Skoller.Classes.Docs
   alias Skoller.ClassDocs.Doc
 
   import Ecto.Query
@@ -26,7 +25,7 @@ defmodule Skoller.Analytics.Docs do
   def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
     |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> join(:inner, [c, cs], d in subquery(Docs.classes_with_syllabus_subquery()), d.class_id == c.id)
+    |> join(:inner, [c, cs], d in subquery(classes_with_syllabus_subquery()), d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
@@ -54,5 +53,13 @@ defmodule Skoller.Analytics.Docs do
     |> select([d], count(d.class_id, :distinct))
     |> Repo.all()
     |> Enum.count()
+  end
+
+  # Gets oldest syllabus in each class.
+  defp classes_with_syllabus_subquery() do
+    from(d in Doc)
+    |> where([d], d.is_syllabus == true)
+    |> distinct([d], d.class_id)
+    |> order_by([d], asc: d.inserted_at)
   end
 end
