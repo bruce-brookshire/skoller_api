@@ -16,6 +16,8 @@ defmodule Skoller.Users do
   alias Skoller.UserRoles
   alias Skoller.Users.Students, as: StudentUsers
   alias Skoller.Sms
+  alias Skoller.Token
+  alias Skoller.Users.Emails
 
   @student_role 100
 
@@ -113,6 +115,22 @@ defmodule Skoller.Users do
   `{:ok, Skoller.Users.User}` or `{:error, Ecto.Changeset}`
   """
   def change_password(user_old, password) do
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:user, &change_password(user_old, password, &1))
+    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
+    |> Repo.transaction()
+  end
+
+  def forgot_password(email) do
+    case get_user_by_email(email) do
+      nil -> nil
+      user -> 
+        {:ok, token} = user.id |> Token.short_token()
+        user |> Emails.send_forgot_pass_email(token)
+    end
+  end
+
+  defp change_password(user_old, password, _) do
     user_old
     |> User.changeset_update(%{"password" => password})
     |> Repo.update()
