@@ -6,7 +6,7 @@ defmodule Skoller.ClassStatuses.Classes do
   alias Skoller.Repo
   alias Skoller.Classes.Class
   alias Skoller.ClassStatuses.Status
-  alias Skoller.ClassNotifications
+  alias Skoller.Classes.Notifications
   alias Skoller.Syllabi
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
@@ -60,7 +60,7 @@ defmodule Skoller.ClassStatuses.Classes do
     old_class = old_class |> Repo.preload(:class_status)
     case old_class do
       %{class_status: %{is_complete: false}} ->
-        Task.start(ClassNotifications, :send_class_complete_notification, [class])
+        Task.start(Notifications, :send_class_complete_notification, [class])
       _ -> nil
     end
   end

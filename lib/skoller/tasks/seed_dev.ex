@@ -19,12 +19,13 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Devices.Device
   alias Skoller.Professors.Professor
+  alias Skoller.Services.Authentication
 
   def run(_) do
     ensure_started(Repo, [])
  
     {:ok, date2, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
-    pass = Comeonin.Bcrypt.add_hash("password")
+    pass = Authentication.hash_password("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 

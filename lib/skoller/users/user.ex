@@ -8,6 +8,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Students.Student
   alias Skoller.Role
   alias Skoller.UserReports.Report
+  alias Skoller.Services.Authentication
 
   schema "users" do
     field :email, :string
@@ -66,7 +67,7 @@ defmodule Skoller.Users.User do
 
   defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
                       %{password: password}} = changeset) do
-    change(changeset, Comeonin.Bcrypt.add_hash(password))
+    change(changeset, Authentication.hash_password(password))
   end
   defp put_pass_hash(changeset), do: changeset
 end

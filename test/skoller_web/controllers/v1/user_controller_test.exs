@@ -175,7 +175,7 @@ defmodule SkollerWeb.Api.V1.UserControllerTest do
   #   assert response["id"] == user.id
   #   assert response["email"] == @valid_user_john.email
   #   assert response["student"] == nil
-  #   assert Comeonin.Bcrypt.checkpw("update", user_updated.password_hash)
+  #   assert Skoller.Services.Authentication.check_password("update", user_updated.password_hash)
   # end
 
   # test "Update/2 updates students when id is provided", %{jwt: jwt} do

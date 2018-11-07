@@ -1,4 +1,4 @@
-defmodule Skoller.ClassNotifications do
+defmodule Skoller.Classes.Notifications do
   @moduledoc """
   A context module for class notifications.
   """
@@ -7,6 +7,7 @@ defmodule Skoller.ClassNotifications do
   alias Skoller.Notifications
   alias Skoller.Services.Notification
   alias Skoller.Devices
+  alias Skoller.Notifications.ManualLogs
 
   @class_complete_category "Class.Complete"
   @manual_syllabus_category "Manual.NeedsSyllabus"
@@ -35,8 +36,8 @@ defmodule Skoller.ClassNotifications do
     users = Notifications.get_notification_enabled_needs_syllabus_users()
     |> Enum.reduce([], &Devices.get_devices_by_user_id(&1.id) ++ &2)
 
-    Repo.insert(%Skoller.Notifications.ManualLog{affected_users: Enum.count(users), notification_category: @manual_syllabus_category, msg: @needs_syllabus_msg})
-
+    ManualLogs.create_manual_log(Enum.count(users), @manual_syllabus_category, @needs_syllabus_msg)
+    
     users
     |> Enum.each(&Notification.create_notification(&1.udid, &1.type, @needs_syllabus_msg, @manual_syllabus_category))
   end

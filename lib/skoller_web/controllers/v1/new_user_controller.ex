@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   
   alias Skoller.Users
   alias SkollerWeb.AuthView
-  alias SkollerWeb.Responses.MultiError
 
   def create(conn, params) do
     case Users.create_user(params, [login: true]) do

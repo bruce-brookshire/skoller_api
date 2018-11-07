@@ -33,7 +33,7 @@ Skoller.Repo.insert!(%Skoller.Mods.Type{id: 500, name: "Delete Assignment"})
 Skoller.Repo.insert!(%Skoller.Locks.Section{id: 100, name: "Weights", is_diy: true})
 Skoller.Repo.insert!(%Skoller.Locks.Section{id: 200, name: "Assignments", is_diy: true})
 
-pass = Comeonin.Bcrypt.add_hash("IGxs1Px9BY1x")
+pass = Skoller.Services.Authentication.hash_password("IGxs1Px9BY1x")
 user = Skoller.Repo.insert!(%Skoller.Users.User{email: "dev_admin@skoller.co", 
                               password_hash: pass.password_hash})
 Skoller.Repo.insert!(%Skoller.UserRoles.UserRole{user_id: user.id, role_id: 200})
