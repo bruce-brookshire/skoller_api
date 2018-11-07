@@ -118,9 +118,9 @@ defmodule Skoller.Mods do
   `dismissed` are the actions that are dismissed as a result of creating the mod.
    * `{:ok, %{self_action: Skoller.Mods.Action, dismissed: Skoller.Mods.Action}}`
   """
-  def insert_delete_mod(%{student_assignment: student_assignment}, params) do
+  def insert_delete_mod(%{student_assignment: student_assignment}, is_private) do
     student_class = StudentClasses.get_student_class_by_id!(student_assignment.student_class_id)
-    mod = build_raw_mod(@delete_assignment_mod, student_assignment, %{is_private: params["is_private"], student_id: student_class.student_id})
+    mod = build_raw_mod(@delete_assignment_mod, student_assignment, %{is_private: is_private, student_id: student_class.student_id})
     existing_mod = mod |> find_mod()
     cond do
       is_nil(existing_mod) -> 

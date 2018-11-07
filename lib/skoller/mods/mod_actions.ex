@@ -10,6 +10,7 @@ defmodule Skoller.ModActions do
   alias Skoller.Assignments.Assignment
   alias Skoller.MapErrors
   alias Skoller.StudentClasses.StudentClass
+  alias Skoller.StudentAssignments.StudentAssignment
 
   import Ecto.Query
 

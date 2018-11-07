@@ -40,13 +40,13 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   ## Returns
   `Skoller.StudentAssignments.StudentAssignment` or `nil`
   """
-  def get_student_assignment_by_id(id) do
+  def get_student_assignment_by_id!(id) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
     |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
     |> where([sa], sa.id == ^id)
     |> where([sa, sc, class], class.is_editable == true)
-    |> Repo.one()
+    |> Repo.one!()
   end
 
   @doc """
