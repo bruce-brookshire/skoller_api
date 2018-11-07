@@ -50,7 +50,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Users.get_user_by_id!(user_id)
 
-    case Users.update_user(user_old, params) do
+    case Users.update_user(user_old, params, [admin: true]) do
       {:ok, %{user: user}} ->
         user = user |> Students.preload_student()
         render(conn, UserView, "show.json", user: user)

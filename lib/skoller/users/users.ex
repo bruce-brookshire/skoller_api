@@ -64,7 +64,7 @@ defmodule Skoller.Users do
     |> verify_student(opts)
     |> verification_code(opts)
     |> get_enrolled_by(params)
-    |> insert_user(params)
+    |> insert_user(params, opts)
     |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Ecto.Multi.run(:points, &add_points_to_student(&1.user))
@@ -85,15 +85,18 @@ defmodule Skoller.Users do
   @doc """
   Updates a user, with student if included in params.
 
+  ## Opts
+   * `[admin: true]`, will allow admin changes.
+
   # Returns
   `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
   or `{:error, _, failed_val, _}`
   """
-  def update_user(user_old, params) do
+  def update_user(user_old, params, opts \\ []) do
     changeset = User.changeset_update_admin(user_old, params)
     Ecto.Multi.new
     |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Repo.transaction()
@@ -208,10 +211,10 @@ defmodule Skoller.Users do
   defp get_enrolled_by(changeset, _params), do: changeset
 
   # The standard insert user multi.
-  defp insert_user(changeset, params) do
+  defp insert_user(changeset, params, opts) do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
   end
 
@@ -244,27 +247,37 @@ defmodule Skoller.Users do
     Students.add_field_of_study(params)
   end
 
-  defp add_roles(%{user: user}, params) do
+  defp add_roles(%{user: user}, params, opts) do
     user 
     |> Repo.preload(:student)
-    |> add_roles_preloaded(params)
+    |> add_roles_preloaded(params, opts)
   end
 
-  defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
+  defp add_roles_preloaded(%{student: student} = user, _params, _opts) when not is_nil(student) do
     user = user |> Repo.preload(:roles)
     case user.roles |> Enum.any?(& &1.id == @student_role) do
       false -> UserRoles.add_role(user.id, @student_role)
       true -> {:ok, nil}
     end
   end
-  defp add_roles_preloaded(user, %{"roles" => roles}) do
-    UserRoles.delete_roles_for_user(user.id)
-    status = roles
-    |> Enum.map(&UserRoles.add_role(user.id, &1))
-    
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  defp add_roles_preloaded(user, %{"roles" => roles}, opts) do
+    case Keyword.get(opts, :admin, false) do
+      true ->
+        # Admin can add roles
+        UserRoles.delete_roles_for_user(user.id)
+        status = roles
+        |> Enum.map(&UserRoles.add_role(user.id, &1))
+        
+        status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+      false ->
+        # Otherwise no.
+        changeset = user
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.add_error(:roles, "Insufficient permissions")
+        {:error, changeset}
+    end
   end
-  defp add_roles_preloaded(_map, _params), do: {:ok, nil}
+  defp add_roles_preloaded(_map, _params, _opts), do: {:ok, nil}
 
   defp delete_fields_of_study(id) do
     Students.delete_fields_of_study_by_student_id(id)
