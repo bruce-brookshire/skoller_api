@@ -1,7 +1,7 @@
 defmodule Skoller.RoleTest do
   use Skoller.DataCase
 
-  alias Skoller.Role
+  alias Skoller.Roles.Role
 
   @valid_attrs %{id: 400, name: "Role"}
 

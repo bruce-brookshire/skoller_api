@@ -6,7 +6,7 @@ defmodule Skoller.Users.User do
 
   alias Skoller.Users.User
   alias Skoller.Students.Student
-  alias Skoller.Role
+  alias Skoller.Roles.Role
   alias Skoller.UserReports.Report
   alias Skoller.Services.Authentication
 

@@ -1,9 +1,9 @@
-defmodule Skoller.Role do
+defmodule Skoller.Roles.Role do
   @moduledoc false
 
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Role
+  alias Skoller.Roles.Role
 
   # The primary key is a normal, non-incrementing ID. Seeded by seed
   # file or migration.

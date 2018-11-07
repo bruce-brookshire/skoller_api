@@ -5,7 +5,7 @@ defmodule Skoller.UserRoles.UserRole do
   import Ecto.Changeset
   alias Skoller.UserRoles.UserRole
   alias Skoller.Users.User
-  alias Skoller.Role
+  alias Skoller.Roles.Role
 
   schema "user_roles" do
     field :user_id, :id

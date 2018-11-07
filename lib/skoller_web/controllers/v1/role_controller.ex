@@ -3,17 +3,16 @@ defmodule SkollerWeb.Api.V1.RoleController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Role
-  alias Skoller.Repo
+  alias Skoller.Roles
   alias SkollerWeb.RoleView
 
   def index(conn, %{}) do
-    roles = Repo.all(Role)
+    roles = Roles.get_roles()
     render(conn, RoleView, "index.json", roles: roles)
   end
 
   def show(conn, %{"id" => id}) do
-    role = Repo.get!(Role, id)
+    role = Roles.get_role_by_id!(id)
     render(conn, RoleView, "show.json", role: role)
   end
 end
