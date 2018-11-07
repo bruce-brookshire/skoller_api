@@ -7,6 +7,7 @@ defmodule Skoller.Students do
   alias Skoller.Students.Student
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.StudentClasses.EnrollmentLinks
+  alias Skoller.Students.Sms
 
   import Ecto.Query
 
@@ -80,4 +81,66 @@ defmodule Skoller.Students do
     |> Repo.update()
   end
   def generate_student_link(_student), do: {:ok, nil}  
+
+  @doc """
+  Generates a 5 digit verification code.
+
+  ## Returns
+  `String`
+  """
+  def generate_verify_code() do
+    case :rand.uniform() do
+      0.0 -> generate_verify_code()
+      num -> num |> convert_rand() |> to_string()
+    end
+  end
+
+  @doc """
+  Resets the verify code on the `student` and sends a text with the new code.
+
+  ## Returns
+  `{:ok, student}` or `{:error, changeset}`
+  """
+  def reset_verify_code(student) do
+    code = generate_verify_code()
+    result = student
+    |> Ecto.Changeset.change(%{verification_code: code})
+    |> Repo.update()
+
+    case result do
+      {:ok, student} ->
+        student.phone |> Sms.verify_phone(student.verification_code)
+        result
+      result ->
+        result
+    end
+  end
+
+  @doc """
+  Checks the verification code of the `student` against the `code`.
+
+  Returns a boolean
+  """
+  def check_verification_code(student, code) do
+    case student.verification_code == code do
+      true -> 
+        student |> verify_student()
+        true
+      false ->
+        false
+    end
+  end
+
+  defp convert_rand(num) do
+    case num < 1.0 do
+      true -> convert_rand(num * 10)
+      false -> Kernel.round(num * 10_000)
+    end
+  end
+
+  defp verify_student(student) do
+    student 
+    |> Ecto.Changeset.change(%{is_verified: true})
+    |> Repo.update!
+  end
 end
