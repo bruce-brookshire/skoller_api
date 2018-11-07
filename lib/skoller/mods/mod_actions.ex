@@ -27,6 +27,16 @@ defmodule Skoller.ModActions do
   end
 
   @doc """
+  Gets an action by `assignment_modification_id` and `student_class_id`
+
+  ## Returns
+  `Skoller.Mods.Action` or raises.
+  """
+  def get_action_by_mod_and_student!(assignment_modification_id, student_class_id) do
+    Repo.get_by(Action, assignment_modification_id: assignment_modification_id, student_class_id: student_class_id)
+  end
+
+  @doc """
   Gets all actions from a mod.
 
   ## Returns
@@ -72,32 +82,6 @@ defmodule Skoller.ModActions do
     |> Repo.all()
   end
   def get_enrolled_actions_from_mod(_mod), do: []
-
-  @doc """
-  Updates an action.
-
-  ## Returns
-  `{:ok, %Skoller.Mods.Action{}}` or `{:error, %Ecto.Changeset{}}`
-  """
-  def update_action(action_old, params) do
-    action_old
-    |> Ecto.Changeset.change(params)
-    |> Repo.update()
-  end
-
-  @doc """
-  Updates an action.
-
-  Raises on error
-
-  ## Returns
-  `%Skoller.Mods.Action{}` or `Ecto.ChangeError`
-  """
-  def update_action!(action_old, params) do
-    action_old
-    |> Ecto.Changeset.change(params)
-    |> Repo.update!()
-  end
 
   @doc """
   Gets the pending mod count for a student.
@@ -210,7 +194,7 @@ defmodule Skoller.ModActions do
   end
 
   @doc """
-  Dismisses mod actions by setting `is_accepted` to false.
+  Dismisses multiple mod actions by setting `is_accepted` to false.
 
   ## Returns
   {:ok, [Skoller.Mods.Actions]}
@@ -219,6 +203,16 @@ defmodule Skoller.ModActions do
   def dismiss_actions(actions) do
     items = actions |> Enum.map(&update_action!(&1, %{is_accepted: false, is_manual: false}))
     {:ok, items}
+  end
+
+  @doc """
+  Manually dismisses a mod action by setting `is_accepted` to false.
+
+  ## Returns
+  `{:ok, Skoller.Mods.Action}` or `{:error, changeset}`
+  """
+  def manual_dismiss_action(action) do
+    update_action(action, %{is_accepted: false, is_manual: true})
   end
 
   defp get_student_class_missing_actions_by_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class) do
@@ -243,5 +237,24 @@ defmodule Skoller.ModActions do
     |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
+  end
+
+  # Updates an action.
+  # ## Returns
+  # `{:ok, %Skoller.Mods.Action{}}` or `{:error, %Ecto.Changeset{}}`
+  defp update_action(action_old, params) do
+    action_old
+    |> Ecto.Changeset.change(params)
+    |> Repo.update()
+  end
+
+  # Updates an action.
+  # Raises on error
+  # ## Returns
+  # `%Skoller.Mods.Action{}` or `Ecto.ChangeError`
+  defp update_action!(action_old, params) do
+    action_old
+    |> Ecto.Changeset.change(params)
+    |> Repo.update!()
   end
 end

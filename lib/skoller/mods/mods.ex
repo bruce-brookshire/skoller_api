@@ -16,6 +16,7 @@ defmodule Skoller.Mods do
   alias Skoller.EnrolledStudents
   alias Skoller.Mods.Assignments, as: ModAssignments
   alias Skoller.ModActions
+  alias Skoller.Mods.Classes
 
   import Ecto.Query
 
@@ -30,7 +31,7 @@ defmodule Skoller.Mods do
 
   Raises `Ecto.NoResultsError` if not found
   """
-  def get!(id) do
+  def get_mod!(id) do
     Repo.get!(Mod, id)
   end
 
@@ -169,6 +170,24 @@ defmodule Skoller.Mods do
     mod_old
     |> Ecto.Changeset.change(params)
     |> Repo.update()
+  end
+
+
+  @doc """
+  Rejects a mod for the given student.
+
+  ## Returns
+  `{:ok, action}` or `{:error, changeset}`
+  """
+  def reject_mod_for_student(mod_id, student_id) do
+    mod = get_mod!(mod_id)
+    class = Classes.get_class_from_mod_id(mod.id)
+
+    #Verifies that a student has permissions/is in the class/has the mod.
+    student_class = StudentClasses.get_active_student_class_by_ids!(class.id, student_id)
+
+    ModActions.get_action_by_mod_and_student!(mod.id, student_class.id)
+    |> ModActions.manual_dismiss_action()
   end
 
   defp build_raw_mod(assignment_mod_type_id, map, params)

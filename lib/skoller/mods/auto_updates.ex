@@ -205,7 +205,7 @@ defmodule Skoller.AutoUpdates do
   end
 
   defp get_and_auto_update_mod(mod) do
-    Mods.get!(mod.assignment_modification_id)
+    Mods.get_mod!(mod.assignment_modification_id)
     |> process_auto_update([notification: true])
   end
 
