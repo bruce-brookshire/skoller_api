@@ -143,7 +143,7 @@ defmodule Skoller.Mods do
   This will either create, delete, or change a student assignment.
 
   ## Returns
-  `Ecto.Multi` with the following keys depending on mod type.
+  Completed Repo Transaction with the following keys depending on mod type.
    * New mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
    * Delete mod: `[:student_assignment, :self_action, :dismissed]`
    * Change mod: `[:student_assignment, :backfill_mods, :self_action, :dismissed]`
@@ -172,6 +172,29 @@ defmodule Skoller.Mods do
     |> Repo.update()
   end
 
+  @doc """
+  Accepts a mod for the given student.
+
+  ## Returns
+  `{:ok, student_assignment}` or `{:error, changeset}`
+  """
+  def manual_accept_mod_for_student(mod_id, student_id) do
+    mod = get_mod!(mod_id)
+    class = Classes.get_class_from_mod_id(mod.id)
+
+    #Verifies that a student has permissions/is in the class/has the mod.
+    student_class = StudentClasses.get_active_student_class_by_ids!(class.id, student_id)
+
+    result = apply_mod(mod, student_class)
+    |> check_auto_updates(mod)
+
+    case result do
+      {:ok, %{student_assignment: student_assignment}} ->
+        {:ok, student_assignment}
+      {:error, _, changeset, _} ->
+        {:error, changeset}
+    end
+  end
 
   @doc """
   Rejects a mod for the given student.
@@ -179,7 +202,7 @@ defmodule Skoller.Mods do
   ## Returns
   `{:ok, action}` or `{:error, changeset}`
   """
-  def reject_mod_for_student(mod_id, student_id) do
+  def manual_reject_mod_for_student(mod_id, student_id) do
     mod = get_mod!(mod_id)
     class = Classes.get_class_from_mod_id(mod.id)
 
@@ -189,6 +212,12 @@ defmodule Skoller.Mods do
     ModActions.get_action_by_mod_and_student!(mod.id, student_class.id)
     |> ModActions.manual_dismiss_action()
   end
+
+  defp check_auto_updates({:ok, _result} = result, mod) do
+    Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
+    result
+  end
+  defp check_auto_updates(result, _mod), do: result
 
   defp build_raw_mod(assignment_mod_type_id, map, params)
   defp build_raw_mod(@new_assignment_mod, assignment, params) do
@@ -251,6 +280,7 @@ defmodule Skoller.Mods do
     |> Ecto.Multi.delete(:student_assignment, student_assignment)
     |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(student_assignment, mod.assignment_mod_type_id, &1))
+    |> Repo.transaction()
   end
 
   defp apply_new_mod(%Mod{} = mod, %StudentClass{} = student_class, opts) do
@@ -262,6 +292,7 @@ defmodule Skoller.Mods do
     |> Ecto.Multi.run(:backfill_mods, &backfill_mods(&1.student_assignment))
     |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
     |> Ecto.Multi.run(:dismissed, &dismiss_mods(&1.student_assignment, mod.assignment_mod_type_id, nil))
+    |> Repo.transaction()
   end
 
   defp apply_change_mod(%Mod{} = mod, %StudentClass{id: id}, opts) do
@@ -272,6 +303,7 @@ defmodule Skoller.Mods do
     |> Ecto.Multi.update(:student_assignment, Ecto.Changeset.change(student_assignment, mod_change))
     |> Ecto.Multi.run(:self_action, &ModActions.accept_action(mod.id, &1.student_assignment.student_class_id, opts))
     |> Ecto.Multi.run(:dismissed, &dismiss_prior_mods(mod, &1.student_assignment.student_class_id, nil))
+    |> Repo.transaction()
   end
 
   # Backfills mods for a given student assignment.

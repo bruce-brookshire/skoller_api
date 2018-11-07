@@ -290,7 +290,6 @@ defmodule Skoller.AutoUpdates do
     student_class = StudentClasses.get_student_class_by_id!(action.student_class_id)
     mod
     |> Mods.apply_mod(student_class, [manual: false])
-    |> Repo.transaction()
   end
 
   defp auto_update_count_needed(count) do
