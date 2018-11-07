@@ -3,8 +3,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Repo
+  alias Skoller.StudentAssignments
   alias SkollerWeb.Class.StudentAssignmentView
   alias Skoller.StudentAssignments.StudentClasses
 
@@ -18,9 +17,7 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   def create(conn, %{"assignment_id" => assignment_id} = params) do
     assign_old = StudentClasses.get_student_assignment_by_id!(assignment_id)
 
-    changeset = StudentAssignment.grade_changeset(assign_old, params)
-
-    case Repo.update(changeset) do
+    case StudentAssignments.update_assignment_grade(assign_old, params) do
       {:ok, student_assignment} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
       {:error, changeset} ->

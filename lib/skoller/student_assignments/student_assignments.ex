@@ -212,6 +212,18 @@ defmodule Skoller.StudentAssignments do
     end
   end
 
+  @doc """
+  Updates an assignment grade.
+
+  ## Returns
+  `{:ok, student_assignment}` or `{:error, changeset}`
+  """
+  def update_assignment_grade(assign_old, params) do
+    assign_old
+    |> StudentAssignment.grade_changeset(params)
+    |> Repo.update()
+  end
+
   defp mod_update_notification({:ok, %{mod: %{actions: actions}}} = result) do
     Task.start(ModNotifications, :send_mod_update_notifications, [actions])
     result
