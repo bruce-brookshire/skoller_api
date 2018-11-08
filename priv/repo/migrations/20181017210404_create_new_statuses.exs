@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.CreateNewStatuses do
+  @moduledoc false
   use Ecto.Migration
 
   alias Skoller.ClassStatuses.Status

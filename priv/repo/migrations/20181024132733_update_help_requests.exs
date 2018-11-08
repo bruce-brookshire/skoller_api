@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.UpdateHelpRequests do
+  @moduledoc false
   use Ecto.Migration
 
   alias Skoller.Repo

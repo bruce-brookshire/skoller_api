@@ -1,7 +1,6 @@
 defmodule Skoller.Repo.Migrations.AddMoreNotificaitonTimes do
+  @moduledoc false
   use Ecto.Migration
-
-  alias Skoller.Repo
 
   def up do
     alter table(:students) do

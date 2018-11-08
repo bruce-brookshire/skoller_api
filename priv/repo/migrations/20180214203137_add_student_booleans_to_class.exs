@@ -1,11 +1,6 @@
 defmodule Skoller.Repo.Migrations.AddStudentBooleansToClass do
+  @moduledoc false
   use Ecto.Migration
-
-  import Ecto.Query
-
-  alias Skoller.Repo
-  alias Skoller.Classes.Class
-  alias Skoller.ClassStatuses.Status
 
   def change do
     alter table(:classes) do

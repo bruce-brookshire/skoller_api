@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.ChangeLocksToBeBetter do
+  @moduledoc false
   use Ecto.Migration
 
   import Ecto.Query

@@ -48,3 +48,83 @@ Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 200, name: "Most Recent"})
 Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 300, name: "Top from the past 24 hours"})
 Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 400, name: "Top from the past week"})
 Skoller.Repo.insert!(%Skoller.Chats.Algorithm{id: 500, name: "Top from the semester"})
+
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "auto_upd_enroll_thresh", topic: "AutoUpdate", value: "5"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "auto_upd_response_thresh", topic: "AutoUpdate", value: "0.35"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "auto_upd_approval_thresh", topic: "AutoUpdate", value: "0.75"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "min_ios_version", value: "0.0.0", topic: "MinVersions"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "min_android_version", value: "0.0.0", topic: "MinVersions"})
+
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AK", name: "Alaska"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AL", name: "Alabama"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AR", name: "Arkansas"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AZ", name: "Arizona"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "CA", name: "California"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "CO", name: "Colorado"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "CT", name: "Connecticut"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "DC", name: "Washington, D.C."})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "DE", name: "Delaware"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "FL", name: "Florida"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "GA", name: "Georgia"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "HI", name: "Hawaii"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "IA", name: "Iowa"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "ID", name: "Idaho"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "IL", name: "Illinois"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "IN", name: "Indiana"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "KS", name: "Kansas"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "KY", name: "Kentucky"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "LA", name: "Louisiana"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MA", name: "Massachusetts"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MD", name: "Maryland"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "ME", name: "Maine"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MI", name: "Michigan"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MN", name: "Minnesota"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MO", name: "Missouri"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MS", name: "Mississippi"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "MT", name: "Montana"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NC", name: "North Carolina"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "ND", name: "North Dakota"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NE", name: "Nebraska"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NH", name: "New Hampshire"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NJ", name: "New Jersey"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NM", name: "New Mexico"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NV", name: "Nevada"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "NY", name: "New York"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "OH", name: "Ohio"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "OK", name: "Oklahoma"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "OR", name: "Oregon"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "PA", name: "Pennsylvania"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "RI", name: "Rhode Island"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "SC", name: "South Carolina"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "SD", name: "South Dakota"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "TN", name: "Tennessee"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "TX", name: "Texas"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "UT", name: "Utah"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "VA", name: "Virginia"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "VT", name: "Vermont"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "WA", name: "Washington"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "WI", name: "Wisconsin"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "WV", name: "West Virginia"})
+Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "WY", name: "Wyoming"})
+
+Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 100, topic: "Assignment.Reminder.Today", name: "Today"})
+Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 200, topic: "Assignment.Reminder.Tomorrow", name: "Tomorrow"})
+Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 300, topic: "Assignment.Reminder.Future", name: "Future"})
+
+Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
+  id: 100,
+  name: "No Classes Email",
+  send_time: "09:00:00",
+  category: "Class.None"
+})
+Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
+  id: 200,
+  name: "Class Setup Email",
+  send_time: "09:00:00",
+  category: "Class.Setup"
+})
+Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
+  id: 300,
+  name: "1000 Points Email",
+  category: "Points.1Thousand"
+})

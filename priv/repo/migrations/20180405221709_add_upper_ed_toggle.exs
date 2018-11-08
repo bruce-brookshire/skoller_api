@@ -1,7 +1,6 @@
 defmodule Skoller.Repo.Migrations.AddUpperEdToggle do
+  @moduledoc false
   use Ecto.Migration
-
-  alias Skoller.Repo
 
   def up do
     rename table("schools"), :adr_city, to: :adr_locality
@@ -11,11 +10,6 @@ defmodule Skoller.Repo.Migrations.AddUpperEdToggle do
       add :adr_line_3, :string
       add :adr_country, :string
     end
-    flush()
-    Skoller.Schools.School
-    |> Repo.all()
-    |> Enum.map(&Ecto.Changeset.change(&1, %{adr_country: "us"}))
-    |> Enum.each(&Repo.update!(&1))
   end
 
   def down do
