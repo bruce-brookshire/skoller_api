@@ -4,6 +4,7 @@ defmodule Skoller.Jobs do
   alias Skoller.AssignmentNotifications
   alias Skoller.Locks
   alias Skoller.StudentClasses.Jobs, as: SCJobs
+  alias Skoller.Periods.Jobs, as: PeriodJobs
 
   @open_lock_mins 60
 
@@ -17,5 +18,7 @@ defmodule Skoller.Jobs do
     now |> SCJobs.send_needs_setup_messages()
 
     Locks.clear_locks(@open_lock_mins)
+
+    now |> PeriodJobs.evaluate_statuses()
   end
 end

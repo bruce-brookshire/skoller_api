@@ -5,8 +5,11 @@ defmodule Skoller.Periods do
 
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
+  alias Skoller.Periods.Notifications
 
   import Ecto.Query
+
+  @prompt_status 300
   
   @doc """
   Gets class periods by school.
@@ -36,13 +39,45 @@ defmodule Skoller.Periods do
     |> Repo.insert()
   end
 
+  @doc """
+  Updates a period
+
+  ## Returns
+  `{:ok, Skoller.Periods.ClassPeriod}` or `{:error, Ecto.Changeset}`
+  """
   def update_period(period_old, params) do
     ClassPeriod.changeset_update(period_old, params)
     |> Repo.update()
   end
 
+  @doc """
+  Gets a period by id. Raises if not found.
+  """
   def get_period!(id) do
     Repo.get!(ClassPeriod, id)
+  end
+
+  @doc """
+  Updates a period's status.
+
+  Sends a notification when a period changes to prompt status for
+  the first time.
+
+  ## Returns
+  `{:ok, Skoller.Periods.ClassPeriod}` or `{:error, Ecto.Changeset}`
+  """
+  def update_period_status(period, @prompt_status) do
+    result = period
+    |> Ecto.Changeset.change(%{class_period_status_id: status_id})
+    |> Repo.update()
+
+    Task.start(Notifications, :prompt_for_future_enrollment_notification, [period])
+    result
+  end
+  def update_period_status(period, status_id) do
+    period
+    |> Ecto.Changeset.change(%{class_period_status_id: status_id})
+    |> Repo.update()
   end
 
   defp filter(query, params) do
