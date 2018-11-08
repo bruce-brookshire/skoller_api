@@ -13,6 +13,8 @@ defmodule Skoller.Periods.ClassPeriod do
     field :is_hidden, :boolean, default: false
     field :start_date, :utc_datetime
     field :end_date, :utc_datetime
+    field :is_main_period, :boolean, default: false
+    field :class_period_status_id, :id
     belongs_to :school, School, define_field: false
     has_many :classes, Class
 
