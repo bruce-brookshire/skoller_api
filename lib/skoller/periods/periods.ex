@@ -68,7 +68,7 @@ defmodule Skoller.Periods do
   """
   def update_period_status(period, @prompt_status) do
     result = period
-    |> Ecto.Changeset.change(%{class_period_status_id: status_id})
+    |> Ecto.Changeset.change(%{class_period_status_id: @prompt_status})
     |> Repo.update()
 
     Task.start(Notifications, :prompt_for_future_enrollment_notification, [period])
