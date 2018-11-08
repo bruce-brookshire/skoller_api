@@ -31,6 +31,6 @@ defmodule Skoller.Schools.EmailDomain do
 
   defp get_last_two_elements(list) do
     len = length(list)
-    Enum.slice((len - 2)..(len - 1))
+    list |> Enum.slice((len - 2)..(len - 1))
   end
 end

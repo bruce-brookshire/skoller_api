@@ -171,6 +171,32 @@ defmodule Skoller.Schools do
     EmailDomain.changeset(email_domain, %{})
   end
 
+  @doc """
+  Gets the school from an email domain. Returns raises if there is no match.
+  """
+  def get_school_from_email_domain!(domain) do
+    trimmed_domain = get_last_section_of_email_domain(domain)
+    case Repo.get_by!(EmailDomain, email_domain: trimmed_domain) do
+      nil ->
+        nil
+      domain ->
+        get_school_by_id!(domain.school_id)
+    end
+  end
+
+  defp get_last_section_of_email_domain(domain) do
+    domain
+    |> String.split(".", trim: true)
+    |> get_last_two_elements()
+    |> Enum.intersperse(".")
+    |> List.to_string()
+  end
+
+  defp get_last_two_elements(list) do
+    len = length(list)
+    list |> Enum.slice((len - 2)..(len - 1))
+  end
+
   defp update_school_times(school, %{timezone: nil}) do
     Timezones.process_timezone_change("Etc/UTC", school)
   end
