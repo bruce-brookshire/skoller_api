@@ -7,7 +7,7 @@ defmodule Skoller.Repo.Migrations.AddDatesToPeriods do
 
   import Ecto.Query
 
-  def change do
+  def up do
     {:ok, spring_start} = Date.new(2018, 1, 15)
     spring_start = spring_start |> Timex.to_datetime("America/Chicago") |> Timex.to_datetime
 
@@ -32,5 +32,12 @@ defmodule Skoller.Repo.Migrations.AddDatesToPeriods do
     from(c in ClassPeriod)
     |> where([c], is_nil(c.start_date))
     |> Repo.update_all(set: [start_date: fall_start, end_date: fall_end])
+  end
+  
+  def down do
+    alter table(:class_periods) do
+      remove :start_date
+      remove :end_date
+    end
   end
 end
