@@ -9,7 +9,10 @@ defmodule Skoller.Periods do
 
   import Ecto.Query
 
+  @past_status 100
+  @active_status 200
   @prompt_status 300
+  @future_status 400
   
   @doc """
   Gets class periods by school.
@@ -36,6 +39,7 @@ defmodule Skoller.Periods do
   """
   def create_period(params) do
     ClassPeriod.changeset_insert(%ClassPeriod{}, params)
+    |> find_changeset_status()
     |> Repo.insert()
   end
 
@@ -78,6 +82,37 @@ defmodule Skoller.Periods do
     period
     |> Ecto.Changeset.change(%{class_period_status_id: status_id})
     |> Repo.update()
+  end
+
+  @doc """
+  Gets the closest "Future" main period for the school
+  """
+  def get_next_period_for_school(school_id) do
+    from(c in ClassPeriod)
+    |> where([c], c.is_main_period == true and c.school_id == ^school_id)
+    |> where([c], c.class_period_status_id == @future_status)
+    |> order_by([c], asc: c.start_date)
+    |> limit(1)
+    |> Repo.one!
+  end
+
+  defp find_changeset_status(%Ecto.Changeset{valid?: true, changes: %{start_date: start_date, end_date: end_date}} = changeset) do
+    status = find_status(start_date, end_date)
+    changeset |> Ecto.Changeset.change(%{class_period_status_id: status})
+  end
+  defp find_changeset_status(changeset), do: changeset
+
+  defp find_status(start_date, end_date) do
+    now = DateTime.utc_now()
+
+    case DateTime.compare(start_date, now) do
+      :gt -> @future_status
+      _ ->
+        case DateTime.compare(end_date, now) do
+          :gt -> @active_status
+          _ -> @past_status
+        end
+    end
   end
 
   defp filter(query, params) do
