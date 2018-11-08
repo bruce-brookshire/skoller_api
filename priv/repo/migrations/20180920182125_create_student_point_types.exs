@@ -2,9 +2,6 @@ defmodule Skoller.Repo.Migrations.CreateStudentPointTypes do
   @moduledoc false
   use Ecto.Migration
 
-  alias Skoller.Repo
-  alias Skoller.StudentPoints.PointType
-
   def change do
     create table(:student_point_types) do
       add :name, :string
@@ -13,9 +10,6 @@ defmodule Skoller.Repo.Migrations.CreateStudentPointTypes do
 
       timestamps()
     end
-    flush()
-    Repo.insert!(%PointType{name: "Class Referral", value: 100})
-    Repo.insert!(%PointType{name: "Student Referral", value: 100})
 
     create table(:student_points) do
       add :value, :integer

@@ -54,6 +54,9 @@ Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "auto_upd_response_thresh",
 Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "auto_upd_approval_thresh", topic: "AutoUpdate", value: "0.75"})
 Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "min_ios_version", value: "0.0.0", topic: "MinVersions"})
 Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "min_android_version", value: "0.0.0", topic: "MinVersions"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "is_diy_enabled", value: "true", topic: "FourDoor"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "is_diy_preferred", value: "false", topic: "FourDoor"})
+Skoller.Repo.insert!(%Skoller.Settings.Setting{name: "is_auto_syllabus", value: "true", topic: "FourDoor"})
 
 Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AK", name: "Alaska"})
 Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "AL", name: "Alabama"})
@@ -110,6 +113,9 @@ Skoller.Repo.insert!(%Skoller.Locations.State{state_code: "WY", name: "Wyoming"}
 Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 100, topic: "Assignment.Reminder.Today", name: "Today"})
 Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 200, topic: "Assignment.Reminder.Tomorrow", name: "Tomorrow"})
 Skoller.Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 300, topic: "Assignment.Reminder.Future", name: "Future"})
+
+Skoller.Repo.insert!(%Skoller.StudentPoints.PointType{name: "Class Referral", value: 100})
+Skoller.Repo.insert!(%Skoller.StudentPoints.PointType{name: "Student Referral", value: 100})
 
 Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
   id: 100,
