@@ -34,6 +34,12 @@ defmodule Skoller.Schools do
     school
   end
 
+  @doc """
+  Updates a school.
+
+  ## Returns
+  `{:ok, school}` or `{:error, changeset}`
+  """
   def update_school(school_old, params) do
     {:ok, timezone} = get_timezone(params)
     changeset = school_old

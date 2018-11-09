@@ -6,6 +6,8 @@ defmodule Skoller.Periods do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
   alias Skoller.Periods.Notifications
+  alias Skoller.Periods.Generator
+  alias Skoller.Schools
 
   import Ecto.Query
 
@@ -94,6 +96,42 @@ defmodule Skoller.Periods do
     |> order_by([c], asc: c.start_date)
     |> limit(1)
     |> Repo.one!
+  end
+
+  @doc """
+  Generates a year's worth of periods for all schools.
+  """
+  def generate_periods_for_all_schools_for_year(year) do
+    Schools.get_schools()
+    |> Enum.each(&generate_periods_for_year_for_school(&1.id, year))
+  end
+
+  @doc """
+  Generates a year's worth of periods for `school_id`.
+  """
+  def generate_periods_for_year_for_school(school_id, year) do
+    get_generators()
+    |> Enum.map(&create_period_from_generator(&1, school_id, year))
+  end
+
+  defp get_generators() do
+    Repo.all(Generator)
+  end
+
+  defp create_period_from_generator(generator, school_id, year) do
+    {:ok, start_date} = Date.new(year, generator.start_month, generator.start_day)
+    {:ok, end_date} = Date.new(year, generator.end_month, generator.end_day)
+
+    start_date = start_date |> Timex.to_datetime("America/Chicago") |> Timex.to_datetime()
+    end_date = end_date |> Timex.to_datetime("America/Chicago") |> Timex.to_datetime()
+
+    Map.new()
+    |> Map.put(:school_id, school_id)
+    |> Map.put(:start_date, start_date)
+    |> Map.put(:end_date, end_date)
+    |> Map.put(:name, generator.name_prefix <> " " <> to_string(year))
+    |> Map.put(:is_main_period, generator.is_main_period)
+    |> create_period()
   end
 
   defp find_changeset_status(%Ecto.Changeset{valid?: true, changes: %{start_date: start_date, end_date: end_date}} = changeset) do
