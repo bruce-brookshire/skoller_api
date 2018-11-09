@@ -197,7 +197,7 @@ defmodule Skoller.ModActions do
   Dismisses multiple mod actions by setting `is_accepted` to false.
 
   ## Returns
-  {:ok, [Skoller.Mods.Actions]}
+  `{:ok, [Skoller.Mods.Actions]}`
   """
   def dismiss_actions([]), do: {:ok, nil}
   def dismiss_actions(actions) do

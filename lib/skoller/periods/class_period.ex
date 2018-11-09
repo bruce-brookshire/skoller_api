@@ -21,7 +21,7 @@ defmodule Skoller.Periods.ClassPeriod do
     timestamps()
   end
 
-  @req_fields [:name, :school_id]
+  @req_fields [:name, :school_id, :start_date, :end_date]
   @all_fields @req_fields
   @upd_req [:name]
   @upd_all @upd_req
