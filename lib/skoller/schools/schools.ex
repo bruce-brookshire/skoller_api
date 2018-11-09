@@ -10,6 +10,7 @@ defmodule Skoller.Schools do
   alias Skoller.FourDoor
   alias Skoller.Schools.Timezones
   alias Skoller.Schools.EmailDomain
+  alias Skoller.Periods
 
   import Ecto.Query
 
@@ -23,6 +24,7 @@ defmodule Skoller.Schools do
     |> Ecto.Changeset.change(%{timezone: timezone})
     |> Repo.insert()
     |> add_four_door()
+    |> add_future_periods()
   end
 
   @doc """
@@ -189,6 +191,16 @@ defmodule Skoller.Schools do
         get_school_by_id!(domain.school_id)
     end
   end
+
+  defp add_future_periods({:ok, school} = result) do
+    # Hard coded because this should not be the way this is done.
+    # 2019 will be the default only for now.
+    # TODO: Figure out the long term solution based on success or failure of new
+    # onboarding.
+    Periods.generate_periods_for_year_for_school(school.id, 2019)
+    result
+  end
+  defp add_future_periods(result), do: result
 
   defp get_last_section_of_email_domain(domain) do
     domain
