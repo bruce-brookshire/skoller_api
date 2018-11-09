@@ -25,7 +25,7 @@ defmodule Skoller.Periods.Jobs do
 
   defp check_active_periods(now) do
     from(p in ClassPeriod)
-    |> where([p], p.class_period_status_id == @active_status)
+    |> where([p], p.class_period_status_id in [@active_status, @prompt_status])
     |> where([p], p.end_date <= ^now)
     |> Repo.all()
     |> Enum.each(&Periods.update_period_status(&1, @past_status))
