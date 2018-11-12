@@ -9,14 +9,13 @@ defmodule SkollerWeb.Api.V1.CSVController do
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
-  alias Skoller.Periods
   alias Skoller.CSVUploads
   
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :class_upload_key]
-  @school_headers [:name, :adr_locality, :adr_region, :period_name, :period_start, :period_end]
+  @school_headers [:name, :adr_locality, :adr_region]
 
   plug :verify_role, %{role: @admin_role}
 
@@ -75,19 +74,13 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp process_school_row(school) do
     case school do
       {:ok, school} ->
-        school = school |> Map.put(:adr_country, "us")
-        new_school = Schools.create_school(school)
-        new_school |> create_period(school)
-        new_school
+        school
+        |> Map.put(:adr_country, "us")
+        |> Schools.create_school()
       {:error, error} ->
         {:error, error}
     end
   end
-
-  defp create_period({:ok, school}, params) do
-    Periods.create_period(%{"school_id" => school.id, "name" => params.period_name, "start_date" => params.period_start, "end_date" => params.period_end})
-  end
-  defp create_period({:error, _school}, _params), do: {:ok, nil}
 
   defp process_class_row(class, period_id) do
     case class do

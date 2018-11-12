@@ -12,8 +12,10 @@ defmodule SkollerWeb.Api.V1.PeriodController do
   
   plug :verify_role, %{roles: [@admin_role, @student_role]}
 
-  def create(conn, %{} = params) do
-    case Periods.create_period(params) do
+  def create(%{assigns: %{user: user}} = conn, %{} = params) do
+    is_admin = user.roles |> Enum.any?(& &1.id == @admin_role)
+
+    case Periods.create_period(params, [admin: is_admin]) do
       {:ok, period} ->
         render(conn, PeriodView, "show.json", period: period)
       {:error, changeset} ->

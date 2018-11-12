@@ -147,6 +147,12 @@ defmodule Skoller.Periods do
       _ -> changeset
     end
   end
+  defp find_changeset_main_period(%Ecto.Changeset{valid?: true} = changeset, %{"is_main_period" => is_main_period}, opts) when opts != [] do
+    case opts |> Keyword.get(:admin, false) do
+      true -> changeset |> Ecto.Changeset.change(%{is_main_period: is_main_period})
+      _ -> changeset
+    end
+  end
   defp find_changeset_main_period(changeset, _params, _opts), do: changeset
 
   defp find_status(start_date, end_date) do
