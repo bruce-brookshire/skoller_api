@@ -27,7 +27,8 @@ defmodule SkollerWeb.PeriodView do
       inserted_at: period.inserted_at,
       class_count: Periods.get_class_count_by_period(period.id),
       student_count: ClassPeriods.get_enrollment_by_period_id(period.id),
-      is_main_period: period.is_main_period
+      is_main_period: period.is_main_period,
+      school_id: period.school_id
     }
   end
 end

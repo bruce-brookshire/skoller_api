@@ -78,10 +78,7 @@ defmodule Skoller.Classes.Class do
     class
     |> cast(attrs, @all_hs_fields)
     |> validate_required(@req_hs_fields)
-    |> update_change(:name, &title_case(&1))
-    |> foreign_key_constraint(:class_period_id)
-    |> foreign_key_constraint(:professor_id)
-    |> unique_constraint(:class, name: :unique_class_index)
+    |> mandatory_validations
   end
   
   @doc false
@@ -89,6 +86,11 @@ defmodule Skoller.Classes.Class do
     class
     |> cast(attrs, @all_uni_fields)
     |> validate_required(@req_uni_fields)
+    |> mandatory_validations
+  end
+
+  defp mandatory_validations(changeset) do
+    changeset
     |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
