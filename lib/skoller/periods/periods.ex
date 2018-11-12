@@ -123,8 +123,10 @@ defmodule Skoller.Periods do
     {:ok, start_date} = Date.new(year, generator.start_month, generator.start_day)
     {:ok, end_date} = Date.new(year, generator.end_month, generator.end_day)
 
-    start_date = start_date |> Timex.to_datetime("America/Chicago") |> Timex.to_datetime()
-    end_date = end_date |> Timex.to_datetime("America/Chicago") |> Timex.to_datetime()
+    school = Schools.get_school_by_id!(school_id)
+
+    start_date = start_date |> Timex.to_datetime(school.timezone) |> Timex.to_datetime()
+    end_date = end_date |> Timex.to_datetime(school.timezone) |> Timex.to_datetime()
 
     Map.new()
     |> Map.put(:school_id, school_id)
