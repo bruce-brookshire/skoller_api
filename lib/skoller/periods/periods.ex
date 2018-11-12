@@ -39,9 +39,10 @@ defmodule Skoller.Periods do
   ## Returns
   `{:ok, Skoller.Periods.ClassPeriod}` or `{:error, Ecto.Changeset}`
   """
-  def create_period(params) do
+  def create_period(params, opts \\ []) do
     ClassPeriod.changeset_insert(%ClassPeriod{}, params)
     |> find_changeset_status()
+    |> find_changeset_main_period(params, opts)
     |> Repo.insert()
   end
 
@@ -131,7 +132,7 @@ defmodule Skoller.Periods do
     |> Map.put(:end_date, end_date)
     |> Map.put(:name, generator.name_prefix <> " " <> to_string(year))
     |> Map.put(:is_main_period, generator.is_main_period)
-    |> create_period()
+    |> create_period([is_generator: true])
   end
 
   defp find_changeset_status(%Ecto.Changeset{valid?: true, changes: %{start_date: start_date, end_date: end_date}} = changeset) do
@@ -139,6 +140,14 @@ defmodule Skoller.Periods do
     changeset |> Ecto.Changeset.change(%{class_period_status_id: status})
   end
   defp find_changeset_status(changeset), do: changeset
+
+  defp find_changeset_main_period(%Ecto.Changeset{valid?: true} = changeset, %{is_main_period: is_main_period}, opts) when opts != [] do
+    case opts |> Keyword.get(:is_generator, false) do
+      true -> changeset |> Ecto.Changeset.change(%{is_main_period: is_main_period})
+      _ -> changeset
+    end
+  end
+  defp find_changeset_main_period(changeset, _params, _opts), do: changeset
 
   defp find_status(start_date, end_date) do
     now = DateTime.utc_now()
