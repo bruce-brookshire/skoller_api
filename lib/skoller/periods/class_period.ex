@@ -6,6 +6,7 @@ defmodule Skoller.Periods.ClassPeriod do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.Classes.Class
+  alias Skoller.Periods.Status
 
   schema "class_periods" do
     field :name, :string
@@ -17,6 +18,7 @@ defmodule Skoller.Periods.ClassPeriod do
     field :class_period_status_id, :id
     belongs_to :school, School, define_field: false
     has_many :classes, Class
+    belongs_to :class_period_status, Status, define_field: false
 
     timestamps()
   end
