@@ -24,7 +24,8 @@ defmodule Mix.Tasks.Seed.Dev do
   def run(_) do
     ensure_started(Repo, [])
  
-    {:ok, date2, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
+    {:ok, date1, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
+    {:ok, date2, _offset2} = DateTime.from_iso8601("2019-10-12T00:00:00Z")
     pass = Authentication.hash_password("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
@@ -39,7 +40,7 @@ defmodule Mix.Tasks.Seed.Dev do
     sw4 = Repo.insert!(%User{email: "sw4@skoller.co", 
                               password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -47,7 +48,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_country: "us"})
 
     school2 = Repo.insert!(%School{name: "Skoller University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -55,7 +56,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_country: "us"})
     
     school3 = Repo.insert!(%School{name: "Classo University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -151,17 +152,26 @@ defmodule Mix.Tasks.Seed.Dev do
                             
     period = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school.id
+      school_id: school.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     period2 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school2.id
+      school_id: school2.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     period3 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school3.id
+      school_id: school3.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     class = Repo.insert!(%Class{name: "Big Money",
