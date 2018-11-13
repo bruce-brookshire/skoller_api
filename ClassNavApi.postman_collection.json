@@ -2599,8 +2599,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"value": "",
-											"type": "file"
+											"type": "file",
+											"src": ""
 										}
 									]
 								},
@@ -2643,8 +2643,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"value": "",
-											"type": "file"
+											"type": "file",
+											"src": ""
 										}
 									]
 								},
@@ -2679,8 +2679,8 @@
 											"formdata": [
 												{
 													"key": "file",
-													"value": null,
-													"type": "file"
+													"type": "file",
+													"src": null
 												}
 											]
 										},
@@ -2759,7 +2759,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"type": "file"
+											"type": "file",
+											"src": null
 										}
 									]
 								},
@@ -2795,9 +2796,7 @@
 												{
 													"key": "file",
 													"type": "file",
-													"src": {
-														"0": {}
-													}
+													"src": null
 												}
 											]
 										},
@@ -2894,8 +2893,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"value": "",
-											"type": "file"
+											"type": "file",
+											"src": ""
 										},
 										{
 											"key": "sammi",
@@ -2941,8 +2940,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"value": "",
-											"type": "file"
+											"type": "file",
+											"src": ""
 										}
 									]
 								},
@@ -5115,8 +5114,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"value": "",
-											"type": "file"
+											"type": "file",
+											"src": ""
 										}
 									]
 								},
@@ -5826,6 +5825,141 @@
 								"v1",
 								"notifications",
 								"custom"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organizations",
+			"item": [
+				{
+					"name": "Get Organizations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/organizations",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"custom_signup_link_id\": 1,\n\t\"name\": \"AOII\"\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/organizations",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Organization",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"custom_signup_link_id\": 2,\n\t\"name\": \"AOI1I\"\n}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/organizations/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organizations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Organization",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/organizations/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organizations",
+								"1"
 							]
 						}
 					},
@@ -7435,7 +7569,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"name\":\"Hard Knocks University\",\n\"timezone\": \"CST\",\n\"adr_zip\": \"37201\",\n\"adr_state\": \"TN\",\n\"adr_line_1\": \"530 Church St\",\n\"adr_city\": \"Nashville\",\n\"is_active\":true}"
+							"raw": "{\"name\":\"Hard Knocks University\",\n\"timezone\": \"CST\",\n\"adr_zip\": \"37201\",\n\"adr_region\": \"TN\",\n\"adr_line_1\": \"530 Church St\",\n\"adr_locality\": \"Nashville\",\n\"adr_country\": \"us\",\n\"is_active\":true}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools",
@@ -8376,8 +8510,8 @@
 							"formdata": [
 								{
 									"key": "file",
-									"value": "",
-									"type": "file"
+									"type": "file",
+									"src": ""
 								}
 							]
 						},
@@ -8394,6 +8528,33 @@
 							]
 						},
 						"description": "Uploads a school from csv"
+					},
+					"response": []
+				},
+				{
+					"name": "Check School Email Domain",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/email_domains/test.edu/check",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"email_domains",
+								"test.edu",
+								"check"
+							]
+						}
 					},
 					"response": []
 				}
