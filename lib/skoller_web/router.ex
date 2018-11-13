@@ -44,7 +44,8 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth_verified
 
     scope "/v1", V1, as: :v1 do
-      resources "/organizations", OrganizationController, except: [:new, :edit]
+      resources "/organizations", OrganizationController, only: [:index]
+      resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
 
       get "/email_domains/:email_domain/check", School.EmailDomainController, :show
       resources "/email-types", Admin.EmailTypeController, only: [:index, :update]
