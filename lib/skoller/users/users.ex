@@ -17,6 +17,7 @@ defmodule Skoller.Users do
   alias Skoller.Students.Sms
   alias Skoller.Token
   alias Skoller.Users.Emails
+  alias Skoller.Students.Organizations
 
   @student_role 100
 
@@ -230,6 +231,10 @@ defmodule Skoller.Users do
       nil -> {:ok, nil}
       link -> CustomSignups.track_signup(student.id, link.id)
     end
+  end
+  # Adds student to custom link enrollment if the user referring the student is attached to an organization with a link.
+  defp custom_link_signup(%User{student: %Student{enrolled_by: enrolled_by} = student}, _params) when not(is_nil(enrolled_by)) do
+    Organizations.attribute_signup_to_organization(student.id, enrolled_by)
   end
   defp custom_link_signup(_user, _params), do: {:ok, nil}
 

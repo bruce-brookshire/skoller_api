@@ -35,7 +35,7 @@ defmodule SkollerWeb.LinkView do
 
   def render("link_detail.json", %{link: link}) do
     link = link |> Repo.preload(:students)
-    render_one(link.link, LinkView, "link_base.json")
+    render_one(link, LinkView, "link_base.json")
     |> Map.merge(%{
       students: render_many(link.students, StudentView, "student-short.json")
     })
