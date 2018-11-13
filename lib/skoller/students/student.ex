@@ -22,7 +22,7 @@ defmodule Skoller.Students.Student do
     field :is_verified, :boolean, default: false
     field :notification_time, :time
     field :future_reminder_notification_time, :time
-    field :notification_days_notice, :integer, default: 1
+    field :notification_days_notice, :integer, default: System.get_env("DEFAULT_NOTIFICATION_DAYS") |> String.to_integer
     field :is_notifications, :boolean, default: true
     field :is_mod_notifications, :boolean, default: true
     field :is_reminder_notifications, :boolean, default: true
