@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
 
   alias Skoller.Classes.Notifications, as: ClassNotifications
   alias SkollerWeb.NotificationView
-  alias Skoller.Notifications
+  alias Skoller.Users.Notifications
   alias Skoller.Notifications.ManualLogs
   alias Skoller.Services.Authentication
 
