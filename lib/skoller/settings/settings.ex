@@ -76,9 +76,9 @@ defmodule Skoller.Settings do
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
-  defp process_multi_update_setting(%{"name" => name} = params) do
+  defp process_multi_update_setting(%{"name" => name, "value" => value}) do
     get_setting_by_name!(name)
-    |> Setting.changeset_update(params)
+    |> Setting.changeset_update(%{value: value |> to_string()})
     |> Repo.update()
   end
 end
