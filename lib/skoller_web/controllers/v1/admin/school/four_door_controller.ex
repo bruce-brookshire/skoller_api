@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Admin.School.FourDoorController do
     render(conn, SchoolView, "index.json", schools: schools)
   end
 
-  def school(conn, %{"school_id" => id} = params) do
+  def school(conn, %{"school_id" => id, "settings" => params}) do
     case FourDoor.override_school_four_door(id, params) do
       {:ok, _fd} ->
         s = Schools.get_school_by_id!(id)

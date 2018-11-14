@@ -89,14 +89,16 @@ defmodule Skoller.FourDoor do
   end
 
   defp insert_override(params) do
+    map = params |> generate_map_from_settings_list()
     %FourDoorOverride{}
-    |> FourDoorOverride.changeset(params)
+    |> FourDoorOverride.changeset(map)
     |> Repo.insert()
   end
 
   defp update_override(override_old, params) do
+    map = params |> generate_map_from_settings_list()
     override_old
-    |> FourDoorOverride.changeset(params)
+    |> FourDoorOverride.changeset(map)
     |> Repo.update()
   end
 
@@ -106,6 +108,10 @@ defmodule Skoller.FourDoor do
 
   defp get_school_override!(school_id) do
     Repo.get_by!(FourDoorOverride, school_id: school_id)
+  end
+
+  defp generate_map_from_settings_list(list) do
+    list |> List.foldl(Map.new, & &2 |> Map.put(&1["name"], &1["value"]))
   end
 
   defp strip_bool("true") do
