@@ -184,12 +184,9 @@ defmodule Skoller.Schools do
   """
   def get_school_from_email_domain!(domain) do
     trimmed_domain = get_last_section_of_email_domain(domain)
-    case Repo.get_by!(EmailDomain, email_domain: trimmed_domain) do
-      nil ->
-        nil
-      domain ->
-        get_school_by_id!(domain.school_id)
-    end
+    school_ids = from(d in EmailDomain, where: d.email_domain == ^trimmed_domain, select: d.school_id) |> Repo.all()
+    schools = from(s in School, where: s.id in ^school_ids) |> Repo.all()
+    schools
   end
 
   defp add_future_periods({:ok, school} = result) do

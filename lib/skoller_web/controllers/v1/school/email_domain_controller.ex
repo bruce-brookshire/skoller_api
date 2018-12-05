@@ -11,7 +11,7 @@ defmodule SkollerWeb.Api.V1.School.EmailDomainController do
   plug :verify_role, %{role: @student_role}
 
   def show(conn, %{"email_domain" => email_domain}) do
-    school = Schools.get_school_from_email_domain!(email_domain)
-    render(conn, SchoolView, "show.json", school: school)
+    schools = Schools.get_school_from_email_domain!(email_domain)
+    render(conn, SchoolView, "index.json", schools: schools)
   end
 end
