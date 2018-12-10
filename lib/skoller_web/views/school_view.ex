@@ -4,6 +4,7 @@ defmodule SkollerWeb.SchoolView do
 
   alias SkollerWeb.SchoolView
   alias SkollerWeb.PeriodView
+  alias Skoller.Schools
   alias Skoller.Repo
 
   def render("index.json", %{schools: schools}) do
@@ -12,6 +13,18 @@ defmodule SkollerWeb.SchoolView do
 
   def render("show.json", %{school: school}) do
     render_one(school, SchoolView, "school.json")
+  end
+
+  def render("school-detail.json", %{school: school}) do
+    school
+    |> render_one(SchoolView, "school.json")
+    |> Map.merge(
+      %{
+        is_diy_enabled: Map.get(school, :is_diy_enabled),
+        is_diy_preferred: Map.get(school, :is_diy_preferred),
+        is_auto_syllabus: Map.get(school, :is_auto_syllabus)
+      }
+    )
   end
 
   def render("school.json", %{school: school}) do

@@ -250,9 +250,15 @@ defmodule Skoller.Schools do
   end
 
   defp add_four_door({:ok, school}) do
-    {:ok, FourDoor.get_four_door_by_school(school.id) |> Map.merge(school)}
+    {:ok, with_four_door(school)}
   end
   defp add_four_door({:error, _school} = response), do: response
+  def with_four_door(%School{} = school) do
+    FourDoor.get_four_door_by_school(school.id) |> Map.merge(school)
+  end
+  def with_four_door(schools) when is_list(schools) do
+    for school <- schools, into: [], do: with_four_door(school)
+  end
 
   defp filter(query, params) do
     query

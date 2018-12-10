@@ -4,6 +4,7 @@ defmodule SkollerWeb.StudentView do
 
   alias SkollerWeb.StudentView
   alias Skoller.Repo
+  alias Skoller.Schools
   alias SkollerWeb.School.FieldOfStudyView
   alias SkollerWeb.SchoolView
   alias SkollerWeb.UserView
@@ -40,7 +41,7 @@ defmodule SkollerWeb.StudentView do
       bio: student.bio,
       grad_year: student.grad_year,
       enrollment_link: System.get_env("WEB_URL") <> @signup_path <> student.enrollment_link,
-      schools: render_many(student.schools, SchoolView, "school.json"),
+      schools: render_many(student.schools |> Schools.with_four_door(), SchoolView, "school-detail.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
       points: Skoller.StudentPoints.get_points_by_student_id(student.id),
       primary_school: render_one(student.primary_school, SchoolView, "school.json"),
