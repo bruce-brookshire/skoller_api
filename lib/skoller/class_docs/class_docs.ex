@@ -94,7 +94,7 @@ defmodule Skoller.ClassDocs do
     |> Repo.transaction()
 
     case result do
-      {:ok, %{doc: doc}} ->
+      {:ok, doc} ->
         {:ok, doc}
       {:error, _, changeset, _} ->
         {:error, changeset}
