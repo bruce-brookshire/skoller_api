@@ -1,0 +1,7 @@
+<%= @student_name_first %>,
+
+
+We have approved your request to change class information for  <%= @class_name %>
+
+
+We hope you and your classmates have a great semester!

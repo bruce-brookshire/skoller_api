@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Repo
   alias Skoller.Users.User
   alias Skoller.ClassDocs.Doc
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Schools.School
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Classes.Class
@@ -19,12 +19,14 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.FieldsOfStudy.FieldOfStudy
   alias Skoller.Devices.Device
   alias Skoller.Professors.Professor
+  alias Skoller.Services.Authentication
 
   def run(_) do
     ensure_started(Repo, [])
  
-    {:ok, date2, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
-    pass = Comeonin.Bcrypt.add_hash("password")
+    {:ok, date1, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
+    {:ok, date2, _offset2} = DateTime.from_iso8601("2019-10-12T00:00:00Z")
+    pass = Authentication.hash_password("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
@@ -38,7 +40,7 @@ defmodule Mix.Tasks.Seed.Dev do
     sw4 = Repo.insert!(%User{email: "sw4@skoller.co", 
                               password_hash: pass.password_hash})
     school = Repo.insert!(%School{name: "Hard Knocks University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -46,7 +48,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_country: "us"})
 
     school2 = Repo.insert!(%School{name: "Skoller University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -54,7 +56,7 @@ defmodule Mix.Tasks.Seed.Dev do
                                     adr_country: "us"})
     
     school3 = Repo.insert!(%School{name: "Classo University",
-                                    timezone: "CST",
+                                    timezone: "America/Chicago",
                                     adr_zip: "37201",
                                     adr_region: "TN",
                                     adr_line_1: "530 Church St",
@@ -150,17 +152,26 @@ defmodule Mix.Tasks.Seed.Dev do
                             
     period = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school.id
+      school_id: school.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     period2 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school2.id
+      school_id: school2.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     period3 = Repo.insert!(%ClassPeriod{
       name: "Q1",
-      school_id: school3.id
+      school_id: school3.id,
+      start_date: date1,
+      end_date: date2,
+      is_main_period: true
     })
 
     class = Repo.insert!(%Class{name: "Big Money",
@@ -172,10 +183,10 @@ defmodule Mix.Tasks.Seed.Dev do
                   meet_end_time: "12:00:00",
                   seat_count: 200,
                   is_editable: true,
-                  is_syllabus: false,
+                  is_syllabus: true,
                   grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
                   class_period_id: period.id,
-                  class_status_id: 700,
+                  class_status_id: 1400,
                   is_ghost: false
     })
 
@@ -188,10 +199,10 @@ defmodule Mix.Tasks.Seed.Dev do
                 meet_end_time: "12:00:00",
                 seat_count: 2,
                 is_editable: true,
-                is_syllabus: false,
+                is_syllabus: true,
                 grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
                 class_period_id: period.id,
-                class_status_id: 300,
+                class_status_id: 1200,
                 is_ghost: false
     })
 
@@ -204,10 +215,10 @@ defmodule Mix.Tasks.Seed.Dev do
       meet_end_time: "12:00:00",
       seat_count: 200,
       is_editable: true,
-      is_syllabus: false,
+      is_syllabus: true,
       grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
       class_period_id: period2.id,
-      class_status_id: 300,
+      class_status_id: 1200,
       is_ghost: false
     })
 
@@ -220,10 +231,10 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_end_time: "12:00:00",
     seat_count: 200,
     is_editable: true,
-    is_syllabus: false,
+    is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
-    class_status_id: 300,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -239,7 +250,7 @@ defmodule Mix.Tasks.Seed.Dev do
     is_syllabus: false,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period2.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -252,10 +263,10 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_end_time: "12:00:00",
     seat_count: 200,
     is_editable: true,
-    is_syllabus: false,
+    is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -268,10 +279,10 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_end_time: "12:00:00",
     seat_count: 200,
     is_editable: true,
-    is_syllabus: false,
+    is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 300,
+    class_status_id: 1200,
     is_ghost: false
   })
 
@@ -284,10 +295,10 @@ defmodule Mix.Tasks.Seed.Dev do
     meet_end_time: "12:00:00",
     seat_count: 200,
     is_editable: true,
-    is_syllabus: false,
+    is_syllabus: true,
     grade_scale: %{"A" => "90", "B" => "80", "C" => "70", "D" => "60"},
     class_period_id: period3.id,
-    class_status_id: 400,
+    class_status_id: 1200,
     is_ghost: false
   })
 

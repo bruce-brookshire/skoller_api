@@ -5,7 +5,7 @@ defmodule SkollerWeb.Assignment.ModView do
   alias SkollerWeb.Assignment.ModView
   alias SkollerWeb.ClassView
   alias Skoller.Repo
-  alias Skoller.Mods
+  alias Skoller.Mods.Users
 
   @name_assignment_mod 100
   @weight_assignment_mod 200
@@ -40,7 +40,7 @@ defmodule SkollerWeb.Assignment.ModView do
 
   defp mod_detail_view(mod, action, student_assignment) do
     mod = mod |> Repo.preload([:assignment_mod_type, :assignment])
-    accepted = mod.id |> Mods.get_student_pic_by_mod_acceptance()
+    accepted = mod.id |> Users.get_student_pic_by_mod_acceptance()
     assignment = mod.assignment |> Repo.preload(:class)
     %{
       id: mod.id,

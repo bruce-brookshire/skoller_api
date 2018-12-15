@@ -29,7 +29,7 @@ defmodule SkollerWeb.Api.V1.CustomLinkController do
   end
 
   def update(conn, %{"id" => id} = params) do
-    link_old = CustomSignups.get_link_by_id(id)
+    link_old = CustomSignups.get_link_by_id!(id)
     case link_old |> CustomSignups.update_link(params) do
       {:ok, link} ->
         render(conn, LinkView, "show.json", link: link)
@@ -41,7 +41,7 @@ defmodule SkollerWeb.Api.V1.CustomLinkController do
   end
 
   def show(conn, %{"id" => id}) do
-    link = CustomSignups.get_link_by_id(id)
+    link = CustomSignups.get_link_by_id!(id)
     render(conn, LinkView, "show.json", link: link)
   end
 end

@@ -11,6 +11,9 @@ defmodule Skoller.StudentAssignments do
   alias Skoller.Mods
   alias Skoller.StudentClasses
   alias Skoller.Classes.Weights
+  alias Skoller.Assignments.Classes
+  alias Skoller.AutoUpdates
+  alias Skoller.ModNotifications
 
   import Ecto.Query
 
@@ -52,7 +55,7 @@ defmodule Skoller.StudentAssignments do
   def insert_assignments(student_class_or_assignment_struct)
   def insert_assignments(%{student_class: %StudentClass{} = student_class}) do
     Logger.info("inserting assignments for student class: " <> to_string(student_class.id))
-    case get_assignments(%{class_id: student_class.class_id}) do
+    case Classes.get_assignments_by_class(student_class.class_id) do
       [] -> {:ok, nil}
       assignments -> convert_and_insert(assignments, student_class)
     end
@@ -99,40 +102,6 @@ defmodule Skoller.StudentAssignments do
   end
 
   @doc """
-  Gets a student's assignments, gets student's assignments by id, or gets class assignments
-
-  ## Behavior
-   * If passed a student class, gets all student assignments for that student class.
-   * If passed an assignment, gets all student assignments for that assignment.
-   * If passed a map containing `%{class_id: class_id}`, gets all assignments for that class.
-
-  ## Returns
-  `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
-  """
-  # TODO: I made this when I first started Elixir. This is absolutely awful.
-  # This is the single worst piece of code.
-  # Anyways. This needs help. This should not do 3 different things.
-  def get_assignments(%StudentClass{id: id}) do
-    query = (from assign in StudentAssignment)
-    query
-    |> where([assign], assign.student_class_id == ^id)
-    |> Repo.all()
-  end
-  def get_assignments(%Assignment{id: id}) do
-    query = (from assign in StudentAssignment)
-    query
-    |> where([assign], assign.assignment_id == ^id)
-    |> Repo.all()
-  end
-  def get_assignments(%{class_id: class_id}) do
-    query = (from assign in Assignment)
-    query
-    |> where([assign], assign.class_id == ^class_id)
-    |> where([assign], assign.from_mod == false)
-    |> Repo.all()
-  end
-
-  @doc """
   Gets the class completion for a student.
 
   ## Returns
@@ -165,8 +134,11 @@ defmodule Skoller.StudentAssignments do
   @doc """
   Creates a student assignment. Also creates a mod.
 
+  Will send notifications on success if auto update is triggered.
+  Will send a notification for a mod being created as well.
+
   ## Returns
-  `{:ok, %{assignment: Skoller.Assignments.Assignment, student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
+  `{:ok, student_assignment: Skoller.StudentAssignments.StudentAssignment}` or `{:error, changeset}`
   """
   def create_student_assignment(params) do
     #Insert into assignments as from_mod as well.
@@ -174,28 +146,142 @@ defmodule Skoller.StudentAssignments do
     |> Ecto.Changeset.change(%{from_mod: true})
     |> validate_class_weight()
 
-    Ecto.Multi.new
+    result = Ecto.Multi.new
     |> Ecto.Multi.run(:assignment, &insert_or_get_assignment(&1, changeset))
     |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(&1, params))
-    |> Ecto.Multi.run(:mod, &Mods.insert_new_mod(&1, params))
+    |> Ecto.Multi.run(:mod, &Mods.insert_new_mod(&1, params["student_id"], params["is_private"]))
     |> Repo.transaction()
+    |> process_auto_update()
+    |> mod_update_notification()
+
+    case result do
+      {:ok, %{student_assignment: student_assignment}} ->
+        {:ok, student_assignment}
+      {:error, _, changeset, _} ->
+        {:error, changeset}
+    end
   end
 
   @doc """
   Updates a student assignment. Also creates a mod.
 
+  Will send notifications on success if auto update is triggered.
+  Will send a notification for a mod being created as well.
+
   ## Returns
-  `{:ok, %{student_assignment: Skoller.StudentAssignments.StudentAssignment, mod: Skoller.Mods.Mod` or `{:error, _, _, _}`
+  `{:ok, student_assignment: Skoller.StudentAssignments.StudentAssignment}` or `{:error, changeset}`
   """
   def update_student_assignment(old, params) do
     changeset = old
     |> StudentAssignment.changeset_update(params)
     |> validate_class_weight()
 
-    Ecto.Multi.new
+    result = Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, changeset)
-    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params))
+    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params["is_private"]))
     |> Repo.transaction()
+    |> process_auto_update()
+    |> mod_update_notification()
+
+    case result do
+      {:ok, %{student_assignment: student_assignment}} ->
+        {:ok, student_assignment}
+      {:error, _, changeset, _} ->
+        {:error, changeset}
+    end
+  end
+
+  @doc """
+  Deletes a student assignment and creates a mod if a public change.
+
+  Will send notificatons and potentially auto update.
+  """
+  def delete_student_assignment(student_assignment, is_private) do
+    result = Ecto.Multi.new
+    |> Ecto.Multi.delete(:student_assignment, student_assignment)
+    |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, is_private))
+    |> Repo.transaction()
+    |> process_auto_update()
+    |> mod_update_notification()
+
+    case result do
+      {:ok, %{student_assignment: student_assignment}} ->
+        {:ok, student_assignment}
+      {:error, _, changeset, _} ->
+        {:error, changeset}
+    end
+  end
+
+  @doc """
+  Updates an assignment grade.
+
+  ## Returns
+  `{:ok, student_assignment}` or `{:error, changeset}`
+  """
+  def update_assignment_grade(assign_old, params) do
+    assign_old
+    |> StudentAssignment.grade_changeset(params)
+    |> Repo.update()
+  end
+
+  defp mod_update_notification({:ok, %{mod: %{actions: actions}}} = result) do
+    Task.start(ModNotifications, :send_mod_update_notifications, [actions])
+    result
+  end
+  # TODO: Normalize return results from insert_update_mod so this doens't need to exist.
+  defp mod_update_notification({:ok, %{mod: mod}} = result) do
+    mod_results = Keyword.get(mod, :ok)
+    case mod_results do
+      %{actions: actions} ->
+        Task.start(ModNotifications, :send_mod_update_notifications, [actions])
+      _ ->
+        {:ok, nil}
+    end
+    result
+  end
+  defp mod_update_notification(result), do: result
+
+  defp process_auto_update({:ok, %{mod: %{mod: mod}}} = result) do
+    Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
+    result
+  end
+  # TODO: Normalize return results from insert_update_mod so this doens't need to exist.
+  defp process_auto_update({:ok, %{mod: mod}} = result) do
+    mod_results = Keyword.get(mod, :ok)
+    case mod_results do
+      %{mod: mod} ->
+        Task.start(AutoUpdates, :process_auto_update, [mod, [notification: true]])
+      _ ->
+        {:ok, nil}
+    end
+    result
+  end
+  defp process_auto_update(result), do: result
+
+  # Gets a student's assignments, gets student's assignments by id, or gets class assignments
+
+  # ## Behavior
+  #  * If passed a student class, gets all student assignments for that student class.
+  #  * If passed an assignment, gets all student assignments for that assignment.
+  #  * If passed a map containing `%{class_id: class_id}`, gets all assignments for that class.
+
+  # ## Returns
+  # `[Skoller.StudentAssignments.StudentAssignment]`, `[Skoller.Assignments.Assignment]`, or `[]`
+  
+  # TODO: I made this when I first started Elixir. This is absolutely awful.
+  # This is the single worst piece of code.
+  # Anyways. This needs help. This should not do 3 different things.
+  defp get_assignments(%StudentClass{id: id}) do
+    query = (from assign in StudentAssignment)
+    query
+    |> where([assign], assign.student_class_id == ^id)
+    |> Repo.all()
+  end
+  defp get_assignments(%Assignment{id: id}) do
+    query = (from assign in StudentAssignment)
+    query
+    |> where([assign], assign.assignment_id == ^id)
+    |> Repo.all()
   end
 
   # 1. Check for existing base Assignment, pass to next multi call.

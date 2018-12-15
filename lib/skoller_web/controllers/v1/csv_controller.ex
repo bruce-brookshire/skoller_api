@@ -3,27 +3,24 @@ defmodule SkollerWeb.Api.V1.CSVController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
   alias Skoller.FieldsOfStudy
   alias SkollerWeb.CSVView
-  alias Skoller.CSVUpload  
   alias Skoller.Classes
   alias Skoller.Universities
   alias Skoller.Professors
   alias Skoller.Schools
-  alias Skoller.Periods
+  alias Skoller.CSVUploads
   
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
   @headers [:campus, :class_type, :subject, :code, :section, :crn, :meet_days, :prof_name_first, :prof_name_last, :location, :name, :meet_start_time, :class_upload_key]
-  @school_headers [:name, :adr_locality, :adr_region, :period_name]
+  @school_headers [:name, :adr_locality, :adr_region]
 
   plug :verify_role, %{role: @admin_role}
 
   def fos(conn, %{"file" => file}) do
-    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
-    case Repo.insert(changeset) do
+    case CSVUploads.create_csv_upload(file.filename) do
       {:ok, _} ->
         uploads = file.path 
         |> File.stream!()
@@ -49,8 +46,7 @@ defmodule SkollerWeb.Api.V1.CSVController do
   end
 
   def class(conn, %{"file" => file, "period_id" => period_id}) do
-    changeset = CSVUpload.changeset(%CSVUpload{}, %{name: file.filename})
-    case Repo.insert(changeset) do
+    case CSVUploads.create_csv_upload(file.filename) do
       {:ok, _} ->
         period_id = period_id |> String.to_integer
         uploads = file.path 
@@ -78,19 +74,13 @@ defmodule SkollerWeb.Api.V1.CSVController do
   defp process_school_row(school) do
     case school do
       {:ok, school} ->
-        school = school |> Map.put(:adr_country, "us")
-        new_school = Schools.create_school(school)
-        new_school |> create_period(school)
-        new_school
+        school
+        |> Map.put(:adr_country, "us")
+        |> Schools.create_school()
       {:error, error} ->
         {:error, error}
     end
   end
-
-  defp create_period({:ok, school}, params) do
-    Periods.create_period(%{"school_id" => school.id, "name" => params.period_name})
-  end
-  defp create_period({:error, _school}, _params), do: {:ok, nil}
 
   defp process_class_row(class, period_id) do
     case class do

@@ -39,10 +39,10 @@ defmodule Skoller.CustomSignups do
   Gets a link by id.
 
   ## Returns
-  `Skoller.CustomSignups.Link` or `nil`
+  `Skoller.CustomSignups.Link` or raises if not found
   """
-  def get_link_by_id(id) do
-    Repo.get(Link, id)
+  def get_link_by_id!(id) do
+    Repo.get!(Link, id)
   end
 
   @doc """
@@ -77,8 +77,31 @@ defmodule Skoller.CustomSignups do
   `{:ok, Skoller.CustomSignups.Signup}` or `{:error, Ecto.Changeset}`
   """
   def track_signup(student_id, link_id) do
-    Repo.insert(%Signup{custom_signup_link_id: link_id, student_id: student_id})
+    link = get_link_by_id!(link_id)
+    case link |> is_active do
+      true -> 
+        Repo.insert(%Signup{custom_signup_link_id: link_id, student_id: student_id})
+      false ->
+        {:ok, nil}
+    end
   end
+
+  defp is_active(%{start: start_date, end: end_date}) when (not is_nil(start_date)) and (not is_nil(end_date)) do
+    is_active(%{start: start_date}) and is_active(%{end: end_date})
+  end
+  defp is_active(%{end: end_date}) when not is_nil(end_date) do
+    case DateTime.compare(DateTime.utc_now, end_date) do
+      :lt -> true
+      _ -> false
+    end
+  end
+  defp is_active(%{start: start_date}) when not is_nil(start_date) do
+    case DateTime.compare(DateTime.utc_now, start_date) do
+      :gt -> true
+      _ -> false
+    end
+  end
+  defp is_active(_link), do: true
 
   # Gets the count of signups per link.
   defp get_link_student_count_subquery() do

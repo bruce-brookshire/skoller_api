@@ -2,9 +2,8 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   @moduledoc false
   
   use SkollerWeb, :controller
-  
-  alias Skoller.Repo
-  alias Skoller.ChatPosts.Like
+
+  alias Skoller.ChatPosts
   alias SkollerWeb.Class.ChatPostView
   alias Skoller.EnrolledStudents
 
@@ -18,16 +17,12 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   plug :verify_member, :class
 
   def create(conn, %{"class_id" => class_id} = params) do
-
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    changeset = Like.changeset(%Like{}, params)
-
-    case Repo.insert(changeset) do
-      {:ok, like} -> 
-        like = like |> Repo.preload(:chat_post)
+    case ChatPosts.like_post(params) do
+      {:ok, chat_post} -> 
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -36,12 +31,10 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   end
 
   def delete(conn, %{"chat_post_id" => post_id}) do
-    like = Repo.get_by!(Like, chat_post_id: post_id, student_id: conn.assigns[:user].student_id)
-    case Repo.delete(like) do
-      {:ok, _struct} ->
-        like = like |> Repo.preload(:chat_post)
-        sc = EnrolledStudents.get_enrolled_class_by_ids!(like.chat_post.class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: like.chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+    case ChatPosts.unlike_post(post_id, conn.assigns[:user].student_id) do
+      {:ok, chat_post} ->
+        sc = EnrolledStudents.get_enrolled_class_by_ids!(chat_post.class_id, conn.assigns[:user].student_id)
+        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

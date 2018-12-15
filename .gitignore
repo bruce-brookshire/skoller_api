@@ -20,5 +20,5 @@ erl_crash.dump
 /config/*.secret.exs
 .env
 
-#version management asdf
+# version management asdf
 /.tool-versions

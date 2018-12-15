@@ -18,8 +18,8 @@ defmodule SkollerWeb.Api.V1.Admin.FourDoorController do
     render(conn, AllView, "show.json", all: fd)
   end
 
-  def update(conn, params) do
-    case FourDoor.update_four_door_defaults(params) do
+  def update(conn, %{"settings" => settings}) do
+    case FourDoor.update_four_door_defaults(settings) do
       {:ok, _params} ->
         fd = FourDoor.get_default_four_door()
         render(conn, AllView, "show.json", all: fd)

@@ -42,6 +42,9 @@ defmodule Skoller.Classes.Class do
     field :campus, :string, default: ""
     field :class_upload_key, :string
     field :is_student_created, :boolean, default: false
+    field :created_by, :id
+    field :updated_by, :id
+    field :created_on, :string
     has_many :docs, Doc
     belongs_to :professor, Professor, define_field: false
     belongs_to :class_period, ClassPeriod, define_field: false
@@ -75,10 +78,7 @@ defmodule Skoller.Classes.Class do
     class
     |> cast(attrs, @all_hs_fields)
     |> validate_required(@req_hs_fields)
-    |> update_change(:name, &title_case(&1))
-    |> foreign_key_constraint(:class_period_id)
-    |> foreign_key_constraint(:professor_id)
-    |> unique_constraint(:class, name: :unique_class_index)
+    |> mandatory_validations
   end
   
   @doc false
@@ -86,6 +86,11 @@ defmodule Skoller.Classes.Class do
     class
     |> cast(attrs, @all_uni_fields)
     |> validate_required(@req_uni_fields)
+    |> mandatory_validations
+  end
+
+  defp mandatory_validations(changeset) do
+    changeset
     |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)

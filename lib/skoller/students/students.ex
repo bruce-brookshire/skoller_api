@@ -4,20 +4,15 @@ defmodule Skoller.Students do
   """
   
   alias Skoller.Repo
-  alias Skoller.StudentClasses.StudentClass
-  alias Skoller.Schools.School
   alias Skoller.Students.Student
   alias Skoller.Students.FieldOfStudy, as: StudentField
-  alias Skoller.FieldsOfStudy.FieldOfStudy
-  alias Skoller.Classes.Schools
-  alias Skoller.EnrolledStudents
   alias Skoller.StudentClasses.EnrollmentLinks
+  alias Skoller.Students.Sms
 
   import Ecto.Query
 
   require Logger
 
-  @community_threshold 2
 
   @doc """
   Gets a student by id.
@@ -27,43 +22,6 @@ defmodule Skoller.Students do
   """
   def get_student_by_id!(student_id) do
     Repo.get!(Student, student_id)
-  end
-
-  @doc """
-  Gets the `num` most common notification times and timezone combos.
-
-  ## Params
-   * %{"school_id" => school_id}, filters by school.
-
-  ## Returns
-  `%{notification_time: Time, timezone: String, count: Integer}` or `[]`
-  """
-  def get_common_notification_times(num, params) do
-    from(s in Student)
-    |> join(:inner, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
-    |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
-    |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
-    |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
-    |> order_by([s], desc: count(s.notification_time))
-    |> limit([s], ^num)
-    |> Repo.all()
-  end
-
-  @doc """
-  Gets communities with a count of students.
-
-  Communities are students with at least `threshold` enrolled students
-
-  ## Returns
-  `%{class_id: Id, count: Integer}`
-  """
-  def get_communities(threshold \\ @community_threshold) do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> group_by([sc], sc.class_id)
-    |> having([sc], count(sc.id) >= ^threshold)
-    |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
   end
 
   @doc """
@@ -122,22 +80,67 @@ defmodule Skoller.Students do
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
   end
-  def generate_student_link(_student), do: {:ok, nil}
+  def generate_student_link(_student), do: {:ok, nil}  
 
   @doc """
-  Returns the `Skoller.FieldsOfStudy.FieldOfStudy` and a count of `Skoller.Students.Student`
+  Generates a 5 digit verification code.
 
-  ## Examples
-
-      iex> Skoller.Students.get_field_of_study_count_by_school_id()
-      [{field: %Skoller.FieldsOfStudy.FieldOfStudy, count: num}]
-
+  ## Returns
+  `String`
   """
-  def get_field_of_study_count() do
-    (from fs in FieldOfStudy)
-    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
-    |> group_by([fs, st], [fs.field, fs.id])
-    |> select([fs, st], %{field: fs, count: count(st.id)})
-    |> Repo.all()
+  def generate_verify_code() do
+    case :rand.uniform() do
+      0.0 -> generate_verify_code()
+      num -> num |> convert_rand() |> to_string()
+    end
+  end
+
+  @doc """
+  Resets the verify code on the `student` and sends a text with the new code.
+
+  ## Returns
+  `{:ok, student}` or `{:error, changeset}`
+  """
+  def reset_verify_code(student) do
+    code = generate_verify_code()
+    result = student
+    |> Ecto.Changeset.change(%{verification_code: code})
+    |> Repo.update()
+
+    case result do
+      {:ok, student} ->
+        student.phone |> Sms.verify_phone(student.verification_code)
+        result
+      result ->
+        result
+    end
+  end
+
+  @doc """
+  Checks the verification code of the `student` against the `code`.
+
+  Returns a boolean
+  """
+  def check_verification_code(student, code) do
+    case student.verification_code == code do
+      true -> 
+        student |> verify_student()
+        true
+      false ->
+        false
+    end
+  end
+
+  defp convert_rand(num) do
+    case num < 1.0 do
+      true -> convert_rand(num * 10)
+      false -> Kernel.round(num * 10_000)
+    end
+  end
+
+  defp verify_student(student) do
+    student 
+    |> Ecto.Changeset.change(%{is_verified: true})
+    |> Repo.update!
   end
 end

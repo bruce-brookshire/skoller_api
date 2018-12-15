@@ -8,15 +8,16 @@ defmodule SkollerWeb.Api.V1.Admin.ProfessorController do
 
   import SkollerWeb.Plugs.Auth
   
+  @student_role 100
   @admin_role 200
   @change_req_role 400
   
-  plug :verify_role, %{roles: [@admin_role, @change_req_role]}
+  plug :verify_role, %{roles: [@student_role, @admin_role, @change_req_role]}
 
-  def update(conn, %{"id" => id} = params) do
+  def update(%{assigns: %{user: user}} = conn, %{"id" => id} = params) do
     professor_old = Professors.get_professor_by_id!(id)
 
-    case Professors.update_professor(professor_old, params) do
+    case Professors.update_professor(professor_old, params, user) do
       {:ok, professor} ->
         render(conn, ProfessorView, "show.json", professor: professor)
       {:error, changeset} ->

@@ -5,8 +5,11 @@ defmodule Skoller.Professors do
 
   alias Skoller.Repo
   alias Skoller.Professors.Professor
+  alias Skoller.Changeset
 
   import Ecto.Query
+
+  @student_role 100
 
   @doc """
   Creates a professor
@@ -25,8 +28,9 @@ defmodule Skoller.Professors do
   ## Returns
   `{:ok, Skoller.Professors.Professor}` or `{:error, Ecto.Changeset}`
   """
-  def update_professor(professor_old, params) do
+  def update_professor(professor_old, params, user \\ nil) do
     Professor.changeset_update(professor_old, params)
+    |> clean_changes_for_students(professor_old, user)
     |> Repo.update()
   end
 
@@ -69,6 +73,28 @@ defmodule Skoller.Professors do
     |> where([p], p.name_first == ^name_first and p.name_last == ^name_last and p.school_id == ^school_id)
     |> limit(1)
     |> Repo.one()
+  end
+
+  defp clean_changes_for_students(changeset, _professor_old, nil), do: changeset
+  defp clean_changes_for_students(%{changes: current_changes} = changeset, professor_old, user) when current_changes != %{} do
+    case user.roles |> Enum.any?(& &1.id == @student_role) do
+      true ->
+        new_changes = changeset |> Changeset.get_new_changes(professor_old)
+        non_allowed_changes = new_changes |> get_non_new_changes(current_changes)
+
+        changeset
+        |> Changeset.delete_changes(non_allowed_changes)
+        |> Ecto.Changeset.change(new_changes)
+      false ->
+        changeset
+    end
+  end
+  defp clean_changes_for_students(changeset, _professor_old, _user), do: changeset
+
+  defp get_non_new_changes(new_changes, current_changes) do
+    current_changes
+    |> Map.to_list()
+    |> Enum.filter(&!Map.has_key?(new_changes, elem(&1, 0)))
   end
 
   defp filters(query, params) do

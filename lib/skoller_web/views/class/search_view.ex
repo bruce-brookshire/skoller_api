@@ -4,7 +4,7 @@ defmodule SkollerWeb.Class.SearchView do
 
   alias SkollerWeb.Class.SearchView
   alias SkollerWeb.ProfessorView
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes
 
   def render("index.json", %{classes: classes}) do
     render_many(classes, SearchView, "class.json", as: :class)
@@ -26,7 +26,7 @@ defmodule SkollerWeb.Class.SearchView do
         id: school.id,
         name: school.name
       },
-      status: ClassStatuses.get_class_status(class_status),
+      status: Classes.get_class_status(class_status),
       period_name: class_period.name
     }
   end

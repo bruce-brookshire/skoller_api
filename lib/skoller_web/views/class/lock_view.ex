@@ -14,9 +14,9 @@ defmodule SkollerWeb.Class.LockView do
   def render("lock.json", %{lock: %{lock: lock, user: user}}) do
     lock = lock |> Repo.preload(:class_lock_section)
     %{
-      is_completed: lock.is_completed,
       class_lock_section: render_one(lock.class_lock_section, SectionView, "section.json"),
-      user: render_one(user, UserView, "user.json")
+      user: render_one(user, UserView, "user.json"),
+      class_lock_subsection: lock.class_lock_subsection
     }
   end
 end

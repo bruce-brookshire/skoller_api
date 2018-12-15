@@ -5,7 +5,7 @@ defmodule Skoller.Admin.Users do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.UserRole
+  alias Skoller.UserRoles.UserRole
   alias Skoller.Students.Student
   alias Skoller.EnrolledSchools
 
@@ -20,7 +20,7 @@ defmodule Skoller.Admin.Users do
     * or :boolean
       * when true, will or the filters.
     * account_type :id
-      * Takes a `Skoller.Role` id
+      * Takes a `Skoller.Roles.Role` id
     * school_id :id
       * Requires account_type filter of student
       * Takes a `Skoller.Schools.School` id

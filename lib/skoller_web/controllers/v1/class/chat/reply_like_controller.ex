@@ -3,9 +3,8 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
-  alias Skoller.ChatReplies.Like
   alias SkollerWeb.Class.ChatReplyView
+  alias Skoller.ChatReplies
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -17,15 +16,11 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   plug :verify_member, :class
 
   def create(conn, params) do
-
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
-    changeset = Like.changeset(%Like{}, params)
-
-    case Repo.insert(changeset) do
-      {:ok, like} -> 
-        like = like |> Repo.preload(:chat_reply)
-        render(conn, ChatReplyView, "show.json", %{chat_reply: like.chat_reply, current_student_id: conn.assigns[:user].student_id})
+    case ChatReplies.like_reply(params) do
+      {:ok, chat_reply} -> 
+        render(conn, ChatReplyView, "show.json", %{chat_reply: chat_reply, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -34,11 +29,9 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   end
 
   def delete(conn, %{"chat_reply_id" => reply_id}) do
-    like = Repo.get_by!(Like, chat_reply_id: reply_id, student_id: conn.assigns[:user].student_id)
-    case Repo.delete(like) do
-      {:ok, _struct} ->
-        like = like |> Repo.preload(:chat_reply)
-        render(conn, ChatReplyView, "show.json", %{chat_reply: like.chat_reply, current_student_id: conn.assigns[:user].student_id})
+    case ChatReplies.unlike_reply(reply_id, conn.assigns[:user].student_id) do
+      {:ok, chat_reply} ->
+        render(conn, ChatReplyView, "show.json", %{chat_reply: chat_reply, current_student_id: conn.assigns[:user].student_id})
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

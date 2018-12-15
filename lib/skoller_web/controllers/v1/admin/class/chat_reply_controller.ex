@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatReplyController do
 
   def delete(conn, %{"id" => id}) do
     reply = conn |> get_reply(id)
-    case ChatReplies.delete(reply) do
+    case ChatReplies.delete_reply(reply) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
@@ -34,6 +34,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatReplyController do
     ChatReplies.get_reply_by_student_and_id!(student_id, id)
   end
   defp get_reply(_conn, id) do
-    ChatReplies.get!(id)
+    ChatReplies.get_reply!(id)
   end
 end

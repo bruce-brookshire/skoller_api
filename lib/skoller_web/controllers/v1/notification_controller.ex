@@ -3,11 +3,11 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
-  alias Skoller.Notifications.ManualLog
-  alias Skoller.ClassNotifications
+  alias Skoller.Classes.Notifications, as: ClassNotifications
   alias SkollerWeb.NotificationView
-  alias Skoller.Notifications
+  alias Skoller.Users.Notifications
+  alias Skoller.Notifications.ManualLogs
+  alias Skoller.Services.Authentication
 
   import SkollerWeb.Plugs.Auth
   
@@ -21,22 +21,20 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   end
 
   def custom(conn, %{"message" => msg, "password" => password}) do
-    if Comeonin.Bcrypt.checkpw(password, conn.assigns[:user].password_hash) do
+    if Authentication.check_password(password, conn.assigns[:user].password_hash) do
       if msg |> String.length > 400 do
-        conn
-        |> send_resp(422, "")
+        conn |> send_resp(422, "")
       else
         Task.start(Notifications, :send_custom_notification, [msg])
         conn |> send_resp(204, "")
       end
     else
-      conn
-        |> send_resp(401, "")
+      conn |> send_resp(401, "")
     end
   end
 
   def index(conn, _params) do
-    logs = Repo.all(ManualLog)
+    logs = ManualLogs.get_manual_logs()
     render(conn, NotificationView, "index.json", notifications: logs)
   end
 end

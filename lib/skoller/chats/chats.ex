@@ -13,8 +13,11 @@ defmodule Skoller.Chats do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.ChatPosts.Like
-  alias Skoller.Classes.Schools
   alias Skoller.EnrolledStudents
+  alias Skoller.Chats.Algorithm
+  alias Skoller.ChatComments
+  alias Skoller.ChatPosts
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -73,25 +76,6 @@ defmodule Skoller.Chats do
   end
 
   @doc """
-  Gets the class with the highest amount of chat posts between the dates.
-
-  ## Dates
-   * `Map`, `%{date_start: DateTime, date_end: DateTime}`
-
-  ## Params
-   * `Map`, `%{"school_id" => Id}` filters by school
-
-  ## Returns
-  `%{class: Skoller.Classes.Class, count: Integer}` or `nil`
-  """
-  def get_max_chat_activity(%{date_start: _date_start, date_end: _date_end} = dates, params) do
-    from(c in Class)
-    |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), cp.class_id == c.id)
-    |> select([c, cp], %{class: c, count: cp.count})
-    |> Repo.one()
-  end
-
-  @doc """
   Gets the chat posts for all of a student's classes. Defaults to most recent ordering.
 
   ## Filters
@@ -130,6 +114,30 @@ defmodule Skoller.Chats do
   def is_liked(chat_item_enum, student_id) do
     chat_item_enum |> Repo.preload(:likes)
     chat_item_enum.likes |> Enum.any?(& to_string(&1.student_id) == to_string(student_id))
+  end
+
+  @doc """
+  Gets a list of chat algorithms.
+  """
+  def get_algorithms(), do: Repo.all(Algorithm)
+
+  @doc """
+  Reads an entire post for a student.
+
+  This includes all comments nested inside the post.
+
+  All comment and post stars under `post_id` will be marked as read.
+  """
+  def read_chat(post_id, student_id) do
+    cstar = ChatComments.get_student_comment_stars_by_post(post_id, student_id)
+    pstar = ChatPosts.get_star_by_student_and_id(student_id, post_id) |> List.wrap()
+
+    update = cstar ++ pstar
+
+    status = update
+    |> Enum.map(&Repo.update(Ecto.Changeset.change(&1, %{is_read: true})))
+    
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1)) 
   end
 
   defp sort_by_params(enum, %{"sort" => @sort_hot}) do
@@ -175,23 +183,6 @@ defmodule Skoller.Chats do
     |> join(:inner, [sc], enroll in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
-  end
-
-  # Gets the top class_id and the count of posts in the class.
-  defp get_max_chat_activity_subquery(dates, params) do
-    from(cp in subquery(get_chat_activity_subquery(dates, params)))
-    |> group_by([cp], cp.class_id)
-    |> select([cp], %{class_id: cp.class_id, count: max(cp.count)})
-    |> limit(1)
-  end
-
-  # This gets a list of classes and post count, with an optional school parameter.
-  defp get_chat_activity_subquery(dates, params) do
-    from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
-    |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
-    |> group_by([cp], cp.class_id)
-    |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})
   end
 
   # Gets distinct post ids where a comment or reply has been made by someone other than the student.

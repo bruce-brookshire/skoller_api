@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.AddColumnsToEmailType do
+  @moduledoc false
   use Ecto.Migration
 
   def change do
@@ -8,20 +9,5 @@ defmodule Skoller.Repo.Migrations.AddColumnsToEmailType do
       add :is_active_notification, :boolean, default: true
       add :send_time, :string
     end
-
-    flush()
-
-    Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
-      id: 100,
-      name: "No Classes Email",
-      send_time: "09:00:00",
-      category: "Class.None"
-    })
-    Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
-      id: 200,
-      name: "Class Setup Email",
-      send_time: "09:00:00",
-      category: "Class.Setup"
-    })
   end
 end

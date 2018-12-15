@@ -7,23 +7,21 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
-  alias Skoller.Repo
   alias Skoller.StudentClasses
   alias Skoller.Users.Students
   alias Skoller.EnrolledStudents
+  alias Skoller.ClassStatuses.Classes
+  alias Skoller.Services.Formatter
 
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
-
-  @needs_syllabus_status 200
   
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
-    case Users.create_user(params) do
-      {:ok, %{user: user}} ->
-        user = user |> Repo.preload([:student, :reports], force: true)
+    case Users.create_user(params, [admin: true]) do
+      {:ok, user} ->
         render(conn, UserView, "show.json", user: user)
       {:error, failed_value} ->
         conn
@@ -52,9 +50,9 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def update(conn, %{"user_id" => user_id} = params) do
     user_old = Users.get_user_by_id!(user_id)
 
-    case Users.update_user(user_old, params) do
+    case Users.update_user(user_old, params, [admin: true]) do
       {:ok, %{user: user}} ->
-        user = user |> Repo.preload([:student, :reports], force: true)
+        user = user |> Students.preload_student()
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn
@@ -76,28 +74,15 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp get_row_data(user) do
-    user = user |> Repo.preload(:student)
     student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
-    [user.email, user.student.name_first, user.student.name_last, format_phone(user.student.phone),
-      format_date(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
+    [user.email, user.student.name_first, user.student.name_last, Formatter.phone_to_string(user.student.phone),
+      Formatter.naive_date_to_string(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
       get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]
-  end
-
-  defp format_phone(phone) do
-    (phone |> String.slice(0, 3)) <> "-" <> (phone |> String.slice(3, 3)) <> "-" <> (phone |> String.slice(6, 4))
-  end
-
-  defp format_date(naive_date_time) do
-    date_time = DateTime.from_naive!(naive_date_time, "Etc/UTC")
-    {:ok, time} = Time.new(date_time.hour, date_time.minute, date_time.second)
-    date = DateTime.to_date(date_time)
-
-    to_string(date) <> " " <> to_string(time)
   end
 
   defp get_needs_syllabus_classes(student_classes) do
     student_classes
-    |> Enum.filter(& &1.class.class_status_id == @needs_syllabus_status)
+    |> Enum.filter(&Classes.class_needs_setup?(&1))
     |> Enum.count
   end
 

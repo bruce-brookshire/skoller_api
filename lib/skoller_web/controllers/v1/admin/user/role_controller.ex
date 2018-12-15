@@ -1,13 +1,10 @@
 defmodule SkollerWeb.Api.V1.Admin.User.RoleController do
   @moduledoc false
-  
   use SkollerWeb, :controller
 
-  alias Skoller.UserRole
-  alias Skoller.Repo
   alias SkollerWeb.UserRoleView
+  alias Skoller.UserRoles
 
-  import Ecto.Query
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
@@ -15,10 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.User.RoleController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{"user_id" => user_id, "id" => role_id}) do
-
-    changeset = UserRole.changeset(%UserRole{}, %{user_id: user_id, role_id: role_id})
-
-    case Repo.insert(changeset) do
+    case UserRoles.add_role(user_id, role_id) do
       {:ok, user_role} ->
         render(conn, UserRoleView, "show.json", user_role: user_role)
       {:error, changeset} ->
@@ -29,13 +23,13 @@ defmodule SkollerWeb.Api.V1.Admin.User.RoleController do
   end
 
   def index(conn, %{"user_id" => user_id}) do
-    user_roles = Repo.all(from ur in UserRole, where: ur.user_id == ^user_id)
+    user_roles = UserRoles.get_roles_for_user(user_id)
     render(conn, UserRoleView, "index.json", user_roles: user_roles)
   end
 
   def delete(conn, %{"user_id" => user_id, "id" => role_id}) do
-    user_role = Repo.get_by!(UserRole, user_id: user_id, role_id: role_id)
-    case Repo.delete(user_role) do
+    user_role = UserRoles.get_role_by_ids!(user_id, role_id)
+    case UserRoles.delete_role(user_role) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")

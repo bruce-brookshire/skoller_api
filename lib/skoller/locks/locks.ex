@@ -6,59 +6,67 @@ defmodule Skoller.Locks do
   alias Skoller.Repo
   alias Skoller.Locks.Lock
   alias Skoller.Locks.Section
-  alias Skoller.Locks.AbandonedLock
   alias Skoller.MapErrors
   alias Skoller.Classes.Weights
-  alias Skoller.Classes.Assignments
+  alias Skoller.Locks.Users
+  alias Skoller.ClassStatuses.Classes
 
   import Ecto.Query
 
   @weight_lock 100
   @assignment_lock 200
-  # @review_lock 300
 
   @doc """
-  Finds an existing, incomplete lock for the class and user.
+  Finds existing locks for the class and user.
 
   ## Returns
-  `Skoller.Locks.Lock` or `nil`
+  `[Skoller.Locks.Lock]` or `[]`
   """
-  def find_lock(class_id, lock_section, user_id) do
+  def find_lock(class_id, lock_section, user_id, subsection \\ nil)
+  def find_lock(class_id, lock_section, user_id, nil) do
+    from(l in Lock)
+    |> where([l], l.class_id == ^class_id and l.class_lock_section_id == ^lock_section and l.user_id == ^user_id)
+    |> Repo.all()
+  end
+  def find_lock(class_id, lock_section, user_id, subsection) do
     Repo.get_by(Lock,
       class_id: class_id,
       class_lock_section_id: lock_section,
       user_id: user_id,
-      is_completed: false)
+      class_lock_subsection: subsection)
+    |> List.wrap()
   end
 
   @doc """
   Locks a full class for a user.
 
+  If section is passed, will lock an individual section.
+
+  ## Opts
+   * subsection: Denotes a subsection to lock.
+
   ## Returns
   `{:ok, %{sections: Skoller.Locks.Section}}` or `{:error, _, _, _}`
   """
-  def lock_class(class_id, user_id, nil) do
-    sections = from(sect in Section)
-    |> where([sect], sect.is_diy == true)
-    |> Repo.all()
+  def lock_class(class_id, user_id, section \\ nil, opts \\ [])
+  def lock_class(class_id, user_id, nil, _opts) do
+    sections = Repo.all(Section)
 
     Ecto.Multi.new
     |> Ecto.Multi.run(:sections, &lock_sections(sections, class_id, user_id, &1))
     |> Repo.transaction()
   end
-  def lock_class(class_id, user_id, :weights) do
-    case lock_section(class_id, user_id, @weight_lock) do
-      {:ok, section} -> 
-        map = Map.new() |> Map.put(:sections, List.wrap(section))
-        {:ok, map}
+  def lock_class(class_id, user_id, :weights, _opts) do
+    case lock_section(class_id, user_id, @weight_lock, nil) do
+      {:ok, sections} -> 
+        {:ok, %{sections: sections}}
       {:error, error} -> {:error, nil, error, nil}
     end
   end
-  def lock_class(class_id, user_id, :assignments) do
-    case lock_section(class_id, user_id, @assignment_lock) do
-      {:ok, section} -> 
-        map = Map.new() |> Map.put(:sections, List.wrap(section))
-        {:ok, map}
+  def lock_class(class_id, user_id, :assignments, opts) do
+    case lock_section(class_id, user_id, @assignment_lock, Keyword.get(opts, :subsection)) do
+      {:ok, sections} -> 
+        {:ok, %{sections: sections}}
       {:error, error} -> {:error, nil, error, nil}
     end
   end
@@ -66,17 +74,18 @@ defmodule Skoller.Locks do
   @doc """
   Unlocks a class.
 
-  ## Params
-   * `%{"is_completed" => Boolean}`, if true, will complete locks and advance status. If false, will abandon locks.
+  If the class `is_completed` it will update the class status accordingly.
 
   ## Returns
-  `[{:ok, Skoller.Locks.Lock}]`
+  `{:ok, %{unlock: unlocked locks, status: ClassStatuses.check_status/2}}` or an Ecto.Multi error
   """
-  def unlock_locks(class_id, user_id, params) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^class_id and l.user_id == ^user_id and l.is_completed == false)
-    |> Repo.all()
-    |> Enum.map(&unlock_lock(&1, params))
+  def unlock_class(old_class, user_id, is_completed) do
+    locks = Users.get_locks_by_class_and_user(old_class.id, user_id)
+
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:unlock, &unlock_locks(locks, &1))
+    |> Ecto.Multi.run(:status, &check_class_status(&1, old_class, is_completed))
+    |> Repo.transaction()
   end
 
   @doc """
@@ -89,34 +98,26 @@ defmodule Skoller.Locks do
     case get_incomplete_locks(min) do
       [] -> {:ok, nil}
       locks -> 
-        locks |> Enum.map(&unlock_lock(&1, %{}))
+        locks |> unlock_locks()
     end
   end
 
-  @doc """
-  Deletes locks for a class based on the new status.
-
-  ## Returns
-  `{:ok, Tuple}` or `{:ok, nil}`
-  """
-  def delete_locks(class, new_status)
-  def delete_locks(_class, %{is_complete: true}), do: {:ok, nil}
-  def delete_locks(_class, %{is_maintenance: true}), do: {:ok, nil}
-  def delete_locks(class, _status) do
-    {:ok, delete_class_locks(class)}
+  defp check_class_status(multi_params, old_class, is_completed) when is_completed == true do
+    Classes.check_status(old_class, multi_params)
   end
+  defp check_class_status(_multi_params, _old_class, _is_completed), do: {:ok, nil}
 
-  defp get_completed_lock_by_section(class_id, class_lock_section_id) do
-    Repo.get_by(Lock,
-      class_id: class_id,
-      class_lock_section_id: class_lock_section_id,
-      is_completed: true)
+  defp unlock_locks(locks, _), do: unlock_locks(locks)
+  defp unlock_locks(locks) do
+    status = locks |> Enum.map(&delete_lock(&1))
+
+    status
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
   # Gets locks that are incomplete after `min` minutes.
   defp get_incomplete_locks(min) do
     from(lock in Lock)
-    |> where([lock], lock.is_completed == false)
     |> where([lock], lock.inserted_at < ago(^min, "minute"))
     |> Repo.all()
   end
@@ -124,65 +125,41 @@ defmodule Skoller.Locks do
   # Locks the sections passed in.
   defp lock_sections(sections, class_id, user_id, _) do
     status = sections
-    |> Enum.map(&lock_section(class_id, user_id, &1.id))
+    |> Enum.map(&lock_full_section(class_id, user_id, &1.id))
 
     status
     |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
+  #Locks all sections and subsections if it is not already locked.
+  defp lock_full_section(class_id, user_id, @assignment_lock) do
+    status = Weights.get_class_weights(class_id)
+    |> Enum.map(&lock_section(class_id, user_id, @assignment_lock, &1.id))
+
+    status = status ++ List.wrap(lock_section(class_id, user_id, @assignment_lock, nil))
+
+    status
+    |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  end
+  defp lock_full_section(class_id, user_id, class_lock_section_id) do
+    lock_section(class_id, user_id, class_lock_section_id, nil)
+  end
+
   #Locks the section if it is not already locked.
-  defp lock_section(class_id, user_id, class_lock_section_id) do
-    case find_lock(class_id, class_lock_section_id, user_id) do
-      nil -> create_new_lock(class_id, user_id, class_lock_section_id)
+  defp lock_section(class_id, user_id, class_lock_section_id, subsection) do
+    case find_lock(class_id, class_lock_section_id, user_id, subsection) do
+      [] -> create_new_lock(class_id, user_id, class_lock_section_id, subsection)
       lock -> {:ok, lock} 
     end
   end
 
-  defp evaluate_completed_locks(class_id, @weight_lock) do
-    case Weights.get_class_weights(class_id) do
-      [] -> get_completed_lock_by_section(class_id, @weight_lock)
-      _weights -> nil
-    end
-  end
-  defp evaluate_completed_locks(class_id, @assignment_lock) do
-    case Assignments.all(class_id) do
-      [] -> get_completed_lock_by_section(class_id, @assignment_lock)
-      _weights -> nil
-    end
-  end
-  defp evaluate_completed_locks(_class_id, _class_lock_section_id), do: nil
-
-  defp create_new_lock(class_id, user_id, class_lock_section_id) do
-    case evaluate_completed_locks(class_id, class_lock_section_id) do
-      nil -> nil
-      lock -> lock |> delete_lock()
-    end
-    changeset = Lock.changeset(%Lock{}, %{
+  defp create_new_lock(class_id, user_id, class_lock_section_id, subsection) do
+    Lock.changeset(%Lock{}, %{
       class_id: class_id, 
       class_lock_section_id: class_lock_section_id, 
-      user_id: user_id
-    }) 
-    Repo.insert(changeset)
-  end
-  
-  defp unlock_lock(lock_old, %{"is_completed" => true}) do
-    changeset = Lock.changeset(lock_old, %{is_completed: true})
-    Repo.update(changeset)
-  end
-
-  defp unlock_lock(lock_old, %{}) do
-    Repo.insert!(%AbandonedLock{
-      class_lock_section_id: lock_old.class_lock_section_id,
-      class_id: lock_old.class_id,
-      user_id: lock_old.user_id
-    })
-    Repo.delete(lock_old)
-  end
-
-  defp delete_class_locks(class) do
-    from(l in Lock)
-    |> where([l], l.class_id == ^class.id)
-    |> Repo.delete_all()
+      user_id: user_id,
+      class_lock_subsection: subsection
+    }) |> Repo.insert()
   end
 
   defp delete_lock(lock) do

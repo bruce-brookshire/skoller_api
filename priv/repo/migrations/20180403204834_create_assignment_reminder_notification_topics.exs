@@ -1,7 +1,6 @@
 defmodule Skoller.Repo.Migrations.CreateAssignmentReminderNotificationTopics do
+  @moduledoc false
   use Ecto.Migration
-
-  alias Skoller.Repo
 
   def up do
     create table(:assignment_reminder_notification_topics) do
@@ -9,10 +8,6 @@ defmodule Skoller.Repo.Migrations.CreateAssignmentReminderNotificationTopics do
 
       timestamps()
     end
-    flush()
-    Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 100, topic: "Assignment.Reminder.Today"})
-    Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 200, topic: "Assignment.Reminder.Tomorrow"})
-    Repo.insert!(%Skoller.Assignments.ReminderNotification.Topic{id: 300, topic: "Assignment.Reminder.Future"})
     drop table(:assignment_reminder_notifications)
     create table(:assignment_reminder_notifications) do
       add :assignment_reminder_notification_topic_id, references(:assignment_reminder_notification_topics, on_delete: :nothing)

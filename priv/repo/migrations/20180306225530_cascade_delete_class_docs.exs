@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.CascadeDeleteClassDocs do
+  @moduledoc false
   use Ecto.Migration
 
   def change do

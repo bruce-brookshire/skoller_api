@@ -11,17 +11,17 @@ defmodule Skoller.Locks.Lock do
   alias Skoller.Locks.Section
 
   schema "class_locks" do
-    field :is_completed, :boolean, default: false
     field :class_lock_section_id, :id
     field :class_id, :id
     field :user_id, :id
+    field :class_lock_subsection, :id
     belongs_to :class_lock_section, Section, define_field: false
 
     timestamps()
   end
 
   @req_fields [:class_lock_section_id, :class_id, :user_id]
-  @opt_fields [:is_completed]
+  @opt_fields [:class_lock_subsection]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
@@ -32,6 +32,6 @@ defmodule Skoller.Locks.Lock do
     |> foreign_key_constraint(:class_id)
     |> foreign_key_constraint(:class_lock_section_id)
     |> foreign_key_constraint(:user_id)
-    |> unique_constraint(:class_lock, name: :class_locks_class_id_class_lock_section_id_index)
+    |> unique_constraint(:class_lock, name: :unique_class_user_section_lock_idx)
   end
 end

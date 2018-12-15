@@ -3,13 +3,8 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
   
   use SkollerWeb, :controller
   
-  alias Skoller.Repo
-  alias Skoller.AssignmentPosts.Post
   alias SkollerWeb.Assignment.PostView
-  alias Skoller.AssignmentPostNotifications
-  alias SkollerWeb.Responses.MultiError
-  alias Skoller.MapErrors
-  alias Skoller.AssignmentPosts.StudentAssignments
+  alias Skoller.AssignmentPosts
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.ChatAuth
@@ -22,29 +17,8 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
   def create(conn, params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
-    
-    changeset = Post.changeset(%Post{}, params)
 
-    multi = Ecto.Multi.new()
-    |> Ecto.Multi.insert(:post, changeset)
-    |> Ecto.Multi.run(:student_assignment, &un_read_assign(&1.post))
-
-    case Repo.transaction(multi) do
-      {:ok, %{post: post}} ->
-        Task.start(AssignmentPostNotifications, :send_assignment_post_notification, [post, conn.assigns[:user].student_id])
-        render(conn, PostView, "show.json", %{post: post})
-      {:error, _, failed_value, _} ->
-        conn
-        |> MultiError.render(failed_value)
-    end
-  end
-
-  def update(conn, %{"id" => id} = params) do
-    post_old = Repo.get_by!(Post, id: id, student_id: conn.assigns[:user].student_id)
-
-    changeset = Post.changeset_update(post_old, params)
-
-    case Repo.update(changeset) do
+    case AssignmentPosts.create_assignment_post(params) do
       {:ok, post} ->
         render(conn, PostView, "show.json", %{post: post})
       {:error, changeset} ->
@@ -54,8 +28,16 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
     end
   end
 
-  defp un_read_assign(post) do
-    status = StudentAssignments.un_read_assignment(post.student_id, post.assignment_id)
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  def update(conn, %{"id" => id} = params) do
+    post_old = AssignmentPosts.get_post_by_student_and_id!(conn.assigns[:user].student_id, id)
+
+    case AssignmentPosts.update_assignment_post(post_old, params) do
+      {:ok, post} ->
+        render(conn, PostView, "show.json", %{post: post})
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 end

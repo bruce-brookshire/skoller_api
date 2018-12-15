@@ -3,15 +3,10 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Mods.Mod
-  alias Skoller.Mods.Action
-  alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.Assignment.ModView
   alias Skoller.Mods
-  alias Skoller.AutoUpdates
-  alias Skoller.StudentClasses
+  alias Skoller.Mods.Students
 
   import SkollerWeb.Plugs.Auth
   
@@ -20,53 +15,37 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
 
-  def create(conn, %{"student_id" => student_id, "id" => id} = params) do
-    mod = Mod
-    |> Repo.get!(id)
-    |> Repo.preload(:assignment)
-
-    case StudentClasses.get_active_student_class_by_ids(mod.assignment.class_id, student_id) do
-      nil ->
-        conn
-        |> send_resp(401, "")
-        |> halt()
-      student_class ->
-        conn |> process_mod(mod, student_class, params)
-    end
-  end
-
-  def show(conn, %{"student_id" => student_id, "id" => id}) do
-    mod = Mods.get_student_mod_by_id(student_id, id)
-    conn |> render(ModView, "show.json", mod: mod)
-  end
-
-  def index(conn, %{"student_id" => student_id} = params) do
-    mods = Mods.get_student_mods(student_id, params)
-    conn |> render(ModView, "index.json", mods: mods)
-  end
-
-  defp process_mod(conn, %Mod{} = mod, %{} = student_class, %{"is_accepted" => true}) do
-    case Repo.transaction(Mods.apply_mod(mod, student_class)) do
-      {:ok, %{student_assignment: student_assignment}} ->
-        Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
+  def create(conn, %{"student_id" => student_id, "id" => id, "is_accepted" => true}) do
+    case Mods.manual_accept_mod_for_student(id, student_id) do
+      {:ok, student_assignment} ->
         conn
         |> render(StudentAssignmentView, "show.json", student_assignment: student_assignment)
-      {:error, _, failed_value, _} ->
+      {:error, changeset} ->
         conn
-        |> MultiError.render(failed_value)
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
-  defp process_mod(conn, %Mod{} = mod, %{} = student_class, %{"is_accepted" => false}) do
-    action = Repo.get_by!(Action, assignment_modification_id: mod.id, student_class_id: student_class.id)
-
-    case Repo.update(Ecto.Changeset.change(action, %{is_accepted: false, is_manual: true})) do
+  def create(conn, %{"student_id" => student_id, "id" => id, "is_accepted" => false}) do
+    case Mods.manual_reject_mod_for_student(id, student_id) do
       {:ok, _} ->
         conn
         |> send_resp(204, "")
       {:error, changeset} ->
         conn
+        |> put_status(:unprocessable_entity)
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
+  end
+
+  def show(conn, %{"student_id" => student_id, "id" => id}) do
+    mod = Students.get_student_mod_by_id(student_id, id)
+    conn |> render(ModView, "show.json", mod: mod)
+  end
+
+  def index(conn, %{"student_id" => student_id} = params) do
+    mods = Students.get_student_mods(student_id, params)
+    conn |> render(ModView, "index.json", mods: mods)
   end
 end

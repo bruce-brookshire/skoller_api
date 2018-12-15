@@ -2,7 +2,7 @@ defmodule SkollerWeb.Assignment.ReminderNotificationView do
   @moduledoc false
   use SkollerWeb, :view
 
-  alias Skoller.Assignments
+  alias Skoller.AssignmentReminders
   alias SkollerWeb.Assignment.ReminderNotificationView
   alias SkollerWeb.Assignment.ReminderNotification.TopicView
 
@@ -19,7 +19,7 @@ defmodule SkollerWeb.Assignment.ReminderNotificationView do
       id: reminder_notification.id,
       message: reminder_notification.message,
       topic: render_one(
-        Assignments.get_assignment_message_topic_by_id!(
+        AssignmentReminders.get_assignment_message_topic_by_id!(
         reminder_notification.assignment_reminder_notification_topic_id), 
         TopicView, "topic.json"),
       is_plural: reminder_notification.is_plural

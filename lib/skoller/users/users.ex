@@ -5,17 +5,19 @@ defmodule Skoller.Users do
 
   alias Skoller.Repo
   alias Skoller.Users.User
-  alias Skoller.UserRole
   alias Skoller.Students
   alias Skoller.Students.Student
-  alias Skoller.Verification
   alias Skoller.CustomSignups
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
   alias Skoller.Users.Notifications
   alias Skoller.StudentClasses.EnrollmentLinks
-
-  import Ecto.Query
+  alias Skoller.UserRoles
+  alias Skoller.Users.Students, as: StudentUsers
+  alias Skoller.Students.Sms
+  alias Skoller.Token
+  alias Skoller.Users.Emails
+  alias Skoller.Students.Organizations
 
   @student_role 100
 
@@ -52,45 +54,50 @@ defmodule Skoller.Users do
 
   ## Opts
    * `[admin: true]`, will verify without text.
+   * `[login: true]` will send a token with the response.
 
   # Returns
-  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRole], field_of_study: Skoller.Students.FieldOfStudy, custom_link: Skoller.CustomSignups.Signup || {:ok, nil}, link: String}}`
-  or `{:error, failed_val}`
+  `{:ok, Skoller.Users.User}` or `{:error, changeset}`
   """
   def create_user(params, opts \\ []) do
-    multi = %User{}
+    result = %User{}
     |> User.changeset_insert(params)
     |> verify_student(opts)
     |> verification_code(opts)
     |> get_enrolled_by(params)
-    |> insert_user(params)
+    |> insert_user(params, opts)
     |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Ecto.Multi.run(:points, &add_points_to_student(&1.user))
-    
-    case multi |> Repo.transaction() do
+    |> Repo.transaction()
+    |> send_link_used_notification()
+    |> send_verification_text()
+    |> log_in_user(opts)
+
+    case result do
+      {:ok, %{user: user}} ->
+        user = user |> StudentUsers.preload_student() |> Repo.preload(:roles)
+        {:ok, user}
       {:error, _, failed_val, _} ->
         {:error, failed_val}
-      {:ok, %{user: %{student: %{enrolled_by: student_id}}} = items} when not is_nil(student_id) ->
-        Task.start(Notifications, :send_link_used_notification, [student_id])
-        {:ok, items}
-      {:ok, items} ->
-        {:ok, items}
     end
   end
 
   @doc """
   Updates a user, with student if included in params.
 
+  ## Opts
+   * `[admin: true]`, will allow admin changes.
+
   # Returns
-  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
+  `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
   or `{:error, _, failed_val, _}`
   """
-  def update_user(user_old, params) do
+  def update_user(user_old, params, opts \\ []) do
     changeset = User.changeset_update_admin(user_old, params)
     Ecto.Multi.new
     |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Repo.transaction()
@@ -113,10 +120,50 @@ defmodule Skoller.Users do
   `{:ok, Skoller.Users.User}` or `{:error, Ecto.Changeset}`
   """
   def change_password(user_old, password) do
+    Ecto.Multi.new
+    |> Ecto.Multi.run(:user, &change_password(user_old, password, &1))
+    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
+    |> Repo.transaction()
+  end
+
+  def forgot_password(email) do
+    case get_user_by_email(email) do
+      nil -> nil
+      user -> 
+        {:ok, token} = user.id |> Token.short_token()
+        user |> Emails.send_forgot_pass_email(token)
+    end
+  end
+
+  defp log_in_user({:ok, %{user: user} = result_map} = result, opts) do
+    case Keyword.get(opts, :login, false) do
+      true -> 
+        {:ok, token} = Token.login(user.id)
+        map = Map.put(result_map.user, :token, token)
+        {:ok, Map.put(result_map, :user, map)}
+      _ -> 
+        result
+    end
+  end
+  defp log_in_user(result, _opts), do: result
+
+  defp change_password(user_old, password, _) do
     user_old
     |> User.changeset_update(%{"password" => password})
     |> Repo.update()
   end
+
+  defp send_link_used_notification({:ok, %{user: %{student: %{enrolled_by: student_id}}}} = result) when not is_nil(student_id) do
+    Task.start(Notifications, :send_link_used_notification, [student_id])
+    result
+  end
+  defp send_link_used_notification(result), do: result
+
+  defp send_verification_text({:ok, %{user: %{student: %{is_verified: false} = student}}} = result) do
+    student.phone |> Sms.verify_phone(student.verification_code)
+    result
+  end
+  defp send_verification_text(result), do: result
 
   defp add_points_to_student(%{student: %{enrolled_by: enrolled_by}}) when not(is_nil(enrolled_by)) do
     enrolled_by
@@ -126,19 +173,19 @@ defmodule Skoller.Users do
 
   # Generates a verification code if admin: true is not passed in through opts.
   defp verification_code(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case get_opt(opts, :admin) do
-      "true" -> 
+    case Keyword.get(opts, :admin, false) do
+      true -> 
         u_changeset
       _ ->
-        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, Verification.generate_verify_code)})
+        Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :verification_code, Students.generate_verify_code)})
     end
   end
   defp verification_code(changeset, _opts), do: changeset
 
   # Verifies a student if admin: true passed in though opts.
   defp verify_student(%Ecto.Changeset{valid?: true, changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}} = u_changeset, opts) do
-    case get_opt(opts, :admin) do
-      "true" -> 
+    case Keyword.get(opts, :admin, false) do
+      true -> 
         Ecto.Changeset.change(u_changeset, %{student: Map.put(s_changeset.changes, :is_verified, true)})
       _ -> 
         u_changeset
@@ -165,10 +212,10 @@ defmodule Skoller.Users do
   defp get_enrolled_by(changeset, _params), do: changeset
 
   # The standard insert user multi.
-  defp insert_user(changeset, params) do
+  defp insert_user(changeset, params, opts) do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params))
+    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
   end
 
@@ -184,6 +231,10 @@ defmodule Skoller.Users do
       nil -> {:ok, nil}
       link -> CustomSignups.track_signup(student.id, link.id)
     end
+  end
+  # Adds student to custom link enrollment if the user referring the student is attached to an organization with a link.
+  defp custom_link_signup(%User{student: %Student{enrolled_by: enrolled_by} = student}, _params) when not(is_nil(enrolled_by)) do
+    Organizations.attribute_signup_to_organization(student.id, enrolled_by)
   end
   defp custom_link_signup(_user, _params), do: {:ok, nil}
 
@@ -201,47 +252,39 @@ defmodule Skoller.Users do
     Students.add_field_of_study(params)
   end
 
-  defp add_roles(%{user: user}, params) do
+  defp add_roles(%{user: user}, params, opts) do
     user 
     |> Repo.preload(:student)
-    |> add_roles_preloaded(params)
+    |> add_roles_preloaded(params, opts)
   end
 
-  defp add_roles_preloaded(%{student: student} = user, _params) when not is_nil(student) do
+  defp add_roles_preloaded(%{student: student} = user, _params, _opts) when not is_nil(student) do
     user = user |> Repo.preload(:roles)
     case user.roles |> Enum.any?(& &1.id == @student_role) do
-      false -> Repo.insert(%UserRole{user_id: user.id, role_id: @student_role})
+      false -> UserRoles.add_role(user.id, @student_role)
       true -> {:ok, nil}
     end
   end
-  defp add_roles_preloaded(user, %{"roles" => roles}) do
-    delete_roles(user.id)
-    status = roles
-    |> Enum.map(&add_role(user, &1))
-    
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  defp add_roles_preloaded(user, %{"roles" => roles}, opts) do
+    case Keyword.get(opts, :admin, false) do
+      true ->
+        # Admin can add roles
+        UserRoles.delete_roles_for_user(user.id)
+        status = roles
+        |> Enum.map(&UserRoles.add_role(user.id, &1))
+        
+        status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+      false ->
+        # Otherwise no.
+        changeset = user
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.add_error(:roles, "Insufficient permissions")
+        {:error, changeset}
+    end
   end
-  defp add_roles_preloaded(_map, _params), do: {:ok, nil}
-
-  defp add_role(user, role) do
-    Repo.insert!(%UserRole{user_id: user.id, role_id: role})
-  end
-
-  defp delete_roles(id) do
-    from(role in UserRole)
-    |> where([role], role.user_id == ^id)
-    |> Repo.delete_all()
-  end
+  defp add_roles_preloaded(_map, _params, _opts), do: {:ok, nil}
 
   defp delete_fields_of_study(id) do
     Students.delete_fields_of_study_by_student_id(id)
-  end
-
-  # Parses a keylist and gets the value of the atom.
-  defp get_opt(opts, atom) do
-    case opts |> List.keytake(atom, 0) do
-      nil -> nil
-      val -> val |> elem(0) |> elem(1)
-    end
   end
 end

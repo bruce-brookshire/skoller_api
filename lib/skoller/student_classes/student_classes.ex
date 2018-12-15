@@ -11,11 +11,10 @@ defmodule Skoller.StudentClasses do
   alias Skoller.Classes.EditableClasses
   alias Skoller.EnrolledStudents
   alias Skoller.Classes
-  alias Skoller.Classes.ClassStatuses
+  alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.StudentAssignments
   alias Skoller.Mods.StudentClasses, as: StudentClassMods
   alias Skoller.StudentClasses.EnrollmentLinks
-  alias Skoller.Classes.ClassStatuses
   alias Skoller.AutoUpdates
   alias Skoller.MapErrors
   alias Skoller.StudentPoints
@@ -109,13 +108,13 @@ defmodule Skoller.StudentClasses do
   Gets a student class where the class is editable and the student enrolled.
 
   ## Returns
-  `Skoller.StudentClasses.StudentClass` or `nil`
+  `Skoller.StudentClasses.StudentClass` or raises on no results
   """
-  def get_active_student_class_by_ids(class_id, student_id) do
+  def get_active_student_class_by_ids!(class_id, student_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
-    |> Repo.one()
+    |> Repo.one!()
   end
 
   @doc """

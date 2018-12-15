@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.Admin.FieldController do
 
   alias SkollerWeb.School.FieldOfStudyView
   alias Skoller.FieldsOfStudy
-  alias Skoller.Students
+  alias Skoller.Students.FieldsOfStudy, as: StudentFieldsOfStudy
 
   import SkollerWeb.Plugs.Auth
   
@@ -25,7 +25,7 @@ defmodule SkollerWeb.Api.V1.Admin.FieldController do
   end
 
   def index(conn, _params) do
-    fields = Students.get_field_of_study_count()
+    fields = StudentFieldsOfStudy.get_field_of_study_count()
     render(conn, FieldOfStudyView, "index.json", fields: fields)
   end
 

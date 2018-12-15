@@ -3,16 +3,10 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.ClassDocs.Doc
-  alias Skoller.Repo
   alias SkollerWeb.Class.DocView
   alias SkollerWeb.ChangesetView
   alias Skoller.ClassDocs
-  alias Skoller.Sammi
-  alias Skoller.Classes
-  alias Skoller.Classes.ClassStatuses
-
-  import Ecto.Query
+  
   import SkollerWeb.Plugs.Auth
   
   @student_role 100
@@ -23,25 +17,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   plug :verify_member, :class
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do
-
-    location = ClassDocs.upload_class_doc(file)
-
-    Task.start(Sammi, :sammi, [params, location])
-  
-    params = params 
-    |> Map.put("path", location)
-    |> Map.put("name", file.filename)
-    |> Map.put("user_id", user.id)
-
-    changeset = Doc.changeset(%Doc{}, params)
-
-    class = Classes.get_class_by_id!(class_id)
-
-    multi = Ecto.Multi.new
-    |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
-
-    case Repo.transaction(multi) do
+    case ClassDocs.upload_doc(file, user.id, class_id, Map.get(params, "is_syllabus", false), [sammi: true]) do
       {:ok, %{doc: doc}} ->
         render(conn, DocView, "show.json", doc: doc)
       {:error, _, failed_value, _} ->
@@ -52,7 +28,7 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    docs = Repo.all(from docs in Doc, where: docs.class_id == ^class_id)
+    docs = ClassDocs.get_docs_by_class(class_id)
     render(conn, DocView, "index.json", docs: docs)
   end
 end

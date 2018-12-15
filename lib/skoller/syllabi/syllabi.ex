@@ -15,12 +15,15 @@ defmodule Skoller.Syllabi do
   alias Skoller.Locks
   alias Skoller.Settings
   alias Skoller.FourDoor.FourDoorOverride
+  alias Skoller.Locks.Users
 
   import Ecto.Query
 
   require Logger
 
   @syllabus_processing_setting "is_auto_syllabus"
+
+  @syllabus_submitted_status 1200
   
   @doc """
   Serves a class to a syllabus worker.
@@ -35,11 +38,10 @@ defmodule Skoller.Syllabi do
    * The default is to serve a class regardless of status or lock.
    * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
   """
-  def serve_class(user, lock_type \\ nil, status_type \\ nil) do
-    case find_existing_lock(user, lock_type) do
+  def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
+    case Users.get_user_lock(user, lock_type) do
       [] -> 
-        workers = get_workers(lock_type)
-        class = workers |> get_class(lock_type, status_type)
+        class = get_workers(lock_type) |> get_class(lock_type, status_type)
         class |> lock_class(user, lock_type)
         class
       list -> Classes.get_class_by_id!(List.first(list).class_id)
@@ -78,14 +80,10 @@ defmodule Skoller.Syllabi do
     |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
-  # TODO: this can probably get moved to Skoller.Locks
-  defp lock_class(%{id: id}, user, nil) do
-    Locks.lock_class(id, user.id, nil)
-  end
+  defp lock_class(nil, _conn, _type), do: nil
   defp lock_class(%{id: id}, user, type) do
-    Repo.insert!(%Lock{user_id: user.id, class_lock_section_id: type, class_id: id, is_completed: false})
+    Locks.lock_class(id, user.id, type)
   end
-  defp lock_class(class, _conn, _type), do: class
 
   # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
   defp get_class(workers, lock_type, status_type) do
@@ -164,10 +162,9 @@ defmodule Skoller.Syllabi do
 
   # Gets a ratio of currently working users per school over total workers.
   defp get_workers(type) do
-    t = from(lock in Lock)
+    t = from(lock in subquery(unique_class_locks()))
     |> join(:inner, [lock], class in Class, lock.class_id == class.id)
     |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
-    |> where([lock], lock.is_completed == false)
     |> where_lock_type(type)
     |> group_by([lock, class, period], period.school_id)
     |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
@@ -178,19 +175,17 @@ defmodule Skoller.Syllabi do
     t
   end
 
+  defp unique_class_locks() do
+    from(lock in Lock)
+    |> distinct([lock], lock.user_id)
+  end
+
   # Takes in an enum where each element has a count, and returns
   # the enum with a :ratio field.
   defp get_enum_ratio(enumerable) do
     sum = enumerable |> Enum.reduce(0, & &1.count + &2)
     
     enumerable |> Enum.map(&Map.put(&1, :ratio, &1.count / sum))
-  end
-
-  defp find_existing_lock(user, type) do
-    from(lock in Lock)
-    |> where([lock], lock.user_id == ^user.id and lock.is_completed == false)
-    |> where_lock_type(type)
-    |> Repo.all()
   end
 
   # If opts are passed in with enrolled: true, then add a join to only get enrolled classes.
@@ -237,12 +232,13 @@ defmodule Skoller.Syllabi do
 
   # Finds the biggest need in schools.
   defp biggest_difference(needed, workers) do
-    needed = Enum.map(needed, &Map.put(&1, :need, get_difference(&1, workers)))
-    max = needed |> Enum.reduce(%{need: 0, school: 0}, &
-      case &1.need >= &2.need do
-        true -> &1
-        false -> &2
-      end)
+    max = needed
+    |> Enum.map(&Map.put(&1, :need, get_difference(&1, workers)))
+    |> Enum.reduce(%{need: 0, school: 0}, &
+        case &1.need >= &2.need do
+          true -> &1
+          false -> &2
+        end)
     Logger.info("biggest_difference")
     Logger.info(inspect(max))
     max.school

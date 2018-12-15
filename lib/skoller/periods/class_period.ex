@@ -6,20 +6,26 @@ defmodule Skoller.Periods.ClassPeriod do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Schools.School
   alias Skoller.Classes.Class
+  alias Skoller.Periods.Status
 
   schema "class_periods" do
     field :name, :string
     field :school_id, :id
     field :is_hidden, :boolean, default: false
+    field :start_date, :utc_datetime
+    field :end_date, :utc_datetime
+    field :is_main_period, :boolean, default: false
+    field :class_period_status_id, :id
     belongs_to :school, School, define_field: false
     has_many :classes, Class
+    belongs_to :class_period_status, Status, define_field: false
 
     timestamps()
   end
 
-  @req_fields [:name, :school_id]
+  @req_fields [:name, :school_id, :start_date, :end_date]
   @all_fields @req_fields
-  @upd_req [:name]
+  @upd_req [:name, :start_date, :end_date]
   @upd_all @upd_req
   
   @doc false

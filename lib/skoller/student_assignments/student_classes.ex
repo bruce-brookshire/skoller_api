@@ -8,9 +8,9 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   alias Skoller.ClassStatuses.Status
   alias Skoller.Repo
   alias Skoller.StudentAssignments
-  alias Skoller.Mods
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
+  alias Skoller.Mods.StudentAssignments, as: StudentAssignmentMods
 
   import Ecto.Query
 
@@ -40,13 +40,13 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   ## Returns
   `Skoller.StudentAssignments.StudentAssignment` or `nil`
   """
-  def get_student_assignment_by_id(id) do
+  def get_student_assignment_by_id!(id) do
     from(sa in StudentAssignment)
     |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
     |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
     |> where([sa], sa.id == ^id)
     |> where([sa, sc, class], class.is_editable == true)
-    |> Repo.one()
+    |> Repo.one!()
   end
 
   @doc """
@@ -84,7 +84,7 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   defp class_filter(query, _params), do: query
 
   defp is_pending_mods(assignment) do
-    case Mods.pending_mods_for_student_assignment(assignment) do
+    case StudentAssignmentMods.pending_mods_for_student_assignment(assignment) do
       [] -> false
       _ -> true
     end

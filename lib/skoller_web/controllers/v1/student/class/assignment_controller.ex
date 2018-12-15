@@ -3,15 +3,11 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   
   use SkollerWeb, :controller
 
-  alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
-  alias SkollerWeb.Responses.MultiError
   alias Skoller.StudentAssignments
-  alias Skoller.Mods
-  alias Skoller.AutoUpdates
-  alias Skoller.ModNotifications
   alias Skoller.EnrolledStudents
   alias Skoller.StudentAssignments.StudentClasses
+  alias Skoller.Mods.StudentAssignments, as: StudentAssignmentMods
 
   import SkollerWeb.Plugs.Auth
   
@@ -29,15 +25,12 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     params = params |> Map.put("student_class_id", student_class.id)
 
     case StudentAssignments.create_student_assignment(params) do
-      {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
-        Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-        Task.start(ModNotifications, :send_mod_update_notifications, [actions])
+      {:ok, student_assignment} ->
         render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-      {:ok, %{student_assignment: student_assignment}} ->
-        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-      {:error, _, failed_value, _} ->
+      {:error, changeset} ->
         conn
-        |> MultiError.render(failed_value)
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
@@ -49,64 +42,36 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   def show(conn, %{"id" => id}) do
     student_assignment = StudentClasses.get_student_assignment_by_id(id, :weight)
     
-    pending_mods = Mods.pending_mods_for_student_assignment(student_assignment)
+    pending_mods = StudentAssignmentMods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
 
     render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
   end
 
   def update(conn, %{"id" => id} = params) do
-    case StudentClasses.get_student_assignment_by_id(id) do
-      nil ->
+    student_assignment = StudentClasses.get_student_assignment_by_id!(id)
+
+    case StudentAssignments.update_student_assignment(student_assignment, params) do
+      {:ok, student_assignment} ->
+        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+      {:error, changeset} ->
         conn
-        |> send_resp(401, "")
-        |> halt()
-      student_assignment -> 
-        case StudentAssignments.update_student_assignment(student_assignment, params) do
-          {:ok, %{student_assignment: student_assignment, mod: %{mod: mod, actions: actions}}} ->
-            student_assignment_update_success(mod, actions)
-            render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-          {:ok, %{student_assignment: student_assignment, mod: mod}} ->
-            mod_results = Keyword.get(mod, :ok)
-            case mod_results do
-              %{mod: mod, actions: actions} ->
-                student_assignment_update_success(mod, actions)
-              _ -> {:ok, nil}
-            end
-            render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
-          {:error, _, failed_value, _} ->
-            conn
-            |> MultiError.render(failed_value)
-        end
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
   end
 
   def delete(conn, %{"id" => id} = params) do
-    case StudentClasses.get_student_assignment_by_id(id) do
-      nil ->
+    student_assignment = StudentClasses.get_student_assignment_by_id!(id)
+
+    case StudentAssignments.delete_student_assignment(student_assignment, params["is_private"]) do
+      {:ok, _results} ->
         conn
-        |> send_resp(401, "")
-        |> halt()
-      student_assignment -> 
-        multi = Ecto.Multi.new
-        |> Ecto.Multi.delete(:student_assignment, student_assignment)
-        |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, params))
-
-        case Repo.transaction(multi) do
-          {:ok, %{mod: mod, actions: actions}} ->
-            Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-            Task.start(ModNotifications, :send_mod_update_notifications, [actions])
-            conn
-            |> send_resp(200, "")
-          {:error, _, failed_value, _} ->
-            conn
-            |> MultiError.render(failed_value)
-        end
+        |> send_resp(200, "")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  defp student_assignment_update_success(mod, actions) do
-    Task.start(AutoUpdates, :process_auto_update, [mod, :notification])
-    Task.start(ModNotifications, :send_mod_update_notifications, [actions])
   end
 end

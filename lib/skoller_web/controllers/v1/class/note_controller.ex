@@ -4,7 +4,8 @@ defmodule SkollerWeb.Api.V1.Class.NoteController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.ClassView
-  alias Skoller.AdminClasses
+  alias Skoller.Classes
+  alias Skoller.Notes
 
   import SkollerWeb.Plugs.Auth
   
@@ -13,8 +14,10 @@ defmodule SkollerWeb.Api.V1.Class.NoteController do
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{"class_id" => class_id} = params) do
-    case AdminClasses.create_note(class_id, params) do
-      {:ok, class} -> render(conn, ClassView, "show.json", class: class)
+    case Notes.create_note(params) do
+      {:ok, _note} -> 
+        class = Classes.get_full_class_by_id!(class_id)
+        render(conn, ClassView, "show.json", class: class)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

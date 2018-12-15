@@ -3,7 +3,7 @@ defmodule Skoller.AssignmentNotifications do
   A context module for sending assignment notifications.
   """
 
-  alias Skoller.Assignments
+  alias Skoller.AssignmentReminders
   alias Skoller.Notifications
   alias Skoller.Services.Notification
 
@@ -27,12 +27,12 @@ defmodule Skoller.AssignmentNotifications do
   end
 
   defp get_message(assignment, atom) do
-    Assignments.get_assignment_reminder(assignment.count, get_topic(atom, assignment.days).id)
+    AssignmentReminders.get_assignment_reminder(assignment.count, get_topic(atom, assignment.days).id)
     |> String.replace("[num]", assignment.count |> to_string())
     |> String.replace("[days]", assignment.days |> to_string())
   end
 
-  defp get_topic(:today, _days), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_today_category)
-  defp get_topic(:future, 1), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_tomorrow_category)
-  defp get_topic(:future, _days), do: Assignments.get_assignment_message_topic_by_id!(@assignment_reminder_future_category)
+  defp get_topic(:today, _days), do: AssignmentReminders.get_assignment_message_topic_by_id!(@assignment_reminder_today_category)
+  defp get_topic(:future, 1), do: AssignmentReminders.get_assignment_message_topic_by_id!(@assignment_reminder_tomorrow_category)
+  defp get_topic(:future, _days), do: AssignmentReminders.get_assignment_message_topic_by_id!(@assignment_reminder_future_category)
 end

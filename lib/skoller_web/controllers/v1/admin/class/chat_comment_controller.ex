@@ -16,9 +16,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
   plug :check_chat_enabled
   plug :verify_member, :class
 
-  def delete(conn, %{"id" => id}) do
+  def delete_comment(conn, %{"id" => id}) do
     comment = conn |> get_comment(id)
-    case ChatComments.delete(comment) do
+    case ChatComments.delete_comment(comment) do
       {:ok, _struct} ->
         conn
         |> send_resp(200, "")
@@ -34,6 +34,6 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChatCommentController do
     ChatComments.get_comment_by_student_and_id!(student_id, id)
   end
   defp get_comment(_conn, id) do
-    ChatComments.get!(id)
+    ChatComments.get_comment!(id)
   end
 end

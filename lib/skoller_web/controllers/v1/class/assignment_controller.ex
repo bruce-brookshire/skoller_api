@@ -5,8 +5,8 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
 
   alias SkollerWeb.AssignmentView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.StudentAssignments
   alias Skoller.Assignments
+  alias Skoller.Assignments.Classes
 
   import SkollerWeb.Plugs.Auth
   import SkollerWeb.Plugs.Lock
@@ -23,8 +23,8 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   plug :check_lock, %{type: :assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :class_id}
 
-  def create(conn, %{"class_id" => class_id} = params) do
-    case Assignments.create_assignment(class_id, params) do
+  def create(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
+    case Assignments.create_assignment(class_id, user.id, params) do
       {:ok, %{assignment: assignment}} ->
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->
@@ -34,7 +34,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   end
 
   def index(conn, %{"class_id" => class_id}) do
-    assignments = StudentAssignments.get_assignments(%{class_id: class_id})
+    assignments = Classes.get_assignments_by_class(class_id)
     render(conn, AssignmentView, "index.json", assignments: assignments)
   end
 
@@ -50,8 +50,8 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
     end
   end
 
-  def update(conn, %{"id" => id} = params) do
-    case Assignments.update_assignment(id, params) do
+  def update(%{assigns: %{user: user}} = conn, %{"id" => id} = params) do
+    case Assignments.update_assignment(id, user.id, params) do
       {:ok, %{assignment: assignment}} ->
         render(conn, AssignmentView, "show.json", assignment: assignment)
       {:error, _, failed_value, _} ->

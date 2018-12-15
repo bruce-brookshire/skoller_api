@@ -4,6 +4,7 @@ defmodule SkollerWeb.StudentView do
 
   alias SkollerWeb.StudentView
   alias Skoller.Repo
+  alias Skoller.Schools
   alias SkollerWeb.School.FieldOfStudyView
   alias SkollerWeb.SchoolView
   alias SkollerWeb.UserView
@@ -19,7 +20,7 @@ defmodule SkollerWeb.StudentView do
   end
 
   def render("student.json", %{student: student}) do
-    student = student |> Repo.preload([:fields_of_study, :schools])
+    student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization])
     %{
       id: student.id,
       name_first: student.name_first,
@@ -40,9 +41,11 @@ defmodule SkollerWeb.StudentView do
       bio: student.bio,
       grad_year: student.grad_year,
       enrollment_link: System.get_env("WEB_URL") <> @signup_path <> student.enrollment_link,
-      schools: render_many(student.schools, SchoolView, "school.json"),
+      schools: render_many(student.schools |> Schools.with_four_door(), SchoolView, "school-detail.json"),
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
-      points: Skoller.StudentPoints.get_points_by_student_id(student.id)
+      points: Skoller.StudentPoints.get_points_by_student_id(student.id),
+      primary_school: render_one(student.primary_school, SchoolView, "school.json"),
+      primary_organization: student |> primary_organization_name()
     }
   end
 
@@ -58,4 +61,9 @@ defmodule SkollerWeb.StudentView do
       user: render_one(student.users |> List.first(), UserView, "user.json")
     }
   end
+
+  defp primary_organization_name(%{primary_organization: primary_organization}) when not is_nil(primary_organization) do
+    primary_organization.name
+  end
+  defp primary_organization_name(_student), do: nil
 end

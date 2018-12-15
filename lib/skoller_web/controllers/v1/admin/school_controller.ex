@@ -6,7 +6,6 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   alias SkollerWeb.Admin.SchoolView
   alias Skoller.Schools
   alias Skoller.EnrolledSchools
-  alias Skoller.ClassStatuses.Schools, as: ClassStatuses
 
   import SkollerWeb.Plugs.Auth
   
@@ -26,8 +25,6 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
 
   def hub(conn, params) do
     schools = EnrolledSchools.get_schools_with_enrollment(params)
-              |> Enum.map(&put_class_statuses(&1))
-    
     render(conn, SchoolView, "index.json", schools: schools)
   end
 
@@ -42,10 +39,5 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
         |> put_status(:unprocessable_entity)
         |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
     end
-  end
-
-  defp put_class_statuses(%{school: school} = params) do
-    params
-    |> Map.put(:classes, ClassStatuses.get_status_counts(school.id))
   end
 end

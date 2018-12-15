@@ -7,6 +7,7 @@ defmodule Skoller.Settings do
 
   alias Skoller.Repo
   alias Skoller.Settings.Setting
+  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -59,14 +60,25 @@ defmodule Skoller.Settings do
   end
 
   @doc """
-  Updates an admin setting.
+  Updates multiple settings.
 
-  `setting` must be of type `Skoller.Settings.Setting`.
-
-  Returns `{:ok, Skoller.Settings.Setting}` or `{:error, Ecto.Changeset}`
+  ## Returns
+  `%{:ok, settings: []}`, or an `Ecto.Multi` error struct.
   """
-  def update_setting(%Setting{} = setting, params) do
-    Setting.changeset_update(setting, params)
+  def update_settings(settings) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:settings, &multi_update_settings(settings, &1))
+    |> Repo.transaction()
+  end
+
+  defp multi_update_settings(settings, _) do
+    status = settings |> Enum.map(&process_multi_update_setting(&1))
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
+  end
+
+  defp process_multi_update_setting(%{"name" => name, "value" => value}) do
+    get_setting_by_name!(name)
+    |> Setting.changeset_update(%{value: value |> to_string()})
     |> Repo.update()
   end
 end

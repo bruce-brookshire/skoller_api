@@ -7,7 +7,6 @@ defmodule Skoller.FourDoor do
   alias Skoller.FourDoor.FourDoorOverride
   alias Skoller.Settings
   alias Skoller.Schools.School
-  alias Skoller.MapErrors
 
   import Ecto.Query
 
@@ -86,29 +85,20 @@ defmodule Skoller.FourDoor do
   `{:ok, %{settings: {:ok, [Skoller.Settings.Setting]}}}` or `{:error, _, _, _}`
   """
   def update_four_door_defaults(params) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.run(:settings, &update_four_door_defaults(params, &1))
-    |> Repo.transaction()
-  end
-  defp update_four_door_defaults(params, _) do
-    status = params |> Enum.map(&update_setting(&1))
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
-  end
-
-  defp update_setting(item) do
-    settings_old = Settings.get_setting_by_name!(elem(item, 0))
-    Settings.update_setting(settings_old, %{value: to_string(elem(item, 1))})
+    Settings.update_settings(params)
   end
 
   defp insert_override(params) do
+    map = params |> generate_map_from_settings_list()
     %FourDoorOverride{}
-    |> FourDoorOverride.changeset(params)
+    |> FourDoorOverride.changeset(map)
     |> Repo.insert()
   end
 
   defp update_override(override_old, params) do
+    map = params |> generate_map_from_settings_list()
     override_old
-    |> FourDoorOverride.changeset(params)
+    |> FourDoorOverride.changeset(map)
     |> Repo.update()
   end
 
@@ -118,6 +108,10 @@ defmodule Skoller.FourDoor do
 
   defp get_school_override!(school_id) do
     Repo.get_by!(FourDoorOverride, school_id: school_id)
+  end
+
+  defp generate_map_from_settings_list(list) do
+    list |> List.foldl(Map.new, & &2 |> Map.put(&1["name"], &1["value"]))
   end
 
   defp strip_bool("true") do

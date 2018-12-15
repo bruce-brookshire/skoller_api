@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.ClassView
-  alias Skoller.AdminClasses
+  alias Skoller.Classes
 
   import SkollerWeb.Plugs.Auth
   
@@ -23,7 +23,7 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
   * 200 `SkollerWeb.ClassView`
   """
   def show(conn, %{"id" => id}) do
-    class = AdminClasses.get_full_class_by_id!(id)
+    class = Classes.get_full_class_by_id!(id)
 
     render(conn, ClassView, "show.json", class: class)
   end

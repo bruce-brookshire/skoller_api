@@ -72,9 +72,9 @@ defmodule Skoller.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs", "seed.dev"],
+      "ecto.setup": ["ecto.create", "ecto.migrate_s", "run priv/repo/seeds.exs", "seed.dev"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      test: ["ecto.create --quiet", "ecto.migrate_s", "test"],
       "ecto.migrate_s": ["ecto.migrate.startup", "ecto.migrate"]
     ]
   end
