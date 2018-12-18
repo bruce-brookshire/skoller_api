@@ -64,7 +64,7 @@ defmodule SkollerWeb.ClassView do
     |> render_one(ClassView, "class.json")
     |> Map.merge(
       %{
-        school: render_one(school, SchoolView, "school.json"),
+        school: render_one(school, SchoolView, "school-detail.json"),
         status: render_one(class.class_status, StatusView, "status.json"),
         help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json"),
         change_requests: render_many(class.change_requests, ChangeRequestView, "change_request.json"),
