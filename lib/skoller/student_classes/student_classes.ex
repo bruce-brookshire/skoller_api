@@ -11,6 +11,7 @@ defmodule Skoller.StudentClasses do
   alias Skoller.Classes.EditableClasses
   alias Skoller.EnrolledStudents
   alias Skoller.Classes
+  alias Skoller.Students
   alias Skoller.ClassStatuses.Classes, as: ClassStatuses
   alias Skoller.StudentAssignments
   alias Skoller.Mods.StudentClasses, as: StudentClassMods
@@ -160,7 +161,8 @@ defmodule Skoller.StudentClasses do
     |> add_enrolled_by(opts)
     |> check_enrollment_limit(student_id)
     
-    class = Classes.get_class_by_id(class_id)
+    class = Classes.get_class_by_id(class_id) |> Repo.preload(:school)
+    student = Students.get_student_by_id!(student_id)
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
@@ -170,7 +172,8 @@ defmodule Skoller.StudentClasses do
     |> Ecto.Multi.run(:mods, &StudentClassMods.add_public_mods_for_student_class(&1))
     |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
     |> Ecto.Multi.run(:points, &add_points_to_student(&1.student_class))
-    
+    |> Ecto.Multi.run(:primary_school, fn _trans -> Students.conditional_primary_school_set(student, class.school.id) end)
+
     case multi |> Repo.transaction() do
       {:ok, trans} -> 
         {:ok, get_student_class_by_id(trans.student_class.id)}

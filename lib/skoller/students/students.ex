@@ -143,4 +143,18 @@ defmodule Skoller.Students do
     |> Ecto.Changeset.change(%{is_verified: true})
     |> Repo.update!
   end
+
+  @doc """
+  Sets the primary school if one doesn't already exist
+  """
+  require IEx
+  def conditional_primary_school_set(student, school_id) do
+    if (student.primary_school_id == nil) do
+      student
+      |> Ecto.Changeset.change(%{primary_school_id: school_id})
+      |> Repo.update
+    else
+      {:ok, student}
+    end
+  end
 end
