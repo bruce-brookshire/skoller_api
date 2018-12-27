@@ -53,8 +53,22 @@ defmodule Skoller.Periods do
   `{:ok, Skoller.Periods.ClassPeriod}` or `{:error, Ecto.Changeset}`
   """
   def update_period(period_old, params) do
-    ClassPeriod.changeset_update(period_old, params)
-    |> Repo.update()
+    result = Ecto.Multi.new()
+    |> Ecto.Multi.update(:class_period, ClassPeriod.changeset_update(period_old, params))
+    |> Ecto.Multi.run(:period, fn %{class_period: class_period} ->
+      status_id = find_status(class_period.start_date, class_period.end_date)
+      update_period_status(class_period, status_id)
+    end)
+    |> Repo.transaction()
+    
+    case result do
+      {:ok, %{period: period}} ->
+        {:ok, period}
+      {:error, _, failed_result, _} -> 
+        {:error, failed_result}
+      _ ->
+        {:error, %{}}
+    end
   end
 
   @doc """
@@ -75,7 +89,7 @@ defmodule Skoller.Periods do
   """
   def update_period_status(period, @prompt_status) do
     result = period
-    |> Ecto.Changeset.change(%{class_period_status_id: @prompt_status})
+    |> update_period_status_changeset(@prompt_status)
     |> Repo.update()
 
     #Task.start(Notifications, :prompt_for_future_enrollment_notification, [period])
@@ -83,8 +97,11 @@ defmodule Skoller.Periods do
   end
   def update_period_status(period, status_id) do
     period
-    |> Ecto.Changeset.change(%{class_period_status_id: status_id})
+    |> update_period_status_changeset(status_id)
     |> Repo.update()
+  end
+  def update_period_status_changeset(period, status_id) do
+    Ecto.Changeset.change(period, %{class_period_status_id: status_id})
   end
 
   @doc """
