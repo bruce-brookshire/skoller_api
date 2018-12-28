@@ -61,6 +61,7 @@ defmodule Skoller.Mixfile do
       {:timex, "~> 3.1"},
       {:bamboo_ses, "~> 0.1.0"},
       {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
+      {:faker, "~> 0.11"}
     ]
   end
 
