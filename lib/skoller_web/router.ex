@@ -127,12 +127,15 @@ defmodule SkollerWeb.Router do
         post "/classes/csv", CSVController, :class
       end
 
+      get "/periods/:period_id/classes", ClassController, :index
+
       # Class routes
       resources "/class-statuses", Class.StatusController, only: [:index]
       get "/class-statuses/hub", Class.StatusController, :hub
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
+      
       resources "/classes", ClassController, only: [:update, :index] do
 
         post "/notes", Class.NoteController, :create

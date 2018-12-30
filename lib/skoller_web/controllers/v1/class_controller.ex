@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Classes
   alias Skoller.StudentClasses.Classes, as: EnrolledClasses
+  alias Skoller.Periods
 
   import SkollerWeb.Plugs.Auth
   
@@ -41,6 +42,20 @@ defmodule SkollerWeb.Api.V1.ClassController do
         conn
         |> MultiError.render(failed_value)
     end
+  end
+
+  @doc """
+   Returns all classes for the period and filters
+
+  ## Returns:
+  * 422 `SkollerWeb.ChangesetView`
+  * 401
+  * 200 `SkollerWeb.ClassView`
+  """
+  def index(conn, %{"period_id" => period_id} = params) do
+    classes = Periods.get_classes_by_period_id(period_id, params)
+
+    render(conn, ClassView, "index.json", classes: classes)
   end
 
   @doc """
