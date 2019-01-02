@@ -11,8 +11,7 @@ defmodule Skoller.Classes.Notifications do
   @class_complete_category "Class.Complete"
   @manual_syllabus_category "Manual.NeedsSyllabus"
 
-  @a_classmate "A classmate is setting up "
-  @check_out " . Watch the assignments start rolling in your schedule 💯  👍  "
+  @class_live " is live ⚡️ Hop on Skoller to connect with classmates and Keep Up with Classes, Together!"
 
   @needs_syllabus_msg "It’s not too late to upload your syllabi on our website! Take a couple minutes to knock it out. Your class will love you for it 👌"
 
@@ -37,6 +36,6 @@ defmodule Skoller.Classes.Notifications do
   end
 
   defp class_complete_msg(class) do
-    @a_classmate <> class.name <> @check_out
+    class.name <> @class_live
   end
 end
