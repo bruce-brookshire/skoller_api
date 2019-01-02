@@ -45,4 +45,11 @@ defmodule Skoller.Periods.Jobs do
     |> Repo.all()
     |> Enum.each(&Periods.update_period_status(&1, @active_status))
   end
+
+  def update_all_period_statuses() do
+    periods = from(p in ClassPeriod) |> Repo.all()
+    Enum.each(periods, fn p ->
+      Periods.reset_status(p)
+    end)
+  end
 end

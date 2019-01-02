@@ -69,8 +69,7 @@ defmodule Skoller.Periods do
     result = Ecto.Multi.new()
     |> Ecto.Multi.update(:class_period, ClassPeriod.changeset_update(period_old, params))
     |> Ecto.Multi.run(:period, fn %{class_period: class_period} ->
-      status_id = find_status(class_period.start_date, class_period.end_date)
-      update_period_status(class_period, status_id)
+      reset_status(class_period)
     end)
     |> Repo.transaction()
     
@@ -197,6 +196,21 @@ defmodule Skoller.Periods do
           :gt -> @active_status
           _ -> @past_status
         end
+    end
+  end
+
+  def reset_status(class_period) do
+    status_id = find_status(class_period.start_date, class_period.end_date)
+    cond do
+      # If status is unchanged, do not update
+      status_id == class_period.class_period_status_id ->
+        {:ok, class_period}
+      # If we've entered prompt already, do not reset to active
+      status_id == @active_status && class_period.class_period_status_id == @prompt_status ->
+        {:ok, class_period}
+      # Update status
+      true ->
+        update_period_status(class_period, status_id)
     end
   end
 
