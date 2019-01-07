@@ -54,7 +54,7 @@ defmodule SkollerWeb.Api.V1.ClassController do
   """
   def index(conn, %{"period_id" => period_id} = params) do
     classes = Periods.get_classes_by_period_id(period_id, params)
-
+    
     render(conn, ClassView, "index.json", classes: classes)
   end
 

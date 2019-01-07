@@ -9,7 +9,9 @@ defmodule Skoller.Periods do
   alias Skoller.Periods.Generator
   alias Skoller.Schools
   alias Skoller.Classes.Class
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Professors.Professor
+  alias Skoller.EnrolledStudents
 
   import Ecto.Query
 
@@ -37,13 +39,17 @@ defmodule Skoller.Periods do
 
   def get_classes_by_period_id(period_id, filters \\ %{}) do
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, period.id == ^period_id and class.class_period_id == period.id and period.is_hidden == false)
-    |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
-    |> where([class, period, prof], ^class_filter(filters))
-    |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
-    |> order_by([class], desc: class.inserted_at)
-    |> limit(50)
-    |> Repo.all()
+      |> join(:inner, [class], period in ClassPeriod, period.id == ^period_id and class.class_period_id == period.id and period.is_hidden == false)
+      |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
+      |> where([class, period, prof], ^class_filter(filters))
+      |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
+      |> order_by([class], desc: class.inserted_at)
+      |> limit(50)
+      |> Repo.all()
+      |> Enum.map( fn (class) -> 
+        Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
+      end)
+    
   end
 
   @doc """

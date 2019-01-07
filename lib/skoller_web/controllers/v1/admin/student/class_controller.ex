@@ -23,6 +23,8 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
     student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(student_id)
     |> Enum.map(&add_student_class_details(&1))
 
+    IO.inspect student_classes
+
     render(conn, StudentClassView, "index.json", student_classes: student_classes)
   end
 

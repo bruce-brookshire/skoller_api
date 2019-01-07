@@ -17,6 +17,7 @@ defmodule SkollerWeb.ClassView do
   import Ecto.Query
 
   def render("index.json", %{classes: classes}) do
+    IO.inspect classes
     render_many(classes, ClassView, "class.json")
   end
 
@@ -24,7 +25,21 @@ defmodule SkollerWeb.ClassView do
     render_one(class, ClassView, "class_detail.json")
   end
 
+  #Made for 
+  def render("class.json", %{class: %{class: class, professor: professor, class_period: class_period, enrollment: enrollment}}) do
+    
+    base_class_view(class)
+    |> Map.merge(
+      %{
+        class_period: render_one(class_period, PeriodView, "period.json"),
+        professor: render_one(professor, ProfessorView, "professor.json"),
+        enrollment: enrollment
+      }
+    )
+  end
+
   def render("class.json", %{class: %{class: class, professor: professor, class_period: class_period}}) do
+    
     base_class_view(class)
     |> Map.merge(
       %{
@@ -35,6 +50,7 @@ defmodule SkollerWeb.ClassView do
   end
 
   def render("class.json", %{class: %{class: class, professor: professor}}) do
+    
     class = class |> Repo.preload(:class_period)
     base_class_view(class)
     |> Map.merge(
@@ -46,6 +62,7 @@ defmodule SkollerWeb.ClassView do
   end
 
   def render("class.json", %{class: class}) do
+    
     class = class |> Repo.preload([:professor, :class_status, :class_period])
     base_class_view(class)
     |> Map.merge(
