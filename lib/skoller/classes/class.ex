@@ -15,6 +15,7 @@ defmodule Skoller.Classes.Class do
   alias Skoller.StudentRequests.StudentRequest
   alias Skoller.Assignments.Assignment
   alias Skoller.Classes.Note
+  alias Skoller.Users.User
 
   schema "classes" do
     field :credits, :string
@@ -48,6 +49,8 @@ defmodule Skoller.Classes.Class do
     has_many :docs, Doc
     belongs_to :professor, Professor, define_field: false
     belongs_to :class_period, ClassPeriod, define_field: false
+    belongs_to :created_by_user, User, define_field: false, foreign_key: :created_by
+    belongs_to :updated_by_user, User, define_field: false, foreign_key: :updated_by
     has_many :weights, Weight
     belongs_to :class_status, Status, define_field: false
     has_one :school, through: [:class_period, :school]

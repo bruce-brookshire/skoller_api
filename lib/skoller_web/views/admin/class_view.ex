@@ -14,7 +14,14 @@ defmodule SkollerWeb.Admin.ClassView do
   end
 
   def render("class.json", %{class: class}) do
+    class = class |> Skoller.Repo.preload([:created_by_user, :updated_by_user])
     render_one(class, ClassView, "show.json")
+    |> Map.merge(%{
+      is_student_created: class.is_student_created,
+      created_by: (if (class.created_by_user != nil), do: class.created_by_user.email, else: nil),
+      updated_by: (if (class.updated_by_user != nil), do: class.updated_by_user.email, else: nil),
+      created_on: class.created_on
+    })
     |> Map.put(:notes, render_many(class.notes, NoteView, "note.json"))
     |> Map.put(:students, render_many(class.students, StudentClassView, "student_class.json"))
     |> Map.put(:weights, render_many(class.weights, WeightView, "weight.json"))
