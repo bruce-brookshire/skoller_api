@@ -7,6 +7,7 @@ defmodule Skoller.Assignments.Assignment do
   alias Skoller.Classes.Class
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.Weights.Weight
+  alias Skoller.Users.User
 
   schema "assignments" do
     field :due, :utc_datetime
@@ -19,6 +20,8 @@ defmodule Skoller.Assignments.Assignment do
     field :created_on, :string
     belongs_to :class, Class, define_field: false
     belongs_to :weight, Weight, define_field: false
+    belongs_to :created_by_user, User, define_field: false, foreign_key: :created_by
+    belongs_to :updated_by_user, User, define_field: false, foreign_key: :updated_by
     has_many :student_assignments, StudentAssignment
     has_many :posts, Skoller.AssignmentPosts.Post
 

@@ -5,7 +5,7 @@ defmodule SkollerWeb.Admin.ClassView do
   alias SkollerWeb.Admin.ClassView, as: AdminClassView
   alias SkollerWeb.ClassView, as: ClassView
   alias SkollerWeb.Admin.StudentClassView
-  alias SkollerWeb.Class.WeightView
+  alias SkollerWeb.Admin.WeightView
   alias SkollerWeb.Admin.AssignmentView
   alias SkollerWeb.Class.NoteView
   

@@ -6,6 +6,7 @@ defmodule Skoller.Weights.Weight do
 
   alias Skoller.Weights.Weight
   alias Skoller.Classes.Class
+  alias Skoller.Users.User
 
   schema "class_weights" do
     field :name, :string
@@ -14,6 +15,8 @@ defmodule Skoller.Weights.Weight do
     field :created_by, :id
     field :updated_by, :id
     field :created_on, :string
+    belongs_to :created_by_user, User, define_field: false, foreign_key: :created_by
+    belongs_to :updated_by_user, User, define_field: false, foreign_key: :updated_by
     belongs_to :class, Class, define_field: false
 
     timestamps()
