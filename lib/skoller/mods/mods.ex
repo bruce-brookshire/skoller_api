@@ -17,6 +17,7 @@ defmodule Skoller.Mods do
   alias Skoller.Mods.Assignments, as: ModAssignments
   alias Skoller.ModActions
   alias Skoller.Mods.Classes
+  alias StructUtils
 
   import Ecto.Query
 
@@ -223,7 +224,7 @@ defmodule Skoller.Mods do
   defp build_raw_mod(@new_assignment_mod, assignment, params) do
     %{
       data: %{
-        assignment: Map.from_struct(assignment)
+        assignment: assignment |> StructUtils.to_storeable_map()
       },
       assignment_mod_type_id: @new_assignment_mod,
       is_private: is_private(params.is_private),
@@ -457,7 +458,6 @@ defmodule Skoller.Mods do
 
   defp insert_mod(mod, %StudentClass{} = student_class) do
     changeset = Mod.changeset(%Mod{}, mod)
-
     Ecto.Multi.new
     |> Ecto.Multi.insert(:mod, changeset)
     |> Ecto.Multi.run(:actions, &ModActions.insert_mod_actions_for_class(&1.mod, student_class))

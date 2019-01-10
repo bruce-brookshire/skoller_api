@@ -306,12 +306,10 @@ defmodule Skoller.StudentAssignments do
   defp insert_student_assignment(%{assignment: %Assignment{} = assignment}, params) do
     params = params |> Map.put("assignment_id", assignment.id)
     changeset = StudentAssignment.changeset(%StudentAssignment{}, params)
-
     student_assign = from(assign in StudentAssignment)
     |> where([assign], assign.student_class_id == ^params["student_class_id"])
     |> where([assign], assign.assignment_id == ^assignment.id)
     |> Repo.all()
-
     case student_assign do
       [] -> Repo.insert(changeset)
       _ -> {:error, %{student_assignment: "Assignment is already added."}}

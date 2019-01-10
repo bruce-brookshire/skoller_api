@@ -147,7 +147,6 @@ defmodule Skoller.Students do
   @doc """
   Sets the primary school if one doesn't already exist
   """
-  require IEx
   def conditional_primary_school_set(student, school_id) do
     if (student.primary_school_id == nil) do
       student
