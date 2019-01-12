@@ -10,7 +10,7 @@ defmodule Skoller.StudentClasses.Notifications do
   @link_used_msg "More points earned! Someone just joined "
   @link_used_msg2 " using your link. 🤩  "
   @link_used_category "SignupLink.Used"
-  @needs_setup "Get the most of our Skoller. Finish setting up your classes 👍 "
+  @needs_setup "Get the most out of Skoller. Finish setting up your classes 👍 "
   @no_classes "Looks like you’re not in any classes…Add them today so you don’t get behind! 👍"
 
   def send_no_classes_notification(students, email_type) do
