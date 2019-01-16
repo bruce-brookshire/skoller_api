@@ -139,7 +139,7 @@ defmodule Skoller.Analytics.Students do
     |> join(:inner, [s, p, t], u in Skoller.Users.User, s.id == u.student_id)
     |> group_by([s, p, t, u], [s.id, u.id, t.id])
     |> order_by([s, p, t, u], asc: s.name_first)
-    |> select([s, p, t, u], [s.id, s.name_first, s.name_last, u.email, sum(p.value), t.name])
+    |> select([s, p, t, u], {s.id, s.name_first, s.name_last, u.email, sum(p.value), t.name})
     |> Repo.all()
   end
 
