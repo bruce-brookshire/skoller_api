@@ -87,7 +87,7 @@ defmodule Skoller.Syllabi do
 
   # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
   defp get_class(workers, lock_type, status_type) do
-    case workers |> find_class(lock_type, status_type, [enrolled: true]) do
+    case workers |> find_class(lock_type, status_type, [enrolled: false]) do
       nil -> workers |> find_class(lock_type, status_type, [])
       class -> class
     end
