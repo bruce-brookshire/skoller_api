@@ -17,6 +17,7 @@ defmodule Skoller.Mods do
   alias Skoller.Mods.Assignments, as: ModAssignments
   alias Skoller.ModActions
   alias Skoller.Mods.Classes
+  alias Skoller.AutoUpdates
   alias StructUtils
 
   import Ecto.Query
@@ -546,10 +547,10 @@ defmodule Skoller.Mods do
     %{weight_id: data |> Map.get("weight_id")}
   end
   defp get_data(%{assignment_mod_type_id: @due_assignment_mod, data: data}) do
-    %{weight_id: data |> Map.get("due") |> get_due_date()}
+    %{due: data |> Map.get("due") |> get_due_date()}
   end
   defp get_data(%{assignment_mod_type_id: @name_assignment_mod, data: data}) do
-    %{weight_id: data |> Map.get("name")}
+    %{name: data |> Map.get("name")}
   end
 
   defp get_due_date(nil), do: nil
