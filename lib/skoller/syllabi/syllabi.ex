@@ -41,11 +41,15 @@ defmodule Skoller.Syllabi do
   def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] -> 
-        class = get_workers(lock_type) |> get_class(lock_type, status_type)
+        class = get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
         class |> lock_class(user, lock_type)
         class
       list -> Classes.get_class_by_id!(List.first(list).class_id)
     end
+  end
+  # Using same logic as above, gets number of all classes that are workable
+  def syllabi_class_count() do
+    count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
   end
 
   @doc """
@@ -86,16 +90,16 @@ defmodule Skoller.Syllabi do
   end
 
   # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
-  defp get_class(workers, lock_type, status_type) do
-    case workers |> find_class(lock_type, status_type, [enrolled: false]) do
-      nil -> workers |> find_class(lock_type, status_type, [])
+  defp get_classes(workers, lock_type, status_type) do
+    case workers |> find_classes(lock_type, status_type, [enrolled: true]) do
+      nil -> workers |> find_classes(lock_type, status_type, [])
       class -> class
     end
   end
 
   # This gets a ratio of workers to avaliable classes at each school, finds the school with the most need,
   # and then gets the oldest class at the school.
-  defp find_class(workers, lock_type, status_type, opts) do
+  defp find_classes(workers, lock_type, status_type, opts) do
     status_type
     |> get_ratios(opts)
     |> biggest_difference(workers) 
@@ -104,7 +108,7 @@ defmodule Skoller.Syllabi do
 
   # Gets the oldest class at a school with the params below.
   defp get_oldest(school_id, status, type, opts) do
-    t = get_oldest_class_by_school(type, status, school_id, opts)
+    t = get_oldest_classes_by_school(type, status, school_id, opts)
     Logger.info("Get oldest")
     Logger.info(inspect(t))
     t
@@ -112,7 +116,7 @@ defmodule Skoller.Syllabi do
 
   # This gets the oldest class at a school.
   # The class must have a doc, must not be locked, must be editable.
-  defp get_oldest_class_by_school(lock_type, class_status, school_id, opts) do
+  defp get_oldest_classes_by_school(lock_type, class_status, school_id, opts) do
     from(class in Class)
     |> join(:inner, [class], doc in subquery(doc_subquery(school_id)), class.id == doc.class_id)
     |> lock_join(lock_type)
@@ -121,9 +125,6 @@ defmodule Skoller.Syllabi do
     |> where([class], class.is_editable == true)
     |> where([class, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
     |> where_oldest_status(class_status)
-    |> order_by([class, doc], asc: doc.inserted_at)
-    |> limit(1)
-    |> Repo.one()
   end
 
   defp doc_subquery(school_id) do
@@ -135,6 +136,19 @@ defmodule Skoller.Syllabi do
     |> order_by([d], asc: d.inserted_at)
     |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
   end
+
+    # Helper methods to cap the query for syllabi classes
+    defp get_one_class(query) do
+      query
+      |> order_by([class, doc], asc: doc.inserted_at)
+      |> limit(1)
+      |> Repo.one()
+    end
+    defp get_class_count(query) do
+      query
+      |> select([class], count(class.id))
+      |> Repo.one()
+    end
 
   # Gets a list of classes that are valid for a syllabus worker to work.
   # Must have a doc, be editable, and be set to have a syllabus.

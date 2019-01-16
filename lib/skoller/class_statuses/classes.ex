@@ -28,6 +28,9 @@ defmodule Skoller.ClassStatuses.Classes do
   @maint_status 999
   @maint_name "Under Maintenance"
 
+  @workable_syllabi_status -999
+  @workable_syllabi_name "Workable Syllabi"
+
   @ghost_name "Ghost"
 
   @wrong_syllabus_type 100
@@ -75,6 +78,7 @@ defmodule Skoller.ClassStatuses.Classes do
   ## Returns
   `[%{id: Skoller.ClassStatuses.Status.id, name: Skoller.ClassStatuses.Status.name, classes: Integer}]` or `nil`
   """
+  require IEx
   def get_class_status_counts() do
     statuses = from(status in Status)
     |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
@@ -95,7 +99,9 @@ defmodule Skoller.ClassStatuses.Classes do
     |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
     |> Repo.all()
 
-    statuses ++ admin_status ++ maint
+    workable = Syllabi.syllabi_class_count()
+    
+    statuses ++ admin_status ++ maint ++ [%{id: @workable_syllabi_status, name: @workable_syllabi_name, classes: workable}]
   end
 
   @doc """
