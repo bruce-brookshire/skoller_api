@@ -8,6 +8,7 @@ defmodule Skoller.Analytics.Students do
   alias Skoller.Students.Student
   alias Skoller.Classes.Schools
   alias Skoller.Schools.School
+  alias Skoller.StudentPoints.StudentPoint
 
   import Ecto.Query
 
@@ -126,6 +127,20 @@ defmodule Skoller.Analytics.Students do
   def get_enrolled_student_count(params) do
     from(s in subquery(EnrolledStudents.get_student_subquery(params)))
     |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Gets the points per student
+  """
+  def get_student_points() do
+    from(s in Student)
+    |> join(:inner, [s], p in StudentPoint, s.id == p.student_id)
+    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType, p.student_point_type_id == t.id)
+    |> join(:inner, [s, p, t], u in Skoller.Users.User, s.id == u.student_id)
+    |> group_by([s, p, t, u], [s.id, u.id, t.id])
+    |> order_by([s, p, t, u], asc: s.name_first)
+    |> select([s, p, t, u], [s.id, s.name_first, s.name_last, u.email, sum(p.value), t.name])
+    |> Repo.all()
   end
 
   defp convert_to_float(nil), do: 0.0

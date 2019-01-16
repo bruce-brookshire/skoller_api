@@ -85,6 +85,7 @@ defmodule SkollerWeb.Router do
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
       get "/users/csv", Admin.UserController, :csv
+      get "/users/points", Admin.UserController, :points
       resources "/users", Admin.UserController, only: [:show, :index] do
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
