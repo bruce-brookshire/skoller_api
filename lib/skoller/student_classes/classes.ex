@@ -40,6 +40,7 @@ defmodule Skoller.StudentClasses.Classes do
     |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), enroll.class_id == class.id)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
+    |> limit(500)
     |> Repo.all()
   end
 
