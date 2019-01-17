@@ -94,7 +94,7 @@ defmodule Skoller.Classes.Class do
 
   defp mandatory_validations(changeset) do
     changeset
-    |> update_change(:name, &title_case(&1))
+    # |> update_change(:name, &title_case(&1))
     |> foreign_key_constraint(:class_period_id)
     |> foreign_key_constraint(:professor_id)
     |> unique_constraint(:class, name: :unique_class_index)
