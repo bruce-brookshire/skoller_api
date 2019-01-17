@@ -197,6 +197,7 @@ defmodule SkollerWeb.Router do
 
       # Student routes
       resources "/students", StudentController, only: [] do
+        get "/student-link/:token", StudentController, :show
         resources "/fields", Student.FieldController, only: [:create, :delete]
 
         # Chat routes
