@@ -17,7 +17,6 @@ defmodule SkollerWeb.ClassView do
   import Ecto.Query
 
   def render("index.json", %{classes: classes}) do
-    IO.inspect classes
     render_many(classes, ClassView, "class.json")
   end
 

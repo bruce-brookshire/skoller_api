@@ -9,10 +9,12 @@ defmodule SkollerWeb.Student.Class.LinkView do
   end
 
   def render("link.json", %{link: link}) do
+    student = link.student |> Skoller.Repo.preload([:users])
     %{
       class_name: link.class.name,
-      student_name_first: link.student.name_first,
-      student_name_last: link.student.name_last
+      student_name_first: student.name_first,
+      student_name_last: student.name_last,
+      student_image_path: (student.users |> List.first).pic_path
     }
   end
 end

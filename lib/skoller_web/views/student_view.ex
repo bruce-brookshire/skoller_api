@@ -19,6 +19,19 @@ defmodule SkollerWeb.StudentView do
     render_one(student, StudentView, "student.json")
   end
 
+  def render("show.json", %{link: student}) do
+    render_one(student, StudentView, "link.json")
+  end
+
+  def render("link.json", %{link: student}) do
+    student = student |> Repo.preload([:users])
+    %{
+      student_first_name: student.first_name,
+      student_last_name: student.last_name,
+      student_image_path: (student.users |> List.first).pic_path
+    }
+  end
+
   def render("student.json", %{student: student}) do
     student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization])
     %{
