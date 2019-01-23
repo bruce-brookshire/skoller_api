@@ -25,7 +25,7 @@ defmodule Skoller.ChatComments.Notifications do
 
     users 
     |> Enum.reduce([], &put_user_devices(&1) ++ &2)
-    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, &1.msg, @class_chat_comment))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, &1.msg, @class_chat_comment, %{chat_post_id: comment.chat_post_id}))
   end
 
   defp get_chat_message(user, comment) do
