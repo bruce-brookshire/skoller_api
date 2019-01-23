@@ -24,6 +24,10 @@ defmodule Skoller.Students do
     Repo.get!(Student, student_id)
   end
 
+  def get_student_by_enrollment_link!(link) do
+    Repo.get_by!(Student, enrollment_link: link)
+  end
+
   @doc """
   Adds a field of study to a student.
 

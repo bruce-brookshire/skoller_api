@@ -198,7 +198,6 @@ defmodule SkollerWeb.Router do
 
       # Student routes
       resources "/students", StudentController, only: [] do
-        get "/student-link/:token", StudentController, :show
         resources "/fields", Student.FieldController, only: [:create, :delete]
 
         # Chat routes
@@ -298,6 +297,7 @@ defmodule SkollerWeb.Router do
       resources "/fields-of-study/list", FieldController, only: [:index]
       post "/forgot", ForgotEmailController, :forgot
       get "/min-version", MinVerController, :index
+      get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
     end
