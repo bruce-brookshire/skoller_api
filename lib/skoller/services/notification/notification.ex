@@ -16,13 +16,13 @@ defmodule Skoller.Services.Notification do
    * `msg` as a `String` will send a simple message.
    * Currently only supports Apple devices.
   """
-  def create_notification(device, "ios", msg, category) do
-    Ios.create_notification(device, msg, category)
+  def create_notification(device, "ios", msg, category, custom) do
+    Ios.create_notification(device, msg, category, custom)
     |> inspect()
     |> Logger.info()
   end
-  def create_notification(device, "android", msg, category) do
-    Android.create_notification(device, msg, category)
+  def create_notification(device, "android", msg, category, data) do
+    Android.create_notification(device, msg, category, data)
     |> inspect()
     |> Logger.info()
   end

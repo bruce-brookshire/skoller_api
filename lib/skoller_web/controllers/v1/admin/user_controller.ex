@@ -43,10 +43,15 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   def csv(conn, _params) do
     users = Students.get_student_users()
+    filename = get_filename()
     conn
     |> put_resp_content_type("text/csv")
-    |> put_resp_header("content-disposition", "attachment; filename=\"Users-" <> to_string(DateTime.utc_now) <>  "\"")
+    |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"; filename*="#{filename}"])
     |> send_resp(200, csv_users(users))
+  end
+  defp get_filename() do
+    now = DateTime.utc_now
+    "Users-#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}.csv"
   end
 
   def update(conn, %{"user_id" => user_id} = params) do
@@ -80,7 +85,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp add_headers(list) do
-    # ["email,first,last,phone,created date,verified?,# of Classes,Classes Need Syllabus,school\r\n" | list]
     [
       "Account Creation Date," <>
       "First Name," <>
@@ -102,9 +106,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   defp get_row_data(user) do
     user = user |> Users.preload_student([:primary_school, :fields_of_study, {:student_classes, [:class]}])
     enrolled_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
-    # [user.email, user.student.name_first, user.student.name_last, Formatter.phone_to_string(user.student.phone),
-    #   Formatter.naive_date_to_string(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
-    #   get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]
     [
       "#{user.inserted_at.month}/#{user.inserted_at.day}/#{user.inserted_at.year} #{user.inserted_at.hour}:#{user.inserted_at.minute}:#{user.inserted_at.second}",
       user.student.name_first,
