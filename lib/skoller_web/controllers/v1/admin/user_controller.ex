@@ -118,7 +118,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       Enum.count(enrolled_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
       Enum.count(user.student.student_classes),
       Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
-      Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.name <> "|" end)
+      Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.field <> "|" end)
     ]
   end
 
