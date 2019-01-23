@@ -14,8 +14,8 @@ defmodule Skoller.Services.Notification.Ios do
    * `%{title: title, body: body}` as `msg` will send with a title and body.
    * `msg` as a `String` will send a simple message.
   """
-  def create_notification(device, msg, category)
-  def create_notification(device, %{title: title, body: body}, category, custom // %{}) do
+  def create_notification(device, msg, category, custom \\ %{})
+  def create_notification(device, %{title: title, body: body}, category, custom) do
     ""
     |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
@@ -28,7 +28,7 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_sound("default")
     |> APNS.push()
   end
-  def create_notification(device, msg, category, custom // %{}) do
+  def create_notification(device, msg, category, custom) do
     msg
     |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content

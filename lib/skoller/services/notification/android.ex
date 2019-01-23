@@ -14,7 +14,8 @@ defmodule Skoller.Services.Notification.Android do
    * `%{title: title, body: body}` as `msg` will send with a title and body.
    * `msg` as a `String` will send a simple message.
   """
-  def create_notification(device, %{title: title, body: body}, category, data \\ %{}) do
+  def create_notification(device, msg, category, data \\ %{})
+  def create_notification(device, %{title: title, body: body}, category, data) do
     device
     |> new()
     |> put_notification(%{"title" => title, "body" => body})
@@ -22,7 +23,7 @@ defmodule Skoller.Services.Notification.Android do
     |> put_data(data)
     |> FCM.push()
   end
-  def create_notification(device, msg, category, data \\ %{}) do
+  def create_notification(device, msg, category, data) do
     device
     |> new()
     |> put_notification(%{"body" => msg})

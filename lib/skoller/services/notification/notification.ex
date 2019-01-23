@@ -16,6 +16,7 @@ defmodule Skoller.Services.Notification do
    * `msg` as a `String` will send a simple message.
    * Currently only supports Apple devices.
   """
+  def create_notification(device, platform, msg, category, custom_data \\ %{})
   def create_notification(device, "ios", msg, category, custom) do
     Ios.create_notification(device, msg, category, custom)
     |> inspect()
