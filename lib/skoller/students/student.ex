@@ -89,4 +89,8 @@ defmodule Skoller.Students.Student do
         end
     end
   end
+
+  def with_primary_school(student) do
+    student |> Repo.preload(:primary_school)
+  end
 end

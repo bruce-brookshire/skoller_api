@@ -287,4 +287,8 @@ defmodule Skoller.Users do
   defp delete_fields_of_study(id) do
     Students.delete_fields_of_study_by_student_id(id)
   end
+
+  def preload_student(user, student_preloads \\ []) do
+    user |> Repo.preload([{:student, student_preloads}])
+  end
 end

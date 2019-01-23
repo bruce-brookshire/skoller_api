@@ -16,6 +16,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
+
+  @class_complete_status 1400
   
   plug :verify_role, %{role: @admin_role}
 
@@ -78,14 +80,46 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp add_headers(list) do
-    ["email,first,last,phone,created date,verified?,# of Classes,Classes Need Syllabus,school\r\n" | list]
+    # ["email,first,last,phone,created date,verified?,# of Classes,Classes Need Syllabus,school\r\n" | list]
+    [
+      "Account Creation Date," <>
+      "First Name," <>
+      "Last Name," <> 
+      "Email," <> 
+      "Phone #," <>
+      "Phone # Verified?," <>
+      "Main School," <>
+      "Graduation Year," <> 
+      "Current Classes," <>
+      "Current Classes Set Up," <>
+      "Total Classes," <>
+      "Total Classes Set Up," <>
+      "Majors and Minors\r\n"
+      | list
+    ]
   end
 
   defp get_row_data(user) do
-    student_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
-    [user.email, user.student.name_first, user.student.name_last, Formatter.phone_to_string(user.student.phone),
-      Formatter.naive_date_to_string(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
-      get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]
+    user = user |> Users.preload_student([:primary_school, :fields_of_study, {:student_classes, [:class]}])
+    enrolled_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
+    # [user.email, user.student.name_first, user.student.name_last, Formatter.phone_to_string(user.student.phone),
+    #   Formatter.naive_date_to_string(user.inserted_at), user.student.is_verified, Enum.count(student_classes),
+    #   get_needs_syllabus_classes(student_classes), get_most_common_school_name(student_classes)]
+    [
+      "#{user.inserted_at.month}/#{user.inserted_at.day}/#{user.inserted_at.year} #{user.inserted_at.hour}:#{user.inserted_at.minute}:#{user.inserted_at.second}",
+      user.student.name_first,
+      user.student.name_last,
+      user.email,
+      Formatter.phone_to_string(user.student.phone),
+      user.student.is_verified,
+      (if user.student.primary_school != nil, do: user.student.primary_school.name, else: get_most_common_school_name(enrolled_classes)),
+      user.student.grad_year,
+      Enum.count(enrolled_classes),
+      Enum.count(enrolled_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
+      Enum.count(user.student.student_classes),
+      Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
+      Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.name <> "|" end)
+    ]
   end
 
   defp get_needs_syllabus_classes(student_classes) do

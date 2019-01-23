@@ -33,9 +33,5 @@ defmodule Skoller.Users.Students do
     |> preload([s], [:student])
     |> Repo.all()
   end
-
-  def preload_student(user) do
-    user |> Repo.preload([:student, :reports], force: true)
-  end
 end
 
