@@ -225,6 +225,8 @@ defmodule Skoller.StudentAssignments do
   end
 
   defp mod_update_notification({:ok, %{mod: %{actions: actions}}} = result) do
+    Logger.info("Sending update notifications for mods 1")
+    Logger.info(actions)
     Task.start(ModNotifications, :send_mod_update_notifications, [actions])
     result
   end
@@ -233,6 +235,8 @@ defmodule Skoller.StudentAssignments do
     mod_results = Keyword.get(mod, :ok)
     case mod_results do
       %{actions: actions} ->
+        Logger.info("Sending update notifications for mods 2")
+        Logger.info(actions)
         Task.start(ModNotifications, :send_mod_update_notifications, [actions])
       _ ->
         {:ok, nil}

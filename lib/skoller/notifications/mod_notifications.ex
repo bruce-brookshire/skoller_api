@@ -15,6 +15,8 @@ defmodule Skoller.ModNotifications do
   alias Skoller.Mods.Classes
   alias Skoller.Mods.StudentClasses
 
+  require Logger
+
   @name_assignment_mod 100
   @weight_assignment_mod 200
   @due_assignment_mod 300
@@ -58,13 +60,17 @@ defmodule Skoller.ModNotifications do
   def send_mod_update_notifications({:ok, %{actions: _} = mod}) do
     send_mod_update_notifications(mod)
   end
-
+  
   def send_mod_update_notifications(mod) when is_list(mod) do
     mod |> Enum.each(&send_mod_update_notifications(&1))
   end
 
   def send_mod_update_notifications(%{actions: nil}), do: nil
   def send_mod_update_notifications({:ok, _}), do: nil
+  def send_mod_update_notifications(nil) do
+    Logger.info("GOT THAT NIL CASE")
+    nil
+  end
   def send_mod_update_notifications(mod) do
     mod.actions |> Enum.each(&send_mod_update_notifications(&1))
   end
