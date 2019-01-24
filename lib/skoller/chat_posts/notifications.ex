@@ -20,7 +20,7 @@ defmodule Skoller.ChatPosts.Notifications do
     student = Students.get_student_by_id!(student_id)
     class = Classes.get_class_by_id!(post.class_id)
     Notifications.get_class_chat_devices_by_class_id(student_id, post.class_id)
-    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, build_chat_post_notification(post, student, class), @class_chat_post, %{chat_post_id: post.id}))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, build_chat_post_notification(post, student, class), @class_chat_post, %{chat_post_id: post.id, class_id: post.class_id}))
   end
 
   defp build_chat_post_notification(post, student, class) do

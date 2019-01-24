@@ -15,7 +15,7 @@ defmodule Skoller.ChatReplies.Notifications do
   @replied_post " replied in a post you follow"
 
   def send_new_reply_notification(reply, student_id) do
-    reply = reply |> Repo.preload([:student, :chat_comment])
+    reply = reply |> Repo.preload([:student, {:chat_comment, [:chat_post]}])
 
     comment_users = Notifications.get_notification_enabled_chat_comment_users(student_id, reply.chat_comment_id)
     |> Enum.map(&Map.put(&1, :msg, get_chat_reply_msg(&1, reply)))
@@ -30,7 +30,7 @@ defmodule Skoller.ChatReplies.Notifications do
 
     users 
     |> Enum.reduce([], &put_user_devices(&1) ++ &2)
-    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, &1.msg, @class_chat_reply, %{chat_post_id: reply.chat_comment.chat_post_id}))
+    |> Enum.each(&Notification.create_notification(&1.udid, &1.type, &1.msg, @class_chat_reply, %{chat_post_id: reply.chat_comment.chat_post_id, class_id: reply.chat_comment.chat_post.class_id}))
   end
 
   defp get_chat_reply_msg(user, reply) do
