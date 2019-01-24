@@ -4,6 +4,7 @@ defmodule Skoller.Users do
   """
 
   alias Skoller.Repo
+  alias Skoller.Users
   alias Skoller.Users.User
   alias Skoller.Students
   alias Skoller.Students.Student
@@ -13,7 +14,6 @@ defmodule Skoller.Users do
   alias Skoller.Users.Notifications
   alias Skoller.StudentClasses.EnrollmentLinks
   alias Skoller.UserRoles
-  alias Skoller.Users.Students, as: StudentUsers
   alias Skoller.Students.Sms
   alias Skoller.Token
   alias Skoller.Users.Emails
@@ -76,7 +76,7 @@ defmodule Skoller.Users do
 
     case result do
       {:ok, %{user: user}} ->
-        user = user |> StudentUsers.preload_student() |> Repo.preload(:roles)
+        user = user |> Users.preload_student() |> Repo.preload(:roles)
         {:ok, user}
       {:error, _, failed_val, _} ->
         {:error, failed_val}

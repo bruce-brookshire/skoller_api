@@ -10,7 +10,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.StudentClasses
   alias Skoller.Users.Students
   alias Skoller.EnrolledStudents
-  alias Skoller.ClassStatuses.Classes
   alias Skoller.Services.Formatter
 
   import SkollerWeb.Plugs.Auth
@@ -59,7 +58,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
     case Users.update_user(user_old, params, [admin: true]) do
       {:ok, %{user: user}} ->
-        user = user |> Students.preload_student()
+        user = user |> Users.preload_student()
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn
@@ -121,12 +120,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
       Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.field <> "|" end)
     ]
-  end
-
-  defp get_needs_syllabus_classes(student_classes) do
-    student_classes
-    |> Enum.filter(&Classes.class_needs_setup?(&1))
-    |> Enum.count
   end
 
   defp get_most_common_school_name(student_classes) do

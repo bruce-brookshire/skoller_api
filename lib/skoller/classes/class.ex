@@ -99,21 +99,5 @@ defmodule Skoller.Classes.Class do
     |> foreign_key_constraint(:professor_id)
     |> unique_constraint(:class, name: :unique_class_index)
   end
-
-  defp title_case(str) do
-    str
-    |> String.split()
-    |> Enum.map(&capitalize(&1))
-    |> Enum.reduce("", & &2 <> " " <> &1)
-    |> String.trim()
-  end
-
-  defp capitalize(string) do
-    cond do
-      string in ["II", "III", "IV", "VI", "VIII", "IX"] -> string
-      string in ["ii", "iii", "iv", "vi", "viii", "ix"] -> string |> String.upcase
-      true -> String.capitalize(string)
-    end
-  end
 end
   

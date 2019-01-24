@@ -4,7 +4,6 @@ defmodule SkollerWeb.SchoolView do
 
   alias SkollerWeb.SchoolView
   alias SkollerWeb.PeriodView
-  alias Skoller.Schools
   alias Skoller.Repo
 
   def render("index.json", %{schools: schools}) do
