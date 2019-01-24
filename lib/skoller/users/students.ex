@@ -34,4 +34,3 @@ defmodule Skoller.Users.Students do
     |> Repo.all()
   end
 end
-

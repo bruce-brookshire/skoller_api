@@ -76,7 +76,7 @@ defmodule Skoller.Users do
 
     case result do
       {:ok, %{user: user}} ->
-        user = user |> Users.preload_student() |> Repo.preload(:roles)
+        user = user |> Users.preload_student([], [force: true]) |> Repo.preload([:reports], force: true) |> Repo.preload([:roles])
         {:ok, user}
       {:error, _, failed_val, _} ->
         {:error, failed_val}
@@ -288,7 +288,7 @@ defmodule Skoller.Users do
     Students.delete_fields_of_study_by_student_id(id)
   end
 
-  def preload_student(user, student_preloads \\ []) do
-    user |> Repo.preload([{:student, student_preloads}])
+  def preload_student(user, student_preloads \\ [], opts \\ []) do
+    user |> Repo.preload([{:student, student_preloads}], opts)
   end
 end

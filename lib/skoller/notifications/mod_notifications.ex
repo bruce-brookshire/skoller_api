@@ -68,7 +68,6 @@ defmodule Skoller.ModNotifications do
   def send_mod_update_notifications(%{actions: nil}), do: nil
   def send_mod_update_notifications({:ok, _}), do: nil
   def send_mod_update_notifications(nil) do
-    Logger.info("GOT THAT NIL CASE")
     nil
   end
   def send_mod_update_notifications(mod) do

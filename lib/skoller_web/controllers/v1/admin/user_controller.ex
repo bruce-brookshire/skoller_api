@@ -19,7 +19,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   @class_complete_status 1400
   
   plug :verify_role, %{role: @admin_role}
-
   def create(conn, %{} = params) do
     case Users.create_user(params, [admin: true]) do
       {:ok, user} ->
