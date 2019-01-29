@@ -1,6 +1,6 @@
 defmodule Skoller.JobHelper do
 
-  defp get_time_diff(now, interval) do
+  def get_time_diff(now, interval) do
     next_min = now.minute |> get_next_interval(interval)
     next_time = case now.minute == next_min do
       true -> get_time(now.minute + interval, now, interval)
@@ -18,21 +18,21 @@ defmodule Skoller.JobHelper do
     end
   end
 
-  defp get_time(min, now, interval) do
+  def get_time(min, now, interval) do
     case min > (60 - interval) do
       true -> now |> add_hour
       _ -> Time.new(now.hour, min, 0, 0)
     end
   end
 
-  defp add_hour(now) do
+  def add_hour(now) do
     case now.hour + 1 do
       24 -> Time.new(23, 59, 59, 0)
       _ -> Time.new(now.hour + 1, 0, 0, 0)
     end
   end
 
-  defp get_next_interval(min, interval) do
+  def get_next_interval(min, interval) do
     case rem(min, interval) do
       0 -> min
       _ -> get_next_interval(min + 1, interval)
