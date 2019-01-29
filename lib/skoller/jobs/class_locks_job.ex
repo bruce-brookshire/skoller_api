@@ -5,7 +5,7 @@ defmodule Skoller.ClassLocksJob do
   use GenServer
 
   alias Skoller.Locks
-  
+
   # This will currently run on every 5 minute interval in an hour.
   # It is NOT every 5 minutes from spin up.
   @interval_min 5
@@ -37,6 +37,6 @@ defmodule Skoller.ClassLocksJob do
 
   # This creates a :work event to be processed after get_time_diff/1 milliseconds.
   defp schedule_work() do
-    Process.send_after(self(), :work, now |> Skoller.JobHelper.get_next_interval(@interval_min))
+    Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_next_interval(@interval_min))
   end
 end
