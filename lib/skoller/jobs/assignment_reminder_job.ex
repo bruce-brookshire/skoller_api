@@ -37,6 +37,6 @@ defmodule Skoller.AssignmentReminderJob do
 
   # This creates a :work event to be processed after get_time_diff/1 milliseconds.
   defp schedule_work() do
-    Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_next_interval(@interval_min))
+    Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_time_diff(@interval_min))
   end
 end
