@@ -17,6 +17,10 @@ defmodule Skoller.ClassDocs do
 
   require Logger
 
+  def get_docs(params) do
+    from(d in Doc, where: ^params) |> Repo.all()
+  end
+
   @doc """
   Gets a doc by id
 
@@ -45,6 +49,12 @@ defmodule Skoller.ClassDocs do
   """
   def delete_doc(%Doc{} = doc) do
     Repo.delete(doc)
+  end
+  def delete_docs(ids) when is_list(ids) do
+    from(d in Doc, where: d.id in ^ids) |> Repo.delete_all()
+  end
+  def delete_docs(params) do
+    from(d in Doc, where: ^params) |> Repo.delete_all()
   end
 
   @doc """

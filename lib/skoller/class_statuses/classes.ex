@@ -78,7 +78,6 @@ defmodule Skoller.ClassStatuses.Classes do
   ## Returns
   `[%{id: Skoller.ClassStatuses.Status.id, name: Skoller.ClassStatuses.Status.name, classes: Integer}]` or `nil`
   """
-  require IEx
   def get_class_status_counts() do
     statuses = from(status in Status)
     |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
