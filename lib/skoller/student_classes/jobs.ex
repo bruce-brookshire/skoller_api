@@ -30,11 +30,12 @@ defmodule Skoller.StudentClasses.Jobs do
       :eq ->
         Logger.info("Sending no classes emails and notifications.")
         students = UnenrolledStudents.get_unenrolled_students()
-        if email_type.is_active_email do
-          students |> Emails.send_no_classes_emails()
-        end
+        #Send emails after notifications because emails are blocking
         if email_type.is_active_notification do
           students |> Notifications.send_no_classes_notification(email_type)
+        end
+        if email_type.is_active_email do
+          students |> Emails.send_no_classes_emails()
         end
       _ -> nil
     end
@@ -46,11 +47,12 @@ defmodule Skoller.StudentClasses.Jobs do
       :eq ->
         Logger.info("Sending needs setup emails and notifications.")
         students = ClassStatuses.get_students_needs_setup_classes()
-        if email_type.is_active_email do
-          students |> Emails.send_needs_setup_emails()
-        end
+        #Send emails after notifications because emails are blocking
         if email_type.is_active_notification do
           students |> Notifications.send_needs_setup_notification(email_type)
+        end
+        if email_type.is_active_email do
+          students |> Emails.send_needs_setup_emails()
         end
       _ -> nil
     end
