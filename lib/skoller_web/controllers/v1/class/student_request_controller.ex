@@ -17,7 +17,6 @@ defmodule SkollerWeb.Api.V1.Class.StudentRequestController do
 
   def create(%{assigns: %{user: user}} = conn, %{} = params) do
     params = params |> Map.put("user_id", user.id)
-
     case StudentRequests.create(user, params["class_id"], params) do
       {:ok, %{student_request: student_request}} ->
         render(conn, StudentRequestView, "show.json", student_request: student_request)

@@ -78,9 +78,8 @@ defmodule Skoller.StudentRequests do
   defp upload_class_doc(user, {_num, file}, params, student_request) do 
     upload_class_doc(user, file, params, student_request)
   end
-
   defp upload_class_doc(user, file, %{"class_id" => class_id}, student_request) do 
-    {:ok, doc} = ClassDocs.upload_doc(file, user.id, class_id, get_is_syllabus(student_request))
+    {:ok, %{doc: doc}} = ClassDocs.upload_doc(file, user.id, class_id, get_is_syllabus(student_request))
     Repo.insert(%Doc{doc_id: doc.id, class_student_request_id: student_request.id})
   end
 
@@ -93,8 +92,16 @@ defmodule Skoller.StudentRequests do
   defp remove_docs_from_same_uploader(%{student_request: %{user_id: nil}}, _class), do: {:ok, nil}
   defp remove_docs_from_same_uploader(%{student_request: %{user_id: user_id, class_student_request_type_id: @syllabus_request}, doc_upload: upload}, class) when not is_nil(upload) do
     class = class |> Repo.preload(:docs)
-    class.docs
-    |> Enum.filter(&user_id == &1.user_id and &1.is_syllabus == true)
-    |> Repo.delete_all()
+    IO.inspect(upload)
+    doc_ids = class.docs
+    |> Enum.filter(&user_id == &1.user_id and &1.is_syllabus == true and &1.id != upload[:ok].doc_id)
+    |> Enum.map(fn d -> d.id end)
+    {num_deleted, _return} = ClassDocs.delete_docs(doc_ids)
+    IO.inspect(num_deleted)
+    IO.inspect(doc_ids)
+    {:ok, num_deleted}
+  end
+  defp remove_docs_from_same_uploader(request, _class) do
+    {:ok, nil}
   end
 end
