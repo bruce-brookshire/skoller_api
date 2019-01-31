@@ -21,7 +21,7 @@ defmodule SkollerWeb.Class.StudentClassView do
     render_one(student_class, StudentClassView, "student_class-detail.json")
   end
 
-  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
+  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students, documents: documents} = student_class}) do
     student_class
     |> base_detail_student_class()
     |> Map.merge(%{
@@ -29,7 +29,8 @@ defmodule SkollerWeb.Class.StudentClassView do
       completion: Decimal.to_float(Decimal.round(completion, 2)),
       enrollment: enrollment,
       new_assignments: render_many(new_assignments, ModView, "mod.json"),
-      students: render_many(students, StudentView, "student-short.json")
+      students: render_many(students, StudentView, "student-short.json"),
+      documents: documents
     })
   end
 

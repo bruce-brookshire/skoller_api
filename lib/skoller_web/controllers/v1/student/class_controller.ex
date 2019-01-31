@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias Skoller.EnrolledStudents
   alias Skoller.StudentClasses.EnrollmentLinks
   alias Skoller.Mods.Assignments
+  alias Skoller.ClassDocs
 
   import SkollerWeb.Plugs.Auth
   
@@ -49,6 +50,7 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
     |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(class_id))
     |> Map.put(:new_assignments, get_new_class_assignments(student_class))
     |> Map.put(:students, EnrolledStudents.get_students_by_class(class_id))
+    |> Map.put(:documents, ClassDocs.get_docs_by_class(student_class.class_id) |> Enum.map(fn elem -> %{name: elem.name, path: elem.path} end))
 
     render(conn, StudentClassView, "show.json", student_class: student_class)
   end
