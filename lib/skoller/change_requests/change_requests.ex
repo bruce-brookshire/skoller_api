@@ -39,7 +39,7 @@ defmodule Skoller.ChangeRequests do
   def complete_change_request(id) do
     change_request_old = Repo.get!(ChangeRequest, id)
     |> Repo.preload(:class)
-    
+
     changeset = ChangeRequest.changeset(change_request_old, %{is_completed: true})
 
     multi = Ecto.Multi.new()
