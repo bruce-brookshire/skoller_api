@@ -26,13 +26,13 @@ defmodule Skoller.EmailJobs.Jobs do
   defp send_email(email_job) do
     case email_job.email_type_id do
       @no_classes_id ->
-        spawn Emails.send_no_classes_email(email_job.user)
+        spawn(Emails, :send_no_classes_email, [email_job.user])
       @needs_setup_id ->
-        spawn Emails.send_needs_setup_email(email_job.user)
+        spawn(Emails, :send_needs_setup_email, [email_job.user])
     end
 
     #delete the entry from the database after it is sent
-    EmailJobs.delete_job(email_job)
+    EmailJobs.delete_job(email_job.id)
   end
 
 end

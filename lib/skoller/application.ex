@@ -19,9 +19,9 @@ defmodule Skoller.Application do
       # Start your own worker by calling:
       # Skoller.Worker.start_link(arg1, arg2, arg3)
       # worker(Skoller.Worker, [arg1, arg2, arg3]),
-      # worker(Skoller.AssignmentReminderJob, []),
-      # worker(Skoller.ClassLocksJob, []),
-      # worker(Skoller.ClassPeriodJob, []),
+      worker(Skoller.AssignmentReminderJob, []),
+      worker(Skoller.ClassLocksJob, []),
+      worker(Skoller.ClassPeriodJob, []),
       worker(Skoller.ClassSetupJob, []),
       worker(Skoller.NoClassesJob, []),
       worker(Skoller.EmailManagerJob, []),

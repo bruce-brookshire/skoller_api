@@ -3,6 +3,7 @@ defmodule Skoller.StudentClasses.Emails do
   Defines emails based on student classes
   """
 
+  alias Skoller.EmailJobs
   alias Skoller.Users.EmailPreferences
   alias Skoller.Services.MarketingEmail
 
@@ -32,14 +33,14 @@ defmodule Skoller.StudentClasses.Emails do
   Queues a no classes email for a user
   """
   def queue_no_classes_email(user) do
-    EmailJob.create_email_job(user.id, @no_classes_id)
+    EmailJobs.create_email_job(user.id, @no_classes_id)
   end
 
   @doc """
   Queues needs setup email for a user
   """
   def queue_needs_setup_email(user) do
-    EmailJob.create_email_job(user.id, @needs_setup_id )
+    EmailJobs.create_email_job(user.id, @needs_setup_id )
   end
 
   def send_no_classes_email(user) do
