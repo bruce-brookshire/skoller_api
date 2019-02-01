@@ -66,6 +66,9 @@ defmodule Skoller.StudentClasses.Jobs do
 
     email_time = email_type.send_time |> Time.from_iso8601!()
 
+    IO.inspect email_time
+    IO.inspect time
+
     Time.compare(time, email_time)
   end
 
