@@ -1,8 +1,8 @@
 defmodule Skoller.StudentClasses.Jobs do
   @moduledoc """
-  
+
   Defines email sending criteria for scheduled jobs.
-  
+
   """
 
   import Ecto.Query
@@ -34,9 +34,8 @@ defmodule Skoller.StudentClasses.Jobs do
         if email_type.is_active_notification do
           students |> Notifications.send_no_classes_notification(email_type)
         end
-
         if email_type.is_active_email do
-          students |> Emails.send_no_classes_emails()
+          students |> Emails.queue_no_classes_emails()
         end
       _ -> nil
     end
@@ -52,9 +51,8 @@ defmodule Skoller.StudentClasses.Jobs do
         if email_type.is_active_notification do
           students |> Notifications.send_needs_setup_notification(email_type)
         end
-        
         if email_type.is_active_email do
-          students |> Emails.send_needs_setup_emails()
+          students |> Emails.queue_needs_setup_emails()
         end
       _ -> nil
     end
@@ -70,7 +68,7 @@ defmodule Skoller.StudentClasses.Jobs do
   end
 
   def drop_past_classes() do
-    from(sc in StudentClass, 
+    from(sc in StudentClass,
           join: c in assoc(sc, :class),
           join: p in assoc(c, :class_period),
           where: sc.is_dropped == false and p.class_period_status_id == @past_status,
