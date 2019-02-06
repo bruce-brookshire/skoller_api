@@ -76,7 +76,7 @@ defmodule Skoller.Users do
 
     case result do
       {:ok, %{user: user}} ->
-        user = user |> Users.preload_student([], [force: true]) |> Repo.preload([:reports], force: true) |> Repo.preload([:roles])
+        user = user |> Users.preload_student([], [force: true]) |> Repo.preload([:reports], force: true) |> Repo.preload([:roles], force: true)
         {:ok, user}
       {:error, _, failed_val, _} ->
         {:error, failed_val}

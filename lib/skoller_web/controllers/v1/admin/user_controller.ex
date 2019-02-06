@@ -11,6 +11,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users.Students
   alias Skoller.EnrolledStudents
   alias Skoller.Services.Formatter
+  alias Skoller.Repo
 
   import SkollerWeb.Plugs.Auth
   
@@ -57,7 +58,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
     case Users.update_user(user_old, params, [admin: true]) do
       {:ok, %{user: user}} ->
-        user = user |> Users.preload_student()
+        user = user |> Users.preload_student([], [force: true]) |> Repo.preload([:reports], force: true) |> Repo.preload([:roles], force: true)
         render(conn, UserView, "show.json", user: user)
       {:error, _, failed_value, _} ->
         conn
