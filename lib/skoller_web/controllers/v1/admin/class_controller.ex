@@ -28,18 +28,4 @@ defmodule SkollerWeb.Api.V1.Admin.ClassController do
     render(conn, ClassView, "show.json", class: class)
   end
 
-  @doc """
-    Returns all classes that have at least one student enrolled or previously enrolled
-
-    ## Returns:
-    * 200
-  """
-  def communities(conn, _params) do
-    classes = Skoller.Analytics.Classes.get_community_classes()
-
-    conn
-      |> put_status(:ok)
-      |> json(classes)
-  end
-
 end

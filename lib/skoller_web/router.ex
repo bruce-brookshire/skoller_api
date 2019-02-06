@@ -79,7 +79,11 @@ defmodule SkollerWeb.Router do
       get "/locations", LocationController, :index
 
       # Analytics routes
-      get "/analytics", Analytics.AnalyticsController, :index
+      scope "/analytics" do
+        get "/", Analytics.AnalyticsController, :index
+        get "/communities", Analytics.AnalyticsController, :communities
+      end
+      
 
       # User routes
       post "/users/create", Admin.UserController, :create
@@ -136,7 +140,6 @@ defmodule SkollerWeb.Router do
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
-      get "/classes/communities", Admin.ClassController, :communities
       
       resources "/classes", ClassController, only: [:update, :index] do
 
