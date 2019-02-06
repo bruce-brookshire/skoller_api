@@ -81,7 +81,11 @@ defmodule SkollerWeb.Router do
       # Analytics routes
       scope "/analytics" do
         get "/", Analytics.AnalyticsController, :index
-        get "/communities", Analytics.AnalyticsController, :communities
+        scope "/communities" do
+          get "/", Analytics.AnalyticsController, :communities
+          get "/csv", Analytics.AnalyticsController, :communities_csv
+        end
+        
       end
       
 

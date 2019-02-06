@@ -17,7 +17,8 @@ defmodule SkollerWeb.AnalyticsView do
   end
 
   def render("community.json", %{analytics: %{created_on: created_on} = community}) do
-    created_on = NaiveDateTime.to_iso8601(created_on)
+    created_on = created_on |> NaiveDateTime.truncate(:second) |> NaiveDateTime.to_string()
+    IO.inspect created_on
     community |> Map.put(:created_on, created_on)
   end
 end
