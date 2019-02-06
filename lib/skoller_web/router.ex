@@ -136,6 +136,7 @@ defmodule SkollerWeb.Router do
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
+      get "/classes/communities", Admin.ClassController, :communities
       
       resources "/classes", ClassController, only: [:update, :index] do
 
