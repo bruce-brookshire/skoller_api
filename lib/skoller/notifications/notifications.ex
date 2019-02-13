@@ -5,6 +5,11 @@ defmodule Skoller.Notifications do
 
   alias Skoller.Repo
   alias Skoller.Students.Student
+  alias Skoller.Analytics.Classes, as: AnalyticsClasses
+  alias Skoller.Classes.Class
+  alias Skoller.Periods.ClassPeriod
+  alias Skoller.Schools.School
+  alias Skoller.Schools.School
   alias Skoller.Users.User
   alias Skoller.Devices.Device
   alias Skoller.StudentAssignments.StudentAssignment
@@ -14,10 +19,12 @@ defmodule Skoller.Notifications do
   alias Skoller.ChatComments.Star, as: CommentStar
   alias Skoller.ChatComments.Comment
   alias Skoller.Classes.EditableClasses
-  alias Skoller.ClassStatuses.Classes
+  alias Skoller.ClassStatuses.Classes, as: ClassStatusesClasses
   alias Skoller.EnrolledStudents
 
   import Ecto.Query
+
+  @class_complete_status 1400
 
   @doc """
   Gets devices where the students have not disabled notifications.
@@ -125,6 +132,48 @@ defmodule Skoller.Notifications do
   end
 
   @doc """
+  Gets students that are attached to a class with notifications enabled
+
+  ## Returns
+  `[%{udid: Skoller.Devices.Device.udid, type: Skoller.Devices.Device.type, class: Skoller.Classes.Class}]` or `[]`
+  """
+  def get_class_start_notifications(class) do
+    from(student_class in StudentClass)
+    |> join(:left, [student_class], student in Student, student.id == student_class.student_id and student_class.class_id == ^class.id)
+    |> join(:left, [student_class, student], user in User, user.student_id == student.id)
+    |> join(:left, [student_class, student, user], device in Device, user.id == device.user_id)
+    |> join(:left, [student_class, student, user, device], class in Class, class.id == student_class.class_id)
+    |> where([student_class, student, user, device, class], student_class.is_dropped == false and 
+        student_class.is_notifications == true and 
+        student.is_notifications == true and
+        not is_nil(device.udid) and
+        not is_nil(device.type))
+    |> select([student_class, student, user, device, class], %{udid: device.udid, type: device.type, class: class})
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets classes that are due for class start notifications
+
+  NOTE: Uses string based fragments written in raw POSTGRES to deal with aggregate functions not provided by the ORM
+
+  ## Returns
+  `[Skoller.Classes.Class]` or `[]`
+  """
+  def get_class_start_classes(day_of_week, time_interval) do
+    from(class in Class)
+    |> join(:left, [class], class_period in ClassPeriod, class_period.id == class.class_period_id)
+    |> join(:left, [class, class_period], school in School, class_period.school_id == school.id)
+    |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), class.id == active_students.class_id)
+    |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
+    |> where([class, class_period, school, active_students], active_students.active >= 5)
+    |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
+    |> where(fragment("(meet_start_time AT TIME ZONE timezone) < CURRENT_TIME"))
+    |> where(fragment("(meet_start_time AT TIME ZONE timezone) > CURRENT_TIME - INTERVAL '1 minutes' * ?", ^time_interval))
+    |> Repo.all()
+  end
+
+  @doc """
   Gets users that are attached to a chat post with notifications enabled.
 
   ## Notes
@@ -194,7 +243,7 @@ defmodule Skoller.Notifications do
     from(u in User)
     |> join(:inner, [u], s in Student, s.id == u.student_id)
     |> join(:inner, [u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [u, s, sc], c in subquery(Classes.need_syllabus_status_class_subquery()), c.id == sc.class_id)
+    |> join(:inner, [u, s, sc], c in subquery(ClassStatusesClasses.need_syllabus_status_class_subquery()), c.id == sc.class_id)
     |> where([u, s], s.is_notifications == true)
     |> distinct([u], u.id)
     |> Repo.all()

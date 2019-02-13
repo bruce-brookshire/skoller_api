@@ -70,7 +70,7 @@ defmodule Skoller.Analytics.Classes do
   end
 
 
-  defp get_student_classes_active_subquery() do
+  def get_student_classes_active_subquery() do
     from(s in StudentClass)
       |> where([s], s.is_dropped == false)
       |> group_by([s], s.class_id)

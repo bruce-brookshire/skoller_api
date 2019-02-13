@@ -29,7 +29,7 @@ defmodule Skoller.Classes.Class do
     field :location, :string
     field :meet_days, :string, default: ""
     field :meet_end_time, :string
-    field :meet_start_time, :string
+    field :meet_start_time, :time
     field :name, :string
     field :code, :string
     field :subject, :string
