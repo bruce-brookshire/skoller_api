@@ -11,8 +11,10 @@ defmodule Skoller.Repo.Migrations.ConvertClassTimes do
 
     %{rows: classes} = Ecto.Adapters.SQL.query!(Skoller.Repo, "SELECT id, meet_start_time, meet_end_time FROM classes")
     Enum.each(classes, fn class ->
+      IO.inspect("Updating Class " <> Enum.at(class, 0))
       # Start times
       time = Enum.at(class, 1)
+      IO.inspect("Updating Start Time " <> time)
       if(time != nil) do
         time = if(String.length(time) < 8) do
           parts = String.split(time, ":")
@@ -34,6 +36,7 @@ defmodule Skoller.Repo.Migrations.ConvertClassTimes do
       end
       # End times
       time = Enum.at(class, 2)
+      IO.inspect("Updating End Time " <> time)
       if(time != nil) do
         time = if(String.length(time) < 8) do
           parts = String.split(time, ":")
