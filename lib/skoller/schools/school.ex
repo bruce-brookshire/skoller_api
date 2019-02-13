@@ -22,6 +22,7 @@ defmodule Skoller.Schools.School do
     field :short_name, :string
     field :color, :string
     field :is_chat_enabled, :boolean, default: true
+    field :is_class_start_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
     field :is_university, :boolean, default: true
     has_many :class_periods, ClassPeriod
@@ -31,7 +32,7 @@ defmodule Skoller.Schools.School do
     timestamps()
   end
 
-  @req_fields [:name, :adr_locality, :adr_region, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country]
+  @req_fields [:name, :adr_locality, :adr_region, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country, :is_class_start_enabled]
   @opt_fields [:adr_line_1, :adr_line_2, :adr_zip, :is_readonly, :adr_line_3, :short_name, :timezone, :color]
   @all_fields @req_fields ++ @opt_fields
   @upd_fields @all_fields

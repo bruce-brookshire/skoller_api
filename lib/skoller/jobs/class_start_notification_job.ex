@@ -29,8 +29,7 @@ defmodule Skoller.ClassStartNotificationJob do
     require Logger
     Logger.info("Running Class Start Notfication Job: " <> to_string(Time.utc_now))
 
-    DateTime.utc_now
-    |> ClassNotifications.send_class_start_notifications()
+    ClassNotifications.send_class_start_notifications()
 
     {:noreply, state}
   end
