@@ -28,7 +28,7 @@ defmodule Skoller.Classes.Class do
     field :is_points, :boolean, default: false
     field :location, :string
     field :meet_days, :string, default: ""
-    field :meet_end_time, :string
+    field :meet_end_time, :time
     field :meet_start_time, :time
     field :name, :string
     field :code, :string
