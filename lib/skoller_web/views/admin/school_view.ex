@@ -56,7 +56,6 @@ defmodule SkollerWeb.Admin.SchoolView do
       short_name: school.short_name,
       class_periods: render_many(school.class_periods, PeriodView, "period.json"),
       is_chat_enabled: school.is_chat_enabled,
-      is_class_start_enabled: school.is_class_start_enabled,
       is_assignment_posts_enabled: school.is_assignment_posts_enabled,
       color: school.color
     }

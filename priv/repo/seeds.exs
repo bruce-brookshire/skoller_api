@@ -121,16 +121,29 @@ Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
   id: 100,
   name: "No Classes Email",
   send_time: "09:00:00",
-  category: "Class.None"
+  category: "Class.None",
+  is_active_email: true,
+  is_active_notification: true
 })
 Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
   id: 200,
   name: "Class Setup Email",
   send_time: "09:00:00",
-  category: "Class.Setup"
+  category: "Class.Setup",
+  is_active_email: true,
+  is_active_notification: true
 })
 Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
   id: 300,
   name: "1000 Points Email",
-  category: "Points.1Thousand"
+  category: "Points.1Thousand",
+  is_active_email: true,
+  is_active_notification: true
+})
+Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
+  id: 400,
+  name: "Class Start Airdrop",
+  category: "Class.Start",
+  is_active_email: nil,
+  is_active_notification: true
 })

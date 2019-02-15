@@ -14,6 +14,7 @@ defmodule Skoller.Settings do
   @auto_upd_topic "AutoUpdate"
   @min_ver_topic "MinVersions"
   @four_door_topic "FourDoor"
+  @notification_topic "Notification"
 
   @doc """
   Gets the current auto update settings from admin_settings.
@@ -45,6 +46,17 @@ defmodule Skoller.Settings do
   def get_four_door_settings() do
     from(s in Setting)
     |> where([s], s.topic == @four_door_topic)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets the current notification settings from admin_settings.
+
+  Returns `[Skoller.Settings.Setting]` or `[]`
+  """
+  def get_notification_settings() do
+    from(s in Setting)
+    |> where([s], s.topic == @notification_topic)
     |> Repo.all()
   end
 

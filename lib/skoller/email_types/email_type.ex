@@ -11,8 +11,8 @@ defmodule Skoller.EmailTypes.EmailType do
   schema "email_types" do
     field :name, :string
     field :category, :string
-    field :is_active_email, :boolean, default: true
-    field :is_active_notification, :boolean, default: true
+    field :is_active_email, :boolean
+    field :is_active_notification, :boolean
     field :send_time, :string
 
     timestamps()
@@ -22,8 +22,8 @@ defmodule Skoller.EmailTypes.EmailType do
   @opt_fields [:category, :send_time]
   @all_fields @req_fields ++ @opt_fields
 
-  @req_upd [:is_active_email, :is_active_notification]
-  @opt_upd [:send_time]
+  @req_upd []
+  @opt_upd [:send_time, :is_active_email, :is_active_notification]
   @all_upd @req_upd ++ @opt_upd
 
   @doc false

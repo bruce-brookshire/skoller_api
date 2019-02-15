@@ -4,6 +4,7 @@ defmodule Skoller.Notifications do
   """
 
   alias Skoller.Repo
+  alias Skoller.EmailTypes
   alias Skoller.Students.Student
   alias Skoller.Analytics.Classes, as: AnalyticsClasses
   alias Skoller.Classes.Class
@@ -25,6 +26,7 @@ defmodule Skoller.Notifications do
   import Ecto.Query
 
   @class_complete_status 1400
+  @class_start_id 400
 
   @doc """
   Gets devices where the students have not disabled notifications.
@@ -161,17 +163,21 @@ defmodule Skoller.Notifications do
   `[Skoller.Classes.Class]` or `[]`
   """
   def get_class_start_classes(day_of_week, time_interval) do
-    from(class in Class)
-    |> join(:left, [class], class_period in ClassPeriod, class_period.id == class.class_period_id)
-    |> join(:left, [class, class_period], school in School, class_period.school_id == school.id)
-    |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), class.id == active_students.class_id)
-    |> where([class, class_period, school, active_students], school.is_class_start_enabled == true)
-    |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
-    |> where([class, class_period, school, active_students], active_students.active >= 5)
-    |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
-    |> where(fragment("(meet_start_time AT TIME ZONE timezone) < CURRENT_TIME"))
-    |> where(fragment("(meet_start_time AT TIME ZONE timezone) > CURRENT_TIME - INTERVAL '1 minutes' * ?", ^time_interval))
-    |> Repo.all()
+    switch = EmailTypes.get!(@class_start_id)
+    if(switch.is_active_notification == true) do
+      from(class in Class)
+      |> join(:left, [class], class_period in ClassPeriod, class_period.id == class.class_period_id)
+      |> join(:left, [class, class_period], school in School, class_period.school_id == school.id)
+      |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), class.id == active_students.class_id)
+      |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
+      |> where([class, class_period, school, active_students], active_students.active >= 5)
+      |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
+      |> where(fragment("(meet_start_time AT TIME ZONE timezone) <= CURRENT_TIME"))
+      |> where(fragment("(meet_start_time AT TIME ZONE timezone) > CURRENT_TIME - INTERVAL '1 minutes' * ?", ^time_interval))
+      |> Repo.all()
+    else
+      []
+    end
   end
 
   @doc """
