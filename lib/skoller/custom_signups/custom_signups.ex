@@ -86,6 +86,14 @@ defmodule Skoller.CustomSignups do
     end
   end
 
+  def signup_organization_name_for_student_id(student_id) do
+    from (s in Signup)
+      |> join([s], l in Link, s.custom_signup_link_id = l.id)
+      |> where([s, l], s.student_id == ^student_id)
+      |> select ([s, l], s.organization_name)
+      |> Repo.one()
+  end
+
   defp is_active(%{start: start_date, end: end_date}) when (not is_nil(start_date)) and (not is_nil(end_date)) do
     is_active(%{start: start_date}) and is_active(%{end: end_date})
   end

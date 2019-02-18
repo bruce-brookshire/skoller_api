@@ -12,6 +12,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.EnrolledStudents
   alias Skoller.Services.Formatter
   alias Skoller.Repo
+  alias Skoller.CustomSignups 
 
   import SkollerWeb.Plugs.Auth
   
@@ -97,6 +98,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       "Current Classes Set Up," <>
       "Total Classes," <>
       "Total Classes Set Up," <>
+      "Referral Organization," <>
       "Majors and Minors\r\n"
       | list
     ]
@@ -118,6 +120,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       Enum.count(enrolled_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
       Enum.count(user.student.student_classes),
       Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
+      CustomSignups.signup_organization_name_for_student_id(user.student_id),
       Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.field <> "|" end)
     ]
   end
