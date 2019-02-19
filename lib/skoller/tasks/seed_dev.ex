@@ -30,7 +30,6 @@ defmodule Mix.Tasks.Seed.Dev do
 
     pass = Authentication.hash_password("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
-    time2 = ~T[10:00:00]
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
                               password_hash: pass.password_hash})
