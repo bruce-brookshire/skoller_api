@@ -170,7 +170,7 @@ defmodule Skoller.Notifications do
       |> join(:left, [class, class_period], school in School, class_period.school_id == school.id)
       |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), class.id == active_students.class_id)
       |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
-      |> where([class, class_period, school, active_students], active_students.active >= 5)
+      |> where([class, class_period, school, active_students], active_students.active <= 5)
       |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
       |> where(fragment("(meet_start_time AT TIME ZONE timezone) <= CURRENT_TIME"))
       |> where(fragment("(meet_start_time AT TIME ZONE timezone) > CURRENT_TIME - INTERVAL '1 minutes' * ?", ^time_interval))

@@ -26,8 +26,11 @@ defmodule Mix.Tasks.Seed.Dev do
  
     {:ok, date1, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
     {:ok, date2, _offset2} = DateTime.from_iso8601("2019-10-12T00:00:00Z")
+    
+
     pass = Authentication.hash_password("password")
     {:ok, time1} = Time.new(13, 0, 0, 0)
+    time2 = ~T[10:00:00]
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
                               password_hash: pass.password_hash})
@@ -179,8 +182,7 @@ defmodule Mix.Tasks.Seed.Dev do
                   code: "8001",
                   section: "01",
                   meet_days: "MWF",
-                  meet_start_time: "8:30:00",
-                  meet_end_time: "12:00:00",
+                  meet_start_time: time1,
                   seat_count: 200,
                   is_editable: true,
                   is_syllabus: true,
@@ -195,8 +197,7 @@ defmodule Mix.Tasks.Seed.Dev do
                 code: "8001",
                 section: "01",
                 meet_days: "MWF",
-                meet_start_time: "8:30:00",
-                meet_end_time: "12:00:00",
+                meet_start_time: time1,
                 seat_count: 2,
                 is_editable: true,
                 is_syllabus: true,
@@ -211,8 +212,7 @@ defmodule Mix.Tasks.Seed.Dev do
       code: "8001",
       section: "01",
       meet_days: "MWF",
-      meet_start_time: "8:30:00",
-      meet_end_time: "12:00:00",
+      meet_start_time: time1,
       seat_count: 200,
       is_editable: true,
       is_syllabus: true,
@@ -227,8 +227,7 @@ defmodule Mix.Tasks.Seed.Dev do
     code: "8001",
     section: "01",
     meet_days: "MWF",
-    meet_start_time: "8:30:00",
-    meet_end_time: "12:00:00",
+    meet_start_time: time1,
     seat_count: 200,
     is_editable: true,
     is_syllabus: true,
@@ -243,8 +242,7 @@ defmodule Mix.Tasks.Seed.Dev do
     code: "8001",
     section: "01",
     meet_days: "MWF",
-    meet_start_time: "8:00:00",
-    meet_end_time: "12:00:00",
+    meet_start_time: time1,
     seat_count: 200,
     is_editable: true,
     is_syllabus: false,
@@ -259,8 +257,7 @@ defmodule Mix.Tasks.Seed.Dev do
     code: "8001",
     section: "01",
     meet_days: "MWF",
-    meet_start_time: "8:30:00",
-    meet_end_time: "12:00:00",
+    meet_start_time: time1,
     seat_count: 200,
     is_editable: true,
     is_syllabus: true,
@@ -275,8 +272,7 @@ defmodule Mix.Tasks.Seed.Dev do
     code: "8001",
     section: "01",
     meet_days: "MWF",
-    meet_start_time: "8:30:00",
-    meet_end_time: "12:00:00",
+    meet_start_time: time1,
     seat_count: 200,
     is_editable: true,
     is_syllabus: true,
@@ -291,8 +287,7 @@ defmodule Mix.Tasks.Seed.Dev do
     code: "8001",
     section: "01",
     meet_days: "MWF",
-    meet_start_time: "8:30:00",
-    meet_end_time: "12:00:00",
+    meet_start_time: time1,
     seat_count: 200,
     is_editable: true,
     is_syllabus: true,
