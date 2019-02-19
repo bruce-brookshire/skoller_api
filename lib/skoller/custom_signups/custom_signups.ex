@@ -90,7 +90,7 @@ defmodule Skoller.CustomSignups do
     from(s in Signup)
       |> join(:inner, [s], l in Link, s.custom_signup_link_id == l.id)
       |> where([s, l], s.student_id == ^student_id)
-      |> select([s, l], s.name)
+      |> select([s, l], l.name)
       |> Repo.one()
   end
 
