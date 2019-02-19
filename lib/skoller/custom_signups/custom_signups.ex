@@ -87,10 +87,10 @@ defmodule Skoller.CustomSignups do
   end
 
   def signup_organization_name_for_student_id(student_id) do
-    from (s in Signup)
+    from(s in Signup)
       |> join([s], l in Link, s.custom_signup_link_id = l.id)
       |> where([s, l], s.student_id == ^student_id)
-      |> select ([s, l], s.organization_name)
+      |> select([s, l], s.organization_name)
       |> Repo.one()
   end
 
