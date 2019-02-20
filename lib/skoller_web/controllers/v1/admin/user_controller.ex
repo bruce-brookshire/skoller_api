@@ -12,7 +12,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.EnrolledStudents
   alias Skoller.Services.Formatter
   alias Skoller.Repo
-  alias Skoller.CustomSignups 
+  alias Skoller.CustomSignups
+  alias Skoller.Students.StudentAnalytics
 
   import SkollerWeb.Plugs.Auth
   
@@ -85,6 +86,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp add_headers(list) do
+
     [
       "Account Creation Date," <>
       "First Name," <>
@@ -99,6 +101,14 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       "Total Classes," <>
       "Total Classes Set Up," <>
       "Referral Organization," <>
+      "Active Assignments," <>
+      "Inactive Assignments," <>
+      "Grades Entered," <>
+      "Created Mods," <>
+      "Assignment Posts," <>
+      "Chat Posts," <>
+      "Chat Comments," <>
+      "Created Assignments," <>
       "Majors and Minors\r\n"
       | list
     ]
@@ -107,6 +117,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   defp get_row_data(user) do
     user = user |> Users.preload_student([:primary_school, :fields_of_study, {:student_classes, [:class]}])
     enrolled_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
+    student_analytics = StudentAnalytics.get_student_analytics(user)
+
     [
       "#{user.inserted_at.month}/#{user.inserted_at.day}/#{user.inserted_at.year} #{user.inserted_at.hour}:#{user.inserted_at.minute}:#{user.inserted_at.second}",
       user.student.name_first,
@@ -121,6 +133,14 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       Enum.count(user.student.student_classes),
       Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
       CustomSignups.signup_organization_name_for_student_id(user.student_id),
+      student_analytics.active,
+      student_analytics.inactive,
+      student_analytics.grades_entered,
+      student_analytics.mods,
+      student_analytics.assignment_posts,
+      student_analytics.chat_posts,
+      student_analytics.chat_comments,
+      student_analytics.created_assignments,
       Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.field <> "|" end)
     ]
   end
