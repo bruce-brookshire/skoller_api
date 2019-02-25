@@ -25,6 +25,6 @@ defmodule Skoller.ClassNotifications do
   end
 
   defp get_message(class_obj) do
-    "Don't try to take on this class alone. AirDrop Skoller to your " <> class_obj.name <> " classmates!"
+    "Don't try to take on this class alone 😛 AirDrop Skoller to your " <> class_obj.name <> " classmates! 💯"
   end
 end
