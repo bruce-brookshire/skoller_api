@@ -18,6 +18,9 @@ defmodule Skoller.Users do
   alias Skoller.Token
   alias Skoller.Users.Emails
   alias Skoller.Students.Organizations
+  alias Skoller.Devices.Device
+
+  import Ecto.Query
 
   @student_role 100
 
@@ -101,6 +104,29 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
     |> Ecto.Multi.run(:link, &get_link(&1.user))
     |> Repo.transaction()
+  end
+
+
+  def delete_user(user_id) do
+    user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)
+
+    user_device_query = from(d in Device)
+      |> where([d], d.user_id == ^user_id)
+
+    multi = Ecto.Multi.new()
+      |> Ecto.Multi.delete_all(:user_devices, user_device_query)
+      |> Ecto.Multi.delete(:users, user)
+
+    if user.student_id != nil do
+      #Delete student (will cascade to student_class and student_assignment)
+      multi 
+        |> Ecto.Multi.delete(:students, user.student)
+        |> Repo.transaction()
+    else
+      #Delete just user
+      multi 
+        |> Repo.transaction()
+    end
   end
 
   @doc """

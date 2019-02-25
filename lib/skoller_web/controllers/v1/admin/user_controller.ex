@@ -37,6 +37,16 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     render(conn, UserView, "index.json", users: users)
   end
 
+  def delete(conn, %{"id" => id}) do
+    case Users.delete_user(id) do
+      {:ok, _} -> 
+        conn |> send_resp(204, "")
+
+      {:error, failed_value} ->
+        conn |> MultiError.render(failed_value)
+      end
+  end
+
   def show(conn, %{"id" => id}) do
     user = AdminUsers.get_user_by_id!(id)
     render(conn, UserView, "show.json", user: user)
