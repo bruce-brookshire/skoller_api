@@ -18,6 +18,10 @@ defmodule Skoller.Services.Notification do
   """
   def create_notification(device, platform, msg, category, custom_data \\ %{})
   def create_notification(device, "ios", msg, category, custom) do
+    IO.inspect device
+    IO.inspect category
+    IO.inspect custom
+    
     Ios.create_notification(device, msg, category, custom)
     |> inspect()
     |> Logger.info()
