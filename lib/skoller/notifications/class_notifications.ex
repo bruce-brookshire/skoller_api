@@ -12,7 +12,7 @@ defmodule Skoller.ClassNotifications do
   def send_class_start_notifications(%Class{} = class) do
     class
     |> Notifications.get_class_start_notifications()
-    |> Enum.each(&send_notifications(&1))
+    |> Enum.each(&send_notifications(&1, class))
   end
   def send_class_start_notifications() do
     Enum.at(@days_of_week, Date.day_of_week(Date.utc_today()) - 1)
@@ -20,8 +20,8 @@ defmodule Skoller.ClassNotifications do
     |> Enum.each(&send_class_start_notifications(&1))
   end
 
-  defp send_notifications(class_start) do
-    Notification.create_notification(class_start.udid, class_start.type, get_message(class_start), "Class.Start", %{class_id: class_start.class_id})
+  defp send_notifications(class_device, class_obj) do
+    Notification.create_notification(class_device.udid, class_device.type, get_message(class_obj), "Class.Start", %{class_id: class_device.class_id})
   end
 
   defp get_message(class_start) do
