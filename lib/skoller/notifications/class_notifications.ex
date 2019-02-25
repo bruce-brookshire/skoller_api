@@ -24,7 +24,7 @@ defmodule Skoller.ClassNotifications do
     Notification.create_notification(class_device.udid, class_device.type, get_message(class_obj), "Class.Start", %{class_id: class_device.class_id})
   end
 
-  defp get_message(class_start) do
-    "Don't try to take on this class alone. AirDrop Skoller to your " <> class_start.class.name <> " classmates!"
+  defp get_message(class_obj) do
+    "Don't try to take on this class alone. AirDrop Skoller to your " <> class_obj.name <> " classmates!"
   end
 end
