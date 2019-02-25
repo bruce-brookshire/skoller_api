@@ -21,7 +21,7 @@ defmodule Skoller.ClassNotifications do
   end
 
   defp send_notifications(class_start) do
-    Notification.create_notification(class_start.udid, class_start.type, get_message(class_start), "Class.Start", %{class_id: class_start.class.id})
+    Notification.create_notification(class_start.udid, class_start.type, get_message(class_start), "Class.Start", %{class_id: class_start.class_id})
   end
 
   defp get_message(class_start) do

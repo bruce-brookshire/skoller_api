@@ -137,20 +137,19 @@ defmodule Skoller.Notifications do
   Gets students that are attached to a class with notifications enabled
 
   ## Returns
-  `[%{udid: Skoller.Devices.Device.udid, type: Skoller.Devices.Device.type, class: Skoller.Classes.Class}]` or `[]`
+  `[%{udid: Skoller.Devices.Device.udid, type: Skoller.Devices.Device.type, class_id: Skoller.Classes.Class.id}]` or `[]`
   """
   def get_class_start_notifications(class) do
     from(student_class in StudentClass)
     |> join(:left, [student_class], student in Student, student.id == student_class.student_id and student_class.class_id == ^class.id)
     |> join(:left, [student_class, student], user in User, user.student_id == student.id)
     |> join(:left, [student_class, student, user], device in Device, user.id == device.user_id)
-    |> join(:left, [student_class, student, user, device], class in Class, class.id == student_class.class_id)
-    |> where([student_class, student, user, device, class], student_class.is_dropped == false and 
+    |> where([student_class, student, user, device], student_class.is_dropped == false and 
         student_class.is_notifications == true and 
         student.is_notifications == true and
         not is_nil(device.udid) and
         not is_nil(device.type))
-    |> select([student_class, student, user, device, class], %{udid: device.udid, type: device.type, class: class})
+    |> select([student_class, student, user, device], %{udid: device.udid, type: device.type, class_id: student_class.class_id})
     |> Repo.all()
   end
 
@@ -172,8 +171,8 @@ defmodule Skoller.Notifications do
       |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
       |> where([class, class_period, school, active_students], active_students.active <= 5)
       |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
-      |> where(fragment("(meet_start_time AT TIME ZONE timezone) <= CURRENT_TIME"))
-      |> where(fragment("(meet_start_time AT TIME ZONE timezone) > CURRENT_TIME - INTERVAL '1 minutes' * ?", ^time_interval))
+      |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+      |> where(fragment("meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * ?) AT TIME ZONE timezone)::time", ^time_interval))
       |> Repo.all()
     else
       []
