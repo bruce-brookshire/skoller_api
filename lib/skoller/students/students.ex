@@ -160,4 +160,11 @@ defmodule Skoller.Students do
       {:ok, student}
     end
   end
+
+  @doc """
+  Gets a list of `Skoller.Students.Student` who have school as their main school.
+  """
+  def get_main_school_students(school) do
+    from(student in Student, where: student.primary_school_id == ^school.id) |> Repo.all()
+  end
 end

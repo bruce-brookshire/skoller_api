@@ -53,6 +53,7 @@ defmodule SkollerWeb.Router do
       get "/sammi", SammiController, :status
       post "/sammi/train", SammiController, :train
 
+      get "/schools/csv", Admin.SchoolController, :csv
       post "/schools/csv", CSVController, :school
 
       get "/four-door/overrides", Admin.School.FourDoorController, :index
