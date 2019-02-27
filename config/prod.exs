@@ -74,8 +74,8 @@ config :skoller, Skoller.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  timeout: 100_000,
-  pool_timeout: 100_000
+  timeout: 600_000,
+  pool_timeout: 600_000
 
 # Configure Guardian Token Generation (this is for auth tokens)
 config :skoller, Skoller.Auth,
