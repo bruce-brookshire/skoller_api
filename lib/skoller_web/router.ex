@@ -94,7 +94,7 @@ defmodule SkollerWeb.Router do
       put "/users/:user_id/update", Admin.UserController, :update
       get "/users/csv", Admin.UserController, :csv
       get "/users/points", Admin.UserController, :points
-      resources "/users", Admin.UserController, only: [:show, :index, :delete] do
+      resources "/users", Admin.UserController, only: [:show, :index] do
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
@@ -283,6 +283,7 @@ defmodule SkollerWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
+      delete "/users/:user_id", UserController, :delete
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
     end

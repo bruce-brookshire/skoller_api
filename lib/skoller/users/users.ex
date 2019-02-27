@@ -110,23 +110,29 @@ defmodule Skoller.Users do
   def delete_user(user_id) do
     user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)
 
-    user_device_query = from(d in Device)
-      |> where([d], d.user_id == ^user_id)
-
-    multi = Ecto.Multi.new()
-      |> Ecto.Multi.delete_all(:user_devices, user_device_query)
-      |> Ecto.Multi.delete(:users, user)
-
-    if user.student_id != nil do
-      #Delete student (will cascade to student_class and student_assignment)
-      multi 
-        |> Ecto.Multi.delete(:students, user.student)
-        |> Repo.transaction()
+    if user == nil do
+      {:error, 404}
     else
-      #Delete just user
-      multi 
-        |> Repo.transaction()
+      user_device_query = from(d in Device)
+        |> where([d], d.user_id == ^user_id)
+
+      multi = Ecto.Multi.new()
+        |> Ecto.Multi.delete_all(:user_devices, user_device_query)
+        |> Ecto.Multi.delete(:users, user)
+
+      if user.student_id != nil do
+        #Delete student (will cascade to student_class and student_assignment)
+        multi 
+          |> Ecto.Multi.delete(:students, user.student)
+          |> Repo.transaction()
+      else
+        #Delete just user
+        multi 
+          |> Repo.transaction()
+      end
     end
+
+    
   end
 
   @doc """

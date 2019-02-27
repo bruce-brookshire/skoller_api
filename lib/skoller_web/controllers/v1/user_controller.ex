@@ -37,6 +37,19 @@ defmodule SkollerWeb.Api.V1.UserController do
     end
   end
 
+  def delete(conn, %{"user_id" => id}) do
+    case Users.delete_user(id) do
+      {:ok, _} -> 
+        conn |> send_resp(204, "")
+
+      {:error, 404} ->
+        conn |> send_resp(404, "User not found")
+      
+      {:error, failed_value} ->
+        conn |> MultiError.render(failed_value)
+      end
+  end
+
   defp upload_pic(%{"file" => ""}), do: ""
   defp upload_pic(%{"file" => file}) do
     scope = %{"id" => UUID.generate()} 
