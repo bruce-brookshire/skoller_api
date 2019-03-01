@@ -1,104 +1,37 @@
 defmodule Skoller.Students.StudentAnalytics do
     
     alias Skoller.Repo
-    alias Skoller.StudentClasses.StudentClass
-    alias Skoller.Assignments.Assignment
-    alias Skoller.StudentAssignments.StudentAssignment
-    alias Skoller.Mods.Mod
-    alias Skoller.AssignmentPosts.Post, as: AssignmentPost
-    alias Skoller.ChatPosts.Post, as: ChatPost
-    alias Skoller.ChatComments.Comment, as: ChatComment
+    alias Skoller.Users.User
+    alias Skoller.Students.Student
 
     import Ecto.Query
 
-    @new_assignment_mod_type 400
-
-    def get_student_analytics(user) do
-
-        #Lets do these all together to minimize queries executed (I/O)
-        student_assignments = get_assignments(user.student_id)
-
-        active = student_assignments
-            |> Enum.filter(& &1.is_dropped == false)
-            |> length()
-        
-        inactive = student_assignments
-            |> Enum.filter(& &1.is_dropped == true)
-            |> length()
-
-        grades_entered = student_assignments
-            |> Enum.filter(& &1.grade != nil)
-            |> length()
-
-        #Individual queries
-        mods = get_number_mods(user.student_id)
-        assignment_posts = get_number_assignment_posts(user.student_id)
-        chat_posts = get_number_chat_posts(user.student_id)
-        chat_comments = get_number_chat_comments(user.student_id)
-        created_assignments = get_number_created_assignments(user)
-
-        #Return map of result analytics
-        %{
-            active: active, 
-            inactive: inactive, 
-            grades_entered: grades_entered, 
-            mods: mods, 
-            assignment_posts: assignment_posts, 
-            chat_posts: chat_posts, 
-            chat_comments: chat_comments, 
-            created_assignments: created_assignments
-        }
-    end
-
-
-    defp get_number_mods(student_id) do
-        from(m in Mod)
-            |> where([m], m.student_id == ^student_id)
-            |> Repo.aggregate(:count, :id)
-    end
-
-
-    defp get_number_assignment_posts(student_id) do
-        from(p in AssignmentPost)
-            |> where([p], p.student_id == ^student_id)
-            |> Repo.aggregate(:count, :id)
-    end
-
-
-    defp get_assignments(student_id) do
-        from(sc in StudentClass)
-            |> join(:inner, [sc], a in StudentAssignment, a.student_class_id == sc.id)
-            |> where([sc, a], sc.student_id == ^student_id)
-            |> select([sc, a], %{is_dropped: sc.is_dropped, grade: a.grade})
+    def get_student_analytics() do
+        from(u in User)
+            |> join(:inner, [u], s in Student, u.student_id == s.id)
+            |> select([u, s], [
+                u.inserted_at,
+                s.name_first,
+                s.name_last, 
+                u.email,
+                s.phone,
+                s.is_verified,
+                fragment( "(SELECT name FROM schools WHERE id = ?)", s.primary_school_id),
+                s.grad_year,
+                fragment("(SELECT COUNT(*) FROM student_classes sc WHERE sc.student_id = ? AND sc.is_dropped = false)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND sc.is_dropped = false AND c.class_status_id = 1400)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_classes WHERE student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND c.class_status_id = 1400)", s.id),
+                fragment("(SELECT name FROM organizations where id = ?)", s.primary_organization_id),
+                fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.is_dropped = false AND sc.student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.student_id = ? AND sc.is_dropped = true)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_assignments WHERE student_id = ? AND grade IS NOT NULL)", s.id),
+                fragment("(SELECT COUNT(*) FROM assignment_modifications WHERE student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM assignment_posts WHERE student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM chat_posts WHERE student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM chat_comments WHERE student_id = ?)", s.id),
+                fragment("(SELECT COUNT(*) FROM assignments a LEFT JOIN assignment_modifications am ON a.id = am.assignment_id WHERE a.created_by = ? OR (am.student_id = ? AND am.assignment_mod_type_id = 400))", u.id, s.id)
+            ])
             |> Repo.all()
     end
-
-
-    defp get_number_chat_posts(student_id) do
-        from(p in ChatPost)
-            |> where([p], p.student_id == ^student_id)
-            |> Repo.aggregate(:count, :id)
-    end
-
-
-    defp get_number_chat_comments(student_id) do
-        from(p in ChatComment)
-            |> where([p], p.student_id == ^student_id)
-            |> Repo.aggregate(:count, :id)
-    end
-    
-
-    defp get_number_created_assignments(user) do
-
-        syllabus_tool_created_assignments = from(a in Assignment)
-            |> where([a], a.created_by == ^user.id)
-            |> Repo.aggregate(:count, :id)
-
-        mod_created_assignments = from(m in Mod)
-            |> where([m], m.student_id == ^user.student_id and m.assignment_mod_type_id == @new_assignment_mod_type)
-            |> Repo.aggregate(:count, :id)
-
-        syllabus_tool_created_assignments + mod_created_assignments
-    end
-
 end

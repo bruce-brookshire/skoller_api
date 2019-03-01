@@ -7,19 +7,12 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
-  alias Skoller.StudentClasses
-  alias Skoller.Users.Students
-  alias Skoller.EnrolledStudents
-  alias Skoller.Services.Formatter
   alias Skoller.Repo
-  alias Skoller.CustomSignups
   alias Skoller.Students.StudentAnalytics
 
   import SkollerWeb.Plugs.Auth
   
   @admin_role 200
-
-  @class_complete_status 1400
   
   plug :verify_role, %{role: @admin_role}
   def create(conn, %{} = params) do
@@ -43,12 +36,11 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def csv(conn, _params) do
-    users = Students.get_student_users()
     filename = get_filename()
     conn
     |> put_resp_content_type("text/csv")
     |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"; filename*="#{filename}"])
-    |> send_resp(200, csv_users(users))
+    |> send_resp(200, csv_users())
   end
   defp get_filename() do
     now = DateTime.utc_now
@@ -76,13 +68,12 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       |> json(points)
   end
 
-  defp csv_users(users) do
-    users
-    |> Enum.map(&get_row_data(&1))
-    |> CSV.encode
-    |> Enum.to_list
-    |> add_headers
-    |> to_string
+  defp csv_users() do
+    StudentAnalytics.get_student_analytics()
+      |> CSV.encode
+      |> Enum.to_list
+      |> add_headers
+      |> to_string
   end
 
   defp add_headers(list) do
@@ -108,47 +99,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       "Assignment Posts," <>
       "Chat Posts," <>
       "Chat Comments," <>
-      "Created Assignments," <>
-      "Majors and Minors\r\n"
+      "Created Assignments\r\n"
       | list
     ]
-  end
-
-  defp get_row_data(user) do
-    user = user |> Users.preload_student([:primary_school, :fields_of_study, {:student_classes, [:class]}])
-    enrolled_classes = EnrolledStudents.get_enrolled_classes_by_student_id(user.student_id)
-    student_analytics = StudentAnalytics.get_student_analytics(user)
-
-    [
-      "#{user.inserted_at.month}/#{user.inserted_at.day}/#{user.inserted_at.year} #{user.inserted_at.hour}:#{user.inserted_at.minute}:#{user.inserted_at.second}",
-      user.student.name_first,
-      user.student.name_last,
-      user.email,
-      Formatter.phone_to_string(user.student.phone),
-      user.student.is_verified,
-      (if user.student.primary_school != nil, do: user.student.primary_school.name, else: get_most_common_school_name(enrolled_classes)),
-      user.student.grad_year,
-      Enum.count(enrolled_classes),
-      Enum.count(enrolled_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
-      Enum.count(user.student.student_classes),
-      Enum.count(user.student.student_classes, fn sc -> sc.class.class_status_id == @class_complete_status end),
-      CustomSignups.signup_organization_name_for_student_id(user.student_id),
-      student_analytics.active,
-      student_analytics.inactive,
-      student_analytics.grades_entered,
-      student_analytics.mods,
-      student_analytics.assignment_posts,
-      student_analytics.chat_posts,
-      student_analytics.chat_comments,
-      student_analytics.created_assignments,
-      Enum.reduce(user.student.fields_of_study, "", fn f, acc -> acc <> f.field <> "|" end)
-    ]
-  end
-
-  defp get_most_common_school_name(student_classes) do
-    case StudentClasses.get_most_common_school(student_classes) do
-      nil -> ""
-      school -> school.name
-    end
   end
 end
