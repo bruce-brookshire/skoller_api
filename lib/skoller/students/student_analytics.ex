@@ -10,13 +10,13 @@ defmodule Skoller.Students.StudentAnalytics do
         from(u in User)
             |> join(:inner, [u], s in Student, u.student_id == s.id)
             |> select([u, s], [
-                u.inserted_at,
+                fragment("(SELECT to_char(?, 'MM/DD/YYYY HH24:MI:SS'))", u.inserted_at),
                 s.name_first,
                 s.name_last, 
                 u.email,
                 s.phone,
                 s.is_verified,
-                fragment( "(SELECT name FROM schools WHERE id = ?)", s.primary_school_id),
+                fragment("(SELECT name FROM schools WHERE id = ?)", s.primary_school_id),
                 s.grad_year,
                 fragment("(SELECT COUNT(*) FROM student_classes sc WHERE sc.student_id = ? AND sc.is_dropped = false)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND sc.is_dropped = false AND c.class_status_id = 1400)", s.id),
