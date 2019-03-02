@@ -10,7 +10,7 @@ defmodule Skoller.Students.StudentAnalytics do
         from(u in User)
             |> join(:inner, [u], s in Student, u.student_id == s.id)
             |> select([u, s], [
-                fragment("(SELECT to_char(?, 'MM/DD/YYYY HH24:MI:SS'))", u.inserted_at),
+                fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.inserted_at),
                 s.name_first,
                 s.name_last, 
                 u.email,
@@ -25,7 +25,7 @@ defmodule Skoller.Students.StudentAnalytics do
                 fragment("(SELECT name FROM organizations where id = ?)", s.primary_organization_id),
                 fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.is_dropped = false AND sc.student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.student_id = ? AND sc.is_dropped = true)", s.id),
-                fragment("(SELECT COUNT(*) FROM student_assignments WHERE student_id = ? AND grade IS NOT NULL)", s.id),
+                fragment("(SELECT COUNT(*) FROM student_assignments sa WHERE EXISTS (SELECT * FROM student_classes sc WHERE sc.id = sa.student_class_id AND sc.student_id = ?) AND grade IS NOT NULL)", s.id),
                 fragment("(SELECT COUNT(*) FROM assignment_modifications WHERE student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM assignment_posts WHERE student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM chat_posts WHERE student_id = ?)", s.id),
