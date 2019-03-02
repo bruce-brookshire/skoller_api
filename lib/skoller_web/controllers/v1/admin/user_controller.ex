@@ -96,9 +96,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       "Inactive Assignments," <>
       "Grades Entered," <>
       "Created Mods," <>
-      "Assignment Posts," <>
-      "Chat Posts," <>
-      "Chat Comments," <>
       "Created Assignments\r\n"
       | list
     ]
