@@ -87,13 +87,20 @@ defmodule Skoller.Classes.Class do
   @doc false
   def university_changeset(%Class{} = class, attrs) do
 
-    {_, attrs} = Map.get_and_update(attrs, :meet_start_time, 
+    IO.inspect attrs
+
+    {_, attrs} = Map.get_and_update(attrs, "meet_start_time", 
     fn current_value -> 
+
+      IO.inspect current_value
+
       case Time.from_iso8601(current_value) do
-        {:error, _} -> nil
-        _ -> current_value
+        {:error, _} -> :pop
+        _ -> {current_value, current_value}
       end
     end)
+
+    IO.inspect attrs
 
     class
     |> cast(attrs, @all_uni_fields)
