@@ -10,6 +10,8 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Repo
   alias Skoller.Students.StudentAnalytics
   alias Skoller.AnalyticUpload
+  alias Skoller.Analytics.Documents.Document
+  alias Skoller.Analytics.Documents
 
   import SkollerWeb.Plugs.Auth
   
@@ -38,15 +40,22 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   def csv(conn, _params) do
     filename = get_filename()
+    file_path = "./" <> filename
 
-    content = csv_users()
+    File.write(file_path, csv_users())
+
     scope = %{:id => filename, :dir => "user_csv"}
+    {success, inserted} = AnalyticUpload.store({file_path, scope})
 
-    
-    case AnalyticUpload.store({content, scope}) do
-      {:ok, inserted} ->
-        conn |> send_resp(200, AnalyticUpload.url({inserted, scope}))
-      {:error, error} ->
+    File.rm(file_path)
+
+    case success do
+      :ok ->
+        path = AnalyticUpload.url({inserted, scope})
+        Documents.set_new_current_user_csv_path(path)
+
+        conn |> send_resp(200, path)
+      :error ->
         conn |> send_resp(404, "not found")
     end
     # conn
@@ -56,7 +65,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
   defp get_filename() do
     now = DateTime.utc_now
-    "Users-#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}.csv"
+    "Users-#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}"
   end
 
   def update(conn, %{"user_id" => user_id} = params) do
@@ -109,7 +118,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp add_headers(list) do
-
     [
       "Account Creation Date," <>
       "First Name," <>

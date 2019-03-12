@@ -14,7 +14,7 @@ defmodule Skoller.AnalyticUpload do
   @doc false
   # Override the persisted filenames:
   def filename(_version, {_file, %{id: id}}) do
-    id
+    id <> ".csv"
   end
 
   @doc false
