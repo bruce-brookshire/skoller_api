@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
   alias Skoller.Students.StudentAnalytics
+  alias Skoller.AnalyticUpload
 
   import SkollerWeb.Plugs.Auth
   
@@ -37,10 +38,21 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
 
   def csv(conn, _params) do
     filename = get_filename()
-    conn
-    |> put_resp_content_type("text/csv")
-    |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"; filename*="#{filename}"])
-    |> send_resp(200, csv_users())
+
+    content = csv_users()
+    scope = %{:id => filename, :dir => "user_csv"}
+
+    
+    case AnalyticUpload.store({content, scope}) do
+      {:ok, inserted} ->
+        conn |> send_resp(200, AnalyticUpload.url({inserted, scope}))
+      {:error, error} ->
+        conn |> send_resp(404, "not found")
+    end
+    # conn
+    # |> put_resp_content_type("text/csv")
+    # |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"; filename*="#{filename}"])
+    # |> send_resp(200, csv_users())
   end
   defp get_filename() do
     now = DateTime.utc_now
@@ -69,7 +81,27 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   defp csv_users() do
-    StudentAnalytics.get_student_analytics()
+    # StudentAnalytics.get_student_analytics()
+    [
+      "Account Creation Date",
+      "First Name",
+      "Last Name",
+      "Email",
+      "Phone #",
+      "Phone # Verified?",
+      "Main School",
+      "Graduation Year",
+      "Current Classes",
+      "Current Classes Set Up",
+      "Total Classes",
+      "Total Classes Set Up",
+      "Referral Organization",
+      "Active Assignments",
+      "Inactive Assignments",
+      "Grades Entered",
+      "Created Mods",
+      "Created Assignments"
+    ]
       |> CSV.encode
       |> Enum.to_list
       |> add_headers
