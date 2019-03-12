@@ -83,7 +83,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   defp csv_users() do
     # StudentAnalytics.get_student_analytics()
     [
-      "Account Creation Date",
+      ["Account Creation Date",
       "First Name",
       "Last Name",
       "Email",
@@ -100,7 +100,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
       "Inactive Assignments",
       "Grades Entered",
       "Created Mods",
-      "Created Assignments"
+      "Created Assignments"]
     ]
       |> CSV.encode
       |> Enum.to_list
