@@ -8,9 +8,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
-  alias Skoller.Students.StudentAnalytics
-  alias Skoller.AnalyticUpload
-  alias Skoller.Analytics.Documents.Document
   alias Skoller.Analytics.Documents
 
   import SkollerWeb.Plugs.Auth
@@ -39,33 +36,17 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def csv(conn, _params) do
-    filename = get_filename()
-    file_path = "./" <> filename
+    path = Documents.get_current_user_csv_path()
 
-    File.write(file_path, csv_users())
-
-    scope = %{:id => filename, :dir => "user_csv"}
-    {success, inserted} = AnalyticUpload.store({file_path, scope})
-
-    File.rm(file_path)
-
-    case success do
-      :ok ->
-        path = AnalyticUpload.url({inserted, scope})
-        Documents.set_new_current_user_csv_path(path)
-
-        conn |> send_resp(200, path)
-      :error ->
-        conn |> send_resp(404, "not found")
+    case HTTPoison.get(path) do
+      {:ok, %{status_code: 200, body: body}} -> 
+        conn
+          |> put_resp_content_type("text/csv")
+          |> put_resp_header("content-disposition", ~s[attachment; filename="users.csv"; filename*="users.csv"])
+          |> send_resp(200, body)
+      _ -> conn |> send_resp(404, "csv not found")
+        
     end
-    # conn
-    # |> put_resp_content_type("text/csv")
-    # |> put_resp_header("content-disposition", ~s[attachment; filename="#{filename}"; filename*="#{filename}"])
-    # |> send_resp(200, csv_users())
-  end
-  defp get_filename() do
-    now = DateTime.utc_now
-    "Users-#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}"
   end
 
   def update(conn, %{"user_id" => user_id} = params) do
@@ -87,57 +68,5 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     conn 
       |> put_status(:ok)
       |> json(points)
-  end
-
-  defp csv_users() do
-    # StudentAnalytics.get_student_analytics()
-    [
-      ["Account Creation Date",
-      "First Name",
-      "Last Name",
-      "Email",
-      "Phone #",
-      "Phone # Verified?",
-      "Main School",
-      "Graduation Year",
-      "Current Classes",
-      "Current Classes Set Up",
-      "Total Classes",
-      "Total Classes Set Up",
-      "Referral Organization",
-      "Active Assignments",
-      "Inactive Assignments",
-      "Grades Entered",
-      "Created Mods",
-      "Created Assignments"]
-    ]
-      |> CSV.encode
-      |> Enum.to_list
-      |> add_headers
-      |> to_string
-  end
-
-  defp add_headers(list) do
-    [
-      "Account Creation Date," <>
-      "First Name," <>
-      "Last Name," <> 
-      "Email," <> 
-      "Phone #," <>
-      "Phone # Verified?," <>
-      "Main School," <>
-      "Graduation Year," <> 
-      "Current Classes," <>
-      "Current Classes Set Up," <>
-      "Total Classes," <>
-      "Total Classes Set Up," <>
-      "Referral Organization," <>
-      "Active Assignments," <>
-      "Inactive Assignments," <>
-      "Grades Entered," <>
-      "Created Mods," <>
-      "Created Assignments\r\n"
-      | list
-    ]
   end
 end

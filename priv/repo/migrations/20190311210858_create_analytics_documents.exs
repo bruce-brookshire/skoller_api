@@ -6,14 +6,15 @@ defmodule Skoller.Repo.Migrations.CreateAnalyticsDocuments do
 
     create table(:analytics_document_types) do
       add :name, :string
+      add :time, :string
       timestamps()
     end
 
     flush()
 
-    Skoller.Repo.insert(%DocumentType{id: 100, name: "User Analytics"})
-    Skoller.Repo.insert(%DocumentType{id: 200, name: "Class Analytics"})
-    Skoller.Repo.insert(%DocumentType{id: 300, name: "School Analytics"})
+    Skoller.Repo.insert(%DocumentType{id: 100, name: "User Analytics", time: "22:00:00"})
+    Skoller.Repo.insert(%DocumentType{id: 200, name: "Class Analytics", time: "22:00:00"})
+    Skoller.Repo.insert(%DocumentType{id: 300, name: "School Analytics", time: "22:00:00"})
 
     flush()
 

@@ -25,7 +25,8 @@ defmodule Skoller.Application do
       worker(Skoller.ClassSetupJob, []),
       worker(Skoller.NoClassesJob, []),
       worker(Skoller.EmailManagerJob, []),
-      worker(Skoller.ClassStartNotificationJob, [])
+      worker(Skoller.ClassStartNotificationJob, []),
+      worker(Skoller.AnalyticsJob, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -6,6 +6,7 @@ defmodule Skoller.Analytics.Documents.DocumentType do
   
     schema "analytics_document_types" do
       field :name, :string
+      field :time, :string
       timestamps()
     end
   

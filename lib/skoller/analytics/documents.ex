@@ -1,6 +1,7 @@
 defmodule Skoller.Analytics.Documents do
 
     alias Skoller.Repo
+    alias Skoller.Analytics.Documents.Document
 
     import Ecto.Query
 
@@ -9,14 +10,47 @@ defmodule Skoller.Analytics.Documents do
     @school_fkey_id 100
 
     def get_current_user_csv_path() do
-        
+        csv = from(d in Document)
+            |> where([d], d.analytics_document_type_id == ^@user_fkey_id)
+            |> order_by([d], [desc: d.inserted_at])
+            |> Repo.one
+
+        csv.path
     end
 
-    def set_new_current_user_csv_path(path) do
+    def set_current_user_csv_path(path) do
         %Document{} 
-          |> Document.changeset(%{path: path, analytics_document_type_id: 100})
+          |> Document.changeset(%{path: path, analytics_document_type_id: @user_fkey_id})
           |> Repo.insert
     end
 
+    def get_current_class_csv_path() do
+        csv = from(d in Document)
+            |> where([d], d.analytics_document_type_id == ^@class_fkey_id)
+            |> order_by([d], [desc: d.inserted_at])
+            |> Repo.one
 
+        csv.path
+    end
+
+    def set_current_class_csv_path(path) do
+        %Document{} 
+          |> Document.changeset(%{path: path, analytics_document_type_id: @class_fkey_id})
+          |> Repo.insert
+    end
+
+    def get_current_school_csv_path() do
+        csv = from(d in Document)
+            |> where([d], d.analytics_document_type_id == ^@school_fkey_id)
+            |> order_by([d], [desc: d.inserted_at])
+            |> Repo.one
+
+        csv.path
+    end
+
+    def set_current_school_csv_path(path) do
+        %Document{} 
+          |> Document.changeset(%{path: path, analytics_document_type_id: @school_fkey_id})
+          |> Repo.insert
+    end
 end
