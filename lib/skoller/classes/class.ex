@@ -90,9 +90,13 @@ defmodule Skoller.Classes.Class do
     #This makes sure that meet_start_time being "online" doesnt fail the creation
     {_, attrs} = Map.get_and_update(attrs, "meet_start_time", 
       fn current_value -> 
-        case Time.from_iso8601(current_value) do
-          {:error, _} -> :pop
-          _ -> {current_value, current_value}
+        if current_value == nil do
+          :pop
+        else
+          case Time.from_iso8601(current_value) do
+            {:error, _} -> :pop
+            _ -> {current_value, current_value}
+          end
         end
       end)
 
