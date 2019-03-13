@@ -20,12 +20,15 @@ defmodule Skoller.Analytics.Jobs do
 
     def generate_user_csv() do
         require Logger
-        Logger.info("Running User analytics")
-
-        content = csv_users()
 
         filename = get_filename()
         file_path = "./" <> filename
+
+        Logger.info("Calculating user analytics " <> filename)
+
+        content = csv_users()
+
+        Logger.info("Writing user analytics to S3")
 
         File.write(file_path, content)
 
@@ -36,6 +39,7 @@ defmodule Skoller.Analytics.Jobs do
 
         case success do
             :ok ->
+                Logger.info("Analytics completed successfully")
                 path = AnalyticUpload.url({inserted, scope})
                 Documents.set_current_user_csv_path(path)
             :error ->
