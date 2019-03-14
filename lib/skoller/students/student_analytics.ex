@@ -43,6 +43,5 @@ defmodule Skoller.Students.StudentAnalytics do
                 fragment("(SELECT COUNT(*) FROM assignments a LEFT JOIN assignment_modifications am ON a.id = am.assignment_id WHERE a.created_by = ? OR (am.student_id = ? AND am.assignment_mod_type_id = 400))", u.id, s.id)
             ])
             |> Repo.one!()
-
     end
 end

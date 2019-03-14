@@ -13,6 +13,7 @@ defmodule Skoller.Analytics.Documents do
         csv = from(d in Document)
             |> where([d], d.analytics_document_type_id == ^@user_fkey_id)
             |> order_by([d], [desc: d.inserted_at])
+            |> limit(1)
             |> Repo.one
 
         csv.path
@@ -28,6 +29,7 @@ defmodule Skoller.Analytics.Documents do
         csv = from(d in Document)
             |> where([d], d.analytics_document_type_id == ^@class_fkey_id)
             |> order_by([d], [desc: d.inserted_at])
+            |> limit(1)
             |> Repo.one
 
         csv.path
@@ -43,6 +45,7 @@ defmodule Skoller.Analytics.Documents do
         csv = from(d in Document)
             |> where([d], d.analytics_document_type_id == ^@school_fkey_id)
             |> order_by([d], [desc: d.inserted_at])
+            |> limit(1)
             |> Repo.one
 
         csv.path
