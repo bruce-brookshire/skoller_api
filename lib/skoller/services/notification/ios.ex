@@ -41,7 +41,8 @@ defmodule Skoller.Services.Notification.Ios do
   defp log_result(response) do
     case response do
       %{status: :success} -> nil
-      %{status: response} -> IO.inspect response
+      %{response: response_msg} -> IO.inspect response_msg
+      _ -> IO.insepct response
     end
   end
 end
