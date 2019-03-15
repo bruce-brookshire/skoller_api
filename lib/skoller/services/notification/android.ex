@@ -35,8 +35,10 @@ defmodule Skoller.Services.Notification.Android do
   defp log_result(response) do
     case response do
       %{status: :success} -> nil
+      
       %{response: response_msg} -> IO.inspect response_msg
-      _ -> IO.insepct response
+
+      _ -> IO.inspect response
     end
   end
 end

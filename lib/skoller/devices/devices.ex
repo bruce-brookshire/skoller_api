@@ -62,6 +62,20 @@ defmodule Skoller.Devices do
     device |> Repo.delete!()
   end
 
+  @doc """
+  Deletes a device by its UDID (which must be unique)
+
+  ## Returns
+  `:ok` or raises.
+  """
+  def delete_device_by_udid!(udid) do
+    Device 
+      |> Repo.get_by!(udid: udid)
+      |> Repo.delete!
+    
+    :ok
+  end
+
 
   @doc """
   Deregisters a device for other users when a new user signs in.
