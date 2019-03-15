@@ -26,25 +26,26 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_custom(custom)
     |> put_category(category)
     |> put_sound("default")
-    |> APNS.push(on_response: &handle_result(&1, device.user_id))
+    |> APNS.push(on_response: &handle_result(&1))
   end
 
   def create_notification(device, msg, category, custom) do
+    IO.inspect device
     APNS.Notification.new(msg, device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_category(category)
     |> put_sound("default")
     |> put_custom(custom)
-    |> APNS.push(on_response: &handle_result(&1, device.user_id))
+    |> APNS.push(on_response: &handle_result(&1))
   end
 
-  def handle_result(response, user_id) do
+  def handle_result(response) do
     case response do
       %{response: :success} -> nil
 
       %{response: :bad_device_token, device_token: udid} -> 
-        Skoller.Devices.delete_device_by_device_and_user!(udid, user_id)
-        IO.puts "deleted #{user_id}'s device: #{udid}"
+        Skoller.Devices.delete_device_by_device!(udid)
+        IO.puts "deleted device: #{udid}"
 
       %{response: response_msg} -> 
         IO.inspect response_msg

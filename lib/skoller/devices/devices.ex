@@ -63,14 +63,14 @@ defmodule Skoller.Devices do
   end
 
   @doc """
-  Deletes a device by its UDID and user_id
+  Deletes a device by its UDID. Raises if more than one user has this device id
 
   ## Returns
   `:ok` or raises.
   """
-  def delete_device_by_device_and_user!(udid, user_id) do
+  def delete_device_by_device!(udid) do
     Device 
-      |> Repo.get_by!(%{udid: udid, user_id: user_id})
+      |> Repo.get_by!(udid: udid)
       |> Repo.delete!
     
     :ok
