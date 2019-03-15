@@ -15,6 +15,7 @@ defmodule Skoller.Services.Notification.Ios do
    * `msg` as a `String` will send a simple message.
   """
   def create_notification(device, msg, category, custom \\ %{})
+
   def create_notification(device, %{title: title, body: body}, category, custom) do
     APNS.Notification.new("", device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
@@ -25,14 +26,22 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_custom(custom)
     |> put_category(category)
     |> put_sound("default")
-    |> APNS.push(on_response: fn(x) -> IO.inspect(x) end)
+    |> APNS.push(on_response: &log_result(&1))
   end
+
   def create_notification(device, msg, category, custom) do
     APNS.Notification.new(msg, device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_category(category)
     |> put_sound("default")
     |> put_custom(custom)
-    |> APNS.push(on_response: fn(x) -> IO.inspect(x) end)
+    |> APNS.push(on_response: &log_result(&1))
+  end
+
+  defp log_result(response) do
+    case response do
+      %{status: :success} -> nil
+      %{status: response} -> IO.inspect response
+    end
   end
 end

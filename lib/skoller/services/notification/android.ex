@@ -21,7 +21,7 @@ defmodule Skoller.Services.Notification.Android do
     |> put_notification(%{"title" => title, "body" => body})
     |> put_collapse_key(category)
     |> put_data(data)
-    |> FCM.push(on_response: fn(x) -> IO.inspect(x) end)
+    |> FCM.push(on_response: &log_result(&1))
   end
   def create_notification(device, msg, category, data) do
     device
@@ -29,6 +29,13 @@ defmodule Skoller.Services.Notification.Android do
     |> put_notification(%{"body" => msg})
     |> put_collapse_key(category)
     |> put_data(data)
-    |> FCM.push(on_response: fn(x) -> IO.inspect(x) end)
+    |> FCM.push(on_response: &log_result(&1))
+  end
+
+  defp log_result(response) do
+    case response do
+      %{status: :success} -> nil
+      %{status: response} -> IO.inspect response
+    end
   end
 end
