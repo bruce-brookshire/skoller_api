@@ -16,8 +16,7 @@ defmodule Skoller.Services.Notification.Ios do
   """
   def create_notification(device, msg, category, custom \\ %{})
   def create_notification(device, %{title: title, body: body}, category, custom) do
-    ""
-    |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
+    APNS.Notification.new("", device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_alert(%{
           "title" => title,
@@ -26,15 +25,14 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_custom(custom)
     |> put_category(category)
     |> put_sound("default")
-    |> APNS.push()
+    |> APNS.push(on_response: fn(x) -> IO.inspect(x) end)
   end
   def create_notification(device, msg, category, custom) do
-    msg
-    |> APNS.Notification.new(device, System.get_env("APP_PUSH_TOPIC"))
+    APNS.Notification.new(msg, device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_category(category)
     |> put_sound("default")
     |> put_custom(custom)
-    |> APNS.push()
+    |> APNS.push(on_response: fn(x) -> IO.inspect(x) end)
   end
 end
