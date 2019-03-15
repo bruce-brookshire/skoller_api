@@ -30,7 +30,7 @@ defmodule Skoller.Services.Notification.Ios do
   end
 
   def create_notification(device, msg, category, custom) do
-    IO.inspect device
+    
     APNS.Notification.new(msg, device, System.get_env("APP_PUSH_TOPIC"))
     |> put_mutable_content
     |> put_category(category)
