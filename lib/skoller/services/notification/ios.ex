@@ -48,6 +48,7 @@ defmodule Skoller.Services.Notification.Ios do
         IO.puts "deleted device: #{udid}"
 
       %{response: response_msg} -> 
+        IO.puts "iOS resp:"
         IO.inspect response_msg
 
       _ -> nil
