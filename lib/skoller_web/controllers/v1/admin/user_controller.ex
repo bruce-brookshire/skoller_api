@@ -4,6 +4,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.UserView
+  alias SkollerWeb.AuthView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
@@ -68,5 +69,17 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     conn 
       |> put_status(:ok)
       |> json(points)
+  end
+
+  def reset_password(conn, %{"password" => password, "user_id" => user_id}) do
+    user = Users.get_user_by_id!(user_id)
+
+    case Users.change_password(user, password) do
+      {:ok, %{} = auth} ->
+        render(conn, AuthView, "show.json", auth: auth)
+      {:error, _, failed_value, _} ->
+        conn
+        |> MultiError.render(failed_value)
+    end
   end
 end

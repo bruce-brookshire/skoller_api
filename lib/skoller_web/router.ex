@@ -66,6 +66,7 @@ defmodule SkollerWeb.Router do
 
       # Login/out routes
       post "/logout", AuthController, :logout
+      put "/reset/:user_id", Admin.UserController, :reset_password
       post "/reset", ForgotEmailController, :reset
 
       # Auto Update Routes
