@@ -75,12 +75,14 @@ defmodule Skoller.Analytics.Jobs do
             "Current Classes Set Up," <>
             "Total Classes," <>
             "Total Classes Set Up," <>
-            "Referral Organization," <>
+            "Sign Up Referral," <>
+            "Associated Referral," <>
             "Active Assignments," <>
             "Inactive Assignments," <>
             "Grades Entered," <>
             "Created Mods," <>
-            "Created Assignments\r\n"
+            "Created Assignments," <>
+            "Majors\r\n"
             | list
         ]
     end

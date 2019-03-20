@@ -157,7 +157,8 @@ defmodule Mix.Tasks.Seed.Dev do
       school_id: school.id,
       start_date: date1,
       end_date: date2,
-      is_main_period: true
+      is_main_period: true,
+      class_period_status_id: 200
     })
 
     period2 = Repo.insert!(%ClassPeriod{
@@ -165,7 +166,8 @@ defmodule Mix.Tasks.Seed.Dev do
       school_id: school2.id,
       start_date: date1,
       end_date: date2,
-      is_main_period: true
+      is_main_period: true,
+      class_period_status_id: 200
     })
 
     period3 = Repo.insert!(%ClassPeriod{
@@ -173,7 +175,8 @@ defmodule Mix.Tasks.Seed.Dev do
       school_id: school3.id,
       start_date: date1,
       end_date: date2,
-      is_main_period: true
+      is_main_period: true,
+      class_period_status_id: 200
     })
 
     class = Repo.insert!(%Class{name: "Big Money",
