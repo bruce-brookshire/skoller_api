@@ -10,7 +10,7 @@ defmodule Skoller.Students.StudentAnalytics do
 
     import Ecto.Query
 
-    def get_student_analytics() do
+    def get_analytics() do
         from(u in User)
             |> where([u], not is_nil(u.student_id) )
             |> select([u], u.id)

@@ -1,67 +1,113 @@
 defmodule Skoller.Analytics.Jobs do
     alias Skoller.AnalyticUpload
     alias Skoller.Analytics.Documents
-    alias Skoller.Analytics.Documents.DocumentType
     alias Skoller.Students.StudentAnalytics
-    alias Skoller.Repo
+    alias Skoller.Classes.ClassAnalytics
+    alias Skoller.Schools.SchoolAnalytics
+    
+    require Logger
+
 
     @user_job_id 100
     @class_job_id 200
     @school_job_id 300
     
-    def run_user_analytics(curtime) do
-        job = Repo.get(DocumentType, @user_job_id)
+    def run_analytics(job, curtime) do
+        curtime 
+            |> check_sending_time(job)
+            |> generate_csv()
+    end
 
-        case check_sending_time(curtime, job) do
-            :eq -> generate_user_csv()
-            _ -> nil
+    defp generate_csv(nil), do: nil
+    defp generate_csv(job_id) do
+        #Get context for job. If it's nil, theres no action implemented for the job
+        case get_context(job_id) do
+            {filename, dir} -> 
+                file_path = "./" <> filename
+                scope = %{:id => filename, :dir => dir}
+
+                Logger.info("Calculating analytics " <> filename)
+
+                job_id 
+                    |> get_analytics
+                    |> CSV.encode
+                    |> Enum.to_list
+                    |> add_headers(job_id)
+                    |> to_string
+                    |> upload_document(file_path, scope)
+                    |> store_document(scope)
+            nil -> 
+                Logger.info("Unknown analytics job")
         end
     end
 
-    def generate_user_csv() do
-        require Logger
-
-        filename = get_filename()
-        file_path = "./" <> filename
-
-        Logger.info("Calculating user analytics " <> filename)
-
-        content = csv_users()
-
-        Logger.info("Writing user analytics to S3")
-
-        File.write(file_path, content)
-
-        scope = %{:id => filename, :dir => "user_csv"}
-        {success, inserted} = AnalyticUpload.store({file_path, scope})
-
-        File.rm(file_path)
-
-        case success do
-            :ok ->
-                Logger.info("Analytics completed successfully")
-                path = AnalyticUpload.url({inserted, scope})
-                Documents.set_current_user_csv_path(path)
-            :error ->
-                Logger.error("Failed to upload user analytics")
-        end
+    #Return the filename and directory for the job if available
+    defp get_context(@school_job_id) do
+        filename = "Schools-" ++ get_file_base()
+        {filename, "school_csv"}
     end
 
-    defp get_filename() do
+    defp get_context(@class_job_id) do
+        filename = "Classes-" ++ get_file_base()
+        {filename, "class_csv"}
+    end
+
+    defp get_context(@user_job_id) do
+        filename = "Users-" ++ get_file_base()
+        {filename, "user_csv"}
+    end
+    defp get_context(_id), do: nil
+
+    #All filenames need this timestamp ending
+    defp get_file_base() do
         now = DateTime.utc_now
-        "Users-#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}"
+        "#{now.month}_#{now.day}_#{now.year}_#{now.hour}_#{now.minute}_#{now.second}"
+    end
+
+    #Retrieve analytics per the job_id
+    defp get_analytics(@school_job_id) do
+        SchoolAnalytics.get_analytics()
+    end
+
+    defp get_analytics(@class_job_id) do
+        ClassAnalytics.get_analytics()
+    end
+
+    defp get_analytics(@user_job_id) do
+        StudentAnalytics.get_analytics()
     end
 
 
-    defp csv_users() do
-        StudentAnalytics.get_student_analytics()
-            |> CSV.encode
-            |> Enum.to_list
-            |> add_headers
-            |> to_string
+    defp add_headers(list, @school_job_id) do
+        [
+            "School Creation Date," <>
+            "School Name," <>
+            "City," <>
+            "State," <>
+            "Timezone," <>
+            "Email Domains," <>
+            "Color," <>
+            "# of Accounts\r\n"
+            | list
+        ]
     end
-
-    defp add_headers(list) do
+    
+    defp add_headers(list, @class_job_id) do
+        [
+            "Created on," <> 
+            "Student Created," <> 
+            "Term Name," <> 
+            "Term Status," <> 
+            "Class Name," <> 
+            "Class Status," <> 
+            "Active Count," <> 
+            "Inactive Count," <> 
+            "School Name\r\n"
+            | list
+        ]
+    end
+    
+    defp add_headers(list, @user_job_id) do
         [
             "Account Creation Date," <>
             "First Name," <>
@@ -88,12 +134,42 @@ defmodule Skoller.Analytics.Jobs do
     end
 
 
+    defp upload_document(content, file_path, scope) do
+        File.write(file_path, content)
+        result = AnalyticUpload.store({file_path, scope})
+        File.rm(file_path)
+        result
+    end
+
+
+    defp store_document({:ok, inserted}, %{:dir => "school_csv"} = scope) do
+        Logger.info("Analytics completed successfully")
+        path = AnalyticUpload.url({inserted, scope})
+        Documents.set_current_school_csv_path(path)
+    end
+
+    defp store_document({:ok, inserted}, %{:dir => "class_csv"} = scope) do
+        Logger.info("Analytics completed successfully")
+        path = AnalyticUpload.url({inserted, scope})
+        Documents.set_current_class_csv_path(path)
+    end
+
+    defp store_document({:ok, inserted}, %{:dir => "user_csv"} = scope) do
+        Logger.info("Analytics completed successfully")
+        path = AnalyticUpload.url({inserted, scope})
+        Documents.set_current_user_csv_path(path)
+    end
+
+    defp store_document(_status, _scope) do
+        Logger.error("Failed to upload user analytics")
+    end
+ 
     defp check_sending_time(curtime, job) do
         converted_datetime = curtime |> Timex.Timezone.convert("America/Chicago")
         {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
 
         job_time = job.time |> Time.from_iso8601!()
     
-        Time.compare(time, job_time)
+        if(Time.compare(time, job_time), do: job.id, else: nil)
     end
 end

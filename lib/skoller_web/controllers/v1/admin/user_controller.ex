@@ -9,7 +9,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
-  alias Skoller.Analytics.Documents
 
   import SkollerWeb.Plugs.Auth
   
@@ -34,20 +33,6 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def show(conn, %{"id" => id}) do
     user = AdminUsers.get_user_by_id!(id)
     render(conn, UserView, "show.json", user: user)
-  end
-
-  def csv(conn, _params) do
-    path = Documents.get_current_user_csv_path()
-
-    case HTTPoison.get(path) do
-      {:ok, %{status_code: 200, body: body}} -> 
-        conn
-          |> put_resp_content_type("text/csv")
-          |> put_resp_header("content-disposition", ~s[attachment; filename="users.csv"; filename*="users.csv"])
-          |> send_resp(200, body)
-      _ -> conn |> send_resp(404, "csv not found")
-        
-    end
   end
 
   def update(conn, %{"user_id" => user_id} = params) do

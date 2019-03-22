@@ -3,8 +3,12 @@ defmodule Skoller.AnalyticsJob do
     # A Scheduler that runs the passed in module's `run/0` function every interval.
     # This needs to be run from a `Supervisor.Spec.worker/3` call.
     use GenServer
-  
+
+    alias Skoller.Repo
+    alias Skoller.Analytics.Documents.DocumentType
     alias Skoller.Analytics.Jobs, as: SAJobs
+
+    import Ecto.Query
   
     # This will currently run on every 5 minute interval in an hour.
     # It is NOT every 5 minutes from spin up.
@@ -31,7 +35,9 @@ defmodule Skoller.AnalyticsJob do
   
       now = DateTime.utc_now
 
-      now |> SAJobs.run_user_analytics()
+      from(j in DocumentType)
+        |> Repo.all
+        |> Enum.each(&SAJobs.run_analytics(&1, now))
   
       {:noreply, state}
     end

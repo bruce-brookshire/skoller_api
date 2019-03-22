@@ -53,7 +53,6 @@ defmodule SkollerWeb.Router do
       get "/sammi", SammiController, :status
       post "/sammi/train", SammiController, :train
 
-      get "/schools/csv", Admin.SchoolController, :csv
       post "/schools/csv", CSVController, :school
 
       get "/four-door/overrides", Admin.School.FourDoorController, :index
@@ -82,19 +81,18 @@ defmodule SkollerWeb.Router do
 
       # Analytics routes
       scope "/analytics" do
-        get "/", Analytics.AnalyticsController, :index
-        scope "/communities" do
-          get "/", Analytics.AnalyticsController, :communities
-          get "/csv", Analytics.AnalyticsController, :communities_csv
+        get "/", Admin.AnalyticsController, :index
+        scope "/csv" do
+          get "/schools", Admin.AnalyticsController, :schools_csv
+          get "/classes", Admin.AnalyticsController, :classes_csv
+          get "/users", Admin.AnalyticsController, :users_csv
         end
-        
       end
       
 
       # User routes
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
-      get "/users/csv", Admin.UserController, :csv
       get "/users/points", Admin.UserController, :points
       resources "/users", Admin.UserController, only: [:show, :index] do
         # User Role routes
