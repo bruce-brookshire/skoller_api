@@ -43,17 +43,17 @@ defmodule Skoller.Analytics.Jobs do
 
     #Return the filename and directory for the job if available
     defp get_context(@school_job_id) do
-        filename = "Schools-" ++ get_file_base()
+        filename = "Schools-" <> get_file_base()
         {filename, "school_csv"}
     end
 
     defp get_context(@class_job_id) do
-        filename = "Classes-" ++ get_file_base()
+        filename = "Classes-" <> get_file_base()
         {filename, "class_csv"}
     end
 
     defp get_context(@user_job_id) do
-        filename = "Users-" ++ get_file_base()
+        filename = "Users-" <> get_file_base()
         {filename, "user_csv"}
     end
     defp get_context(_id), do: nil
