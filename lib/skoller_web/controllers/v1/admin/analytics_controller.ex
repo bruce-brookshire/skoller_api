@@ -20,16 +20,19 @@ defmodule SkollerWeb.Api.V1.Admin.AnalyticsController do
 
   def schools_csv(conn, _params) do
     Documents.get_current_school_csv_path()
+      |> IO.inspect
       |> csv(conn)
   end
 
   def users_csv(conn, _params) do
     Documents.get_current_user_csv_path()
+      |> IO.inspect
       |> csv(conn)
   end
 
   def classes_csv(conn, _params) do
     Documents.get_current_class_csv_path()
+      |> IO.inspect
       |> csv(conn)
   end
 
