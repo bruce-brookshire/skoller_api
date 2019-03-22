@@ -39,6 +39,7 @@ defmodule SkollerWeb.Api.V1.Admin.AnalyticsController do
   defp csv(path, conn) do
     case HTTPoison.get(path) do
       {:ok, %{status_code: 200, body: body}} -> 
+        IO.inspect body
         conn
           |> put_resp_content_type("text/csv")
           |> put_resp_header("content-disposition", ~s[attachment; filename="analytics.csv"; filename*="analytics.csv"])
