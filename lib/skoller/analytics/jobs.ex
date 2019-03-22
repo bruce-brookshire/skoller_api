@@ -170,6 +170,6 @@ defmodule Skoller.Analytics.Jobs do
 
         job_time = job.time |> Time.from_iso8601!()
     
-        if(Time.compare(time, job_time), do: job.id, else: nil)
+        if(Time.compare(time, job_time) == :eq, do: job.id, else: nil)
     end
 end

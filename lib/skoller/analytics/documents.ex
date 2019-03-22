@@ -6,8 +6,8 @@ defmodule Skoller.Analytics.Documents do
     import Ecto.Query
 
     @user_fkey_id 100
-    @class_fkey_id 100
-    @school_fkey_id 100
+    @class_fkey_id 200
+    @school_fkey_id 300
 
     def get_current_user_csv_path() do
         csv = from(d in Document)
