@@ -20,26 +20,22 @@ defmodule SkollerWeb.Api.V1.Admin.AnalyticsController do
 
   def schools_csv(conn, _params) do
     Documents.get_current_school_csv_path()
-      |> IO.inspect
       |> csv(conn)
   end
 
   def users_csv(conn, _params) do
     Documents.get_current_user_csv_path()
-      |> IO.inspect
       |> csv(conn)
   end
 
   def classes_csv(conn, _params) do
     Documents.get_current_class_csv_path()
-      |> IO.inspect
       |> csv(conn)
   end
 
   defp csv(path, conn) do
     case HTTPoison.get(path) do
       {:ok, %{status_code: 200, body: body}} -> 
-        IO.inspect body
         conn
           |> put_resp_content_type("text/csv")
           |> put_resp_header("content-disposition", ~s[attachment; filename="analytics.csv"; filename*="analytics.csv"])
