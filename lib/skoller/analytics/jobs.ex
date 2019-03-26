@@ -7,7 +7,6 @@ defmodule Skoller.Analytics.Jobs do
     
     require Logger
 
-
     @user_job_id 100
     @class_job_id 200
     @school_job_id 300
@@ -77,7 +76,6 @@ defmodule Skoller.Analytics.Jobs do
         StudentAnalytics.get_analytics()
     end
 
-
     defp add_headers(list, @school_job_id) do
         [
             "School Creation Date," <>
@@ -133,14 +131,12 @@ defmodule Skoller.Analytics.Jobs do
         ]
     end
 
-
     defp upload_document(content, file_path, scope) do
         File.write(file_path, content)
         result = AnalyticUpload.store({file_path, scope})
         File.rm(file_path)
         result
     end
-
 
     defp store_document({:ok, inserted}, %{:dir => "school_csv"} = scope) do
         Logger.info("Analytics completed successfully")

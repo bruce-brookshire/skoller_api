@@ -148,7 +148,8 @@ defmodule Skoller.Notifications do
         student_class.is_notifications == true and 
         student.is_notifications == true and
         not is_nil(device.udid) and
-        not is_nil(device.type))
+        not is_nil(device.type) and
+        device.type == "ios")
     |> select([student_class, student, user, device], %{udid: device.udid, type: device.type, class_id: student_class.class_id})
     |> Repo.all()
   end
