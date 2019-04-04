@@ -17,6 +17,7 @@ defmodule Skoller.Users.User do
     field :pic_path, :string
     field :is_active, :boolean, default: true
     field :is_unsubscribed, :boolean, default: false
+    field :last_login, :utc_datetime
     belongs_to :student, Student
     many_to_many :roles, Role, join_through: "user_roles"
     has_many :reports, Report
@@ -28,10 +29,10 @@ defmodule Skoller.Users.User do
   @opt_fields [:pic_path]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
-  @upd_opt [:password, :pic_path]
+  @upd_opt [:password, :pic_path, :last_login]
   @upd_fields @upd_req ++ @upd_opt
   @adm_upd_req [:is_active, :is_unsubscribed]
-  @adm_upd_opt [:password, :pic_path]
+  @adm_upd_opt [:password, :pic_path, :last_login]
   @adm_upd_fields @adm_upd_req ++ @adm_upd_opt
 
   @doc false

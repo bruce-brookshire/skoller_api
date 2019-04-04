@@ -19,6 +19,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
     if Authentication.check_password(password, user.password_hash) do
         {:ok, token} = Token.login(user.id)
         token = Map.new(%{token: token}) |> Map.merge(%{user: user})
+        user |> Users.update_user(%{ last_login: DateTime.utc_now() })
         render(conn, AuthView, "show.json", auth: token)
     else
         conn
