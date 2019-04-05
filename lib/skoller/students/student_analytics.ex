@@ -33,6 +33,8 @@ defmodule Skoller.Students.StudentAnalytics do
                 fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.last_login),
                 s.is_verified,
                 sc.name,
+                sc.adr_locality,
+                sc.adr_region,
                 s.grad_year,
                 fragment("(SELECT COUNT(*) FROM student_classes sc WHERE sc.student_id = ? AND sc.is_dropped = false)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND sc.is_dropped = false AND c.class_status_id = 1400)", s.id),

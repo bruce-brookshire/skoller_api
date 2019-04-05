@@ -115,6 +115,8 @@ defmodule Skoller.Analytics.Jobs do
             "Phone # Verified?," <>
             "Last Logged In," <>
             "Main School," <>
+            "School City," <>
+            "School State," <>
             "Graduation Year," <> 
             "Current Classes," <>
             "Current Classes Set Up," <>
