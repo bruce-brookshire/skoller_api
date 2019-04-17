@@ -12,8 +12,8 @@ defmodule Skoller.Schools.Timezones do
 
   def process_timezone_change(old_timezone, school) do
     Ecto.Multi.new()
-    |> Ecto.Multi.run(:assignments, &update_assignment_due_dates(school, old_timezone, &1))
-    |> Ecto.Multi.run(:student_assignments, &update_student_assignment_due_times(school, old_timezone, &1))
+    |> Ecto.Multi.run(:assignments, fn (_, changes) -> update_assignment_due_dates(school, old_timezone, changes) end)
+    |> Ecto.Multi.run(:student_assignments, fn (_, changes) -> update_student_assignment_due_times(school, old_timezone, changes) end)
   end
 
   defp update_assignment_due_dates(school, old_timezone, _) do

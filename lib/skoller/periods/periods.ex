@@ -74,7 +74,7 @@ defmodule Skoller.Periods do
   def update_period(period_old, params) do
     result = Ecto.Multi.new()
     |> Ecto.Multi.update(:class_period, ClassPeriod.changeset_update(period_old, params))
-    |> Ecto.Multi.run(:period, fn %{class_period: class_period} ->
+    |> Ecto.Multi.run(:period, fn _, %{class_period: class_period} ->
       reset_status(class_period)
     end)
     |> Repo.transaction()

@@ -22,7 +22,7 @@ defmodule Skoller.HelpRequests do
     
     Ecto.Multi.new
     |> Ecto.Multi.insert(:help_request, changeset)
-    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
+    |> Ecto.Multi.run(:class, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
     |> Repo.transaction()
   end
 

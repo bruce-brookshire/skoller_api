@@ -21,7 +21,7 @@ defmodule Skoller.ChangeRequests do
     
     Ecto.Multi.new
     |> Ecto.Multi.insert(:change_request, changeset)
-    |> Ecto.Multi.run(:class, &ClassStatuses.check_status(class, &1))
+    |> Ecto.Multi.run(:class, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
     |> Repo.transaction()
   end
 
@@ -43,7 +43,7 @@ defmodule Skoller.ChangeRequests do
 
     multi = Ecto.Multi.new()
     |> Ecto.Multi.update(:change_request, changeset)
-    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(change_request_old.class, &1))
+    |> Ecto.Multi.run(:class_status, fn (_, changes) -> ClassStatuses.check_status(change_request_old.class, changes) end)
     |> Repo.transaction()
 
     case multi do

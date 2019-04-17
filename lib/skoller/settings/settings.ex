@@ -79,7 +79,7 @@ defmodule Skoller.Settings do
   """
   def update_settings(settings) do
     Ecto.Multi.new()
-    |> Ecto.Multi.run(:settings, &multi_update_settings(settings, &1))
+    |> Ecto.Multi.run(:settings, fn (_, changes) -> multi_update_settings(settings, changes) end)
     |> Repo.transaction()
   end
 

@@ -55,7 +55,7 @@ defmodule Skoller.AssignmentPosts do
 
     result = Ecto.Multi.new()
     |> Ecto.Multi.insert(:post, changeset)
-    |> Ecto.Multi.run(:student_assignment, &StudentAssignments.un_read_assignment(&1.post.student_id, &1.post.assignment_id))
+    |> Ecto.Multi.run(:student_assignment, fn (_, changes) -> StudentAssignments.un_read_assignment(changes.post.student_id, changes.post.assignment_id) end)
     |> Repo.transaction()
 
     case result do

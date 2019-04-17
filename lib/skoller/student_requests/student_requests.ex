@@ -33,9 +33,9 @@ defmodule Skoller.StudentRequests do
 
     Ecto.Multi.new
     |> Ecto.Multi.insert(:student_request, changeset)
-    |> Ecto.Multi.run(:doc_upload, &upload_class_docs(user, params, &1.student_request))
-    |> Ecto.Multi.run(:doc_removal, &remove_docs_from_same_uploader(&1, class))
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
+    |> Ecto.Multi.run(:doc_upload, fn (_, changes) -> upload_class_docs(user, params, changes.student_request) end)
+    |> Ecto.Multi.run(:doc_removal, fn (_, changes) -> remove_docs_from_same_uploader(changes, class) end)
+    |> Ecto.Multi.run(:status, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
     |> Repo.transaction()
   end
 
@@ -58,7 +58,7 @@ defmodule Skoller.StudentRequests do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:student_request, changeset)
-    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(class, &1))
+    |> Ecto.Multi.run(:class_status, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
     |> Repo.transaction()
   end
 

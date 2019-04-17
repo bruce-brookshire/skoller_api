@@ -74,7 +74,7 @@ defmodule Skoller.Classes do
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(&1.class, %{params: params}))
+    |> Ecto.Multi.run(:class_status, fn (_, changes) -> ClassStatuses.check_status(changes.class, %{params: params}) end)
     |> Repo.transaction()
   end
 
@@ -95,7 +95,7 @@ defmodule Skoller.Classes do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:class, changeset)
-    |> Ecto.Multi.run(:class_status, &ClassStatuses.check_status(&1.class, nil))
+    |> Ecto.Multi.run(:class_status, fn (_, changes) -> ClassStatuses.check_status(changes.class, nil) end)
     |> Repo.transaction()
   end
 

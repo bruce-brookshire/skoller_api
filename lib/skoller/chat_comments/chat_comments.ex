@@ -56,8 +56,8 @@ defmodule Skoller.ChatComments do
 
     result = Ecto.Multi.new
     |> Ecto.Multi.insert(:comment, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.comment.id, student_id))
-    |> Ecto.Multi.run(:unread, &ChatPosts.unread_posts(&1.comment.chat_post_id, student_id))
+    |> Ecto.Multi.run(:star, fn (_, changes) -> insert_star(changes.comment.id, student_id) end)
+    |> Ecto.Multi.run(:unread, fn (_, changes) -> ChatPosts.unread_posts(changes.comment.chat_post_id, student_id) end)
     |> Repo.transaction()
 
     case result do

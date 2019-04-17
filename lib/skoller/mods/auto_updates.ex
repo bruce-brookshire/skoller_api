@@ -253,8 +253,8 @@ defmodule Skoller.AutoUpdates do
 
   defp auto_update_mod(mod) do
     Ecto.Multi.new
-    |> Ecto.Multi.run(:mod, &update_mod(mod, &1))
-    |> Ecto.Multi.run(:actions, &apply_mod_from_actions(&1.mod))
+    |> Ecto.Multi.run(:mod, fn (_, changes) -> update_mod(mod, changes) end)
+    |> Ecto.Multi.run(:actions, fn (_, changes) -> apply_mod_from_actions(changes.mod) end)
     |> Repo.transaction()
   end
 

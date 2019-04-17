@@ -53,7 +53,7 @@ defmodule Skoller.Locks do
     sections = Repo.all(Section)
 
     Ecto.Multi.new
-    |> Ecto.Multi.run(:sections, &lock_sections(sections, class_id, user_id, &1))
+    |> Ecto.Multi.run(:sections, fn (_, changes) -> lock_sections(sections, class_id, user_id, changes) end)
     |> Repo.transaction()
   end
   def lock_class(class_id, user_id, :weights, _opts) do
@@ -83,8 +83,8 @@ defmodule Skoller.Locks do
     locks = Users.get_locks_by_class_and_user(old_class.id, user_id)
 
     Ecto.Multi.new
-    |> Ecto.Multi.run(:unlock, &unlock_locks(locks, &1))
-    |> Ecto.Multi.run(:status, &check_class_status(&1, old_class, is_completed))
+    |> Ecto.Multi.run(:unlock, fn (_, changes) -> unlock_locks(locks, changes) end)
+    |> Ecto.Multi.run(:status, fn (_, changes) -> check_class_status(changes, old_class, is_completed) end)
     |> Repo.transaction()
   end
 

@@ -69,9 +69,9 @@ defmodule Skoller.Users do
     |> verification_code(opts)
     |> get_enrolled_by(params)
     |> insert_user(params, opts)
-    |> Ecto.Multi.run(:custom_link, &custom_link_signup(&1.user, params))
-    |> Ecto.Multi.run(:link, &get_link(&1.user))
-    |> Ecto.Multi.run(:points, &add_points_to_student(&1.user))
+    |> Ecto.Multi.run(:custom_link, fn (_, changes) -> custom_link_signup(changes.user, params) end)
+    |> Ecto.Multi.run(:link, fn (_, changes) -> get_link(changes.user) end)
+    |> Ecto.Multi.run(:points, fn (_, changes) -> add_points_to_student(changes.user) end)
     |> Repo.transaction()
     |> send_link_used_notification()
     |> send_verification_text()
@@ -100,10 +100,15 @@ defmodule Skoller.Users do
     changeset = User.changeset_update_admin(user_old, params)
     Ecto.Multi.new
     |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
-    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
-    |> Ecto.Multi.run(:link, &get_link(&1.user))
+    |> Ecto.Multi.run(:roles, fn (_, changes) -> add_roles(changes, params, opts) end)
+    |> Ecto.Multi.run(:fields_of_study, fn (_, changes) -> add_fields_of_study(changes, params) end)
+    |> Ecto.Multi.run(:link, fn (_, changes) -> get_link(changes.user) end)
     |> Repo.transaction()
+  end
+
+  def tester(one, two, three) do
+    IO.puts "ugh"
+    {:ok, 'stuff'}
   end
 
 
@@ -153,8 +158,8 @@ defmodule Skoller.Users do
   """
   def change_password(user_old, password) do
     Ecto.Multi.new
-    |> Ecto.Multi.run(:user, &change_password(user_old, password, &1))
-    |> Ecto.Multi.run(:token, &Token.login(&1.user.id))
+    |> Ecto.Multi.run(:user, fn (_, changes) -> change_password(user_old, password, changes) end)
+    |> Ecto.Multi.run(:token, fn (_, changes) -> Token.login(changes.user.id) end)
     |> Repo.transaction()
   end
 
@@ -247,13 +252,15 @@ defmodule Skoller.Users do
   defp insert_user(changeset, params, opts) do
     Ecto.Multi.new
     |> Ecto.Multi.insert(:user, changeset)
-    |> Ecto.Multi.run(:roles, &add_roles(&1, params, opts))
-    |> Ecto.Multi.run(:fields_of_study, &add_fields_of_study(&1, params))
+    |> Ecto.Multi.run(:roles, fn (_, changes) -> add_roles(changes, params, opts) end)
+    |> Ecto.Multi.run(:fields_of_study, fn (_, changes) -> add_fields_of_study(changes, params) end)
   end
 
   # Gets a link for a student.
   defp get_link(%User{student: %Student{} = student}) do
-    Students.generate_student_link(student)
+    link = Students.generate_student_link(student)
+    IO.inspect link 
+    link
   end
   defp get_link(_user), do: {:ok, nil}
 

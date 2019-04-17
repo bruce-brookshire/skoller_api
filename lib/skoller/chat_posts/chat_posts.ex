@@ -66,7 +66,7 @@ defmodule Skoller.ChatPosts do
 
     results = Ecto.Multi.new
     |> Ecto.Multi.insert(:post, changeset)
-    |> Ecto.Multi.run(:star, &insert_star(&1.post.id, student_id))
+    |> Ecto.Multi.run(:star, fn (_, changes) -> insert_star(changes.post.id, student_id) end)
     |> Repo.transaction()
 
     case results do

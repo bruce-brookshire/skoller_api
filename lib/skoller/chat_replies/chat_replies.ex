@@ -55,8 +55,8 @@ defmodule Skoller.ChatReplies do
 
     result = Ecto.Multi.new
     |> Ecto.Multi.insert(:reply, changeset)
-    |> Ecto.Multi.run(:unread_post, &unread_post(&1.reply, student_id))
-    |> Ecto.Multi.run(:unread_comments, &ChatComments.unread_comments(&1.reply.chat_comment_id, student_id))
+    |> Ecto.Multi.run(:unread_post, fn (_, changes) -> unread_post(changes.reply, student_id) end)
+    |> Ecto.Multi.run(:unread_comments, fn (_, changes) -> ChatComments.unread_comments(changes.reply.chat_comment_id, student_id) end)
     |> Repo.transaction()
 
     case result do

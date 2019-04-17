@@ -147,9 +147,9 @@ defmodule Skoller.StudentAssignments do
     |> validate_class_weight()
 
     result = Ecto.Multi.new
-    |> Ecto.Multi.run(:assignment, &insert_or_get_assignment(&1, changeset))
-    |> Ecto.Multi.run(:student_assignment, &insert_student_assignment(&1, params))
-    |> Ecto.Multi.run(:mod, &Mods.insert_new_mod(&1, params["student_id"], params["is_private"]))
+    |> Ecto.Multi.run(:assignment, fn (_, changes) -> insert_or_get_assignment(changes, changeset) end)
+    |> Ecto.Multi.run(:student_assignment, fn (_, changes) -> insert_student_assignment(changes, params) end)
+    |> Ecto.Multi.run(:mod, fn (_, changes) -> Mods.insert_new_mod(changes, params["student_id"], params["is_private"]) end)
     |> Repo.transaction()
     |> process_auto_update()
     |> mod_update_notification()
@@ -178,7 +178,7 @@ defmodule Skoller.StudentAssignments do
 
     result = Ecto.Multi.new
     |> Ecto.Multi.update(:student_assignment, changeset)
-    |> Ecto.Multi.run(:mod, &Mods.insert_update_mod(&1, changeset, params["is_private"]))
+    |> Ecto.Multi.run(:mod, fn (_, changes) -> Mods.insert_update_mod(changes, changeset, params["is_private"]) end)
     |> Repo.transaction()
     |> process_auto_update()
     |> mod_update_notification()
@@ -199,7 +199,7 @@ defmodule Skoller.StudentAssignments do
   def delete_student_assignment(student_assignment, is_private) do
     result = Ecto.Multi.new
     |> Ecto.Multi.delete(:student_assignment, student_assignment)
-    |> Ecto.Multi.run(:mod, &Mods.insert_delete_mod(&1, is_private))
+    |> Ecto.Multi.run(:mod, fn (_, changes) -> Mods.insert_delete_mod(changes, is_private) end)
     |> Repo.transaction()
     |> process_auto_update()
     |> mod_update_notification()

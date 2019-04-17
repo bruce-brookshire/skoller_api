@@ -166,13 +166,13 @@ defmodule Skoller.StudentClasses do
 
     multi = Ecto.Multi.new
     |> Ecto.Multi.insert(:student_class, changeset)
-    |> Ecto.Multi.run(:enrollment_link, &generate_enrollment_link(&1.student_class))
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
-    |> Ecto.Multi.run(:mods, &StudentClassMods.add_public_mods_for_student_class(&1))
-    |> Ecto.Multi.run(:auto_approve, &auto_approve_mods(&1))
-    |> Ecto.Multi.run(:points, &add_points_to_student(&1.student_class))
-    |> Ecto.Multi.run(:primary_school, fn _trans -> Students.conditional_primary_school_set(student, class.school.id) end)
+    |> Ecto.Multi.run(:enrollment_link, fn (_, changes) -> generate_enrollment_link(changes.student_class) end)
+    |> Ecto.Multi.run(:status, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
+    |> Ecto.Multi.run(:student_assignments, fn (_, changes) -> StudentAssignments.insert_assignments(changes) end)
+    |> Ecto.Multi.run(:mods, fn (_, changes) -> StudentClassMods.add_public_mods_for_student_class(changes) end)
+    |> Ecto.Multi.run(:auto_approve, fn (_, changes) -> auto_approve_mods(changes) end)
+    |> Ecto.Multi.run(:points, fn (_, changes) -> add_points_to_student(changes.student_class) end)
+    |> Ecto.Multi.run(:primary_school, fn (_,_trans) -> Students.conditional_primary_school_set(student, class.school.id) end)
 
     case multi |> Repo.transaction() do
       {:ok, trans} -> 

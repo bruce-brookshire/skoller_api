@@ -100,7 +100,7 @@ defmodule Skoller.ClassDocs do
 
     result = Ecto.Multi.new
     |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, &ClassStatuses.check_status(class, &1))
+    |> Ecto.Multi.run(:status, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
     |> Repo.transaction()
 
     case result do
@@ -136,8 +136,8 @@ defmodule Skoller.ClassDocs do
     |> Map.put("user_id", user_id)
 
     Ecto.Multi.new
-    |> Ecto.Multi.run(:doc, &insert_class_doc(classes, params, &1))
-    |> Ecto.Multi.run(:status, &check_statuses(classes, &1.doc))
+    |> Ecto.Multi.run(:doc, fn (_, changes) -> insert_class_doc(classes, params, changes) end)
+    |> Ecto.Multi.run(:status, fn (_, changes) -> check_statuses(classes, changes.doc) end)
     |> Repo.transaction()
   end
 

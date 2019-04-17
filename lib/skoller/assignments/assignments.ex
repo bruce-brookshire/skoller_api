@@ -47,7 +47,7 @@ defmodule Skoller.Assignments do
 
     Ecto.Multi.new
     |> Ecto.Multi.insert(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.insert_assignments(&1))
+    |> Ecto.Multi.run(:student_assignments, fn (_, changes) -> StudentAssignments.insert_assignments(changes) end)
     |> Repo.transaction()
   end
 
@@ -70,7 +70,7 @@ defmodule Skoller.Assignments do
 
     Ecto.Multi.new
     |> Ecto.Multi.update(:assignment, changeset)
-    |> Ecto.Multi.run(:student_assignments, &StudentAssignments.update_assignments(&1))
+    |> Ecto.Multi.run(:student_assignments, fn (_, changes) -> StudentAssignments.update_assignments(changes) end)
     |> Repo.transaction()
   end
 
