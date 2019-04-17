@@ -37,6 +37,7 @@ defmodule SkollerWeb.Class.ChatPostView do
     student_chat_post(chat_post, color, student_id)
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_post.json", %{chat_post: chat_post}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes])
     %{
@@ -45,10 +46,11 @@ defmodule SkollerWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      inserted_at: chat_post.inserted_at
+      inserted_at:  NaiveDateTime.to_iso8601(chat_post.inserted_at) <> "Z"
     }
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_post_detail.json", %{chat_post: %{chat_post: chat_post, color: color}, current_student_id: student_id}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes, :class])
     %{
@@ -61,10 +63,11 @@ defmodule SkollerWeb.Class.ChatPostView do
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, SkollerWeb.ClassView, "class_short.json"),
       color: color,
-      inserted_at: chat_post.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_post.inserted_at) <> "Z"
     }
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_post_detail.json", %{chat_post: chat_post}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes])
     %{
@@ -73,7 +76,7 @@ defmodule SkollerWeb.Class.ChatPostView do
       id: chat_post.id,
       comments: render_many(chat_post.chat_comments, ChatCommentView, "chat_comment_detail.json"),
       likes: render_many(chat_post.likes, LikeView, "like.json"),
-      inserted_at: chat_post.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_post.inserted_at) <> "Z"
     }
   end
 
@@ -86,6 +89,7 @@ defmodule SkollerWeb.Class.ChatPostView do
     }
   end
 
+  # TODO: Remove to_iso8601 modification
   defp student_chat_post(chat_post, color, student_id) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes, :class])
     %{
@@ -98,7 +102,7 @@ defmodule SkollerWeb.Class.ChatPostView do
       is_starred: chat_post |> is_starred(student_id),
       class: render_one(chat_post.class, SkollerWeb.ClassView, "class_short.json"),
       color: color,
-      inserted_at: chat_post.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_post.inserted_at) <> "Z"
     }
   end
 

@@ -106,12 +106,6 @@ defmodule Skoller.Users do
     |> Repo.transaction()
   end
 
-  def tester(one, two, three) do
-    IO.puts "ugh"
-    {:ok, 'stuff'}
-  end
-
-
   def delete_user(user_id) do
     user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)
 
@@ -258,9 +252,7 @@ defmodule Skoller.Users do
 
   # Gets a link for a student.
   defp get_link(%User{student: %Student{} = student}) do
-    link = Students.generate_student_link(student)
-    IO.inspect link 
-    link
+    Students.generate_student_link(student)
   end
   defp get_link(_user), do: {:ok, nil}
 

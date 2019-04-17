@@ -19,16 +19,18 @@ defmodule SkollerWeb.Class.ChatReplyView do
     render_one(chat_reply, ChatReplyView, "chat_reply_detail.json")
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_reply.json", %{chat_reply: chat_reply}) do
     chat_reply = chat_reply |> Repo.preload([:student])
     %{
       reply: chat_reply.reply,
       student: render_one(chat_reply.student, SkollerWeb.StudentView, "student-short.json"),
       id: chat_reply.id,
-      inserted_at: chat_reply.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_reply.inserted_at) <> "Z"
     }
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_reply_detail.json", %{chat_reply: chat_reply, current_student_id: student_id}) do
     chat_reply = chat_reply |> Repo.preload([:student, :likes])
     %{
@@ -37,10 +39,11 @@ defmodule SkollerWeb.Class.ChatReplyView do
       id: chat_reply.id,
       likes: render_many(chat_reply.likes, LikeView, "like.json"),
       is_liked: chat_reply |> Chats.is_liked(student_id),
-      inserted_at: chat_reply.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_reply.inserted_at) <> "Z"
     }
   end
 
+  # TODO: Remove to_iso8601 modification
   def render("chat_reply_detail.json", %{chat_reply: chat_reply}) do
     chat_reply = chat_reply |> Repo.preload([:student, :likes])
     %{
@@ -48,7 +51,7 @@ defmodule SkollerWeb.Class.ChatReplyView do
       student: render_one(chat_reply.student, SkollerWeb.StudentView, "student-short.json"),
       id: chat_reply.id,
       likes: render_many(chat_reply.likes, LikeView, "like.json"),
-      inserted_at: chat_reply.inserted_at
+      inserted_at: NaiveDateTime.to_iso8601(chat_reply.inserted_at) <> "Z"
     }
   end
 end

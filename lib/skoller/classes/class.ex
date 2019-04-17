@@ -85,6 +85,7 @@ defmodule Skoller.Classes.Class do
   end
   
   @doc false
+  #TODO: Remove this temp jank code once flutter is deployed
   def university_changeset(%Class{} = class, attrs) do
 
     #This makes sure that meet_start_time being "online" doesnt fail the creation
