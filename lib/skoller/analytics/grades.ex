@@ -18,7 +18,7 @@ defmodule Skoller.Analytics.Grades do
   """
   def get_grades_entered_count(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
+    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), on: sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> Repo.aggregate(:count, :id)
   end
@@ -32,7 +32,7 @@ defmodule Skoller.Analytics.Grades do
   """
   def get_student_classes_with_grades_count(params) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.id == sa.student_class_id)
+    |> join(:inner, [sa], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), on: sc.id == sa.student_class_id)
     |> where([sa], not is_nil(sa.grade))
     |> distinct([sa], [sa.student_class_id])
     |> Repo.aggregate(:count, :id)

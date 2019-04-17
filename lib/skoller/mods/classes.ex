@@ -18,8 +18,8 @@ defmodule Skoller.Mods.Classes do
   """
   def get_class_from_mod_id(mod_id) do
     from(class in Class)
-    |> join(:inner, [class], assign in Assignment, class.id == assign.class_id)
-    |> join(:inner, [class, assign], mod in Mod, mod.assignment_id == assign.id)
+    |> join(:inner, [class], assign in Assignment, on: class.id == assign.class_id)
+    |> join(:inner, [class, assign], mod in Mod, on: mod.assignment_id == assign.id)
     |> where([class, assign, mod], mod.id == ^mod_id)
     |> Repo.one()
   end
@@ -34,13 +34,13 @@ defmodule Skoller.Mods.Classes do
   """
   def get_class_from_mod_subquery() do
     from(mod in Mod)
-    |> join(:inner, [mod], assign in Assignment, mod.assignment_id == assign.id)
+    |> join(:inner, [mod], assign in Assignment, on: mod.assignment_id == assign.id)
     |> select([mod, assign], %{class_id: assign.class_id, mod_id: mod.id})
   end
 
   def get_count_of_mods_in_classes(mods, classes) do
     from(m in Mod)
-    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
+    |> join(:inner, [m], a in Assignment, on: m.assignment_id == a.id)
     |> where([m, a], a.class_id in ^classes)
     |> where([m], m.id in ^mods)
     |> select([m], count(m.id))

@@ -30,7 +30,7 @@ defmodule Skoller.CustomSignups do
   """
   def get_links() do
     from(l in Link)
-    |> join(:inner, [l], c in subquery(get_link_student_count_subquery()), c.link_id == l.id)
+    |> join(:inner, [l], c in subquery(get_link_student_count_subquery()), on: c.link_id == l.id)
     |> select([l, c], %{link: l, signup_count: c.count})
     |> Repo.all()
   end
@@ -88,7 +88,7 @@ defmodule Skoller.CustomSignups do
 
   def signup_organization_name_for_student_id(student_id) do
     from(s in Signup)
-      |> join(:inner, [s], l in Link, s.custom_signup_link_id == l.id)
+      |> join(:inner, [s], l in Link, on: s.custom_signup_link_id == l.id)
       |> where([s, l], s.student_id == ^student_id)
       |> select([s, l], l.name)
       |> Repo.one()
@@ -114,8 +114,8 @@ defmodule Skoller.CustomSignups do
   # Gets the count of signups per link.
   defp get_link_student_count_subquery() do
     from(l in Link)
-    |> join(:left, [l], s in Signup, s.custom_signup_link_id == l.id)
-    |> join(:left, [l, s], stu in Student, stu.id == s.student_id)
+    |> join(:left, [l], s in Signup, on: s.custom_signup_link_id == l.id)
+    |> join(:left, [l, s], stu in Student, on: stu.id == s.student_id)
     |> group_by([l], l.id)
     |> select([l, s, stu], %{link_id: l.id, count: count(stu.id)})
   end

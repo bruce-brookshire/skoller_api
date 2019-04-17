@@ -24,8 +24,8 @@ defmodule Skoller.Analytics.Docs do
   """
   def get_enrolled_class_with_syllabus_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> join(:inner, [c, cs], d in subquery(classes_with_syllabus_subquery()), d.class_id == c.id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), on: c.id == cs.class_id)
+    |> join(:inner, [c, cs], d in subquery(classes_with_syllabus_subquery()), on: d.class_id == c.id)
     |> where([c], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", c.id))
     |> where([c, cs, d], fragment("?::date", d.inserted_at) >= ^date_start and fragment("?::date", d.inserted_at) <= ^date_end)
     |> Repo.aggregate(:count, :id)
@@ -45,7 +45,7 @@ defmodule Skoller.Analytics.Docs do
   """
   def classes_multiple_files(dates, params) do
     from(d in Doc)
-    |> join(:inner, [d], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == d.class_id)
+    |> join(:inner, [d], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == d.class_id)
     |> where([d], fragment("?::date", d.inserted_at) >= ^dates.date_start and fragment("?::date", d.inserted_at) <= ^dates.date_end)
     |> where([d], fragment("exists(select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false)", d.class_id))
     |> group_by([d], d.class_id)

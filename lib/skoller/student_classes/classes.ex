@@ -33,11 +33,11 @@ defmodule Skoller.StudentClasses.Classes do
   def get_classes_with_enrollment(params) do
     #TODO: Filter ClassPeriod
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
-    |> join(:inner, [class, period, prof], school in School, school.id == period.school_id)
-    |> join(:inner, [class, period, prof, school], status in Status, status.id == class.class_status_id)
-    |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), enroll.class_id == class.id)
+    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
+    |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
+    |> join(:inner, [class, period, prof], school in School, on: school.id == period.school_id)
+    |> join(:inner, [class, period, prof, school], status in Status, on: status.id == class.class_status_id)
+    |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), on: enroll.class_id == class.id)
     |> where([class, period, prof], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> limit(500)

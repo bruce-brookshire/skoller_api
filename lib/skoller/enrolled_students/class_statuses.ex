@@ -15,8 +15,8 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
   """
   def get_students_needs_setup_classes() do
     from(s in Student)
-    |> join(:inner, [s], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in subquery(Classes.needs_setup_classes_subquery()), sc.class_id == c.id)
+    |> join(:inner, [s], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), on: sc.student_id == s.id)
+    |> join(:inner, [s, sc], c in subquery(Classes.needs_setup_classes_subquery()), on: sc.class_id == c.id)
     |> preload([s], [:users])
     |> distinct([s], s.id)
     |> Repo.all()

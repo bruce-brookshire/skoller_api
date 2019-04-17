@@ -39,8 +39,8 @@ defmodule Skoller.Periods do
 
   def get_classes_by_period_id(period_id, filters \\ %{}) do
     from(class in Class)
-      |> join(:inner, [class], period in ClassPeriod, period.id == ^period_id and class.class_period_id == period.id and period.is_hidden == false)
-      |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
+      |> join(:inner, [class], period in ClassPeriod, on: period.id == ^period_id and class.class_period_id == period.id and period.is_hidden == false)
+      |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
       |> where([class, period, prof], ^class_filter(filters))
       |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
       |> order_by([class], desc: class.inserted_at)

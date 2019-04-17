@@ -19,7 +19,7 @@ defmodule Skoller.Students.Organizations do
   """
   def attribute_signup_to_organization(new_student_id, enroller_student_id) do
     organization = from(o in Organization)
-    |> join(:inner, [o], s in Student, s.primary_organization_id == o.id)
+    |> join(:inner, [o], s in Student, on: s.primary_organization_id == o.id)
     |> where([o, s], s.id == ^enroller_student_id)
     |> preload([o], [:custom_signup_link])
     |> Repo.one()

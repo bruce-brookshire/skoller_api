@@ -38,8 +38,8 @@ defmodule Skoller.Mods.Assignments do
   """
   def get_new_assignment_mods(%StudentClass{} = student_class) do
     from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
-    |> join(:inner, [mod, act], assign in Assignment, assign.id == mod.assignment_id)
+    |> join(:inner, [mod], act in Action, on: mod.id == act.assignment_modification_id and act.student_class_id == ^student_class.id) 
+    |> join(:inner, [mod, act], assign in Assignment, on: assign.id == mod.assignment_id)
     |> where([mod], mod.assignment_mod_type_id == ^@new_assignment_mod)
     |> where([mod, act], is_nil(act.is_accepted))
     |> Repo.all()
@@ -62,9 +62,9 @@ defmodule Skoller.Mods.Assignments do
   #This gets enrolled users' Skoller.Mods.Action and Skoller.Users.User for a given mod.
   defp add_action_details(mod_id) do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), a.student_class_id == sc.id)
-    |> join(:inner, [a, sc], s in Student, s.id == sc.student_id)
-    |> join(:inner, [a, sc, s], u in User, u.student_id == s.id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: a.student_class_id == sc.id)
+    |> join(:inner, [a, sc], s in Student, on: s.id == sc.student_id)
+    |> join(:inner, [a, sc, s], u in User, on: u.student_id == s.id)
     |> where([a], a.assignment_modification_id == ^mod_id)
     |> select([a, sc, s, u], %{action: a, user: u})
     |> Repo.all()

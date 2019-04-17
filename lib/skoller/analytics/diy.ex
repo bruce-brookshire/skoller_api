@@ -29,8 +29,8 @@ defmodule Skoller.Analytics.DIY do
   """
   def classes_completed_by_diy_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
-    |> join(:inner, [c, cs], cu in subquery(classes_with_student_assignment_entry_subquery()), c.id == cu.class_id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), on: c.id == cs.class_id)
+    |> join(:inner, [c, cs], cu in subquery(classes_with_student_assignment_entry_subquery()), on: c.id == cu.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> distinct([c], c.id)
     |> Repo.aggregate(:count, :id)
@@ -38,9 +38,9 @@ defmodule Skoller.Analytics.DIY do
 
   defp classes_with_student_assignment_entry_subquery() do
     from(a in Assignment)
-    |> join(:inner, [a], u in User, a.created_by == u.user_id)
-    |> join(:inner, [a, u], r in UserRole, r.user_id == u.id)
-    |> join(:inner, [a, u, r, c], c in Class, c.id == a.class_id)
+    |> join(:inner, [a], u in User, on: a.created_by == u.user_id)
+    |> join(:inner, [a, u], r in UserRole, on: r.user_id == u.id)
+    |> join(:inner, [a, u, r, c], c in Class, on: c.id == a.class_id)
     |> where([a, u, r], r.role_id == @student_role)
     |> select([a, u, r, c], %{class_id: c.id})
   end

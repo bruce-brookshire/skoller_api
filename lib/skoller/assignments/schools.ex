@@ -18,8 +18,8 @@ defmodule Skoller.Assignments.Schools do
   """
   def get_school_assignments(school_id) do
     from(a in Assignment)
-    |> join(:inner, [a], c in Class, c.id == a.class_id)
-    |> join(:inner, [a, c], s in subquery(Schools.get_school_from_class_subquery(school_id)), c.id == s.class_id)
+    |> join(:inner, [a], c in Class, on: c.id == a.class_id)
+    |> join(:inner, [a, c], s in subquery(Schools.get_school_from_class_subquery(school_id)), on: c.id == s.class_id)
     |> Repo.all()
   end
 end

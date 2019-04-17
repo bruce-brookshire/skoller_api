@@ -2,7 +2,9 @@ defmodule Skoller.Repo do
   @moduledoc """
   The Skoller Repository.
   """
-  use Ecto.Repo, otp_app: :skoller
+  use Ecto.Repo, 
+    otp_app: :skoller,
+    adapter: Ecto.Adapters.Postgres
 
   @doc """
   Dynamically loads the repository url from the

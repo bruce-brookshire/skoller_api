@@ -80,14 +80,14 @@ defmodule Skoller.ClassStatuses.Classes do
   """
   def get_class_status_counts() do
     statuses = from(status in Status)
-    |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), status.id == class.class_status_id)
+    |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), on: status.id == class.class_status_id)
     |> where([status], status.id == @syllabus_submitted_status)
     |> group_by([status], [status.id, status.name])
     |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
     |> Repo.all()
 
     admin_status = from(status in Status)
-    |> join(:left, [status], class in Class, status.id == class.class_status_id)
+    |> join(:left, [status], class in Class, on: status.id == class.class_status_id)
     |> where([status], status.id  == @class_issue_status)
     |> group_by([status], [status.id, status.name])
     |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})

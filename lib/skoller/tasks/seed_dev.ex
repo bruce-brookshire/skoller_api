@@ -3,6 +3,7 @@ defmodule Mix.Tasks.Seed.Dev do
 
   use Mix.Task
   import Mix.Ecto
+  import Mix.EctoSQL
 
   alias Skoller.Repo
   alias Skoller.Users.User

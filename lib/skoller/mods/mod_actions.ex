@@ -77,7 +77,7 @@ defmodule Skoller.ModActions do
   """
   def get_enrolled_actions_from_mod(%Mod{id: id}) do
     from(act in Action)
-    |> join(:inner, [act], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), sc.id == act.student_class_id)
+    |> join(:inner, [act], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), on: sc.id == act.student_class_id)
     |> where([act], act.assignment_modification_id == ^id)
     |> Repo.all()
   end
@@ -93,7 +93,7 @@ defmodule Skoller.ModActions do
   """
   def get_pending_mod_count_for_student(student_id) do
     from(act in Action)
-    |> join(:inner, [act], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.id == act.student_class_id)
+    |> join(:inner, [act], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.id == act.student_class_id)
     |> where([act], is_nil(act.is_accepted))
     |> select([act], count(act.id))
     |> Repo.one
@@ -117,9 +117,9 @@ defmodule Skoller.ModActions do
   """
   def get_responded_mods() do
     from(m in Mod)
-    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), sc.class_id == a.class_id)
-    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> join(:inner, [m], a in Assignment, on: m.assignment_id == a.id)
+    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), on: sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), on: act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> where([m], fragment("exists(select 1 from modification_actions ma inner join student_classes sc on sc.id = ma.student_class_id where sc.is_dropped = false and ma.is_accepted = true and ma.assignment_modification_id = ? and sc.student_id != ?)", m.id, m.student_id)) #Get mods with a response that is not from the creator.
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, accepted: act.accepted})
@@ -134,9 +134,9 @@ defmodule Skoller.ModActions do
   """
   def get_shared_mods() do
     from(m in Mod)
-    |> join(:inner, [m], a in Assignment, m.assignment_id == a.id)
-    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), sc.class_id == a.class_id)
-    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
+    |> join(:inner, [m], a in Assignment, on: m.assignment_id == a.id)
+    |> join(:inner, [m, a], sc in subquery(EnrolledStudents.get_communities()), on: sc.class_id == a.class_id)
+    |> join(:inner, [m, a, sc], act in subquery(mod_responses_sub()), on: act.assignment_modification_id == m.id)
     |> where([m], m.is_private == false)
     |> select([m, a, sc, act], %{mod: m, responses: act.responses, audience: act.audience})
     |> Repo.all()
@@ -150,8 +150,8 @@ defmodule Skoller.ModActions do
   """
   def get_non_auto_update_mod_actions_in_enrollment_threshold(enrollment_threshold) do
     from(m in Mod)
-    |> join(:inner, [m], act in subquery(mod_responses_sub()), act.assignment_modification_id == m.id)
-    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
+    |> join(:inner, [m], act in subquery(mod_responses_sub()), on: act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, on: a.id == m.assignment_id)
     |> where([m], m.is_auto_update == false and m.is_private == false)
     |> where([m, act, a], fragment("exists (select 1 from student_classes sc where sc.class_id = ? and sc.is_dropped = false group by class_id having count(1) > ?)", a.class_id, ^enrollment_threshold))
     |> select([m, act], act)
@@ -217,15 +217,15 @@ defmodule Skoller.ModActions do
 
   defp get_student_class_missing_actions_by_mod(%Mod{assignment_mod_type_id: @new_assignment_mod} = mod, student_class) do
     from(sc in StudentClass)
-    |> join(:left, [sc], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> join(:left, [sc], act in Action, on: sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
     |> where([sc], sc.class_id == ^student_class.class_id and sc.id != ^student_class.id)
     |> where([sc, act], is_nil(act.id))
     |> Repo.all()
   end
   defp get_student_class_missing_actions_by_mod(%Mod{} = mod, student_class) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], assign in StudentAssignment, assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
-    |> join(:left, [sc, assign], act in Action, sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
+    |> join(:inner, [sc], assign in StudentAssignment, on: assign.student_class_id == sc.id and assign.assignment_id == ^mod.assignment_id)
+    |> join(:left, [sc, assign], act in Action, on: sc.id == act.student_class_id and act.assignment_modification_id == ^mod.id)
     |> where([sc, assign, act], is_nil(act.id))
     |> where([sc], sc.id != ^student_class.id)
     |> Repo.all()
@@ -234,7 +234,7 @@ defmodule Skoller.ModActions do
   #This is a subquery that returns the responses for a mod of all enrolled students in that class.
   defp mod_responses_sub() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.id == a.student_class_id)
     |> group_by([a], a.assignment_modification_id)
     |> select([a], %{assignment_modification_id: a.assignment_modification_id, responses: count(a.is_accepted), audience: count(a.id), accepted: sum(fragment("?::int", a.is_accepted))})
   end

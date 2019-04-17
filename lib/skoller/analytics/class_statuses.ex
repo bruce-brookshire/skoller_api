@@ -27,7 +27,7 @@ defmodule Skoller.Analytics.ClassStatuses do
   """
   def get_completed_class_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), on: c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id == @class_complete_status)
     |> Repo.aggregate(:count, :id)
@@ -48,7 +48,7 @@ defmodule Skoller.Analytics.ClassStatuses do
   """
   def get_class_in_review_count(%{date_start: date_start, date_end: date_end}, params) do
     from(c in Class)
-    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), c.id == cs.class_id)
+    |> join(:inner, [c], cs in subquery(Schools.get_school_from_class_subquery(params)), on: c.id == cs.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^date_start and fragment("?::date", c.inserted_at) <= ^date_end)
     |> where([c], c.class_status_id != @class_complete_status and c.class_status_id > @needs_setup_status)
     |> Repo.aggregate(:count, :id)

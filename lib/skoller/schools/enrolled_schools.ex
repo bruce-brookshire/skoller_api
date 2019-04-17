@@ -23,7 +23,7 @@ defmodule Skoller.EnrolledSchools do
   """
   def get_schools_with_enrollment(filter \\ %{}) do
     from(school in School)
-    |> join(:left, [school], student in subquery(get_school_enrollment_subquery()), student.school_id == school.id)
+    |> join(:left, [school], student in subquery(get_school_enrollment_subquery()), on: student.school_id == school.id)
     |> filter(filter)
     |> select([school, student], %{school: school, students: fragment("coalesce(?, 0)", student.count)})
     |> Repo.all()
@@ -36,8 +36,8 @@ defmodule Skoller.EnrolledSchools do
   """
   def get_student_schools_subquery() do
     from(student in Student)
-    |> join(:inner, [student], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == student.id)
-    |> join(:inner, [student, sc], class in subquery(Schools.get_school_from_class_subquery()), sc.class_id == class.class_id)
+    |> join(:inner, [student], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.student_id == student.id)
+    |> join(:inner, [student, sc], class in subquery(Schools.get_school_from_class_subquery()), on: sc.class_id == class.class_id)
     |> distinct([student, sc, class], [student.id, class.school_id])
     |> select([student, sc, class], %{student_id: student.id, school_id: class.school_id})
   end

@@ -24,7 +24,7 @@ defmodule Skoller.Analytics.Chats do
   """
   def get_classes_with_chat_count(dates, params) do
     from(cp in subquery(get_unique_chat_class(dates)))
-    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == cp.class_id)
     |> Repo.aggregate(:count, :id)
   end
 
@@ -40,7 +40,7 @@ defmodule Skoller.Analytics.Chats do
   """
   def get_chat_post_count(dates, params) do
     from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == cp.class_id)
     |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -59,7 +59,7 @@ defmodule Skoller.Analytics.Chats do
   """
   def get_max_chat_activity(%{date_start: _date_start, date_end: _date_end} = dates, params) do
     from(c in Class)
-    |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), cp.class_id == c.id)
+    |> join(:inner, [c], cp in subquery(get_max_chat_activity_subquery(dates, params)), on: cp.class_id == c.id)
     |> select([c, cp], %{class: c, count: cp.count})
     |> Repo.one()
   end
@@ -78,15 +78,15 @@ defmodule Skoller.Analytics.Chats do
   """
   def get_chat_participating_students_count(dates, params) do
     post_students = from(p in Post)
-    |> join(:inner, [p], c in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == c.class_id)
+    |> join(:inner, [p], c in subquery(Schools.get_school_from_class_subquery(params)), on: p.class_id == c.class_id)
     |> where([p], fragment("?::date", p.inserted_at) >= ^dates.date_start and fragment("?::date", p.inserted_at) <= ^dates.date_end)
     |> distinct([p], p.student_id)
     |> select([p], p.student_id)
     |> Repo.all()
 
     comment_students = from(c in Comment)
-    |> join(:inner, [c], p in Post, p.id == c.chat_post_id)
-    |> join(:inner, [c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
+    |> join(:inner, [c], p in Post, on: p.id == c.chat_post_id)
+    |> join(:inner, [c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), on: p.class_id == cl.class_id)
     |> where([c], fragment("?::date", c.inserted_at) >= ^dates.date_start and fragment("?::date", c.inserted_at) <= ^dates.date_end)
     |> where([c], c.student_id not in ^post_students)
     |> distinct([c], c.student_id)
@@ -96,9 +96,9 @@ defmodule Skoller.Analytics.Chats do
     students = post_students ++ comment_students
 
     reply_students = from(r in Reply)
-    |> join(:inner, [r], c in Comment, r.chat_comment_id == c.id)
-    |> join(:inner, [r, c], p in Post, p.id == c.chat_post_id)
-    |> join(:inner, [r, c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), p.class_id == cl.class_id)
+    |> join(:inner, [r], c in Comment, on: r.chat_comment_id == c.id)
+    |> join(:inner, [r, c], p in Post, on: p.id == c.chat_post_id)
+    |> join(:inner, [r, c, p], cl in subquery(Schools.get_school_from_class_subquery(params)), on: p.class_id == cl.class_id)
     |> where([r], fragment("?::date", r.inserted_at) >= ^dates.date_start and fragment("?::date", r.inserted_at) <= ^dates.date_end)
     |> where([r], r.student_id not in ^students)
     |> distinct([r], r.student_id)
@@ -120,7 +120,7 @@ defmodule Skoller.Analytics.Chats do
   # This gets a list of classes and post count, with an optional school parameter.
   defp get_chat_activity_subquery(dates, params) do
     from(cp in Post)
-    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == cp.class_id)
+    |> join(:inner, [cp], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == cp.class_id)
     |> where([cp], fragment("?::date", cp.inserted_at) >= ^dates.date_start and fragment("?::date", cp.inserted_at) <= ^dates.date_end)
     |> group_by([cp], cp.class_id)
     |> select([cp], %{class_id: cp.class_id, count: count(cp.id)})

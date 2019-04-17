@@ -35,7 +35,7 @@ defmodule Skoller.StudentClasses do
   def get_class_grade(student_class_id) do
     query = from(assign in StudentAssignment)
     student_grades = query
-      |> join(:inner, [assign], weight in Weight, weight.id == assign.weight_id)
+      |> join(:inner, [assign], weight in Weight, on: weight.id == assign.weight_id)
       |> where([assign], assign.student_class_id == ^student_class_id)
       |> group_by([assign, weight], [assign.weight_id, weight.weight])
       |> select([assign, weight], %{grade: avg(assign.grade), weight_id: assign.weight_id, weight: weight.weight})
@@ -113,7 +113,7 @@ defmodule Skoller.StudentClasses do
   """
   def get_active_student_class_by_ids!(class_id, student_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), class.id == sc.class_id)
+    |> join(:inner, [sc], class in subquery(EditableClasses.get_editable_classes_subquery()), on: class.id == sc.class_id)
     |> where([sc], sc.class_id == ^class_id)
     |> Repo.one!()
   end

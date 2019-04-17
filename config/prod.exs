@@ -67,11 +67,10 @@ config :logger, level: System.get_env("LOG_LEVEL") |> String.to_atom()
 # kept out of version control and might be hard to recover
 # or recreate for your teammates (or yourself later on).
 config :skoller, SkollerWeb.Endpoint,
-secret_key_base: System.get_env("API_SECRET_KEY")
+  secret_key_base: System.get_env("API_SECRET_KEY")
 
 # Configure your database
 config :skoller, Skoller.Repo,
-  adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   timeout: 200_000,

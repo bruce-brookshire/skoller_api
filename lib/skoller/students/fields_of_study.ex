@@ -20,7 +20,7 @@ defmodule Skoller.Students.FieldsOfStudy do
   """
   def get_field_of_study_count() do
     (from fs in FieldOfStudy)
-    |> join(:left, [fs], st in StudentField, fs.id == st.field_of_study_id)
+    |> join(:left, [fs], st in StudentField, on: fs.id == st.field_of_study_id)
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
     |> Repo.all()

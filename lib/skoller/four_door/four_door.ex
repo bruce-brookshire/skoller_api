@@ -33,7 +33,7 @@ defmodule Skoller.FourDoor do
   """
   def get_four_door_overrides() do
     from(s in School)
-    |> join(:inner, [s], fdo in FourDoorOverride, s.id == fdo.school_id)
+    |> join(:inner, [s], fdo in FourDoorOverride, on: s.id == fdo.school_id)
     |> Repo.all()
   end
 

@@ -55,9 +55,9 @@ defmodule Skoller.Analytics.Mods do
 
   defp get_manual_copies(type, dates, params) do
     from(m in Mod)
-    |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
-    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m], act in Action, on: act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, on: a.id == m.assignment_id)
+    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == true)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
@@ -66,9 +66,9 @@ defmodule Skoller.Analytics.Mods do
 
   defp get_manual_dismisses(type, dates, params) do
     from(m in Mod)
-    |> join(:inner, [m], act in Action, act.assignment_modification_id == m.id)
-    |> join(:inner, [m, act], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m], act in Action, on: act.assignment_modification_id == m.id)
+    |> join(:inner, [m, act], a in Assignment, on: a.id == m.assignment_id)
+    |> join(:inner, [m, act, a], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == a.class_id)
     |> where([m], m.assignment_mod_type_id == ^type.id and m.is_private == false)
     |> where([m, act], act.is_manual == true and act.is_accepted == false)
     |> where([m, act], fragment("?::date", act.inserted_at) >= ^dates.date_start and fragment("?::date", act.inserted_at) <= ^dates.date_end)
@@ -100,8 +100,8 @@ defmodule Skoller.Analytics.Mods do
 
   defp mods_query(dates, params) do
     from(m in Mod)
-    |> join(:inner, [m], a in Assignment, a.id == m.assignment_id)
-    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == a.class_id)
+    |> join(:inner, [m], a in Assignment, on: a.id == m.assignment_id)
+    |> join(:inner, [m, a], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == a.class_id)
     |> where([m], fragment("?::date", m.inserted_at) >= ^dates.date_start and fragment("?::date", m.inserted_at) <= ^dates.date_end)
   end
 end

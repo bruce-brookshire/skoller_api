@@ -36,7 +36,7 @@ defmodule Skoller.Classes.Periods do
   """
   def get_class_from_hash(class_hash, period_id) do
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
     |> where([class, period], period.id == ^period_id)
     |> where([class], class.class_upload_key == ^class_hash)
     |> Repo.all()

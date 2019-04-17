@@ -20,9 +20,9 @@ defmodule Skoller.Students.StudentAnalytics do
 
     defp aggregate_individual_metrics(user_id) do
         from(u in User)
-            |> join(:inner, [u], s in Student, u.student_id == s.id)
-            |> join(:left, [u, s], o in Organization, s.primary_organization_id == o.id)
-            |> join(:left, [u, s, o], sc in School, s.primary_school_id == sc.id)
+            |> join(:inner, [u], s in Student, on: u.student_id == s.id)
+            |> join(:left, [u, s], o in Organization, on: s.primary_organization_id == o.id)
+            |> join(:left, [u, s, o], sc in School, on: s.primary_school_id == sc.id)
             |> where([u, s, o, sc], u.id == ^user_id)
             |> select([u, s, o, sc], [
                 fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.inserted_at),
@@ -54,8 +54,8 @@ defmodule Skoller.Students.StudentAnalytics do
 
     defp get_majors(data, user_id) do
         data ++ [from(u in User)
-            |> join(:inner, [u], sf in StudentField, sf.student_id == u.student_id)
-            |> join(:inner, [u, sf], f in FieldOfStudy, sf.field_of_study_id == f.id)
+            |> join(:inner, [u], sf in StudentField, on: sf.student_id == u.student_id)
+            |> join(:inner, [u, sf], f in FieldOfStudy, on: sf.field_of_study_id == f.id)
             |> where([u, sf, f], u.id == ^user_id)
             |> select([u, sf, f], f.field)
             |> Repo.all()

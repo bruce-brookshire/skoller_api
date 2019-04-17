@@ -18,7 +18,7 @@ defmodule Skoller.AssignmentPosts.StudentAssignments do
   """
   def un_read_assignment(student_id, assignment_id) do
     status = from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
+    |> join(:inner, [sa], sc in StudentClass, on: sc.id == sa.student_class_id)
     |> where([sa], sa.assignment_id == ^assignment_id)
     |> where([sa, sc], sc.student_id != ^student_id)
     |> Repo.all()

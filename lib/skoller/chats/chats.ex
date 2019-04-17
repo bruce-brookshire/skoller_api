@@ -43,12 +43,12 @@ defmodule Skoller.Chats do
   """
   def get_chat_notifications(student_id) do
     posts = from(p in Post)
-    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
-    |> join(:inner, [p, sc], s in PStar, s.chat_post_id == p.id and s.student_id == sc.student_id)
-    |> join(:inner, [p, sc, s], c in subquery(distinct_post_id(student_id)), c.chat_post_id == p.id)
-    |> join(:inner, [p, sc, s, c], cl in Class, cl.id == p.class_id)
-    |> join(:inner, [p, sc, s, c, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
-    |> join(:inner, [p, sc, s, c, cl, cp], sch in School, cp.school_id == sch.id)
+    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == p.class_id)
+    |> join(:inner, [p, sc], s in PStar, on: s.chat_post_id == p.id and s.student_id == sc.student_id)
+    |> join(:inner, [p, sc, s], c in subquery(distinct_post_id(student_id)), on: c.chat_post_id == p.id)
+    |> join(:inner, [p, sc, s, c], cl in Class, on: cl.id == p.class_id)
+    |> join(:inner, [p, sc, s, c, cl], cp in ClassPeriod, on: cp.id == cl.class_period_id)
+    |> join(:inner, [p, sc, s, c, cl, cp], sch in School, on: cp.school_id == sch.id)
     |> where([p, sc, s, c, cl], cl.is_chat_enabled == true)
     |> where([p, sc, s, c, cl, cp, sch], sch.is_chat_enabled == true)
     |> select([p, sc, s], %{chat_post: p, color: sc.color, star: s})
@@ -56,14 +56,14 @@ defmodule Skoller.Chats do
     |> Enum.map(&Map.put(&1, :response, most_recent_response(&1.chat_post.id, student_id)))
   
     comments = from(c in Comment)
-    |> join(:inner, [c], p in Post, c.chat_post_id == p.id)
-    |> join(:inner, [c, p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
-    |> join(:inner, [c, p, sc], s in CStar, s.chat_comment_id == c.id and s.student_id == sc.student_id)
-    |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), r.chat_comment_id == c.id)
-    |> join(:left, [c, p, sc, s, r], ps in PStar, ps.chat_post_id == p.id and ps.student_id == ^student_id)
-    |> join(:inner, [c, p, sc, s, r, ps], cl in Class, cl.id == p.class_id)
-    |> join(:inner, [c, p, sc, s, r, ps, cl], cp in ClassPeriod, cp.id == cl.class_period_id)
-    |> join(:inner, [c, p, sc, s, r, ps, cl, cp], sch in School, cp.school_id == sch.id)
+    |> join(:inner, [c], p in Post, on: c.chat_post_id == p.id)
+    |> join(:inner, [c, p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == p.class_id)
+    |> join(:inner, [c, p, sc], s in CStar, on: s.chat_comment_id == c.id and s.student_id == sc.student_id)
+    |> join(:inner, [c, p, sc, s], r in subquery(most_recent_reply(student_id)), on: r.chat_comment_id == c.id)
+    |> join(:left, [c, p, sc, s, r], ps in PStar, on: ps.chat_post_id == p.id and ps.student_id == ^student_id)
+    |> join(:inner, [c, p, sc, s, r, ps], cl in Class, on: cl.id == p.class_id)
+    |> join(:inner, [c, p, sc, s, r, ps, cl], cp in ClassPeriod, on: cp.id == cl.class_period_id)
+    |> join(:inner, [c, p, sc, s, r, ps, cl, cp], sch in School, on: cp.school_id == sch.id)
     |> where([c, p, sc, s, r, ps], is_nil(ps.id)) # Don't get comment stars if post commented.
     |> where([c, p, sc, s, r, ps, cl], cl.is_chat_enabled == true)
     |> where([c, p, sc, s, r, ps, cl, cp, sch], sch.is_chat_enabled == true)
@@ -86,12 +86,12 @@ defmodule Skoller.Chats do
   """
   def get_student_chat(student_id, filters) do
     from(p in Post)
-    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == p.class_id)
-    |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), enroll.class_id == sc.class_id)
-    |> join(:inner, [p, sc, enroll], c in Class, c.id == p.class_id)
-    |> join(:inner, [p, sc, enroll, c], cp in ClassPeriod, cp.id == c.class_period_id)
-    |> join(:inner, [p, sc, enroll, c, cp], s in School, cp.school_id == s.id)
-    |> join(:left, [p, sc, enroll, c, cp, s], l in subquery(like_subquery(student_id)), l.chat_post_id == p.id)
+    |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == p.class_id)
+    |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), on: enroll.class_id == sc.class_id)
+    |> join(:inner, [p, sc, enroll], c in Class, on: c.id == p.class_id)
+    |> join(:inner, [p, sc, enroll, c], cp in ClassPeriod, on: cp.id == c.class_period_id)
+    |> join(:inner, [p, sc, enroll, c, cp], s in School, on: cp.school_id == s.id)
+    |> join(:left, [p, sc, enroll, c, cp, s], l in subquery(like_subquery(student_id)), on: l.chat_post_id == p.id)
     |> where([p, sc, enroll, c], c.is_chat_enabled == true)
     |> where([p, sc, enroll, c, cp, s], s.is_chat_enabled == true)
     |> where_by_params(filters)
@@ -171,8 +171,8 @@ defmodule Skoller.Chats do
   # Gets the number of likes for each post in student_id's classes.
   defp like_subquery(student_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], p in Post, sc.class_id == p.class_id)
-    |> join(:left, [sc, p], l in Like, l.chat_post_id == p.id)
+    |> join(:inner, [sc], p in Post, on: sc.class_id == p.class_id)
+    |> join(:left, [sc, p], l in Like, on: l.chat_post_id == p.id)
     |> group_by([sc, p], p.id)
     |> select([sc, p, l], %{chat_post_id: p.id, count: count(l.id)})
   end
@@ -180,7 +180,7 @@ defmodule Skoller.Chats do
   # Gets number of students in each of student_id's classes
   defp enrollment_subquery(student_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], enroll in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.class_id == enroll.class_id)
+    |> join(:inner, [sc], enroll in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.class_id == enroll.class_id)
     |> group_by([sc, enroll], enroll.class_id)
     |> select([sc, enroll], %{class_id: enroll.class_id, count: count(enroll.id)})
   end
@@ -188,7 +188,7 @@ defmodule Skoller.Chats do
   # Gets distinct post ids where a comment or reply has been made by someone other than the student.
   defp distinct_post_id(student_id) do
     from(c in Comment)
-    |> join(:left, [c], r in Reply, r.chat_comment_id == c.id)
+    |> join(:left, [c], r in Reply, on: r.chat_comment_id == c.id)
     |> where([c], c.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> or_where([c, r], r.student_id != ^student_id)
     |> distinct([c], c.chat_post_id)
@@ -204,7 +204,7 @@ defmodule Skoller.Chats do
     |> Repo.one()
 
     reply = from(r in Reply)
-    |> join(:inner, [r], c in Comment, c.id == r.chat_comment_id)
+    |> join(:inner, [r], c in Comment, on: c.id == r.chat_comment_id)
     |> where([r, c], c.chat_post_id == ^post_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)
@@ -226,7 +226,7 @@ defmodule Skoller.Chats do
   # gets the most recent reply on a comment that is starred by student_id
   defp most_recent_reply(student_id) do
     from(r in Reply)
-    |> join(:inner, [r], s in CStar, s.chat_comment_id == r.chat_comment_id)
+    |> join(:inner, [r], s in CStar, on: s.chat_comment_id == r.chat_comment_id)
     |> where([r, s], s.student_id == ^student_id and r.student_id != ^student_id) #Stop a student from getting hit with their own updates
     |> order_by([r], desc: r.updated_at)
     |> limit(1)

@@ -21,7 +21,7 @@ defmodule Skoller.Analytics.Assignments do
   """
   def get_assignment_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), on: a.class_id == c.class_id)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
   end
@@ -70,7 +70,7 @@ defmodule Skoller.Analytics.Assignments do
   # TODO: This needs to be updated now that students can do DIY.
   def student_assign_count(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), on: a.class_id == c.class_id)
     |> where([a], a.from_mod == true)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
     |> Repo.aggregate(:count, :id)
@@ -79,7 +79,7 @@ defmodule Skoller.Analytics.Assignments do
   # TODO: This needs to be updated now that students can do DIY.
   defp skoller_created_assignment_subquery(dates, params) do
     from(a in Assignment)
-    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), a.class_id == c.class_id)
+    |> join(:inner, [a], c in subquery(Schools.get_school_from_class_subquery(params)), on: a.class_id == c.class_id)
     |> where([a], a.from_mod == false)
     |> where([a], fragment("?::date", a.inserted_at) >= ^dates.date_start and fragment("?::date", a.inserted_at) <= ^dates.date_end)
   end

@@ -82,7 +82,7 @@ defmodule Skoller.Analytics.Enrollment do
 
   defp student_counts_subquery(dates, params) do
     from(s in Student)
-    |> join(:left, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
+    |> join(:left, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), on: s.id == sc.student_id and fragment("?::date", sc.inserted_at) >= ^dates.date_start and fragment("?::date", sc.inserted_at) <= ^dates.date_end)
     |> group_by([s, sc], sc.student_id)
     |> select([s, sc], %{count: count(sc.student_id)})
   end

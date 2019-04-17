@@ -67,8 +67,8 @@ defmodule Skoller.AutoUpdates do
   """
   def get_joyriders() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), on: cm.class_id == sc.class_id)
     |> where([a], a.is_accepted == true and a.is_manual == false)
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -84,8 +84,8 @@ defmodule Skoller.AutoUpdates do
   """
   def get_pending() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), on: cm.class_id == sc.class_id)
     |> where([a], is_nil(a.is_accepted))
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -101,8 +101,8 @@ defmodule Skoller.AutoUpdates do
   """
   def get_followers() do
     from(a in Action)
-    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.id == a.student_class_id)
-    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [a], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.id == a.student_class_id)
+    |> join(:inner, [a, sc], cm in subquery(EnrolledStudents.get_communities()), on: cm.class_id == sc.class_id)
     |> where([a], a.is_manual == true and a.is_accepted == true)
     |> distinct([a, sc], sc.student_id)
     |> Repo.aggregate(:count, :id)
@@ -118,8 +118,8 @@ defmodule Skoller.AutoUpdates do
   """
   def get_creators() do
     from(m in Mod)
-    |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == m.student_id)
-    |> join(:inner, [m, sc], cm in subquery(EnrolledStudents.get_communities()), cm.class_id == sc.class_id)
+    |> join(:inner, [m], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.student_id == m.student_id)
+    |> join(:inner, [m, sc], cm in subquery(EnrolledStudents.get_communities()), on: cm.class_id == sc.class_id)
     |> distinct([m], m.student_id)
     |> Repo.aggregate(:count, :id)
   end

@@ -21,7 +21,7 @@ defmodule Skoller.EnrolledStudents.ClassPeriods do
   """
   def get_enrollment_by_period_id(period_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
     |> where([sc, c], c.class_period_id == ^period_id)
     |> distinct([sc], sc.student_id)
     |> Repo.aggregate(:count, :id)

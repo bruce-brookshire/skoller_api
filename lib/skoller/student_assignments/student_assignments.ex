@@ -337,7 +337,7 @@ defmodule Skoller.StudentAssignments do
   # Checks to see if an incoming changeset is identical to another student's assignment in the same class.
   defp check_student_assignment(changeset) do
     assign = from(assign in StudentAssignment)
-    |> join(:inner, [assign], sc in StudentClass, sc.id == assign.student_class_id)
+    |> join(:inner, [assign], sc in StudentClass, on: sc.id == assign.student_class_id)
     |> where([assign, sc], sc.class_id == ^Ecto.Changeset.get_field(changeset, :class_id))
     |> where([assign], assign.name == ^Ecto.Changeset.get_field(changeset, :name))
     |> compare_weights(changeset)
@@ -407,7 +407,7 @@ defmodule Skoller.StudentAssignments do
   # Returns the relative weight for each weight category.
   defp get_relative_weight(%{class_id: class_id} = params) do
     assign_count = from(w in Weight)
-    |> join(:left, [w], s in subquery(relative_weight_subquery(params)), s.weight_id == w.id)
+    |> join(:left, [w], s in subquery(relative_weight_subquery(params)), on: s.weight_id == w.id)
     |> where([w], w.class_id == ^class_id)
     |> select([w, s], %{weight: w.weight, count: s.count, weight_id: w.id})
     |> Repo.all()
@@ -426,7 +426,7 @@ defmodule Skoller.StudentAssignments do
   defp relative_weight_subquery(%StudentClass{id: id}) do #good
     query = (from assign in StudentAssignment)
     query
-    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+    |> join(:inner, [assign], weight in Weight, on: assign.weight_id == weight.id)
     |> where([assign], assign.student_class_id == ^id)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])
     |> select([assign, weight], %{count: count(assign.id), weight_id: assign.weight_id})
@@ -434,7 +434,7 @@ defmodule Skoller.StudentAssignments do
   defp relative_weight_subquery(%{class_id: class_id}) do
     query = (from assign in Assignment)
     query
-    |> join(:inner, [assign], weight in Weight, assign.weight_id == weight.id)
+    |> join(:inner, [assign], weight in Weight, on: assign.weight_id == weight.id)
     |> where([assign], assign.class_id == ^class_id)
     |> where([assign], assign.from_mod == false)
     |> group_by([assign, weight], [assign.weight_id, weight.weight])

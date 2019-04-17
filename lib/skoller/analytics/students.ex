@@ -63,9 +63,9 @@ defmodule Skoller.Analytics.Students do
   """
   def get_common_notification_times(num, params) do
     from(s in Student)
-    |> join(:inner, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), sc.student_id == s.id)
-    |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), sfc.class_id == sc.class_id)
-    |> join(:inner, [s, sc, sfc], sch in School, sch.id == sfc.school_id)
+    |> join(:inner, [s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)), on: sc.student_id == s.id)
+    |> join(:inner, [s, sc], sfc in subquery(Schools.get_school_from_class_subquery(params)), on: sfc.class_id == sc.class_id)
+    |> join(:inner, [s, sc, sfc], sch in School, on: sch.id == sfc.school_id)
     |> group_by([s, sc, sfc, sch], [s.notification_time, sch.timezone])
     |> select([s, sc, sfc, sch], %{notification_time: s.notification_time, timezone: sch.timezone, count: count(s.notification_time)})
     |> order_by([s], desc: count(s.notification_time))
@@ -111,7 +111,7 @@ defmodule Skoller.Analytics.Students do
   """
   def get_student_class_notifications_enabled(params) do
     from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery(params)))
-    |> join(:inner, [sc], s in Student, sc.student_id == s.id)
+    |> join(:inner, [sc], s in Student, on: sc.student_id == s.id)
     |> where([sc], sc.is_notifications == true)
     |> where([sc, s], s.is_notifications == true)
     |> Repo.aggregate(:count, :id)
@@ -134,9 +134,9 @@ defmodule Skoller.Analytics.Students do
   """
   def get_student_points() do
     from(s in Student)
-    |> join(:inner, [s], p in StudentPoint, s.id == p.student_id)
-    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType, p.student_point_type_id == t.id)
-    |> join(:inner, [s, p, t], u in Skoller.Users.User, s.id == u.student_id)
+    |> join(:inner, [s], p in StudentPoint, on: s.id == p.student_id)
+    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType, on: p.student_point_type_id == t.id)
+    |> join(:inner, [s, p, t], u in Skoller.Users.User, on: s.id == u.student_id)
     |> group_by([s, p, t, u], [s.id, u.id, t.id])
     |> order_by([s, p, t, u], asc: s.name_first)
     |> select([s, p, t, u], %{"student_id" => s.id, "first_name" => s.name_first, "last_name" => s.name_last, "user_email" => u.email, "points" => sum(p.value), "type" =>  t.name})

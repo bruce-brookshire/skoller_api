@@ -20,7 +20,7 @@ defmodule Skoller.EnrolledStudents do
   """
   def preload_enrolled_classes(student_id) do
     from(c in Class)
-    |> join(:inner, [c], sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)), sc.class_id == c.id)
+    |> join(:inner, [c], sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == c.id)
   end
 
   @doc """
@@ -31,7 +31,7 @@ defmodule Skoller.EnrolledStudents do
   """
   def get_students_by_class(class_id) do
     from(s in Student)
-    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)), s.id == sc.student_id)
+    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)), on: s.id == sc.student_id)
     |> Repo.all()
   end
 
@@ -156,7 +156,7 @@ defmodule Skoller.EnrolledStudents do
   """
   def get_enrolled_student_classes_subquery(params \\ %{}) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == sc.class_id)
     |> where([sc], sc.is_dropped == false)
   end
 
@@ -169,8 +169,8 @@ defmodule Skoller.EnrolledStudents do
   def get_student_subquery(_params \\ %{})
   def get_student_subquery(%{"school_id" => _school_id} = params) do
     from(s in Student)
-    |> join(:inner, [s], sc in StudentClass, sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), c.class_id == sc.class_id)
+    |> join(:inner, [s], sc in StudentClass, on: sc.student_id == s.id)
+    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == sc.class_id)
     |> where([s, sc], sc.is_dropped == false)
     |> distinct([s], s.id)
   end
@@ -193,7 +193,7 @@ defmodule Skoller.EnrolledStudents do
   """
   def count_subquery() do
     from(c in Class)
-    |> join(:left, [c], sc in StudentClass, c.id == sc.class_id)
+    |> join(:left, [c], sc in StudentClass, on: c.id == sc.class_id)
     |> where([c, sc], sc.is_dropped == false)
     |> group_by([c, sc], c.id)
     |> select([c, sc], %{class_id: c.id, count: count(sc.id)})

@@ -29,8 +29,8 @@ defmodule Skoller.Classes.Schools do
   def get_classes_by_school(school_id, filters \\ nil) do
     #TODO: Filter ClassPeriod
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id and period.is_hidden == false)
-    |> join(:left, [class], prof in Professor, class.professor_id == prof.id)
+    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id and period.is_hidden == false)
+    |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
     |> where([class, period], period.school_id == ^school_id)
     |> where([class, period, prof], ^filter(filters))
     |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
@@ -51,7 +51,7 @@ defmodule Skoller.Classes.Schools do
   end
   def get_school_from_class_subquery(params) when is_map(params) do
     from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [c], p in ClassPeriod, on: c.class_period_id == p.id)
     |> select([c, p], %{class_id: c.id, school_id: p.school_id})
   end
   def get_school_from_class_subquery(school_id) do
@@ -60,7 +60,7 @@ defmodule Skoller.Classes.Schools do
 
   defp get_school_from_class_by_school_subquery(school_id) do
     from(c in Class)
-    |> join(:inner, [c], p in ClassPeriod, c.class_period_id == p.id)
+    |> join(:inner, [c], p in ClassPeriod, on: c.class_period_id == p.id)
     |> where([c, p], p.school_id == ^school_id)
     |> select([c, p], %{class_id: c.id, school_id: p.school_id})
   end

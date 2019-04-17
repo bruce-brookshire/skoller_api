@@ -311,7 +311,7 @@ defmodule Skoller.Mods do
   # Backfills mods for a given student assignment.
   defp backfill_mods(student_assignment) do
     missing_mods = from(mod in Mod)
-    |> join(:left, [mod], act in Action, act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
+    |> join(:left, [mod], act in Action, on: act.assignment_modification_id == mod.id and act.student_class_id == ^student_assignment.student_class_id)
     |> where([mod, act], mod.assignment_id == ^student_assignment.assignment_id)
     |> where([mod, act], is_nil(act.id))
     |> where([mod], mod.is_private == false)
@@ -411,7 +411,7 @@ defmodule Skoller.Mods do
 
   defp dismiss_mods(%StudentAssignment{} = student_assignment, @new_assignment_mod, _) do
     from(mod in Mod)
-    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> join(:inner, [mod], action in Action, on: mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
     |> where([mod], mod.assignment_mod_type_id == @delete_assignment_mod)
     |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> select([mod, action], action)
@@ -420,7 +420,7 @@ defmodule Skoller.Mods do
   end
   defp dismiss_mods(%StudentAssignment{} = student_assignment, @delete_assignment_mod, _) do
     from(mod in Mod)
-    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> join(:inner, [mod], action in Action, on: mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
     |> where([mod], mod.assignment_mod_type_id != @delete_assignment_mod)
     |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> select([mod, action], action)
@@ -429,7 +429,7 @@ defmodule Skoller.Mods do
   end
   defp dismiss_mods(%StudentAssignment{} = student_assignment, change_type, _) do
     from(mod in Mod)
-    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
+    |> join(:inner, [mod], action in Action, on: mod.id == action.assignment_modification_id and action.student_class_id == ^student_assignment.student_class_id)
     |> where([mod], mod.assignment_mod_type_id == ^change_type)
     |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> select([mod, action], action)
@@ -439,7 +439,7 @@ defmodule Skoller.Mods do
 
   defp find_accepted_mods_for_student_assignment(%StudentAssignment{} = student_assignment) do
     from(mod in Mod)
-    |> join(:inner, [mod], act in Action, mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id and act.is_accepted == true)
+    |> join(:inner, [mod], act in Action, on: mod.id == act.assignment_modification_id and act.student_class_id == ^student_assignment.student_class_id and act.is_accepted == true)
     |> where([mod], mod.assignment_id == ^student_assignment.assignment_id)
     |> Repo.all
   end
@@ -535,7 +535,7 @@ defmodule Skoller.Mods do
 
   defp get_other_same_type_mods(mod, student_class_id) do
     from(mod in Mod)
-    |> join(:inner, [mod], action in Action, mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
+    |> join(:inner, [mod], action in Action, on: mod.id == action.assignment_modification_id and action.student_class_id == ^student_class_id)
     |> where([mod], mod.assignment_mod_type_id == ^mod.assignment_mod_type_id)
     |> where([mod], mod.assignment_id == ^mod.assignment_id)
     |> where([mod], mod.id != ^mod.id)

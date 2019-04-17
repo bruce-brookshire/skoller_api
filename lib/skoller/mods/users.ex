@@ -19,9 +19,9 @@ defmodule Skoller.Mods.Users do
   """
   def get_student_pic_by_mod_acceptance(mod_id) do
     from(user in User)
-    |> join(:inner, [user], stu in Student, user.student_id == stu.id)
-    |> join(:inner, [user, stu], sc in StudentClass, sc.student_id == stu.id)
-    |> join(:inner, [user, stu, sc], act in Action, act.student_class_id == sc.id)
+    |> join(:inner, [user], stu in Student, on: user.student_id == stu.id)
+    |> join(:inner, [user, stu], sc in StudentClass, on: sc.student_id == stu.id)
+    |> join(:inner, [user, stu, sc], act in Action, on: act.student_class_id == sc.id)
     |> where([user, stu, sc, act], act.assignment_modification_id == ^mod_id)
     |> where([user, stu, sc, act], act.is_accepted == true)
     |> select([user, stu, sc, act], user.pic_path)

@@ -60,8 +60,8 @@ defmodule Skoller.Syllabi do
     |> generate_servable_schools_subquery()
 
     from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, period], sch in subquery(subq), sch.id == period.school_id)
+    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
+    |> join(:inner, [class, period], sch in subquery(subq), on: sch.id == period.school_id)
   end
 
   # This function takes in the current admin setting as the parameter.
@@ -118,9 +118,9 @@ defmodule Skoller.Syllabi do
   # The class must have a doc, must not be locked, must be editable.
   defp get_oldest_classes_by_school(lock_type, class_status, school_id, opts) do
     from(class in Class)
-    |> join(:inner, [class], doc in subquery(doc_subquery(school_id)), class.id == doc.class_id)
+    |> join(:inner, [class], doc in subquery(doc_subquery(school_id)), on: class.id == doc.class_id)
     |> lock_join(lock_type)
-    |> join(:inner, [class], s in Status, class.class_status_id == s.id)
+    |> join(:inner, [class], s in Status, on: class.class_status_id == s.id)
     |> enrolled_classes(opts)
     |> where([class], class.is_editable == true)
     |> where([class, doc, lock], is_nil(lock.id)) #trying to avoid clashing with manual admin changes
@@ -129,8 +129,8 @@ defmodule Skoller.Syllabi do
 
   defp doc_subquery(school_id) do
     from(d in Doc)
-    |> join(:inner, [d], c in Class, c.id == d.class_id)
-    |> join(:inner, [d, class], period in ClassPeriod, class.class_period_id == period.id)
+    |> join(:inner, [d], c in Class, on: c.id == d.class_id)
+    |> join(:inner, [d, class], period in ClassPeriod, on: class.class_period_id == period.id)
     |> where([d, class, period], period.school_id == ^school_id)
     |> group_by([d], [d.class_id, d.inserted_at])
     |> order_by([d], asc: d.inserted_at)
@@ -154,8 +154,8 @@ defmodule Skoller.Syllabi do
   # Must have a doc, be editable, and be set to have a syllabus.
   defp get_processable_classes(status_id, opts) do
     from(class in subquery(get_servable_classes_subquery()))
-    |> join(:inner, [class], period in ClassPeriod, class.class_period_id == period.id)
-    |> join(:inner, [class, peroiod, sch], s in Status, class.class_status_id == s.id)
+    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
+    |> join(:inner, [class, peroiod, sch], s in Status, on: class.class_status_id == s.id)
     |> enrolled_classes(opts)
     |> where([class], class.is_editable == true and class.is_syllabus == true)
     |> where([class], fragment("exists (select 1 from docs where class_id = ?)", class.id))
@@ -177,8 +177,8 @@ defmodule Skoller.Syllabi do
   # Gets a ratio of currently working users per school over total workers.
   defp get_workers(type) do
     t = from(lock in subquery(unique_class_locks()))
-    |> join(:inner, [lock], class in Class, lock.class_id == class.id)
-    |> join(:inner, [lock, class], period in ClassPeriod, period.id == class.class_period_id)
+    |> join(:inner, [lock], class in Class, on: lock.class_id == class.id)
+    |> join(:inner, [lock, class], period in ClassPeriod, on: period.id == class.class_period_id)
     |> where_lock_type(type)
     |> group_by([lock, class, period], period.school_id)
     |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
@@ -207,18 +207,18 @@ defmodule Skoller.Syllabi do
   defp enrolled_classes(query, opts) do
     case opts |> List.keytake(:enrolled, 0) |> elem(0) do
       {:enrolled, true} ->
-        query |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_subquery()), sc.class_id == class.id)
+        query |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_subquery()), on: sc.class_id == class.id)
       _ -> query
     end
   end
 
   defp lock_join(query, nil) do
     query
-    |> join(:left, [class, doc], lock in Lock, class.id == lock.class_id)
+    |> join(:left, [class, doc], lock in Lock, on: class.id == lock.class_id)
   end
   defp lock_join(query, lock_type) do
     query
-    |> join(:left, [class, doc], lock in Lock, class.id == lock.class_id and lock.class_lock_section_id == ^lock_type)
+    |> join(:left, [class, doc], lock in Lock, on: class.id == lock.class_id and lock.class_lock_section_id == ^lock_type)
   end
 
   defp where_oldest_status(query, nil) do

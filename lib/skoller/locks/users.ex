@@ -17,7 +17,7 @@ defmodule Skoller.Locks.Users do
   """
   def get_user_locks_by_class(class_id) do
     from(l in Lock)
-    |> join(:inner, [l], u in User, l.user_id == u.id)
+    |> join(:inner, [l], u in User, on: l.user_id == u.id)
     |> where([l], l.class_id == ^class_id)
     |> select([l, u], %{lock: l, user: u})
     |> Repo.all()

@@ -23,9 +23,9 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   #TODO: make this and the one argument one, one function.
   def get_student_assignment_by_id(id, :weight) do
     from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], sa in StudentAssignment, sc.id == sa.student_class_id)
-    |> join(:inner, [sc, sa], class in Class, class.id == sc.class_id)
-    |> join(:inner, [sc, sa, class], cs in Status, cs.id == class.class_status_id)
+    |> join(:inner, [sc], sa in StudentAssignment, on: sc.id == sa.student_class_id)
+    |> join(:inner, [sc, sa], class in Class, on: class.id == sc.class_id)
+    |> join(:inner, [sc, sa, class], cs in Status, on: cs.id == class.class_status_id)
     |> where([sc, sa], sa.id == ^id)
     |> where([sc, sa, class, cs], cs.is_complete == true)
     |> Repo.all()
@@ -42,8 +42,8 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   """
   def get_student_assignment_by_id!(id) do
     from(sa in StudentAssignment)
-    |> join(:inner, [sa], sc in StudentClass, sc.id == sa.student_class_id)
-    |> join(:inner, [sa, sc], class in Class, sc.class_id == class.id)
+    |> join(:inner, [sa], sc in StudentClass, on: sc.id == sa.student_class_id)
+    |> join(:inner, [sa, sc], class in Class, on: sc.class_id == class.id)
     |> where([sa], sa.id == ^id)
     |> where([sa, sc, class], class.is_editable == true)
     |> Repo.one!()
@@ -62,8 +62,8 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   """
   def get_student_assignments(student_id, filters) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> join(:inner, [sc], class in Class, class.id == sc.class_id)
-    |> join(:inner, [sc, class], cs in Status, cs.id == class.class_status_id)
+    |> join(:inner, [sc], class in Class, on: class.id == sc.class_id)
+    |> join(:inner, [sc, class], cs in Status, on: cs.id == class.class_status_id)
     |> where([sc, class, cs], cs.is_complete == true)
     |> where_filters(filters)
     |> Repo.all()

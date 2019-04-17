@@ -36,8 +36,8 @@ defmodule Skoller.Notifications do
   """
   def get_notification_enabled_devices() do
     from(d in Device)
-    |> join(:inner, [d], u in User, d.user_id == u.id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
+    |> join(:inner, [d], u in User, on: d.user_id == u.id)
+    |> join(:inner, [d, u], s in Student, on: s.id == u.student_id)
     |> where([d, u, s], s.is_notifications == true)
     |> distinct([d], d.udid)
     |> Repo.all()
@@ -54,9 +54,9 @@ defmodule Skoller.Notifications do
   """
   def get_user_from_student_class(student_class_id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], stu in Student, stu.id == sc.student_id)
-    |> join(:inner, [sc, stu], usr in User, usr.student_id == stu.id)
-    |> join(:inner, [sc, stu, usr], class in subquery(EditableClasses.get_editable_classes_subquery()), sc.class_id == class.id)
+    |> join(:inner, [sc], stu in Student, on: stu.id == sc.student_id)
+    |> join(:inner, [sc, stu], usr in User, on: usr.student_id == stu.id)
+    |> join(:inner, [sc, stu, usr], class in subquery(EditableClasses.get_editable_classes_subquery()), on: sc.class_id == class.id)
     |> where([sc, stu, usr], sc.id == ^student_class_id)
     |> where([sc, stu, usr], stu.is_notifications == true and stu.is_mod_notifications == true)
     |> select([sc, stu, usr], %{user: usr, student: stu})
@@ -75,9 +75,9 @@ defmodule Skoller.Notifications do
   """
   def get_class_chat_devices_by_class_id(student_id, class_id) do
     from(d in Device)
-    |> join(:inner, [d], u in User, d.user_id == u.id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
+    |> join(:inner, [d], u in User, on: d.user_id == u.id)
+    |> join(:inner, [d, u], s in Student, on: s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.student_id == s.id)
     |> where([d, u, s], s.is_chat_notifications == true and s.is_notifications == true and s.id != ^student_id)
     |> where([d, u, s, sc], sc.class_id == ^class_id)
     |> Repo.all()
@@ -94,11 +94,11 @@ defmodule Skoller.Notifications do
   """
   def get_assignment_post_devices_by_assignment(student_id, assignment_id) do
     from(d in Device)
-    |> join(:inner, [d], u in User, u.id == d.user_id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [d, u, s, sc], a in Assignment, a.class_id == sc.class_id)
-    |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, sa.assignment_id == a.id and sa.student_class_id == sc.id)
+    |> join(:inner, [d], u in User, on: u.id == d.user_id)
+    |> join(:inner, [d, u], s in Student, on: s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.student_id == s.id)
+    |> join(:inner, [d, u, s, sc], a in Assignment, on: a.class_id == sc.class_id)
+    |> join(:inner, [d, u, s, sc, a], sa in StudentAssignment, on: sa.assignment_id == a.id and sa.student_class_id == sc.id)
     |> where([d, u, s], s.id != ^student_id and s.is_notifications == true and s.is_assign_post_notifications == true)
     |> where([d, u, s, sc, a], a.id == ^assignment_id)
     |> where([d, u, s, sc, a, sa], sa.is_post_notifications == true)
@@ -120,10 +120,10 @@ defmodule Skoller.Notifications do
     now = DateTime.utc_now() |> DateTime.to_date()
 
     from(student in Student)
-    |> join(:inner, [student], sclass in StudentClass, student.id == sclass.student_id and sclass.is_notifications == true)
-    |> join(:inner, [student, sclass], sassign in StudentAssignment, sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true)
-    |> join(:inner, [student, sclass, sassign], user in User, user.student_id == student.id)
-    |> join(:inner, [student, sclass, sassign, user], device in Device, user.id == device.user_id)
+    |> join(:inner, [student], sclass in StudentClass, on: student.id == sclass.student_id and sclass.is_notifications == true)
+    |> join(:inner, [student, sclass], sassign in StudentAssignment, on: sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true)
+    |> join(:inner, [student, sclass, sassign], user in User, on: user.student_id == student.id)
+    |> join(:inner, [student, sclass, sassign, user], device in Device, on: user.id == device.user_id)
     |> where([student], student.is_notifications == true and student.is_reminder_notifications == true)
     |> where([student, sclass, sassign], not(is_nil(sassign.due)) and sassign.is_completed == false)
     |> filter_due_date(now, atom, time)
@@ -141,9 +141,9 @@ defmodule Skoller.Notifications do
   """
   def get_class_start_notifications(class) do
     from(student_class in StudentClass)
-    |> join(:left, [student_class], student in Student, student.id == student_class.student_id and student_class.class_id == ^class.id)
-    |> join(:left, [student_class, student], user in User, user.student_id == student.id)
-    |> join(:left, [student_class, student, user], device in Device, user.id == device.user_id)
+    |> join(:left, [student_class], student in Student, on: student.id == student_class.student_id and student_class.class_id == ^class.id)
+    |> join(:left, [student_class, student], user in User, on: user.student_id == student.id)
+    |> join(:left, [student_class, student, user], device in Device, on: user.id == device.user_id)
     |> where([student_class, student, user, device], student_class.is_dropped == false and 
         student_class.is_notifications == true and 
         student.is_notifications == true and
@@ -166,9 +166,9 @@ defmodule Skoller.Notifications do
     switch = EmailTypes.get!(@class_start_id)
     if(switch.is_active_notification == true) do
       from(class in Class)
-      |> join(:left, [class], class_period in ClassPeriod, class_period.id == class.class_period_id)
-      |> join(:left, [class, class_period], school in School, class_period.school_id == school.id)
-      |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), class.id == active_students.class_id)
+      |> join(:left, [class], class_period in ClassPeriod, on: class_period.id == class.class_period_id)
+      |> join(:left, [class, class_period], school in School, on: class_period.school_id == school.id)
+      |> join(:left, [class, class_period, school], active_students in subquery(AnalyticsClasses.get_student_classes_active_subquery()), on: class.id == active_students.class_id)
       |> where([class, class_period, school, active_students], class.class_status_id == @class_complete_status)
       |> where([class, class_period, school, active_students], active_students.active < 5)
       |> where(fragment("LEFT(meet_days, 1)=?", ^day_of_week))
@@ -191,8 +191,8 @@ defmodule Skoller.Notifications do
   """
   def get_notification_enabled_chat_post_users(student_id, chat_post_id) do
     from(s in PostStar)
-    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> join(:inner, [s], stu in Student, on: stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, on: u.student_id == stu.id)
     |> where([s], s.chat_post_id == ^chat_post_id and s.student_id != ^student_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
     |> select([s, stu, u], u)
@@ -210,8 +210,8 @@ defmodule Skoller.Notifications do
   """
   def get_notification_enabled_chat_comment_users(student_id, chat_comment_id) do
     from(s in CommentStar)
-    |> join(:inner, [s], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, stu], u in User, u.student_id == stu.id)
+    |> join(:inner, [s], stu in Student, on: stu.id == s.student_id)
+    |> join(:inner, [s, stu], u in User, on: u.student_id == stu.id)
     |> where([s], s.student_id != ^student_id)
     |> where([s], s.chat_comment_id == ^chat_comment_id)
     |> where([s, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
@@ -230,9 +230,9 @@ defmodule Skoller.Notifications do
   """
   def get_notification_enabled_chat_post_users_by_comment(student_id, chat_comment_id) do
     from(s in PostStar)
-    |> join(:inner, [s], c in Comment, c.chat_post_id == s.chat_post_id)
-    |> join(:inner, [s, c], stu in Student, stu.id == s.student_id)
-    |> join(:inner, [s, c, stu], u in User, u.student_id == stu.id)
+    |> join(:inner, [s], c in Comment, on: c.chat_post_id == s.chat_post_id)
+    |> join(:inner, [s, c], stu in Student, on: stu.id == s.student_id)
+    |> join(:inner, [s, c, stu], u in User, on: u.student_id == stu.id)
     |> where([s], s.student_id != ^student_id)
     |> where([s, c], c.id == ^chat_comment_id)
     |> where([s, c, stu], stu.is_chat_notifications == true and stu.is_notifications == true)
@@ -248,9 +248,9 @@ defmodule Skoller.Notifications do
   """
   def get_notification_enabled_needs_syllabus_users() do
     from(u in User)
-    |> join(:inner, [u], s in Student, s.id == u.student_id)
-    |> join(:inner, [u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), sc.student_id == s.id)
-    |> join(:inner, [u, s, sc], c in subquery(ClassStatusesClasses.need_syllabus_status_class_subquery()), c.id == sc.class_id)
+    |> join(:inner, [u], s in Student, on: s.id == u.student_id)
+    |> join(:inner, [u, s], sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()), on: sc.student_id == s.id)
+    |> join(:inner, [u, s, sc], c in subquery(ClassStatusesClasses.need_syllabus_status_class_subquery()), on: c.id == sc.class_id)
     |> where([u, s], s.is_notifications == true)
     |> distinct([u], u.id)
     |> Repo.all()
@@ -264,8 +264,8 @@ defmodule Skoller.Notifications do
   """
   def get_users_from_class(class_id) do
     from(sc in subquery(EnrolledStudents.get_enrollment_by_class_id_subquery(class_id)))
-    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
+    |> join(:inner, [sc], user in User, on: user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, on: stu.id == sc.student_id)
     |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)
     |> Repo.all()
@@ -279,8 +279,8 @@ defmodule Skoller.Notifications do
   """
   def get_users_from_student_class(id) do
     from(sc in subquery(EnrolledStudents.get_enrolled_student_classes_subquery()))
-    |> join(:inner, [sc], user in User, user.student_id == sc.student_id)
-    |> join(:inner, [sc, user], stu in Student, stu.id == sc.student_id)
+    |> join(:inner, [sc], user in User, on: user.student_id == sc.student_id)
+    |> join(:inner, [sc, user], stu in Student, on: stu.id == sc.student_id)
     |> where([sc, user], sc.id == ^id)
     |> where([sc, user, stu], stu.is_notifications == true)
     |> select([sc, user], user)

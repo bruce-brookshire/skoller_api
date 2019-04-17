@@ -21,7 +21,7 @@ defmodule SkollerWeb do
     quote do
       use Phoenix.Controller, namespace: SkollerWeb
       import Plug.Conn
-      import SkollerWeb.Router.Helpers
+      alias AppWeb.Router.Helpers, as: Routes
       import SkollerWeb.Gettext
     end
   end
@@ -34,7 +34,7 @@ defmodule SkollerWeb do
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
 
-      import SkollerWeb.Router.Helpers
+      alias AppWeb.Router.Helpers, as: Routes
       import SkollerWeb.ErrorHelpers
       import SkollerWeb.Gettext
     end

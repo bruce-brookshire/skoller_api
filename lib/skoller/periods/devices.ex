@@ -17,10 +17,10 @@ defmodule Skoller.Periods.Devices do
   """
   def get_devices_by_period(period_id) do
     from(d in Device)
-    |> join(:inner, [d], u in User, u.id == d.user_id)
-    |> join(:inner, [d, u], s in Student, s.id == u.student_id)
-    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), sc.student_id == s.id)
-    |> join(:inner, [d, u, s, sc], c in Class, c.id == sc.class_id)
+    |> join(:inner, [d], u in User, on: u.id == d.user_id)
+    |> join(:inner, [d, u], s in Student, on: s.id == u.student_id)
+    |> join(:inner, [d, u, s], sc in subquery(EnrolledStudents.enrolled_student_class_subquery()), on: sc.student_id == s.id)
+    |> join(:inner, [d, u, s, sc], c in Class, on: c.id == sc.class_id)
     |> where([d, u, s, sc, c], c.class_period_id == ^period_id)
     |> Repo.all()
   end
