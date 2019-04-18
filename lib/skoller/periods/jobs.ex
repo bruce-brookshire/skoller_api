@@ -30,9 +30,10 @@ defmodule Skoller.Periods.Jobs do
     |> Repo.all()
     |> Enum.each(&Periods.update_period_status(&1, @past_status))
 
+    #TODO datetime code here changed for bug fix
     from(p in ClassPeriod)
     |> where([p], p.class_period_status_id == @active_status)
-    |> where([p], p.end_date <= datetime_add(^now, 30, "day"))
+    |> where([p], p.end_date <= datetime_add(^now, 0, "day"))
     |> where([p], p.is_main_period == true)
     |> Repo.all()
     |> Enum.each(&Periods.update_period_status(&1, @prompt_status))
