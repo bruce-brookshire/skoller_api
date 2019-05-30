@@ -29,6 +29,7 @@ defmodule Skoller.Chats do
   @sort_top_week "400"
   @sort_top_period "500"
 
+
   @doc """
   Gets chat notifications by student.
 
@@ -42,6 +43,7 @@ defmodule Skoller.Chats do
   for comments. The `response` object is `%{chat_post_id: Id, response: Skoller.ChatComments.Comment || Skoller.ChatReplies.Reply, is_reply: Boolean, updated_at: DateTime, id: Id}`
   """
   def get_chat_notifications(student_id) do
+    # TODO: Remove class from route before deployment. URGENT!
     posts = from(p in Post)
     |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == p.class_id)
     |> join(:inner, [p, sc], s in PStar, on: s.chat_post_id == p.id and s.student_id == sc.student_id)
@@ -85,6 +87,7 @@ defmodule Skoller.Chats do
   `[%{chat_post: Skoller.ChatPosts.Post, color: String, enroll: Integer, likes: Integer}]` or `[]`
   """
   def get_student_chat(student_id, filters) do
+    # TODO: Remove class from route before deployment. URGENT!
     from(p in Post)
     |> join(:inner, [p], sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == p.class_id)
     |> join(:inner, [p, sc], enroll in subquery(enrollment_subquery(student_id)), on: enroll.class_id == sc.class_id)

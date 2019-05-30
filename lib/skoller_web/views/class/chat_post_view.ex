@@ -50,6 +50,7 @@ defmodule SkollerWeb.Class.ChatPostView do
     }
   end
 
+  # TODO: Remove class from route before deployment. URGENT!
   # TODO: Remove to_iso8601 modification
   def render("chat_post_detail.json", %{chat_post: %{chat_post: chat_post, color: color}, current_student_id: student_id}) do
     chat_post = chat_post |> Repo.preload([:student, :chat_comments, :likes, :class])
@@ -80,6 +81,7 @@ defmodule SkollerWeb.Class.ChatPostView do
     }
   end
 
+  # TODO: Remove class from route before deployment. URGENT!
   def render("chat_post_short.json", %{chat_post: chat_post}) do
     chat_post = chat_post |> Repo.preload(:class)
     %{
