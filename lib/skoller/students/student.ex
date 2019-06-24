@@ -21,7 +21,6 @@ defmodule Skoller.Students.Student do
     field :phone, :string
     field :verification_code, :string
     field :login_attempt, :utc_datetime
-    field :is_verified, :boolean, default: false
     field :notification_time, :time
     field :future_reminder_notification_time, :time
     field :notification_days_notice, :integer, default: System.get_env("DEFAULT_NOTIFICATION_DAYS") |> String.to_integer

@@ -77,7 +77,6 @@ defmodule Skoller.Users do
     result =
       %User{}
       |> User.changeset_insert(params)
-      |> verify_student(opts)
       |> verification_code(opts)
       |> get_enrolled_by(params)
       |> insert_user(params, opts)
@@ -219,9 +218,7 @@ defmodule Skoller.Users do
 
   defp send_link_used_notification(result), do: result
 
-  defp send_verification_text(
-         {:ok, %{user: %{student: %{is_verified: false} = student}}} = result
-       ) do
+  defp send_verification_text({:ok, %{user: %{student: student}}} = result) do
     student.phone |> Sms.verify_phone(student.verification_code)
     result
   end
@@ -257,27 +254,6 @@ defmodule Skoller.Users do
   end
 
   defp verification_code(changeset, _opts), do: changeset
-
-  # Verifies a student if admin: true passed in though opts.
-  defp verify_student(
-         %Ecto.Changeset{
-           valid?: true,
-           changes: %{student: %Ecto.Changeset{valid?: true} = s_changeset}
-         } = u_changeset,
-         opts
-       ) do
-    case Keyword.get(opts, :admin, false) do
-      true ->
-        Ecto.Changeset.change(u_changeset, %{
-          student: Map.put(s_changeset.changes, :is_verified, true)
-        })
-
-      _ ->
-        u_changeset
-    end
-  end
-
-  defp verify_student(changeset, _opts), do: changeset
 
   # Adds enrolled_by if "link" is present in params.
   defp get_enrolled_by(

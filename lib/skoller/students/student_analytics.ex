@@ -30,7 +30,6 @@ defmodule Skoller.Students.StudentAnalytics do
                 s.name_last, 
                 u.email,
                 s.phone,
-                s.is_verified,
                 fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.last_login),
                 sc.name,
                 sc.adr_locality,

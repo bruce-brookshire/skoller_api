@@ -41,7 +41,6 @@ defmodule SkollerWeb.StudentView do
       phone: student.phone,
       birthday: student.birthday,
       gender: student.gender,
-      is_verified: student.is_verified,
       is_notifications: student.is_notifications,
       is_mod_notifications: student.is_mod_notifications,
       is_reminder_notifications: student.is_reminder_notifications,

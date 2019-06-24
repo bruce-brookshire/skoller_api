@@ -49,12 +49,11 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
       _ ->
         conn
-        |> send_resp(401, "Invalid token")
+        |> send_resp(401, "Invalid code")
     end
   end
 
   def student_login(conn, %{"phone" => phone}) do
-    IO.puts("no code")
     student = Students.get_student_by_phone(phone)
 
     case Students.create_login_attempt(student) do

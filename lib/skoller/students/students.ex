@@ -165,33 +165,11 @@ defmodule Skoller.Students do
     end
   end
 
-  @doc """
-  Checks the verification code of the `student` against the `code`.
-
-  Returns a boolean
-  """
-  def check_verification_code(student, code) do
-    case student.verification_code == code do
-      true ->
-        student |> verify_student()
-        true
-
-      false ->
-        false
-    end
-  end
-
   defp convert_rand(num) do
     case num < 1.0 do
       true -> convert_rand(num * 10)
       false -> Kernel.round(num * 10_000)
     end
-  end
-
-  defp verify_student(student) do
-    student
-    |> Ecto.Changeset.change(%{is_verified: true})
-    |> Repo.update!()
   end
 
   @doc """

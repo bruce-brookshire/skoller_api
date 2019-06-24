@@ -14,34 +14,26 @@ defmodule SkollerWeb.Router do
     plug :accepts, ["json", "text"]
   end
 
-  pipeline :api_auth_verified do
-    plug :accepts, ["json"]
-    plug Guardian.Plug.Pipeline, module: Skoller.Auth,
-                                  error_handler: Skoller.AuthErrorHandler
-    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
-    plug Guardian.Plug.EnsureAuthenticated
-    plug Guardian.Plug.LoadResource
-    plug :authenticate
-    plug :is_phone_verified
-  end
-
   pipeline :api_auth do
     plug :accepts, ["json"]
-    plug Guardian.Plug.Pipeline, module: Skoller.Auth,
-                                  error_handler: Skoller.AuthErrorHandler
+
+    plug Guardian.Plug.Pipeline,
+      module: Skoller.Auth,
+      error_handler: Skoller.AuthErrorHandler
+
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource
     plug :authenticate
   end
 
-  if Mix.env == :dev do
+  if Mix.env() == :dev do
     forward "/sent_emails", Bamboo.SentEmailViewerPlug
   end
 
   # Other scopes may use custom stacks.
   scope "/api", SkollerWeb.Api do
-    pipe_through :api_auth_verified
+    pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
       resources "/organizations", OrganizationController, only: [:index]
@@ -82,18 +74,19 @@ defmodule SkollerWeb.Router do
       # Analytics routes
       scope "/analytics" do
         get "/", Admin.AnalyticsController, :index
+
         scope "/csv" do
           get "/schools", Admin.AnalyticsController, :schools_csv
           get "/classes", Admin.AnalyticsController, :classes_csv
           get "/users", Admin.AnalyticsController, :users_csv
         end
       end
-      
 
       # User routes
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
       get "/users/points", Admin.UserController, :points
+
       resources "/users", Admin.UserController, only: [:show, :index] do
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
@@ -111,8 +104,8 @@ defmodule SkollerWeb.Router do
       get "/schools/hub", Admin.SchoolController, :hub
       get "/school/list", SchoolController, :index
       resources "/schools", SchoolController, only: [:create]
-      resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
 
+      resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
         post "/four-door", Admin.School.FourDoorController, :school
         delete "/four-door", Admin.School.FourDoorController, :delete
 
@@ -127,6 +120,7 @@ defmodule SkollerWeb.Router do
 
         resources "/email_domains", EmailDomainController, only: [:index, :create]
       end
+
       resources "/email_domains", EmailDomainController, only: [:show, :update, :delete]
 
       # Class Period routes
@@ -144,24 +138,26 @@ defmodule SkollerWeb.Router do
       post "/classes/:class_hash/pydocs", Admin.Class.ScriptDocController, :create
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
-      
-      resources "/classes", ClassController, only: [:update, :index] do
 
+      resources "/classes", ClassController, only: [:update, :index] do
         post "/notes", Class.NoteController, :create
 
         put "/statuses", Admin.Class.StatusController, :update
 
         # Chat routes
         resources "/posts", Admin.Class.ChatPostController, only: [:index, :delete, :show]
+
         resources "/posts", Class.ChatPostController, only: [:create, :update] do
           resources "/comments", Class.ChatCommentController, only: [:create]
-          resources "/like", Class.Chat.PostLikeController,  only: [:create]
+          resources "/like", Class.Chat.PostLikeController, only: [:create]
           delete "/unlike", Class.Chat.PostLikeController, :delete
           resources "/star", Class.Chat.PostStarController, only: [:create]
           delete "/unstar", Class.Chat.PostStarController, :delete
           post "/read", Class.Chat.PostStarController, :update
         end
+
         put "/comments/:id", Class.ChatCommentController, :update
+
         resources "/comments", Admin.Class.ChatCommentController, only: [:delete] do
           resources "/replies", Class.ChatReplyController, only: [:create]
           resources "/star", Class.Chat.CommentStarController, only: [:create]
@@ -169,10 +165,12 @@ defmodule SkollerWeb.Router do
           resources "/like", Class.Chat.CommentLikeController, only: [:create]
           delete "/unlike", Class.Chat.CommentLikeController, :delete
         end
+
         resources "/replies", Admin.Class.ChatReplyController, only: [:delete] do
           resources "/like", Class.Chat.ReplyLikeController, only: [:create]
           delete "/unlike", Class.Chat.ReplyLikeController, :delete
         end
+
         put "/replies/:id", Class.ChatReplyController, :update
 
         # Class Lock routes
@@ -196,13 +194,19 @@ defmodule SkollerWeb.Router do
         # Class Request routes
         post "/help/:class_help_type_id", Class.HelpRequestController, :create
         post "/changes/:class_change_type_id", Class.ChangeRequestController, :create
-        post "/student-request/:class_student_request_type_id", Class.StudentRequestController, :create
+
+        post "/student-request/:class_student_request_type_id",
+             Class.StudentRequestController,
+             :create
       end
+
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
       post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
-      resources "/class-student-request-types", Class.StudentRequest.TypeController, only: [:index]
+
+      resources "/class-student-request-types", Class.StudentRequest.TypeController,
+        only: [:index]
 
       # Student routes
       resources "/students", StudentController, only: [] do
@@ -215,7 +219,7 @@ defmodule SkollerWeb.Router do
         # Notificaiton route
         get "/notifications", Student.NotificationController, :notifications
 
-        #Text Verification routes
+        # Text Verification routes
         post "/verify", Student.VerificationController, :verify
         post "/resend", Student.VerificationController, :resend
 
@@ -231,7 +235,9 @@ defmodule SkollerWeb.Router do
         get "/classes", Admin.Student.ClassController, :index
         get "/classes/:class_id", Student.ClassController, :show
         get "/classes/:class_id/mods", Student.Class.ModController, :index
-        resources "/classes/:class_id/assignments", Student.Class.AssignmentController, only: [:create]
+
+        resources "/classes/:class_id/assignments", Student.Class.AssignmentController,
+          only: [:create]
 
         # School routes
         get "/school", Student.SchoolController, :show
@@ -239,8 +245,9 @@ defmodule SkollerWeb.Router do
 
       # Assignment routes
       resources "/class/assignments", Class.AssignmentController, only: [:delete, :update]
-      resources "/assignments", Student.Class.AssignmentController, only: [:delete, :update, :show] do
 
+      resources "/assignments", Student.Class.AssignmentController,
+        only: [:delete, :update, :show] do
         # Assignment Post routes
         resources "/posts", Admin.Assignment.PostController, only: [:delete]
         resources "/posts", Assignment.PostController, only: [:create, :update]
@@ -264,24 +271,20 @@ defmodule SkollerWeb.Router do
       resources "/fields-of-study", Admin.FieldController, only: [:update, :create, :index]
       post "/fields-of-study/csv", CSVController, :fos
 
-      #Syllabus Worker routes
+      # Syllabus Worker routes
       post "/syllabus-workers", SyllabusWorkerController, :class
 
       post "/notifications/syllabus-needed", NotificationController, :syllabus
       post "/notifications/custom", NotificationController, :custom
       get "/notifications", NotificationController, :index
 
-      resources "/reminder-messages", Assignment.ReminderController, only: [:create, :index, :delete]
+      resources "/reminder-messages", Assignment.ReminderController,
+        only: [:create, :index, :delete]
+
       resources "/reminder-messages/topics", Assignment.Reminder.TopicController, only: [:index]
 
       resources "/custom-links", CustomLinkController, only: [:create, :index, :update, :show]
-    end
-  end
 
-  scope "/api", SkollerWeb.Api do
-    pipe_through :api_auth
-
-    scope "/v1", V1, as: :v1 do
       put "/users/:user_id", UserController, :update
       delete "/users/:user_id", UserController, :delete
       post "/users/:user_id/register", DeviceController, :register
