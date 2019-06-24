@@ -2,7 +2,7 @@ defmodule Skoller.Students do
   @moduledoc """
   The Students context.
   """
-  
+
   alias Skoller.Repo
   alias Skoller.Students.Student
   alias Skoller.Students.FieldOfStudy, as: StudentField
@@ -12,7 +12,6 @@ defmodule Skoller.Students do
   import Ecto.Query
 
   require Logger
-
 
   @doc """
   Gets a student by id.
@@ -29,6 +28,19 @@ defmodule Skoller.Students do
   end
 
   @doc """
+  Gets a student by phone.
+
+  ## Returns
+  `Skoller.Students.Student` or `nil`
+  """
+  def get_student_by_phone(phone) do
+    from(s in Student)
+    |> where([s], s.phone == ^phone)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @doc """
   Adds a field of study to a student.
 
   ## Returns
@@ -36,6 +48,7 @@ defmodule Skoller.Students do
   """
   def add_field_of_study(params) do
     changeset = StudentField.changeset(%StudentField{}, params)
+
     case changeset |> Repo.insert() do
       {:ok, results} -> results |> Repo.preload(:student)
       error -> error
@@ -79,12 +92,13 @@ defmodule Skoller.Students do
   """
   def generate_student_link(%Student{id: id, enrollment_link: nil} = student) do
     link = EnrollmentLinks.generate_link(id)
-    
+
     student
     |> Ecto.Changeset.change(%{enrollment_link: link})
     |> Repo.update()
   end
-  def generate_student_link(_student), do: {:ok, nil}  
+
+  def generate_student_link(_student), do: {:ok, nil}
 
   @doc """
   Generates a 5 digit verification code.
@@ -107,14 +121,45 @@ defmodule Skoller.Students do
   """
   def reset_verify_code(student) do
     code = generate_verify_code()
-    result = student
-    |> Ecto.Changeset.change(%{verification_code: code})
-    |> Repo.update()
+
+    result =
+      student
+      |> Ecto.Changeset.change(%{verification_code: code})
+      |> Repo.update()
 
     case result do
       {:ok, student} ->
         student.phone |> Sms.verify_phone(student.verification_code)
         result
+
+      result ->
+        result
+    end
+  end
+
+  @doc """
+  Sets a new login code on the `student` and attempt time and sends a text with the new code.
+
+  ## Returns
+  `{:ok, student}` or `{:error, changeset}`
+  """
+  def create_login_attempt(student) do
+    code = generate_verify_code()
+
+    dateTime =
+      DateTime.utc_now()
+      |> DateTime.truncate(:second)
+      
+    result =
+      student
+      |> Ecto.Changeset.change(%{verification_code: code, login_attempt: dateTime})
+      |> Repo.update()
+
+    case result do
+      {:ok, student} ->
+        student.phone |> Sms.login_phone(student.verification_code)
+        result
+
       result ->
         result
     end
@@ -127,9 +172,10 @@ defmodule Skoller.Students do
   """
   def check_verification_code(student, code) do
     case student.verification_code == code do
-      true -> 
+      true ->
         student |> verify_student()
         true
+
       false ->
         false
     end
@@ -143,19 +189,19 @@ defmodule Skoller.Students do
   end
 
   defp verify_student(student) do
-    student 
+    student
     |> Ecto.Changeset.change(%{is_verified: true})
-    |> Repo.update!
+    |> Repo.update!()
   end
 
   @doc """
   Sets the primary school if one doesn't already exist
   """
   def conditional_primary_school_set(student, school_id) do
-    if (student.primary_school_id == nil) do
+    if student.primary_school_id == nil do
       student
       |> Ecto.Changeset.change(%{primary_school_id: school_id})
-      |> Repo.update
+      |> Repo.update()
     else
       {:ok, student}
     end

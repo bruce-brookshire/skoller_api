@@ -300,6 +300,7 @@ defmodule SkollerWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       post "/users/login", AuthController, :login
+      post "/students/login", AuthController, :student_login
       resources "/users", NewUserController, only: [:create]
       put "/users/:user_id/email-preferences", EmailPreferenceController, :update
       get "/users/:user_id/email-preferences", EmailPreferenceController, :index

@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
 
   alias SkollerWeb.Admin.SchoolView
   alias Skoller.Schools
-  alias Skoller.Students
   alias Skoller.EnrolledSchools
 
   import SkollerWeb.Plugs.Auth

@@ -5,6 +5,7 @@ defmodule SkollerWeb.Plugs.Auth do
 
   alias Skoller.Repo
   alias Skoller.Users
+  alias Skoller.Students
   alias Skoller.Assignments
   alias Skoller.Classes.EditableClasses
   alias Skoller.EnrolledStudents
@@ -18,8 +19,12 @@ defmodule SkollerWeb.Plugs.Auth do
     case conn |> get_auth_obj() do
       {:ok, user} ->
         assign(conn, :user, user)
-      {:error, :inactive} -> conn |> forbidden
-      {:error, _} -> conn |> unauth
+
+      {:error, :inactive} ->
+        conn |> forbidden
+
+      {:error, _} ->
+        conn |> unauth
     end
   end
 
@@ -29,32 +34,40 @@ defmodule SkollerWeb.Plugs.Auth do
       nil -> {:error, :no_user}
       %{} = user -> {:ok, user}
     end
-  end 
+  end
 
   def get_auth_obj(conn) do
     case Users.get_user_by_id(Guardian.Plug.current_resource(conn)) do
-      %{is_active: false} -> {:error, :inactive}
-      nil -> {:error, :no_user}
-      %{} = user -> 
+      %{is_active: false} ->
+        {:error, :inactive}
+
+      nil ->
+        {:error, :no_user}
+
+      %{} = user ->
         {:ok, user}
     end
-  end 
+  end
 
   def is_phone_verified(%{assigns: %{user: %{student: nil}}} = conn, _), do: conn
+
   def is_phone_verified(%{assigns: %{user: %{student: student}}} = conn, _) do
     case List.last(conn.path_info) in ["verify", "resend"] do
-      true -> conn
-      false -> 
+      true ->
+        conn
+
+      false ->
         case student.is_verified do
           true -> conn
           _ -> conn |> unauth
         end
     end
   end
+
   def is_phone_verified(conn, _), do: conn
 
   def verify_role(conn, %{role: role}) do
-    case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
+    case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
       true -> conn
       false -> conn |> unauth
     end
@@ -69,18 +82,22 @@ defmodule SkollerWeb.Plugs.Auth do
 
   def verify_class_is_editable(conn, id) do
     case conn.path_params |> Map.fetch(to_string(id)) do
-      :error -> conn
+      :error ->
+        conn
+
       {:ok, class_id} ->
         case EditableClasses.get_editable_class_by_id(class_id) do
           nil -> conn |> in_role(@admin_role)
           _ -> conn
         end
-      end
+    end
   end
 
   def verify_member(conn, %{of: type, using: id}) do
     case conn.path_params |> Map.fetch(to_string(id)) do
-      :error -> conn
+      :error ->
+        conn
+
       _ ->
         case conn |> get_items(type) do
           nil -> conn |> not_in_role(@student_role)
@@ -97,8 +114,10 @@ defmodule SkollerWeb.Plugs.Auth do
   end
 
   def verify_user(conn, :allow_admin) do
-    case Enum.any?(conn.assigns[:user].roles, & &1.id == @admin_role) do
-      true -> conn
+    case Enum.any?(conn.assigns[:user].roles, &(&1.id == @admin_role)) do
+      true ->
+        conn
+
       _ ->
         case conn |> get_items(:user) do
           nil -> conn |> unauth
@@ -113,7 +132,7 @@ defmodule SkollerWeb.Plugs.Auth do
       items -> conn |> find_item(%{type: :user, items: items}, conn.path_params)
     end
   end
-  
+
   def verify_user_exists(%{params: %{"email" => email}} = conn, _) do
     case Users.get_user_by_email(email) do
       nil -> conn |> unauth
@@ -122,15 +141,23 @@ defmodule SkollerWeb.Plugs.Auth do
   end
   def verify_user_exists(conn, _), do: conn
 
+  def verify_student_exists(%{params: %{"phone" => phone}} = conn, _) do
+    case Students.get_student_by_phone(phone) do
+      nil -> conn |> unauth
+      _ -> conn
+    end
+  end
+  def verify_student_exists(conn, _), do: conn
+
   defp not_in_role(conn, role) do
-    case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
+    case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
       true -> conn |> unauth
       false -> conn
     end
   end
 
   defp in_role(conn, role) do
-    case Enum.any?(conn.assigns[:user].roles, & &1.id == role) do
+    case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
       false -> conn |> unauth
       true -> conn
     end
@@ -138,74 +165,96 @@ defmodule SkollerWeb.Plugs.Auth do
 
   defp get_items(%{assigns: %{user: user}}, :user), do: user.id
   defp get_items(%{assigns: %{user: %{student: nil}}}, _atom), do: nil
+
   defp get_items(%{assigns: %{user: %{student: student}}}, :class) do
-    student = student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
+    student =
+      student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
+
     student.classes
   end
+
   defp get_items(%{assigns: %{user: %{student: student}}}, :student), do: student.id
+
   defp get_items(%{assigns: %{user: %{student: student}}}, :student_assignment) do
     student = student |> Repo.preload(:student_assignments)
     student.student_assignments
   end
+
   defp get_items(%{assigns: %{user: %{student: student}}}, :class_assignment) do
-    student = student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
+    student =
+      student |> Repo.preload(classes: EnrolledStudents.preload_enrolled_classes(student.id))
+
     student.classes
   end
 
   defp find_item(conn, %{type: :student_assignment, items: assignments, using: :id}, %{"id" => id}) do
-    case assignments |> Enum.any?(& &1.id == String.to_integer(id)) do
+    case assignments |> Enum.any?(&(&1.id == String.to_integer(id))) do
       true -> conn
       false -> conn |> unauth
     end
   end
+
   defp find_item(conn, %{type: :class_assignment, items: classes, using: :id}, %{"id" => id}) do
     case Assignments.get_assignment_by_id(String.to_integer(id)) do
-      nil -> conn |> unauth
-      assign -> 
-        case classes |> Enum.any?(& &1.id == assign.class_id) do
+      nil ->
+        conn |> unauth
+
+      assign ->
+        case classes |> Enum.any?(&(&1.id == assign.class_id)) do
           true -> conn
           false -> conn |> unauth
         end
     end
   end
-  defp find_item(conn, %{type: :student_assignment, items: assignments, using: :assignment_id}, %{"assignment_id" => id}) do
-    case assignments |> Enum.any?(& &1.id == String.to_integer(id)) do
+
+  defp find_item(conn, %{type: :student_assignment, items: assignments, using: :assignment_id}, %{
+         "assignment_id" => id
+       }) do
+    case assignments |> Enum.any?(&(&1.id == String.to_integer(id))) do
       true -> conn
       false -> conn |> unauth
     end
   end
+
   defp find_item(conn, %{type: :class, items: classes, using: :id}, %{"id" => class_id}) do
     conn |> compare_classes(classes, class_id)
   end
+
   defp find_item(conn, %{type: :class_assignment, items: classes}, %{"assignment_id" => id}) do
-    case Assignments.get_assignment_by_id(String.to_integer(id))do
-      nil -> conn |> unauth
-      assign -> 
-        case classes |> Enum.any?(& &1.id == assign.class_id) do
+    case Assignments.get_assignment_by_id(String.to_integer(id)) do
+      nil ->
+        conn |> unauth
+
+      assign ->
+        case classes |> Enum.any?(&(&1.id == assign.class_id)) do
           true -> conn
           false -> conn |> unauth
         end
     end
   end
+
   defp find_item(conn, %{type: :class, items: classes}, %{"class_id" => class_id}) do
     conn |> compare_classes(classes, class_id)
   end
+
   defp find_item(conn, %{type: :student, items: id}, %{"student_id" => student_id}) do
     case id == String.to_integer(student_id) do
       true -> conn
       false -> conn |> unauth
     end
   end
+
   defp find_item(conn, %{type: :user, items: id}, %{"user_id" => user_id}) do
     case id == String.to_integer(user_id) do
       true -> conn
       false -> conn |> unauth
     end
   end
+
   defp find_item(conn, _items, _params), do: conn
 
   defp compare_classes(conn, classes, id) do
-    case classes |> Enum.any?(& &1.id == String.to_integer(id)) do
+    case classes |> Enum.any?(&(&1.id == String.to_integer(id))) do
       true -> conn
       false -> conn |> unauth
     end
