@@ -88,7 +88,6 @@ defmodule Skoller.Users do
       |> Repo.transaction()
       |> send_link_used_notification()
       |> send_verification_text()
-      |> log_in_user(opts)
 
     case result do
       {:ok, %{user: user}} ->
@@ -188,20 +187,6 @@ defmodule Skoller.Users do
     end
   end
 
-  defp log_in_user({:ok, %{user: user} = result_map} = result, opts) do
-    case Keyword.get(opts, :login, false) do
-      true ->
-        {:ok, token} = Token.login(user.id)
-        map = Map.put(result_map.user, :token, token)
-        {:ok, Map.put(result_map, :user, map)}
-
-      _ ->
-        result
-    end
-  end
-
-  defp log_in_user(result, _opts), do: result
-
   defp change_password(user_old, password, _) do
     user_old
     |> User.changeset_update(%{"password" => password})
@@ -248,7 +233,9 @@ defmodule Skoller.Users do
       _ ->
         Ecto.Changeset.change(u_changeset, %{
           student:
-            Map.put(s_changeset.changes, :verification_code, Students.generate_verify_code())
+            s_changeset.changes
+            |> Map.put(:verification_code, Students.generate_verify_code())
+            |> Map.put(:login_attempt, DateTime.utc_now() |> DateTime.truncate(:second))
         })
     end
   end

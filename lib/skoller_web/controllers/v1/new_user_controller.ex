@@ -4,12 +4,13 @@ defmodule SkollerWeb.Api.V1.NewUserController do
   use SkollerWeb, :controller
   
   alias Skoller.Users
-  alias SkollerWeb.AuthView
+  alias Skoller.Users.User
+  alias SkollerWeb.UserView
 
   def create(conn, params) do
-    case Users.create_user(params, [login: true]) do
-      {:ok, %{token: token} = user} ->
-        render(conn, AuthView, "show.json", [user: user, token: token])
+    case Users.create_user(params) do
+      {:ok, %User{} = user} ->
+        render(conn, UserView, "show.json", user: user)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
