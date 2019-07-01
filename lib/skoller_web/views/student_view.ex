@@ -32,6 +32,7 @@ defmodule SkollerWeb.StudentView do
     }
   end
 
+  # TODO: remove is_verified once new app has been adopted
   def render("student.json", %{student: student}) do
     student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization])
     %{
@@ -42,6 +43,7 @@ defmodule SkollerWeb.StudentView do
       birthday: student.birthday,
       gender: student.gender,
       is_notifications: student.is_notifications,
+      is_verified: true,
       is_mod_notifications: student.is_mod_notifications,
       is_reminder_notifications: student.is_reminder_notifications,
       is_chat_notifications: student.is_chat_notifications,
