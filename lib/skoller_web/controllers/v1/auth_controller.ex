@@ -5,6 +5,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
   alias Skoller.Users
   alias Skoller.Students
+  alias Skoller.Students.Student
   alias Skoller.Devices
   alias SkollerWeb.AuthView
   alias Skoller.Token
@@ -30,7 +31,9 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
   def student_login(conn, %{"verification_code" => code, "phone" => phone}) do
     case Students.get_student_by_phone(phone) do
+
       %{verification_code: verification_code, login_attempt: last_attempt} = student
+
       when verification_code == code ->
         if DateTime.diff(DateTime.utc_now(), last_attempt, :seconds) <= 300 do
           user = Users.get_user_by_student_id(student.id)
@@ -54,16 +57,20 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def student_login(conn, %{"phone" => phone}) do
-    student = Students.get_student_by_phone(phone)
+    case Students.get_student_by_phone(phone) do
+      %Student{} = student ->
+        case Students.create_login_attempt(student) do
+          {:ok, _} ->
+            conn
+            |> send_resp(204, "")
 
-    case Students.create_login_attempt(student) do
-      {:ok, _} ->
-        conn
-        |> send_resp(204, "")
+          _ ->
+            conn
+            |> send_resp(422, "Failed to update student")
+        end
 
       _ ->
-        conn
-        |> send_resp(422, "Failed to update student")
+        conn |> send_resp(404, "User not found")
     end
   end
 
@@ -74,7 +81,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
-    IO.inspect conn.assigns[:user]
+    IO.inspect(conn.assigns[:user])
     render(conn, AuthView, "show.json", auth: conn.assigns[:user])
   end
 
