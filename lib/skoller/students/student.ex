@@ -10,6 +10,7 @@ defmodule Skoller.Students.Student do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Schools.School
   alias Skoller.Organizations.Organization
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
   import Ecto.Query
 
@@ -23,7 +24,10 @@ defmodule Skoller.Students.Student do
     field :login_attempt, :utc_datetime
     field :notification_time, :time
     field :future_reminder_notification_time, :time
-    field :notification_days_notice, :integer, default: System.get_env("DEFAULT_NOTIFICATION_DAYS") |> String.to_integer
+
+    field :notification_days_notice, :integer,
+      default: System.get_env("DEFAULT_NOTIFICATION_DAYS") |> String.to_integer()
+
     field :is_notifications, :boolean, default: true
     field :is_mod_notifications, :boolean, default: true
     field :is_reminder_notifications, :boolean, default: true
@@ -35,6 +39,7 @@ defmodule Skoller.Students.Student do
     field :enrollment_link, :string
     field :enrolled_by, :id
     field :primary_school_id, :id
+    field :primary_period_id, :id
     field :primary_organization_id, :id
     has_many :users, User
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
@@ -43,16 +48,35 @@ defmodule Skoller.Students.Student do
     has_many :student_assignments, through: [:student_classes, :student_assignments]
     has_many :schools, through: [:classes, :school]
     belongs_to :primary_school, School, define_field: false
+    belongs_to :primary_period, ClassPeriod, define_field: false
     belongs_to :primary_organization, Organization, define_field: false
 
     timestamps()
   end
 
-  @req_fields [:name_first, :name_last, :phone,
-              :notification_time, :notification_days_notice, :is_notifications,
-              :is_mod_notifications, :is_reminder_notifications, :is_chat_notifications,
-               :is_assign_post_notifications, :future_reminder_notification_time]
-  @opt_fields [:birthday, :gender, :organization, :bio, :grad_year, :primary_school_id, :primary_organization_id]
+  @req_fields [
+    :name_first,
+    :name_last,
+    :phone,
+    :notification_time,
+    :notification_days_notice,
+    :is_notifications,
+    :is_mod_notifications,
+    :is_reminder_notifications,
+    :is_chat_notifications,
+    :is_assign_post_notifications,
+    :future_reminder_notification_time
+  ]
+  @opt_fields [
+    :birthday,
+    :gender,
+    :organization,
+    :bio,
+    :grad_year,
+    :primary_school_id,
+    :primary_period_id,
+    :primary_organization_id
+  ]
   @all_fields @req_fields ++ @opt_fields
 
   @doc false
@@ -68,21 +92,27 @@ defmodule Skoller.Students.Student do
     case get_check_phone() do
       false ->
         changeset
+
       true ->
-        q = from s in Student,
-          where: s.phone == ^phone
+        q =
+          from s in Student,
+            where: s.phone == ^phone
+
         case Repo.all(q) do
           [] -> changeset
           _phone -> changeset |> add_error(:phone, "Phone exists.")
         end
     end
   end
+
   defp check_phone(changeset), do: changeset
 
   defp get_check_phone() do
     case System.get_env("CHECK_PHONE") do
-      nil -> false
-      val -> 
+      nil ->
+        false
+
+      val ->
         case val |> String.downcase() do
           "true" -> true
           _ -> false
