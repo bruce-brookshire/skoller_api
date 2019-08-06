@@ -112,7 +112,6 @@ defmodule Skoller.Analytics.Jobs do
             "Last Name," <> 
             "Email," <> 
             "Phone #," <>
-            "Phone # Verified?," <>
             "Last Logged In," <>
             "Main School," <>
             "School City," <>

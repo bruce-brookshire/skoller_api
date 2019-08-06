@@ -7,6 +7,7 @@ defmodule SkollerWeb.StudentView do
   alias Skoller.Schools
   alias SkollerWeb.School.FieldOfStudyView
   alias SkollerWeb.SchoolView
+  alias SkollerWeb.PeriodView
   alias SkollerWeb.UserView
 
   @signup_path "/s/"
@@ -32,8 +33,9 @@ defmodule SkollerWeb.StudentView do
     }
   end
 
+  # TODO: remove is_verified once new app has been adopted
   def render("student.json", %{student: student}) do
-    student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization])
+    student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization, :primary_period])
     %{
       id: student.id,
       name_first: student.name_first,
@@ -41,8 +43,8 @@ defmodule SkollerWeb.StudentView do
       phone: student.phone,
       birthday: student.birthday,
       gender: student.gender,
-      is_verified: student.is_verified,
       is_notifications: student.is_notifications,
+      is_verified: true,
       is_mod_notifications: student.is_mod_notifications,
       is_reminder_notifications: student.is_reminder_notifications,
       is_chat_notifications: student.is_chat_notifications,
@@ -58,6 +60,7 @@ defmodule SkollerWeb.StudentView do
       fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
       points: Skoller.StudentPoints.get_points_by_student_id(student.id),
       primary_school: render_one(student.primary_school, SchoolView, "school.json"),
+      primary_period: render_one(student.primary_period, PeriodView, "period.json"),
       primary_organization: student |> primary_organization_name()
     }
   end

@@ -30,7 +30,9 @@ defmodule Mix.Tasks.Seed.Dev do
     
 
     pass = Authentication.hash_password("password")
-    {:ok, time1} = Time.new(13, 0, 0)
+    
+    {:ok, time_pre} = Time.new(13, 0, 0, 0)
+    time1 = Time.truncate(time_pre, :second)
 
     user = Repo.insert!(%User{email: "dev@skoller.co", 
                               password_hash: pass.password_hash})
@@ -73,7 +75,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                    phone: "1111111111",
                                    birthday: bday,
                                    gender: "Male",
-                                   is_verified: true,
                                    notification_time: time1,
                                    future_reminder_notification_time: time1,
                                    enrollment_link: "S1"}})
@@ -85,7 +86,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                       phone: "2222222222",
                                       birthday: bday,
                                       gender: "Male",
-                                      is_verified: true,
                                       notification_time: time1,
                                       future_reminder_notification_time: time1,
                                       enrollment_link: "S2"}})
@@ -97,7 +97,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                          phone: "3333333333",
                                          birthday: bday,
                                          gender: "Male",
-                                         is_verified: true,
                                          notification_time: time1,
                                          future_reminder_notification_time: time1,
                                          enrollment_link: "S3"}})
@@ -109,7 +108,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                             phone: "4444444444",
                                             birthday: bday,
                                             gender: "Male",
-                                            is_verified: true,
                                             notification_time: time1,
                                             future_reminder_notification_time: time1,
                                             enrollment_link: "S3"}})
@@ -121,7 +119,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                     phone: "5555555555",
                                     birthday: bday,
                                     gender: "Male",
-                                    is_verified: true,
                                     notification_time: time1,
                                     future_reminder_notification_time: time1,
                                     enrollment_link: "S4"}})
@@ -133,7 +130,6 @@ defmodule Mix.Tasks.Seed.Dev do
                                       phone: "6666666666",
                                       birthday: bday,
                                       gender: "Male",
-                                      is_verified: true,
                                       notification_time: time1,
                                       future_reminder_notification_time: time1,
                                       enrollment_link: "S5"}})

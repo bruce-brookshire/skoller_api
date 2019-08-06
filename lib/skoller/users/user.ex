@@ -25,8 +25,8 @@ defmodule Skoller.Users.User do
     timestamps()
   end
 
-  @req_fields [:email, :password]
-  @opt_fields [:pic_path]
+  @req_fields [:email]
+  @opt_fields [:pic_path, :password]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
   @upd_opt [:password, :pic_path, :last_login]

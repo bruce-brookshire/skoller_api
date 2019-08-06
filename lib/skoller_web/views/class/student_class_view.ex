@@ -14,7 +14,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   @enrollment_path "/e/"
 
   def render("index.json", %{student_classes: student_classes}) do
-    render_many(student_classes, StudentClassView, "student_class.json")
+    render_many(student_classes, StudentClassView, "student_class-detail.json")
   end
 
   def render("show.json", %{student_class: student_class}) do
