@@ -4,6 +4,7 @@ defmodule Skoller.FieldsOfStudy do
   """
 
   alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.Repo
 
   import Ecto.Query
@@ -65,7 +66,7 @@ defmodule Skoller.FieldsOfStudy do
 
   """
   def get_field_of_study_count() do
-    (from fs in FieldOfStudy)
+    from(fs in FieldOfStudy)
     |> join(:left, [fs], st in StudentField, on: fs.id == st.field_of_study_id)
     |> group_by([fs, st], [fs.field, fs.id])
     |> select([fs, st], %{field: fs, count: count(st.id)})
@@ -79,8 +80,10 @@ defmodule Skoller.FieldsOfStudy do
 
   defp name_filter(query, %{"field_name" => filter}) do
     filter = "%" <> filter <> "%"
+
     query
     |> where([fs], ilike(fs.field, ^filter))
   end
+
   defp name_filter(query, _), do: query
 end

@@ -11,10 +11,11 @@ defmodule Skoller.EmailJobs do
   @doc """
   Create email job
   """
-  def create_email_job(user_id, email_type_id) do
+  def create_email_job(user_id, email_type_id, options \\ nil) do
     changeset = EmailJob.changeset(%EmailJob{}, %{
       user_id: user_id,
-      email_type_id: email_type_id
+      email_type_id: email_type_id,
+      options: options
     })
 
     Repo.insert!(changeset)
