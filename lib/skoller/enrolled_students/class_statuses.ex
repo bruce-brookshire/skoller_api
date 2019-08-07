@@ -7,10 +7,7 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
   alias Skoller.Users.User
   alias Skoller.Classes.Class
   alias Skoller.Schools.School
-  alias Skoller.Students.Student
-  alias Skoller.EnrolledStudents
   alias Skoller.Periods.ClassPeriod
-  alias Skoller.ClassStatuses.Classes
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Analytics.Classes, as: AnalyticsClasses
 
@@ -112,8 +109,14 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
     )
     |> join(:left, [u, a_s, a_n], sc in StudentClass, on: sc.student_id == u.student_id)
     |> join(:left, [u, a_s, a_n, sc], c in Class, on: sc.class_id == c.id)
+    |> join(:left, [u, a_s, a_n, sc, c], p in ClassPeriod,
+      on: p.id == c.class_period_id
+    )
+    |> join(:left, [u, a_s, a_n, sc, c, p], s in School,
+      on: p.school_id == s.id
+    )
     |> where(
-      [u, a_s, a_n, sc, c],
+      [u, a_s, a_n, sc, c, p, s],
       a_s.enrollment_count == 1 and (is_nil(a_n.enrollment_count) or a_n.enrollment_count == 0) and
         sc.is_dropped == false
     )
@@ -123,7 +126,7 @@ defmodule Skoller.EnrolledStudents.ClassStatuses do
         "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
-    |> select([u, a_s, a_n, sc, c], u)
+    |> select([u, a_s, a_n, sc, c, p, s], u)
     |> Repo.all()
   end
 

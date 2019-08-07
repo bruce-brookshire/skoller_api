@@ -3,9 +3,11 @@ defmodule Skoller.StudentClasses.Emails do
   Defines emails based on student classes
   """
 
+  alias Skoller.Repo
   alias Skoller.EmailJobs
   alias Skoller.Users.EmailPreferences
   alias Skoller.Services.ConversionEmail
+  alias Skoller.EmailLogs.EmailLog
 
   @no_classes_id 100
   @needs_setup_id 200
