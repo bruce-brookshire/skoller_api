@@ -80,18 +80,26 @@ defmodule Skoller.StudentClasses.Emails do
   def send_no_classes_email(user) do
     user_id = user.id |> to_string
     subject = "Don't waste time on that paper planner..."
+
+    @no_classes_id |> log_email_sent(user_id)
+
     ConversionEmail.send_email(user.email, subject, :need_classes, user_id)
   end
 
   def send_needs_setup_email(user, class_name) do
     user_id = user.id |> to_string
     subject = "Kickstart an easier semester!"
+
+    @needs_setup_id |> log_email_sent(user_id)
+
     ConversionEmail.send_email(user.email, subject, :needs_setup, user_id, class_name: class_name)
   end
 
   def send_grow_community_email(user, class_name) do
     user_id = user.id |> to_string
     subject = "Whoa you're missing out..."
+
+    @grow_community_id |> log_email_sent(user_id)
 
     ConversionEmail.send_email(user.email, subject, :unlock_community, user_id,
       class_name: class_name
@@ -101,6 +109,13 @@ defmodule Skoller.StudentClasses.Emails do
   def send_join_second_class_email(user) do
     user_id = user.id |> to_string
     subject = "Not organized? We'll help."
+
+    @join_second_class_id |> log_email_sent(user_id)
+
     ConversionEmail.send_email(user.email, subject, :second_class, user_id)
+  end
+
+  def log_email_sent(status_id, user_id) do
+    Repo.insert(%EmailLog{user_id: user_id |> String.to_integer(), email_type_id: status_id})
   end
 end
