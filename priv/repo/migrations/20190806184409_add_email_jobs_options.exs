@@ -16,6 +16,14 @@ defmodule Skoller.Repo.Migrations.AddEmailJobsOptions do
       is_active_email: true,
       is_active_notification: true
     })
+    
+    Repo.insert!(%EmailType{
+      id: 600,
+      name: "Join Second Class",
+      category: "Class.JoinSecond",
+      is_active_email: true,
+      is_active_notification: true
+    })
   end
 
   def down do
@@ -24,7 +32,11 @@ defmodule Skoller.Repo.Migrations.AddEmailJobsOptions do
     end
 
     EmailType
-    |> Repo.get_by(category: "Class.Community")
+    |> Repo.get_by(id: 500)
+    |> Repo.delete()
+
+    EmailType
+    |> Repo.get_by(id: 600)
     |> Repo.delete()
   end
 end

@@ -5,12 +5,12 @@ defmodule Skoller.StudentClasses.Emails do
 
   alias Skoller.EmailJobs
   alias Skoller.Users.EmailPreferences
-  alias Skoller.Services.MarketingEmail
   alias Skoller.Services.ConversionEmail
 
   @no_classes_id 100
   @needs_setup_id 200
   @grow_community_id 500
+  @join_second_class_id 600
 
   @doc """
   Queues the no classes email to the list of `users`
@@ -20,7 +20,6 @@ defmodule Skoller.StudentClasses.Emails do
     |> Enum.map(&List.first(&1.users))
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1, @no_classes_id))
     |> Enum.map(&queue_no_classes_email(&1))
-    |> IO.inspect()
   end
 
   @doc """
@@ -42,6 +41,15 @@ defmodule Skoller.StudentClasses.Emails do
   end
 
   @doc """
+  Queue the join second class email for the list of `users`
+  """
+  def queue_join_second_class_emails(users) do
+    users
+    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1, @join_second_class_id))
+    |> Enum.map(&queue_join_second_class_email(&1))
+  end
+
+  @doc """
   Queues a no classes email for a user
   """
   def queue_no_classes_email(user) do
@@ -49,17 +57,24 @@ defmodule Skoller.StudentClasses.Emails do
   end
 
   @doc """
-  Queues needs setup email for a user
+  Queues needs setup email for a user and class
   """
   def queue_needs_setup_email(user_class) do
     EmailJobs.create_email_job(user_class.user.id, @needs_setup_id, user_class.class_name)
   end
 
   @doc """
-  Queues grow community email for a user
+  Queues grow community email for a user and class
   """
   def queue_grow_community_email(user_class) do
     EmailJobs.create_email_job(user_class.user.id, @grow_community_id, user_class.class_name)
+  end
+
+  @doc """
+  Queues join second class email for a user
+  """
+  def queue_join_second_class_email(user) do
+    EmailJobs.create_email_job(user.id, @grow_community_id)
   end
 
   def send_no_classes_email(user) do
@@ -81,5 +96,11 @@ defmodule Skoller.StudentClasses.Emails do
     ConversionEmail.send_email(user.email, subject, :unlock_community, user_id,
       class_name: class_name
     )
+  end
+
+  def send_join_second_class_email(user) do
+    user_id = user.id |> to_string
+    subject = "Not organized? We'll help."
+    ConversionEmail.send_email(user.email, subject, :second_class, user_id)
   end
 end

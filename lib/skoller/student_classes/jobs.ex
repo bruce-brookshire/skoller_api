@@ -10,11 +10,11 @@ defmodule Skoller.StudentClasses.Jobs do
   use Timex
 
   alias Skoller.Repo
+  alias Skoller.EmailTypes
   alias Skoller.UnenrolledStudents
+  alias Skoller.StudentClasses.Emails
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
-  alias Skoller.StudentClasses.Emails
-  alias Skoller.EmailTypes
   alias Skoller.EnrolledStudents.ClassStatuses
 
   require Logger
@@ -22,6 +22,7 @@ defmodule Skoller.StudentClasses.Jobs do
   @no_classes_id 100
   @needs_setup_id 200
   @grow_community_id 500
+  @join_second_class_id 600
 
   @past_status 100
 
@@ -71,11 +72,28 @@ defmodule Skoller.StudentClasses.Jobs do
     # Send emails after notifications because emails are blocking
     if email_type.is_active_notification do
       # TODO send notifications
-      user_class_info |> Notifications.send_needs_setup_notification(email_type)
+      # user_class_info |> Notifications.send_needs_setup_notification(email_type)
     end
 
     if email_type.is_active_email do
       user_class_info |> Emails.queue_grow_community_emails()
+    end
+  end
+
+  def send_second_class_messages() do
+    email_type = EmailTypes.get!(@join_second_class_id)
+    Logger.info("Sending second class emails and notifications.")
+
+    users = ClassStatuses.get_users_join_second_class()
+
+    # Send emails after notifications because emails are blocking
+    if email_type.is_active_notification do
+      # TODO send notifications
+      # users |> Notifications.send_needs_setup_notification(email_type)
+    end
+
+    if email_type.is_active_email do
+      users |> Emails.queue_join_second_class_emails()
     end
   end
 
