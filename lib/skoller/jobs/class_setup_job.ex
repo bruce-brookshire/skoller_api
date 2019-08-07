@@ -29,8 +29,11 @@ defmodule Skoller.ClassSetupJob do
     require Logger
     Logger.info("Running Class Setup Job: " <> to_string(Time.utc_now))
 
-    DateTime.utc_now
-    |> SCJobs.send_needs_setup_messages()
+    SCJobs.send_needs_setup_messages()
+
+    SCJobs.send_grow_community_messages()
+
+
 
     {:noreply, state}
   end

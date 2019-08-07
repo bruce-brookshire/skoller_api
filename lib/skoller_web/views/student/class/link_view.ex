@@ -11,7 +11,6 @@ defmodule SkollerWeb.Student.Class.LinkView do
 
   def render("link.json", %{link: %{class: student_class} = link}) do
     student = link.student |> Skoller.Repo.preload([:users])
-    IO.inspect student_class
 
     %{
       student_name_first: student.name_first,

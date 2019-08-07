@@ -14,7 +14,8 @@ defmodule Skoller.Services.ConversionEmail do
   @reply_to_email "support@skoller.co"
 
   def send_email(email_adr, subject, template, user_id, assigns \\ []) do
-    base_email()
+    new_email()
+    |> from({"Skoller", @from_email})
     |> to(email_adr)
     |> subject(subject)
     |> put_header("Reply-To", @reply_to_email)
@@ -22,11 +23,6 @@ defmodule Skoller.Services.ConversionEmail do
     |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
     |> render(template)
     |> Mailer.deliver_now()
-  end
-
-  defp base_email() do
-    new_email()
-    |> from({"Skoller", @from_email})
   end
 
   defp put_assigns(email, []), do: email

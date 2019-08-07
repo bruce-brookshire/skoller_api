@@ -21,6 +21,7 @@ defmodule Skoller.StudentClasses.Jobs do
 
   @no_classes_id 100
   @needs_setup_id 200
+  @grow_community_id 500
 
   @past_status 100
 
@@ -45,7 +46,7 @@ defmodule Skoller.StudentClasses.Jobs do
     end
   end
 
-  def send_needs_setup_messages(datetime) do
+  def send_needs_setup_messages() do
     email_type = EmailTypes.get!(@needs_setup_id)
     Logger.info("Sending needs setup emails and notifications.")
 
@@ -58,6 +59,23 @@ defmodule Skoller.StudentClasses.Jobs do
 
     if email_type.is_active_email do
       user_class_info |> Emails.queue_needs_setup_emails()
+    end
+  end
+
+  def send_grow_community_messages() do
+    email_type = EmailTypes.get!(@grow_community_id)
+    Logger.info("Sending grow community emails and notifications.")
+
+    user_class_info = ClassStatuses.get_students_grow_community_classes()
+
+    # Send emails after notifications because emails are blocking
+    if email_type.is_active_notification do
+      # TODO send notifications
+      user_class_info |> Notifications.send_needs_setup_notification(email_type)
+    end
+
+    if email_type.is_active_email do
+      user_class_info |> Emails.queue_grow_community_emails()
     end
   end
 

@@ -236,7 +236,7 @@
 	*/
 		#templateHeader{
 			/*@editable*/background-color:#4a4a4a;
-			/*@editable*/background-image:url("https://classnav-email-images.s3.amazonaws.com/syllabus_needed/send_syllabus.jpg");
+			/*@editable*/background-image:url("https://classnav-email-images.s3.amazonaws.com/join_classes/needs_classes.png");
 			/*@editable*/background-repeat:no-repeat;
 			/*@editable*/background-position:center;
 			/*@editable*/background-size:cover;
@@ -703,9 +703,9 @@
                         
                             <h1 style="text-align: center;">&nbsp;</h1>
 
-<p><span style="font-size:21px"><span style="color:#4a4a4a"><span style="background-color:#FFFFFF">Let us organize your assignments for you...</span></span></span></p>
+<p><span style="color:#4a4a4a"><span style="background-color:#FFFFFF">Don't wait to get organized...</span></span></p>
 
-<h1 class="null"><span style="color:#4a4a4a"><span style="font-family:arvo,courier,georgia,serif"><span style="font-size:53px"><span style="background-color:#FFFFFF">Send your syllabus for </span></span></span></span><span style="color:#57b9e4"><span style="font-family:arvo,courier,georgia,serif"><span style="font-size:53px"><span style="background-color:#FFFFFF"><%= @class_name %></span></span></span></span><span style="color:#4a4a4a"><span style="font-family:arvo,courier,georgia,serif"><span style="font-size:53px"><span style="background-color:#FFFFFF">!</span></span></span></span></h1>
+<h1 class="null"><span style="color:#4a4a4a"><span style="font-family:arvo,courier,georgia,serif"><span style="font-size:53px"><span style="background-color:#FFFFFF">Join your first class!</span></span></span></span></h1>
 
                         </td>
                     </tr>
@@ -747,7 +747,7 @@
                     <tbody>
                         <tr>
                             <td align="center" valign="middle" class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 20px;">
-                                <a class="mcnButton " title="Submit Syllabus HERE" href="https://skoller.co/landing" target="_blank" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Submit Syllabus HERE</a>
+                                <a class="mcnButton " title="Click here to join now!" href="https://skoller.co/landing" target="_blank" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Click here to join now!</a>
                             </td>
                         </tr>
                     </tbody>
@@ -793,7 +793,7 @@
                     
                         
 
-                        <img alt="" src="https://classnav-email-images.s3.amazonaws.com/syllabus_needed/syllabus.png" width="202" style="max-width:202px;" class="mcnImage">
+                        <img alt="" src="https://classnav-email-images.s3.amazonaws.com/join_classes/cloud.png" width="264" style="max-width:1380px;" class="mcnImage">
                         
 
                     
@@ -803,12 +803,9 @@
             <table class="mcnCaptionRightTextContentContainer" align="right" border="0" cellpadding="0" cellspacing="0" width="264">
                 <tbody><tr>
                     <td valign="top" class="mcnTextContent" style="color: #4A4A4A;">
-                        <br>
+                        There are thousands of classes in the Skoller cloud just waiting to be accessed!&nbsp;<br>
 <br>
-<br>
-Setting up your first class is <strong>EASY</strong>!<br>
-<br>
-Send us your syllabus to set up your class and then <strong>follow the checklist </strong>to get the most out of Skoller!
+Head over to the app and <strong>join your 1st class</strong> or if it's not there yet, <strong>create a class</strong>&nbsp;and we will organize it for you!
                     </td>
                 </tr>
             </tbody></table>
@@ -863,7 +860,7 @@ Send us your syllabus to set up your class and then <strong>follow the checklist
             <table class="mcnCaptionLeftTextContentContainer" align="left" border="0" cellpadding="0" cellspacing="0" width="264">
                 <tbody><tr>
                     <td valign="top" class="mcnTextContent" style="color: #4A4A4A;">
-                        Once you're in-- Skoller unlocks <strong>endless organization</strong> for your classes including reminders, a full color calendar and task list to make sure you <strong>never miss another assignment</strong>!<br>
+                        Once you're in-- Skoller unlocks <strong>endless organization</strong> for you classes including reminders, a full color calendar and task list to make sure you <strong>never miss another assignment</strong>!<br>
 <br>
 <strong>Skoller works best when it's shared.&nbsp;</strong>After you're all set up, <strong>share Skoller</strong> with your classmates and <strong>unlock community features</strong>.
                     </td>
