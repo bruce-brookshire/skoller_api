@@ -20,7 +20,7 @@ defmodule Skoller.Services.ConversionEmail do
     |> subject(subject)
     |> put_header("Reply-To", @reply_to_email)
     |> put_assigns(assigns)
-    |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
+    |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> (user_id |> to_string))
     |> render(template)
     |> Mailer.deliver_now()
   end

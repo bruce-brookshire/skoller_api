@@ -7,6 +7,7 @@ defmodule Skoller.Organizations do
   alias Skoller.Repo
 
   alias Skoller.Organizations.Organization
+  alias Skoller.CustomSignups.Signup
 
   @doc """
   Returns the list of organizations.
@@ -106,12 +107,22 @@ defmodule Skoller.Organizations do
     Organization.changeset(organization, %{})
   end
 
+  def get_student_associated_organization(student_id) do
+    from(s in Signup)
+    |> join(:inner, [s], o in Organization, on: o.custom_signup_link_id == s.custom_signup_link_id)
+    |> where([s, o], s.student_id == ^student_id)
+    |> select([s, o], o)
+    |> Repo.one()
+  end
+
   defp preload_org({:ok, org}) do
     {:ok, run_preloads(org)}
   end
+
   defp preload_org(%Organization{} = org) do
     run_preloads(org)
   end
+
   defp preload_org(result), do: result
 
   defp run_preloads(org) do
