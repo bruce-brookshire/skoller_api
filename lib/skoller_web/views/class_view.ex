@@ -24,70 +24,75 @@ defmodule SkollerWeb.ClassView do
     render_one(class, ClassView, "class_detail.json")
   end
 
-  #Made for 
-  def render("class.json", %{class: %{class: class, professor: professor, class_period: class_period, enrollment: enrollment}}) do
-    
+  # Made for 
+  def render("class.json", %{
+        class: %{
+          class: class,
+          professor: professor,
+          class_period: class_period,
+          enrollment: enrollment
+        }
+      }) do
     base_class_view(class)
-    |> Map.merge(
-      %{
-        class_period: render_one(class_period, PeriodView, "period.json"),
-        professor: render_one(professor, ProfessorView, "professor.json"),
-        enrollment: enrollment
-      }
-    )
+    |> Map.merge(%{
+      class_period: render_one(class_period, PeriodView, "period.json"),
+      professor: render_one(professor, ProfessorView, "professor.json"),
+      enrollment: enrollment
+    })
   end
 
-  def render("class.json", %{class: %{class: class, professor: professor, class_period: class_period}}) do
-    
+  def render("class.json", %{
+        class: %{class: class, professor: professor, class_period: class_period}
+      }) do
     base_class_view(class)
-    |> Map.merge(
-      %{
-        class_period: render_one(class_period, PeriodView, "period.json"),
-        professor: render_one(professor, ProfessorView, "professor.json")
-      }
-    )
+    |> Map.merge(%{
+      class_period: render_one(class_period, PeriodView, "period.json"),
+      professor: render_one(professor, ProfessorView, "professor.json")
+    })
   end
 
   def render("class.json", %{class: %{class: class, professor: professor}}) do
-    
     class = class |> Repo.preload(:class_period)
+
     base_class_view(class)
-    |> Map.merge(
-      %{
-        class_period: render_one(class.class_period, PeriodView, "period.json"),
-        professor: render_one(professor, ProfessorView, "professor.json")
-      }
-    )
+    |> Map.merge(%{
+      class_period: render_one(class.class_period, PeriodView, "period.json"),
+      professor: render_one(professor, ProfessorView, "professor.json")
+    })
   end
 
   def render("class.json", %{class: class}) do
-    
     class = class |> Repo.preload([:professor, :class_status, :class_period])
+
     base_class_view(class)
-    |> Map.merge(
-      %{
-        class_period: render_one(class.class_period, PeriodView, "period.json"),
-        professor: render_one(class.professor, ProfessorView, "professor.json"),
-        status: render_one(class.class_status, StatusView, "status.json")
-      }
-    )
+    |> Map.merge(%{
+      class_period: render_one(class.class_period, PeriodView, "period.json"),
+      professor: render_one(class.professor, ProfessorView, "professor.json"),
+      status: render_one(class.class_status, StatusView, "status.json")
+    })
   end
 
   def render("class_detail.json", %{class: class}) do
-    class = class |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests], force: true)
+    class =
+      class
+      |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests],
+        force: true
+      )
+
     school = Schools.get_school_from_period(class.class_period_id)
+
     class
     |> render_one(ClassView, "class.json")
-    |> Map.merge(
-      %{
-        school: render_one(school, SchoolView, "school-detail.json"),
-        status: render_one(class.class_status, StatusView, "status.json"),
-        help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json"),
-        change_requests: render_many(class.change_requests, ChangeRequestView, "change_request.json"),
-        student_requests: render_many(class.student_requests, StudentRequestView, "student_request.json"),
-        enrollment: class |> get_class_enrollment()
-      }
-    )
+    |> Map.merge(%{
+      school: render_one(school, SchoolView, "school-detail.json"),
+      status: render_one(class.class_status, StatusView, "status.json"),
+      help_requests: render_many(class.help_requests, HelpRequestView, "help_request.json"),
+      change_requests:
+        render_many(class.change_requests, ChangeRequestView, "change_request.json"),
+      student_requests:
+        render_many(class.student_requests, StudentRequestView, "student_request.json"),
+      enrollment: class |> get_class_enrollment()
+    })
   end
 
   def render("class_short.json", %{class: class}) do
@@ -99,7 +104,7 @@ defmodule SkollerWeb.ClassView do
       subject: class.subject,
       is_editable: class.is_editable,
       campus: class.campus,
-      class_period_id: class.class_period_id,
+      class_period_id: class.class_period_id
     }
   end
 

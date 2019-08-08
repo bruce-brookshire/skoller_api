@@ -17,7 +17,8 @@ defmodule Skoller.ClassSetupJob do
 
   # This is the first call after start_link/1
   def init(state) do
-    schedule_work() # Schedule work to be performed at some point
+    # Schedule work to be performed at some point
+    schedule_work()
     {:ok, state}
   end
 
@@ -25,18 +26,26 @@ defmodule Skoller.ClassSetupJob do
   # It immediately reschedules itself, and then runs module.run.
   def handle_info(:work, state) do
     # Do the work you desire here
-    schedule_work() # Reschedule once more
+    # Reschedule once more
+    schedule_work()
     require Logger
-    Logger.info("Running Class Setup Job: " <> to_string(Time.utc_now))
+    Logger.info("Running Conversion Prompt Jobs: " <> to_string(Time.utc_now()))
 
-    DateTime.utc_now
-    |> SCJobs.send_needs_setup_messages()
+    SCJobs.send_needs_setup_messages()
+
+    SCJobs.send_grow_community_messages()
+
+    SCJobs.send_second_class_messages()
 
     {:noreply, state}
   end
 
   # This creates a :work event to be processed after get_time_diff/1 milliseconds.
   defp schedule_work() do
-    Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_time_diff(@interval_min))
+    Process.send_after(
+      self(),
+      :work,
+      Time.utc_now() |> Skoller.JobHelper.get_time_diff(@interval_min)
+    )
   end
 end

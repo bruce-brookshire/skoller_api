@@ -10,51 +10,88 @@ defmodule Skoller.StudentClasses.Jobs do
   use Timex
 
   alias Skoller.Repo
+  alias Skoller.EmailTypes
   alias Skoller.UnenrolledStudents
+  alias Skoller.StudentClasses.Emails
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
-  alias Skoller.StudentClasses.Emails
-  alias Skoller.EmailTypes
   alias Skoller.EnrolledStudents.ClassStatuses
 
   require Logger
 
   @no_classes_id 100
   @needs_setup_id 200
+  @grow_community_id 500
+  @join_second_class_id 600
 
   @past_status 100
 
   def send_no_classes_messages(datetime) do
     email_type = EmailTypes.get!(@no_classes_id)
+
     case check_sending_time(datetime, email_type) do
       :eq ->
         Logger.info("Sending no classes emails and notifications.")
         students = UnenrolledStudents.get_unenrolled_students()
-        #Send emails after notifications because emails are blocking
+        # Send emails after notifications because emails are blocking
         if email_type.is_active_notification do
           students |> Notifications.send_no_classes_notification(email_type)
         end
+
         if email_type.is_active_email do
           students |> Emails.queue_no_classes_emails()
         end
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
 
-  def send_needs_setup_messages(datetime) do
+  def send_needs_setup_messages() do
     email_type = EmailTypes.get!(@needs_setup_id)
-    case check_sending_time(datetime, email_type) do
-      :eq ->
-        Logger.info("Sending needs setup emails and notifications.")
-        students = ClassStatuses.get_students_needs_setup_classes()
-        #Send emails after notifications because emails are blocking
-        if email_type.is_active_notification do
-          students |> Notifications.send_needs_setup_notification(email_type)
-        end
-        if email_type.is_active_email do
-          students |> Emails.queue_needs_setup_emails()
-        end
-      _ -> nil
+    Logger.info("Sending needs setup emails and notifications.")
+
+    user_class_info = ClassStatuses.get_students_needs_setup_classes()
+
+    # Send emails after notifications because emails are blocking
+    if email_type.is_active_notification do
+      user_class_info |> Notifications.send_needs_setup_notification(email_type)
+    end
+
+    if email_type.is_active_email do
+      user_class_info |> Emails.queue_needs_setup_emails()
+    end
+  end
+
+  def send_grow_community_messages() do
+    email_type = EmailTypes.get!(@grow_community_id)
+    Logger.info("Sending grow community emails and notifications.")
+
+    user_class_info = ClassStatuses.get_students_grow_community_classes()
+
+    # Send emails after notifications because emails are blocking
+    if email_type.is_active_notification do
+      user_class_info |> Notifications.send_grow_community_notification(email_type)
+    end
+
+    if email_type.is_active_email do
+      user_class_info |> Emails.queue_grow_community_emails()
+    end
+  end
+
+  def send_second_class_messages() do
+    email_type = EmailTypes.get!(@join_second_class_id)
+    Logger.info("Sending second class emails and notifications.")
+
+    users = ClassStatuses.get_users_join_second_class()
+
+    # Send emails after notifications because emails are blocking
+    if email_type.is_active_notification do
+      users |> Notifications.send_join_second_class_notification(email_type)
+    end
+
+    if email_type.is_active_email do
+      users |> Emails.queue_join_second_class_emails()
     end
   end
 
@@ -69,10 +106,11 @@ defmodule Skoller.StudentClasses.Jobs do
 
   def drop_past_classes() do
     from(sc in StudentClass,
-          join: c in assoc(sc, :class),
-          join: p in assoc(c, :class_period),
-          where: sc.is_dropped == false and p.class_period_status_id == @past_status,
-          update: [set: [is_dropped: true]])
+      join: c in assoc(sc, :class),
+      join: p in assoc(c, :class_period),
+      where: sc.is_dropped == false and p.class_period_status_id == @past_status,
+      update: [set: [is_dropped: true]]
+    )
     |> Repo.update_all([])
   end
 end
