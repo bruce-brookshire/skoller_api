@@ -71,8 +71,7 @@ defmodule Skoller.StudentClasses.Jobs do
 
     # Send emails after notifications because emails are blocking
     if email_type.is_active_notification do
-      # TODO send notifications
-      # user_class_info |> Notifications.send_needs_setup_notification(email_type)
+      user_class_info |> Notifications.send_grow_community_notification(email_type)
     end
 
     if email_type.is_active_email do
@@ -88,8 +87,7 @@ defmodule Skoller.StudentClasses.Jobs do
 
     # Send emails after notifications because emails are blocking
     if email_type.is_active_notification do
-      # TODO send notifications
-      # users |> Notifications.send_needs_setup_notification(email_type)
+      users |> Notifications.send_join_second_class_notification(email_type)
     end
 
     if email_type.is_active_email do

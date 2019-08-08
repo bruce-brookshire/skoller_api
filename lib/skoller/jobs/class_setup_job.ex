@@ -8,7 +8,7 @@ defmodule Skoller.ClassSetupJob do
 
   # This will currently run on every 5 minute interval in an hour.
   # It is NOT every 5 minutes from spin up.
-  @interval_min 1
+  @interval_min 5
 
   # This puts :jobs on the state for future calls.
   def start_link do
@@ -29,7 +29,7 @@ defmodule Skoller.ClassSetupJob do
     # Reschedule once more
     schedule_work()
     require Logger
-    Logger.info("Running Class Setup Job: " <> to_string(Time.utc_now()))
+    Logger.info("Running Conversion Prompt Jobs: " <> to_string(Time.utc_now()))
 
     SCJobs.send_needs_setup_messages()
 

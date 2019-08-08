@@ -10,8 +10,12 @@ defmodule Skoller.StudentClasses.Notifications do
   @link_used_msg "More points earned! Someone just joined "
   @link_used_msg2 " using your link. 🤩  "
   @link_used_category "SignupLink.Used"
-  @needs_setup "Get the most out of Skoller. Finish setting up your classes 👍 "
-  @no_classes "Looks like you’re not in any classes…Add them today so you don’t get behind! 👍"
+
+  @no_classes "Don't take on this semester alone! Join a class and let Skoller get you organized."
+  @needs_setup "Kickstart an easier semester! All you need to do is drop your syllabus for "
+  @grow_community_1 "You're missing out... Unlock hidden community features for "
+  @grow_community_2 " when you share Skoller with your classmates."
+  @second_class "Let us organize ALL your assignments. Join your 2nd class!"
 
   def send_no_classes_notification(students, email_type) do
     students_with_devices =
@@ -31,7 +35,37 @@ defmodule Skoller.StudentClasses.Notifications do
     |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
     |> Enum.each(
       &Enum.each(&1.devices, fn x ->
-        Notification.create_notification(x.udid, x.type, @needs_setup, email_type.category)
+        Notification.create_notification(
+          x.udid,
+          x.type,
+          @needs_setup <> &1.class_name,
+          email_type.category
+        )
+      end)
+    )
+  end
+
+  def send_grow_community_notification(user_class_info, email_type) do
+    user_class_info
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
+    |> Enum.each(
+      &Enum.each(&1.devices, fn x ->
+        Notification.create_notification(
+          x.udid,
+          x.type,
+          @grow_community_1 <> &1.class_name <> @grow_community_2,
+          email_type.category
+        )
+      end)
+    )
+  end
+
+  def send_join_second_class_notification(users, email_type) do
+    users
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.id)))
+    |> Enum.each(
+      &Enum.each(&1.devices, fn x ->
+        Notification.create_notification(x.udid, x.type, @second_class, email_type.category)
       end)
     )
   end

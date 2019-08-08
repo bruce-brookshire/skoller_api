@@ -5,10 +5,10 @@ defmodule Skoller.StudentClasses.Emails do
 
   alias Skoller.Repo
   alias Skoller.EmailJobs
+  alias Skoller.Organizations
+  alias Skoller.EmailLogs.EmailLog
   alias Skoller.Users.EmailPreferences
   alias Skoller.Services.ConversionEmail
-  alias Skoller.EmailLogs.EmailLog
-  alias Skoller.CustomSignups
   alias Skoller.Organizations.Organization
 
   @no_classes_id 100
@@ -24,8 +24,6 @@ defmodule Skoller.StudentClasses.Emails do
 
   @aopi_name "AOII"
   @asa_name "ASA"
-
-
 
   @doc """
   Queues the no classes email to the list of `users`
@@ -96,11 +94,11 @@ defmodule Skoller.StudentClasses.Emails do
   def send_no_classes_email(user) do
     @no_classes_id |> log_email_sent(user.id)
 
-    get_student_associated_organization(user.student_id)
+    Organizations.get_student_associated_organization(user.student_id)
     |> send_no_classes_email("Don't waste time on that paper planner...", user)
   end
 
-  def send_no_classes_email(%Organization{name: @aopi_name} = org, subject, user) do
+  def send_no_classes_email(%Organization{name: @aopi_name} = _org, _subject, user) do
     params = [
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -109,11 +107,16 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/join_classes/aoii_needs_classes.png"
     ]
 
-    ConversionEmail.send_email(user.email, subject, :org_need_classes, user.id, params)
-  end
+    ConversionEmail.send_email(
+      user.email,
+      "The " <> @aopi_foundation <> " is waiting on you...",
+      :org_need_classes,
+      user.id,
+      params
+    )
   end
 
-  def send_no_classes_email(%Organization{id: @asa_id} = org, subject, user) do
+  def send_no_classes_email(%Organization{name: @asa_name} = _org, _subject, user) do
     params = [
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -122,7 +125,13 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/join_classes/asa_join_classes.png"
     ]
 
-    ConversionEmail.send_email(user.email, subject, :org_need_classes, user.id, params)
+    ConversionEmail.send_email(
+      user.email,
+      "The " <> @asa_foundation <> " is waiting on you...",
+      :org_need_classes,
+      user.id,
+      params
+    )
   end
 
   def send_no_classes_email(_, subject, user) do
@@ -133,11 +142,11 @@ defmodule Skoller.StudentClasses.Emails do
   def send_needs_setup_email(user, class_name) do
     @needs_setup_id |> log_email_sent(user.id)
 
-    get_student_associated_organization(user.student_id)
+    Organizations.get_student_associated_organization(user.student_id)
     |> send_needs_setup_email("Kickstart an easier semester!", user, class_name)
   end
 
-  def send_needs_setup_email(%Organization{name: @aopi_name} = org, subject, user, class_name) do
+  def send_needs_setup_email(%Organization{name: @aopi_name} = _org, subject, user, class_name) do
     params = [
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -149,9 +158,8 @@ defmodule Skoller.StudentClasses.Emails do
 
     ConversionEmail.send_email(user.email, subject, :org_needs_setup, user.id, params)
   end
-  end
 
-  def send_needs_setup_email(%Organization{name: @asa_name} = org, subject, user, class_name) do
+  def send_needs_setup_email(%Organization{name: @asa_name} = _org, subject, user, class_name) do
     params = [
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -172,11 +180,11 @@ defmodule Skoller.StudentClasses.Emails do
   def send_grow_community_email(user, class_name) do
     @grow_community_id |> log_email_sent(user.id)
 
-    get_student_associated_organization(user.student_id)
+    Organizations.get_student_associated_organization(user.student_id)
     |> send_grow_community_email("Whoa you're missing out...", user, class_name)
   end
 
-  def send_grow_community_email(%Organization{name: @aopi_name} = org, subject, user, class_name) do
+  def send_grow_community_email(%Organization{name: @aopi_name} = _org, subject, user, class_name) do
     params = [
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -188,9 +196,8 @@ defmodule Skoller.StudentClasses.Emails do
 
     ConversionEmail.send_email(user.email, subject, :org_unlock_community, user.id, params)
   end
-  end
 
-  def send_grow_community_email(%Organization{name: @asa_name} = org, subject, user, class_name) do
+  def send_grow_community_email(%Organization{name: @asa_name} = _org, subject, user, class_name) do
     params = [
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -213,11 +220,11 @@ defmodule Skoller.StudentClasses.Emails do
   def send_join_second_class_email(user) do
     @join_second_class_id |> log_email_sent(user.id)
 
-    get_student_associated_organization(user.student_id)
-    |> send_join_second_class_email("Not organized? We'll help.", user)
+    Organizations.get_student_associated_organization(user.student_id)
+    |> send_join_second_class_email("Overwhelmed with assignments? We can help.", user)
   end
 
-  def send_join_second_class_email(%Organization{name: @aopi_name} = org, subject, user) do
+  def send_join_second_class_email(%Organization{name: @aopi_name} = _org, subject, user) do
     params = [
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -227,9 +234,8 @@ defmodule Skoller.StudentClasses.Emails do
 
     ConversionEmail.send_email(user.email, subject, :org_second_class, user.id, params)
   end
-  end
 
-  def send_join_second_class_email(%Organization{name: @asa_name} = org, subject, user) do
+  def send_join_second_class_email(%Organization{name: @asa_name} = _org, subject, user) do
     params = [
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
