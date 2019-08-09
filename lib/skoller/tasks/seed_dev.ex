@@ -2,7 +2,6 @@ defmodule Mix.Tasks.Seed.Dev do
   @moduledoc false
 
   use Mix.Task
-  import Mix.Ecto
   import Mix.EctoSQL
 
   alias Skoller.Repo
