@@ -25,7 +25,6 @@ defmodule Skoller.Application do
       worker(Skoller.ClassSetupJob, []),
       worker(Skoller.NoClassesJob, []),
       worker(Skoller.EmailManagerJob, []),
-      worker(Skoller.ClassStartNotificationJob, []),
       worker(Skoller.AnalyticsJob, [])
     ]
 
