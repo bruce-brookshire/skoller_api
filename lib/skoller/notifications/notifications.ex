@@ -170,33 +170,6 @@ defmodule Skoller.Notifications do
   end
 
   @doc """
-  Gets students that are attached to a class with notifications enabled
-
-  ## Returns
-  `[%{udid: Skoller.Devices.Device.udid, type: Skoller.Devices.Device.type, class_id: Skoller.Classes.Class.id}]` or `[]`
-  """
-  def get_class_start_notifications(class) do
-    from(student_class in StudentClass)
-    |> join(:left, [student_class], student in Student,
-      on: student.id == student_class.student_id and student_class.class_id == ^class.id
-    )
-    |> join(:left, [student_class, student], user in User, on: user.student_id == student.id)
-    |> join(:left, [student_class, student, user], device in Device, on: user.id == device.user_id)
-    |> where(
-      [student_class, student, user, device],
-      student_class.is_dropped == false and student_class.is_notifications == true and
-        student.is_notifications == true and not is_nil(device.udid) and not is_nil(device.type) and
-        device.type == "ios"
-    )
-    |> select([student_class, student, user, device], %{
-      udid: device.udid,
-      type: device.type,
-      class_id: student_class.class_id
-    })
-    |> Repo.all()
-  end
-
-  @doc """
   Gets users that are attached to a chat post with notifications enabled.
 
   ## Notes
