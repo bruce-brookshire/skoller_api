@@ -101,6 +101,7 @@ defmodule Skoller.Periods do
     |> join(:left, [sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
     |> where([sc, c, p], p.class_period_status_id == @past_status)
     |> select([sc, c, p], sc)
+    |> Repo.all
     |> Enum.map(&drop_and_update/1)
   end
 
