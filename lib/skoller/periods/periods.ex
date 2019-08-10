@@ -99,7 +99,7 @@ defmodule Skoller.Periods do
     from(sc in StudentClass)
     |> join(:left, [sc], c in Class, on: sc.class_id == c.id)
     |> join(:left, [sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
-    |> where([sc, c, p], p.class_period_status_id == @past_status)
+    |> where([sc, c, p], p.class_period_status_id == @past_status and sc.is_dropped == false)
     |> select([sc, c, p], sc)
     |> Repo.all()
     |> Enum.each(&drop_and_update/1)
