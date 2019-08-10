@@ -97,7 +97,7 @@ defmodule Skoller.Periods do
 
   def drop_past_classes() do
     from(sc in StudentClass)
-    |> join(:left, [sc], c in Class, on: sc.class_id = c.id)
+    |> join(:left, [sc], c in Class, on: sc.class_id == c.id)
     |> join(:left, [sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
     |> where([sc, c, p], p.class_period_status_id == @past_status)
     |> select([sc, c, p], sc)
