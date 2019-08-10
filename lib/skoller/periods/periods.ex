@@ -101,13 +101,12 @@ defmodule Skoller.Periods do
     |> join(:left, [sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
     |> where([sc, c, p], p.class_period_status_id == @past_status)
     |> select([sc, c, p], sc)
-    |> Repo.all
-    |> Enum.map(&drop_and_update/1)
+    |> Repo.all()
+    |> Enum.each(&drop_and_update/1)
   end
 
   defp drop_and_update(student_class) do
-    Skoller.StudentClasses
-    student_class |> StudentClass.changeset(%{is_dropped: true}) |> Repo.update()
+    student_class |> Ecto.Changeset.change(%{is_dropped: true}) |> Repo.update()
   end
 
   @doc """
