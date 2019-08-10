@@ -5,6 +5,7 @@ defmodule Skoller.StudentClasses.Notifications do
 
   alias Skoller.Devices
   alias Skoller.Services.Notification
+  alias Skoller.Organizations.Organization
   alias Skoller.Users.Students
 
   @link_used_msg "More points earned! Someone just joined "
@@ -15,59 +16,135 @@ defmodule Skoller.StudentClasses.Notifications do
   @needs_setup "Kickstart an easier semester! All you need to do is drop your syllabus for "
   @grow_community_1 "You're missing out... Unlock hidden community features for "
   @grow_community_2 " when you share Skoller with your classmates."
+  @grow_community_org "The more you share, the more $$$ you earn for your philanthropy! Share with classmates to unlock hidden features & raise more money"
   @second_class "Let us organize ALL your assignments. Join your 2nd class!"
+  @second_class_org "We'll organize ALL your assignments for you. Join your 2nd class and share to raise more $$$!"
 
-  def send_no_classes_notification(students, email_type) do
-    students_with_devices =
-      students
-      |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(List.first(&1.users).id)))
+  @aopi_foundation "Arthritis Foundation"
+  @asa_foundation "Alpha Sigma Alpha Foundation"
 
-    students_with_devices
-    |> Enum.each(
-      &Enum.each(&1.devices, fn x ->
-        Notification.create_notification(x.udid, x.type, @no_classes, email_type.category)
-      end)
-    )
-  end
+  @aopi_name "AOII"
+  @asa_name "ASA"
 
-  def send_needs_setup_notification(user_class_info, email_type) do
-    user_class_info
-    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
-    |> Enum.each(
-      &Enum.each(&1.devices, fn x ->
-        Notification.create_notification(
-          x.udid,
-          x.type,
-          @needs_setup <> &1.class_name,
+  # No classes notifications
+  def send_no_classes_notification(
+        %{
+          devices: devices,
+          org: org
+        },
+        email_type
+      ) do
+    case org do
+      %Organization{name: @aopi_name} ->
+        create_notifications(
+          devices,
+          "You're so close! Sign up & join your first class on Skoller to earn a $1 donation to the " <>
+            @aopi_foundation <> "!",
           email_type.category
         )
-      end)
-    )
-  end
 
-  def send_grow_community_notification(user_class_info, email_type) do
-    user_class_info
-    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
-    |> Enum.each(
-      &Enum.each(&1.devices, fn x ->
-        Notification.create_notification(
-          x.udid,
-          x.type,
-          @grow_community_1 <> &1.class_name <> @grow_community_2,
+      %Organization{name: @asa_name} ->
+        create_notifications(
+          devices,
+          "You're so close! Sign up & join your first class on Skoller to earn a $1 donation to the " <>
+            @asa_foundation <> "!",
           email_type.category
         )
-      end)
-    )
+
+      _ ->
+        create_notifications(devices, @no_classes, email_type.category)
+    end
   end
 
-  def send_join_second_class_notification(users, email_type) do
-    users
-    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.id)))
-    |> Enum.each(
-      &Enum.each(&1.devices, fn x ->
-        Notification.create_notification(x.udid, x.type, @second_class, email_type.category)
-      end)
-    )
+  def send_no_classes_notification(user_info, email_type) do
+    user_info
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
+    |> Enum.each(&send_no_classes_notification(&1, email_type))
+  end
+
+  # Needs setup notifications
+  def send_needs_setup_notification(
+        %{
+          class_name: class_name,
+          devices: devices,
+          org: org
+        },
+        email_type
+      ) do
+    case org do
+      %Organization{} ->
+        create_notifications(
+          devices,
+          "Halfway there! You joined " <> class_name <> ", now just submit the syllabus",
+          email_type.category
+        )
+
+      _ ->
+        create_notifications(devices, @needs_setup <> class_name, email_type.category)
+    end
+  end
+
+  def send_needs_setup_notification(user_info, email_type) do
+    user_info
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
+    |> Enum.each(&send_needs_setup_notification(&1, email_type))
+  end
+
+  # Grow community notifications
+  def send_grow_community_notification(
+        %{
+          class_name: class_name,
+          devices: devices,
+          org: org
+        },
+        email_type
+      ) do
+    case org do
+      %Organization{} ->
+        create_notifications(
+          devices,
+          @grow_community_org,
+          email_type.category
+        )
+
+      _ ->
+        create_notifications(
+          devices,
+          @grow_community_1 <> class_name <> @grow_community_2,
+          email_type.category
+        )
+    end
+  end
+
+  def send_grow_community_notification(user_info, email_type) do
+    user_info
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
+    |> Enum.each(&send_grow_community_notification(&1, email_type))
+  end
+
+  # Needs setup notifications
+  def send_join_second_class_notification(
+        %{
+          class_name: class_name,
+          devices: devices,
+          org: org
+        },
+        email_type
+      ) do
+    case org do
+      %Organization{} ->
+        create_notifications(devices, @second_class_org, email_type.category)
+
+      _ ->
+        create_notifications(devices, @second_class <> class_name, email_type.category)
+    end
+  end
+
+  # Join second class
+  def send_join_second_class_notification(user_info, email_type) do
+    user_info
+    |> Enum.map(&Map.put(&1, :devices, Devices.get_devices_by_user_id(&1.user.id)))
+    |> Enum.each(&send_join_second_class_notification(&1, email_type))
   end
 
   def send_link_used_notification(student_class, class) do
@@ -81,6 +158,18 @@ defmodule Skoller.StudentClasses.Notifications do
         &1.type,
         @link_used_msg <> class.name <> @link_used_msg2,
         @link_used_category
+      )
+    )
+  end
+
+  defp create_notifications(devices, message, category) do
+    devices
+    |> Enum.each(
+      &Notification.create_notification(
+        &1.udid,
+        &1.type,
+        message,
+        category
       )
     )
   end

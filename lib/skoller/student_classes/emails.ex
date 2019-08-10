@@ -28,27 +28,26 @@ defmodule Skoller.StudentClasses.Emails do
   @doc """
   Queues the no classes email to the list of `users`
   """
-  def queue_no_classes_emails(users) do
-    users
-    |> Enum.map(&List.first(&1.users))
-    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1, @no_classes_id))
+  def queue_no_classes_emails(user_info) do
+    user_info
+    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @no_classes_id))
     |> Enum.map(&queue_no_classes_email(&1))
   end
 
   @doc """
-  Queue the class needs setup email for the list of `user_classes`
+  Queue the class needs setup email for the list of `user_info`
   """
-  def queue_needs_setup_emails(user_classes) do
-    user_classes
+  def queue_needs_setup_emails(user_info) do
+    user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @needs_setup_id))
     |> Enum.map(&queue_needs_setup_email(&1))
   end
 
   @doc """
-  Queue the class grow community email for the list of `user_classes`
+  Queue the class grow community email for the list of `user_info`
   """
-  def queue_grow_community_emails(user_classes) do
-    user_classes
+  def queue_grow_community_emails(user_info) do
+    user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @grow_community_id))
     |> Enum.map(&queue_grow_community_email(&1))
   end
@@ -56,38 +55,38 @@ defmodule Skoller.StudentClasses.Emails do
   @doc """
   Queue the join second class email for the list of `users`
   """
-  def queue_join_second_class_emails(users) do
-    users
-    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1, @join_second_class_id))
+  def queue_join_second_class_emails(user_info) do
+    user_info
+    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @join_second_class_id))
     |> Enum.map(&queue_join_second_class_email(&1))
   end
 
   @doc """
   Queues a no classes email for a user
   """
-  def queue_no_classes_email(user) do
-    EmailJobs.create_email_job(user.id, @no_classes_id)
+  def queue_no_classes_email(user_info) do
+    EmailJobs.create_email_job(user_info.user.id, @no_classes_id)
   end
 
   @doc """
   Queues needs setup email for a user and class
   """
-  def queue_needs_setup_email(user_class) do
-    EmailJobs.create_email_job(user_class.user.id, @needs_setup_id, user_class.class_name)
+  def queue_needs_setup_email(user_info) do
+    EmailJobs.create_email_job(user_info.user.id, @needs_setup_id, user_info.class_name)
   end
 
   @doc """
   Queues grow community email for a user and class
   """
-  def queue_grow_community_email(user_class) do
-    EmailJobs.create_email_job(user_class.user.id, @grow_community_id, user_class.class_name)
+  def queue_grow_community_email(user_info) do
+    EmailJobs.create_email_job(user_info.user.id, @grow_community_id, user_info.class_name)
   end
 
   @doc """
   Queues join second class email for a user
   """
-  def queue_join_second_class_email(user) do
-    EmailJobs.create_email_job(user.id, @grow_community_id)
+  def queue_join_second_class_email(user_info) do
+    EmailJobs.create_email_job(user_info.user.id, @grow_community_id)
   end
 
   # No classes email sender
