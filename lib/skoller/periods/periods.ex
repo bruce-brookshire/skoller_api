@@ -106,7 +106,7 @@ defmodule Skoller.Periods do
 
   defp drop_and_update(student_class) do
     Skoller.StudentClasses
-    student_class |> StudentClass.changeset(&1, %{is_dropped: true}) |> Repo.update()
+    student_class |> StudentClass.changeset(%{is_dropped: true}) |> Repo.update()
   end
 
   @doc """
