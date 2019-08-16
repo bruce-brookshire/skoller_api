@@ -241,6 +241,8 @@ defmodule SkollerWeb.Router do
 
         # School routes
         get "/school", Student.SchoolController, :show
+
+        get "/signup-organization", Student.EnrolledByController, :signup_organization
       end
 
       # Assignment routes

@@ -7,6 +7,7 @@ defmodule Skoller.CustomSignups do
   alias Skoller.CustomSignups.Signup
   alias Skoller.Repo
   alias Skoller.Students.Student
+  alias Skoller.Organizations.Organization
 
   import Ecto.Query
 
@@ -91,6 +92,15 @@ defmodule Skoller.CustomSignups do
       |> join(:inner, [s], l in Link, on: s.custom_signup_link_id == l.id)
       |> where([s, l], s.student_id == ^student_id)
       |> select([s, l], l.name)
+      |> Repo.one()
+  end
+  
+  def organization_for_student_id(student_id) do
+    from(s in Signup)
+      |> join(:inner, [s], l in Link, on: s.custom_signup_link_id == l.id)
+      |> join(:inner, [s, l], o in Organization, on: l.id == o.custom_signup_link_id)
+      |> where([s, l, o], s.student_id == ^student_id)
+      |> select([s, l, o], o)
       |> Repo.one()
   end
 
