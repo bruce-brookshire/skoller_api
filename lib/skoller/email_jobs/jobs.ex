@@ -4,7 +4,7 @@ defmodule Skoller.EmailJobs.Jobs do
   alias Skoller.EmailJobs
   alias Skoller.StudentClasses.Emails
 
-  @max_number_of_processes 10
+  @max_number_of_processes 9
 
   @no_classes_id 100
   @needs_setup_id 200
