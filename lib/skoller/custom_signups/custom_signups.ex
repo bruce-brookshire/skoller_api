@@ -95,12 +95,11 @@ defmodule Skoller.CustomSignups do
       |> Repo.one()
   end
   
-  def organization_for_student_id(student_id) do
+  def link_for_student_id(student_id) do
     from(s in Signup)
       |> join(:inner, [s], l in Link, on: s.custom_signup_link_id == l.id)
-      |> join(:inner, [s, l], o in Organization, on: l.id == o.custom_signup_link_id)
-      |> where([s, l, o], s.student_id == ^student_id)
-      |> select([s, l, o], o)
+      |> where([s, l], s.student_id == ^student_id)
+      |> select([s, l], l)
       |> Repo.one()
   end
 

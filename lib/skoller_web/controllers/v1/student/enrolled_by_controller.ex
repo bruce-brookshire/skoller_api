@@ -4,13 +4,13 @@ defmodule SkollerWeb.Api.V1.Student.EnrolledByController do
   use SkollerWeb, :controller
 
   alias Skoller.CustomSignups
-  alias Skoller.Organizations.Organization
-  alias SkollerWeb.OrganizationView
+  alias Skoller.CustomSignups.Link
+  alias SkollerWeb.LinkView
 
   def signup_organization(conn, %{"student_id" => student_id} = params) do
     #TODO make sure we are checking that a student can only get their own org
-    case student_id |> CustomSignups.organization_for_student_id() do
-      %Organization{} = org -> conn |> render(OrganizationView, "organization-base.json", organization: org)
+    case student_id |> CustomSignups.link_for_student_id() do
+      %Link{} = link -> conn |> render(LinkView, "link_base.json", link: link)
       _ -> conn |> send_resp(404, "signup organization not found")
     end
   end
