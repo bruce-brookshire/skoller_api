@@ -44,8 +44,6 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   def show(conn, %{"student_id" => student_id, "class_id" => class_id}) do
     student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
-    IO.inspect student_class
-
     student_class = student_class
     |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
     |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
