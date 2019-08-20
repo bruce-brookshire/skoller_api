@@ -21,10 +21,9 @@ defmodule Skoller.Students.StudentAnalytics do
     defp aggregate_individual_metrics(user_id) do
         from(u in User)
             |> join(:inner, [u], s in Student, on: u.student_id == s.id)
-            |> join(:left, [u, s], o in Organization, on: s.primary_organization_id == o.id)
-            |> join(:left, [u, s, o], sc in School, on: s.primary_school_id == sc.id)
-            |> where([u, s, o, sc], u.id == ^user_id)
-            |> select([u, s, o, sc], [
+            |> join(:left, [u, s], sc in School, on: s.primary_school_id == sc.id)
+            |> where([u, s, sc], u.id == ^user_id)
+            |> select([u, s, sc], [
                 fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.inserted_at),
                 s.name_first,
                 s.name_last, 
@@ -35,11 +34,11 @@ defmodule Skoller.Students.StudentAnalytics do
                 sc.adr_locality,
                 sc.adr_region,
                 s.grad_year,
+                fragment("(SELECT SUM(p.value) FROM student_points p WHERE p.student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes sc WHERE sc.student_id = ? AND sc.is_dropped = false)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND sc.is_dropped = false AND c.class_status_id = 1400)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes WHERE student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_classes sc JOIN classes c ON sc.class_id = c.id WHERE sc.student_id = ? AND c.class_status_id = 1400)", s.id),
-                o.name,
                 fragment("(SELECT csl.name FROM custom_signups cs JOIN custom_signup_links csl ON cs.custom_signup_link_id = csl.id WHERE cs.student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.is_dropped = false AND sc.student_id = ?)", s.id),
                 fragment("(SELECT COUNT(*) FROM student_assignments sa JOIN student_classes sc ON sa.student_class_id = sc.id WHERE sc.student_id = ? AND sc.is_dropped = true)", s.id),

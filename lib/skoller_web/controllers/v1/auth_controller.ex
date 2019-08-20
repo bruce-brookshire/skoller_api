@@ -81,7 +81,6 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
-    IO.inspect(conn.assigns[:user])
     render(conn, AuthView, "show.json", auth: conn.assigns[:user])
   end
 

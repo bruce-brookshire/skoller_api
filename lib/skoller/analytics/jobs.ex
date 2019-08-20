@@ -117,12 +117,12 @@ defmodule Skoller.Analytics.Jobs do
             "School City," <>
             "School State," <>
             "Graduation Year," <> 
+            "Student Points," <>
             "Current Classes," <>
             "Current Classes Set Up," <>
             "Total Classes," <>
             "Total Classes Set Up," <>
             "Sign Up Referral," <>
-            "Associated Referral," <>
             "Active Assignments," <>
             "Inactive Assignments," <>
             "Grades Entered," <>
