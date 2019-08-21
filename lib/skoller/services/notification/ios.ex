@@ -39,9 +39,6 @@ defmodule Skoller.Services.Notification.Ios do
   end
 
   def handle_result(response) do
-    IO.puts("IOS PUSH RESPONSE")
-    IO.inspect(response)
-
     case response do
       %{response: :success} ->
         nil
