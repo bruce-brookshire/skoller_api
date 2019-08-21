@@ -55,7 +55,7 @@ defmodule Skoller.Mixfile do
       {:comeonin, "~> 4.0"},
       {:bcrypt_elixir, "~> 1.0"},
       {:cors_plug, "~> 1.2"},
-      {:pigeon, "~> 1.3"},
+      {:pigeon, "~> 1.3.2"},
       {:kadabra, "~> 0.4.4"},
       {:ex_twilio, "~> 0.7.0"},
       {:csv, "~> 2.0.0"},
