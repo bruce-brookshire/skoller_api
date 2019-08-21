@@ -26,9 +26,7 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_custom(custom)
     |> put_category(category)
     |> put_sound("default")
-    |> APNS.push()
-    |> IO.inspect()
-    # |> APNS.push(on_response: &handle_result/1)
+    |> APNS.push(on_response: &handle_result/1)
   end
 
   def create_notification(device, msg, category, custom) do
@@ -37,8 +35,7 @@ defmodule Skoller.Services.Notification.Ios do
     |> put_category(category)
     |> put_sound("default")
     |> put_custom(custom)
-    |> APNS.push()
-    |> IO.inspect()
+    |> APNS.push(on_response: &handle_result/1)
   end
 
   def handle_result(response) do
