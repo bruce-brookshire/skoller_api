@@ -53,16 +53,12 @@ defmodule Skoller.Syllabi do
   # Using same logic as above, gets number of all classes that are workable
   def syllabi_class_count() do
     # count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
-    total_count =
-      from(class in Class)
-      |> where([c], c.class_status_id == @syllabus_submitted_status)
-      |> select([c], count(c.id))
-      |> Repo.one()
 
-    worker_count =
-      from(lock in Lock) |> distinct([l], l.class_id) |> select([l], count(l.id)) |> Repo.one()
-
-    total_count - worker_count
+    from(class in Class)
+    |> join(:left, [c], l in Lock, on: c.id == l.class_id)
+    |> where([c, l], c.class_status_id == @syllabus_submitted_status and is_nil(l.id))
+    |> select([c, l], count(c.id))
+    |> Repo.one()
   end
 
   @doc """
