@@ -61,7 +61,7 @@ defmodule Skoller.Syllabi do
     from(class in Class)
     |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
     |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
-    |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == l.class_id)
+    |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == sc.class_id)
     |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id)) # Where the class is ready for review and does not have a lock
     |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id) # Ensure that the class period isnt over yet
     |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id))) # Remove any double counting, and get the total
