@@ -6,6 +6,7 @@ defmodule Skoller.Syllabi do
   alias Skoller.Repo
   alias Skoller.Classes
   alias Skoller.Classes.Class
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Locks.Lock
   alias Skoller.ClassDocs.Doc
@@ -24,6 +25,7 @@ defmodule Skoller.Syllabi do
   @syllabus_processing_setting "is_auto_syllabus"
 
   @syllabus_submitted_status 1200
+  @class_period_past_status_id 100
 
   @doc """
   Serves a class to a syllabus worker.
@@ -54,10 +56,15 @@ defmodule Skoller.Syllabi do
   def syllabi_class_count() do
     # count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
 
+    now = DateTime.utc_now()
+
     from(class in Class)
-    |> join(:left, [c], l in Lock, on: c.id == l.class_id)
-    |> where([c, l], c.class_status_id == @syllabus_submitted_status and is_nil(l.id))
-    |> select([c, l], count(c.id))
+    |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
+    |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == l.class_id)
+    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id)) # Where the class is ready for review and does not have a lock
+    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id) # Ensure that the class period isnt over yet
+    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id))) # Remove any double counting, and get the total
     |> Repo.one()
   end
 
