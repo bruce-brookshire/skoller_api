@@ -69,7 +69,8 @@ defmodule SkollerWeb.Api.V1.AuthController do
             |> send_resp(422, "Failed to update student")
         end
 
-      _ ->
+      value ->
+        IO.inspect value
         conn |> send_resp(404, "User not found")
     end
   end
