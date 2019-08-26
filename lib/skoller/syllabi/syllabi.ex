@@ -54,10 +54,6 @@ defmodule Skoller.Syllabi do
 
   # Using same logic as above, gets number of all classes that are workable
   def syllabi_class_count() do
-    # count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
-
-    now = DateTime.utc_now()
-
     from(class in Class)
     |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
     |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
