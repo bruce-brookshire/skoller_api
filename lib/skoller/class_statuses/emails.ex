@@ -18,5 +18,6 @@ defmodule Skoller.ClassStatuses.Emails do
 
   defp build_need_syllabus_email(user, class) do
     TriggeredEmail.send_email(user.email, @syllabus_subj, :needs_syllabus, [class_name: class.name])
+    # web_home_path
   end
 end

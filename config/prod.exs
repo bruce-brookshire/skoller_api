@@ -89,7 +89,3 @@ config :pigeon, :apns,
     mode: :prod,
     use_2197: true
   }
-
-# This is for emails
-config :skoller, Skoller.Services.Mailer,
-  adapter: Bamboo.SesAdapter

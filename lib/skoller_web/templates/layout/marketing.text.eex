@@ -1,6 +1,0 @@
-
-<%= render @view_module, @view_template, assigns %>
-
-
-
-<%= render SkollerWeb.MarketingView, "footer.text", unsub_path: @unsub_path %>

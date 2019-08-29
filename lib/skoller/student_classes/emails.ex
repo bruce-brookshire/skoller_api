@@ -57,7 +57,9 @@ defmodule Skoller.StudentClasses.Emails do
   """
   def queue_join_second_class_emails(user_info) do
     user_info
-    |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @join_second_class_id))
+    |> Enum.filter(
+      &EmailPreferences.check_email_subscription_status(&1.user, @join_second_class_id)
+    )
     |> Enum.map(&queue_join_second_class_email(&1))
   end
 
@@ -69,17 +71,17 @@ defmodule Skoller.StudentClasses.Emails do
   end
 
   @doc """
-  Queues needs setup email for a user and class
+  Queues needs setup email for a user
   """
   def queue_needs_setup_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @needs_setup_id, user_info.class_name)
+    EmailJobs.create_email_job(user_info.user.id, @needs_setup_id)
   end
 
   @doc """
-  Queues grow community email for a user and class
+  Queues grow community email for a user 
   """
   def queue_grow_community_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @grow_community_id, user_info.class_name)
+    EmailJobs.create_email_job(user_info.user.id, @grow_community_id)
   end
 
   @doc """

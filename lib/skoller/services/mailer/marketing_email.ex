@@ -2,13 +2,8 @@ defmodule Skoller.Services.MarketingEmail do
   @moduledoc """
   A helper module for sending marketing emails
   """
-  use Bamboo.Phoenix, view: SkollerWeb.MarketingView
-
-  alias Skoller.Services.Mailer
   alias Skoller.EmailLogs.EmailLog
   alias Skoller.Repo
-
-  import Bamboo.Email
 
   require Logger
 
@@ -16,12 +11,12 @@ defmodule Skoller.Services.MarketingEmail do
   @reply_to_email "support@skoller.co"
 
   def send_email(user_id, email_adr, subject, template, email_type_id) do
-    base_email(user_id)
-    |> to(email_adr)
-    |> subject(subject)
-    |> render(template)
-    |> put_header("Reply-To", @reply_to_email)
-    |> deliver_message(user_id, email_type_id)
+    # base_email(user_id)
+    # |> to(email_adr)
+    # |> subject(subject)
+    # |> render(template)
+    # |> put_header("Reply-To", @reply_to_email)
+    # |> deliver_message(user_id, email_type_id)
   end
 
   defp deliver_message(email, user_id, email_type_id) do
@@ -36,9 +31,9 @@ defmodule Skoller.Services.MarketingEmail do
   end
 
   defp base_email(user_id) do
-    new_email()
-    |> from({"Skoller", @from_email})
-    |> put_layout({SkollerWeb.LayoutView, :marketing})
-    |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
+    # new_email()
+    # |> from({"Skoller", @from_email})
+    # |> put_layout({SkollerWeb.LayoutView, :marketing})
+    # |> assign(:unsub_path, System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id)
   end
 end

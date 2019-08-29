@@ -1,8 +1,0 @@
-Copyright 2018 Skoller, Inc., All rights reserved.
-
-            Our mailing address is:
-            530 Church St. Suite 301
-            Nashville, TN 37219
-
-Want to change how you receive these emails?
-You can unsubscribe from this list here: <%= @unsub_path %>.

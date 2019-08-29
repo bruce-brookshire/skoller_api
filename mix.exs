@@ -50,6 +50,7 @@ defmodule Skoller.Mixfile do
       {:arc_ecto, "~> 0.11.1"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
+      {:ex_aws_ses, "~> 2.1.0"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
       {:comeonin, "~> 4.0"},
@@ -59,10 +60,8 @@ defmodule Skoller.Mixfile do
       {:kadabra, "~> 0.4.4"},
       {:ex_twilio, "~> 0.7.0"},
       {:csv, "~> 2.0.0"},
-      {:bamboo, "~> 1.0"},
       {:timex, "~> 3.1"},
       {:tzdata, "~> 0.5.21"},
-      {:bamboo_ses, "~> 0.1.0"},
       {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
       {:faker, "~> 0.11"}
     ]
