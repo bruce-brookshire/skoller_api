@@ -43,7 +43,8 @@ defmodule Skoller.Syllabi do
   def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] ->
-        class = get_oldest_syllabus() #TODO, is this needed? get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
+        # TODO, is this needed? get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
+        class = get_oldest_syllabus()
         class |> lock_class(user, lock_type)
         class
 
@@ -84,14 +85,15 @@ defmodule Skoller.Syllabi do
     from(class in Class)
     |> join(:inner, [c], d in Doc, on: d.class_id == c.id)
     |> join(:inner, [c, d], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> join(:left, [c, d, p], l in Lock, on: l.class_id == c.id)
     |> where(
-      [c, d, p],
+      [c, d, p, l],
       c.class_status_id == @syllabus_submitted_status and
-        p.class_period_status_id != @class_period_past_status_id
+        p.class_period_status_id != @class_period_past_status_id and is_nil(l.id)
     )
-    |> order_by([c, d, p], asc: d.inserted_at)
+    |> order_by([c, d, p, l], asc: d.inserted_at)
     |> limit(1)
-    |> select([c, d, p], c)
+    |> select([c, d, p, l], c)
     |> Repo.one()
   end
 
