@@ -43,7 +43,7 @@ defmodule Skoller.Syllabi do
   def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] ->
-        class = get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
+        class = get_oldest_syllabus() #TODO, is this needed? get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
         class |> lock_class(user, lock_type)
         class
 
@@ -58,9 +58,12 @@ defmodule Skoller.Syllabi do
     |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
     |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
     |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == sc.class_id)
-    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id)) # Where the class is ready for review and does not have a lock
-    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id) # Ensure that the class period isnt over yet
-    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id))) # Remove any double counting, and get the total
+    # Where the class is ready for review and does not have a lock
+    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id))
+    # Ensure that the class period isnt over yet
+    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id)
+    # Remove any double counting, and get the total
+    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id)))
     |> Repo.one()
   end
 
@@ -75,6 +78,21 @@ defmodule Skoller.Syllabi do
     from(class in Class)
     |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
     |> join(:inner, [class, period], sch in subquery(subq), on: sch.id == period.school_id)
+  end
+
+  defp get_oldest_syllabus() do
+    from(class in Class)
+    |> join(:inner, [c], d in Doc, on: d.class_id == c.id)
+    |> join(:inner, [c, d], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> where(
+      [c, d, p],
+      c.class_status_id == @syllabus_submitted_status and
+        p.class_period_status_id != @class_period_past_status_id
+    )
+    |> order_by([c, d, p], asc: d.inserted_at)
+    |> limit(1)
+    |> select([c, d, p], c)
+    |> Repo.one()
   end
 
   # This function takes in the current admin setting as the parameter.
