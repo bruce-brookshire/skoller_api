@@ -8,7 +8,6 @@ defmodule Skoller.StudentClasses.Emails do
   alias Skoller.Organizations
   alias Skoller.EmailLogs.EmailLog
   alias Skoller.Users.EmailPreferences
-  alias Skoller.Services.ConversionEmail
   alias Skoller.Organizations.Organization
   alias Skoller.Services.Mailer.AwsEmailAdapter
 
@@ -152,6 +151,7 @@ defmodule Skoller.StudentClasses.Emails do
   # Needs setup
   #############
 
+  # TODO refactor to enable class_name
   defp template(%Organization{name: @asa_name}, @needs_setup_id),
     do: %{
       org_philanthropy_name: @asa_foundation,
@@ -159,9 +159,10 @@ defmodule Skoller.StudentClasses.Emails do
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/asa_needs_setup.png",
-      class_name: class_name
+      class_name: "class_name"
     }
 
+  # TODO refactor to enable class_name
   defp template(%Organization{name: @aopi_name}, @needs_setup_id),
     do: %{
       org_philanthropy_name: @aopi_foundation,
@@ -169,7 +170,7 @@ defmodule Skoller.StudentClasses.Emails do
       org_name: @aopi_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/setup_class_aopi.png",
-      class_name: class_name
+      class_name: "class_name"
     }
 
   # TODO refactor to enable class_name
@@ -178,6 +179,7 @@ defmodule Skoller.StudentClasses.Emails do
   # Grow community
   ################
 
+  # TODO refactor to enable class_name
   defp template(%Organization{name: @asa_name}, @grow_community_id),
     do: %{
       org_philanthropy_name: @asa_foundation,
@@ -185,9 +187,10 @@ defmodule Skoller.StudentClasses.Emails do
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png",
-      class_name: class_name
+      class_name: "class_name"
     }
 
+  # TODO refactor to enable class_name
   defp template(%Organization{name: @aopi_name}, @grow_community_id),
     do: %{
       org_philanthropy_name: @aopi_foundation,
@@ -195,7 +198,7 @@ defmodule Skoller.StudentClasses.Emails do
       org_name: @aopi_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png",
-      class_name: class_name
+      class_name: "class_name"
     }
 
   # TODO refactor to enable class_name
@@ -227,19 +230,19 @@ defmodule Skoller.StudentClasses.Emails do
   ##################
 
   # No classes
-  defp template_name(@no_classes_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@no_classes_id, %{form: %{org_name: _}}), do: :org_needs_classes
   defp template_name(@no_classes_id, _), do: :needs_classes
 
   # Needs setup
-  defp template_name(@needs_setup_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@needs_setup_id, %{form: %{org_name: _}}), do: :org_needs_classes
   defp template_name(@needs_setup_id, _), do: :needs_classes
 
   # Grow community
-  defp template_name(@grow_community_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@grow_community_id, %{form: %{org_name: _}}), do: :org_needs_classes
   defp template_name(@grow_community_id, _), do: :needs_classes
 
   # Join second class
-  defp template_name(@join_second_class_id, %{form: %{org_name: org_name}}),
+  defp template_name(@join_second_class_id, %{form: %{org_name: _}}),
     do: :org_needs_classes
 
   defp template_name(@join_second_class_id, _), do: :needs_classes
