@@ -101,7 +101,7 @@ defmodule Skoller.StudentClasses.Emails do
     emails
     |> Enum.map(&load_template_data(email_job_id, &1.user))
     |> Enum.each(
-      &AwsEmailAdapter.send_batch_email(
+      &SesMailer.send_batch_email(
         &1,
         template_name(email_job_id, &1)
       )
@@ -230,22 +230,22 @@ defmodule Skoller.StudentClasses.Emails do
   ##################
 
   # No classes
-  defp template_name(@no_classes_id, %{form: %{org_name: _}}), do: :org_needs_classes
+  defp template_name(@no_classes_id, %{form: %{org_name: _}}), do: "org_needs_classes"
   defp template_name(@no_classes_id, _), do: :needs_classes
 
   # Needs setup
-  defp template_name(@needs_setup_id, %{form: %{org_name: _}}), do: :org_needs_classes
-  defp template_name(@needs_setup_id, _), do: :needs_classes
+  defp template_name(@needs_setup_id, %{form: %{org_name: _}}), do: "org_needs_setup"
+  defp template_name(@needs_setup_id, _), do: "needs_setup"
 
   # Grow community
-  defp template_name(@grow_community_id, %{form: %{org_name: _}}), do: :org_needs_classes
-  defp template_name(@grow_community_id, _), do: :needs_classes
+  defp template_name(@grow_community_id, %{form: %{org_name: _}}), do: "org_unlock_community"
+  defp template_name(@grow_community_id, _), do: "unlock_community"
 
   # Join second class
   defp template_name(@join_second_class_id, %{form: %{org_name: _}}),
-    do: :org_needs_classes
+    do: "needs_classes"
 
-  defp template_name(@join_second_class_id, _), do: :needs_classes
+  defp template_name(@join_second_class_id, _), do: "needs_classes"
 
   # Email sent logger
   def log_email_sent(status_id, user_id) do

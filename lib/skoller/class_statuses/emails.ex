@@ -4,9 +4,7 @@ defmodule Skoller.ClassStatuses.Emails do
   """
 
   alias Skoller.StudentClasses.Users
-  alias Skoller.Services.TriggeredEmail
-
-  @syllabus_subj "Wrong Syllabus?"
+  alias Skoller.Services.SesMailer
 
   @doc """
   Sends an email to students when a class status is changed needs syllabus.
@@ -17,7 +15,15 @@ defmodule Skoller.ClassStatuses.Emails do
   end
 
   defp build_need_syllabus_email(user, class) do
-    TriggeredEmail.send_email(user.email, @syllabus_subj, :needs_syllabus, [class_name: class.name])
-    # web_home_path
+    SesMailer.send_individual_email(
+      %{
+        email: user.email,
+        form: %{
+          class_name: class.name,
+          web_home_path: System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id
+        }
+      },
+      "wrong_syllabus"
+    )
   end
 end

@@ -4,7 +4,7 @@ defmodule Skoller.StudentPoints.Emails do
   """
 
   alias Skoller.Users.EmailPreferences
-  alias Skoller.Services.MarketingEmail
+  alias Skoller.Services.Mailer.SesMailer
   alias Skoller.EmailLogs
   alias Skoller.Users.Students
   alias Skoller.EmailTypes
@@ -23,38 +23,51 @@ defmodule Skoller.StudentPoints.Emails do
     |> send_notification()
   end
 
-  defp send_notification({:ok, %{user: user, email_type: %{is_active_notification: true} = email_type}}) do
+  defp send_notification(
+         {:ok, %{user: user, email_type: %{is_active_notification: true} = email_type}}
+       ) do
     Notifications.send_one_thousand_points_notification(user, email_type)
   end
+
   defp send_notification(params), do: params
 
   defp check_email_count({:ok, map}, student_id) do
     user = Students.get_user_by_student_id(student_id)
-    email_count = EmailLogs.get_sent_emails_by_user_and_type(user.id, @one_thousand_points_id) |> Enum.count()
+
+    email_count =
+      EmailLogs.get_sent_emails_by_user_and_type(user.id, @one_thousand_points_id) |> Enum.count()
+
     case email_count == 0 do
-      true -> 
+      true ->
         map = map |> Map.put(:user, user)
         {:ok, map}
+
       false ->
         {:error, :email_count}
     end
   end
+
   defp check_email_count(params, _student_id), do: params
 
-  defp check_email_type(%{is_active_email: true} = email_type), do: {:ok, %{email_type: email_type}}
+  defp check_email_type(%{is_active_email: true} = email_type),
+    do: {:ok, %{email_type: email_type}}
+
   defp check_email_type(_email_type), do: {:error, :email_type_disabled}
 
   defp send_email({:ok, %{user: user} = map}) do
     if EmailPreferences.check_email_subscription_status(user, @one_thousand_points_id) do
       send_no_classes_email(user)
     end
+
     {:ok, map}
   end
+
   defp send_email(params), do: params
 
   defp send_no_classes_email(user) do
     user_id = user.id |> to_string
     subject = "Sign up for your classes so you can party harder!  🍻"
-    MarketingEmail.send_email(user_id, user.email, subject, :one_thousand_points, @one_thousand_points_id)
+
+    SesMailer.send_individual_email(%{to: user.email, form: %{}}, "one_thousand_points")
   end
 end

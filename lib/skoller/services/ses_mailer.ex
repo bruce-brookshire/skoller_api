@@ -1,4 +1,4 @@
-defmodule Skoller.Services.Mailer.AwsEmailAdapter do
+defmodule Skoller.Services.SesMailer do
   import ExAws.SES
 
   @sending_env System.get_env("MIX_ENV")
