@@ -14,17 +14,17 @@ defmodule Skoller.EmailJobs.Jobs do
   def run_manager do
     next_jobs =
       [
-        %{id: @no_classes_id, function: :send_no_classes_email},
-        %{id: @needs_setup_id, function: :send_needs_setup_email},
-        %{id: @grow_community_id, function: :send_grow_community_email},
-        %{id: @join_second_class_id, function: :send_join_second_class_email}
+        %{id: @no_classes_id},
+        %{id: @needs_setup_id},
+        %{id: @grow_community_id},
+        %{id: @join_second_class_id}
       ]
       |> Enum.each(fn %{id: id} = job ->
         emails = EmailJobs.get_next_jobs(id, @aws_batch_max_recipients)
 
         job = Map.put(job, :emails, emails)
 
-        spawn(Skoller.EmailJobs.Jobs, :start_email_job, job)
+        spawn(Skoller.EmailJobs.Jobs, :start_email_job, [job])
       end)
   end
 
@@ -41,8 +41,8 @@ defmodule Skoller.EmailJobs.Jobs do
     job
   end
 
-  defp send_email(%{function: function, emails: emails} = job) do
-    apply(Emails, function, emails)
+  defp send_email(%{id: id, emails: emails} = job) do
+    apply(Emails, :send_emails, [id, emails])
 
     job
   end

@@ -33,7 +33,8 @@ defmodule Skoller.EmailJobs do
     query = from e in EmailJob,
             where: e.is_running == false and e.email_type_id == ^email_type_id,
             order_by: [asc: e.updated_at],
-            limit: ^limit
+            limit: ^limit,
+            preload: [:user]
 
     query |> Repo.all()
   end
@@ -62,5 +63,4 @@ defmodule Skoller.EmailJobs do
     email_job = Repo.get!(EmailJob, id)
     Repo.delete!(email_job)
   end
-
 end

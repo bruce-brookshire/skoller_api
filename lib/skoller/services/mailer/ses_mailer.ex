@@ -1,6 +1,5 @@
 defmodule Skoller.Services.Mailer.AwsEmailAdapter do
   import ExAws.SES
-  alias Skoller.EmailJobs.EmailJob
 
   @sending_env System.get_env("MIX_ENV")
 
@@ -27,11 +26,11 @@ defmodule Skoller.Services.Mailer.AwsEmailAdapter do
   end
 
   @spec send(ExAws.Operation.Query.t()) :: :ok
-  defp send(email)
-       when @sending_env == "prod",
-       do: email |> ExAws.request()
-
-  defp send(_)
+  defp send(email) do
+    if @sending_env == :prod do
+      email |> ExAws.request()
+    end
+  end
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
     do: %{destination: %{to: email_address}, replacement_template_data: replacement_data}

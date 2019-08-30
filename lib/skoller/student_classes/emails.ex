@@ -10,6 +10,7 @@ defmodule Skoller.StudentClasses.Emails do
   alias Skoller.Users.EmailPreferences
   alias Skoller.Services.ConversionEmail
   alias Skoller.Organizations.Organization
+  alias Skoller.Services.Mailer.AwsEmailAdapter
 
   @no_classes_id 100
   @needs_setup_id 200
@@ -24,6 +25,8 @@ defmodule Skoller.StudentClasses.Emails do
 
   @aopi_name "AOII"
   @asa_name "ASA"
+
+  @env_url System.get_env("WEB_URL")
 
   @doc """
   Queues the no classes email to the list of `users`
@@ -91,168 +94,163 @@ defmodule Skoller.StudentClasses.Emails do
     EmailJobs.create_email_job(user_info.user.id, @grow_community_id)
   end
 
-  # No classes email sender
-  def send_no_classes_email(user) do
-    @no_classes_id |> log_email_sent(user.id)
+  ################
+  # Email sender #
+  ################
 
-    Organizations.get_student_associated_organization(user.student_id)
-    |> send_no_classes_email("Don't waste time on that paper planner...", user)
-  end
-
-  def send_no_classes_email(%Organization{name: @aopi_name} = _org, _subject, user) do
-    params = [
-      org_philanthropy_name: @aopi_foundation,
-      org_plus_skoller: @aopi_plus_skoller,
-      org_name: @aopi_name,
-      header_img_url:
-        "https://classnav-email-images.s3.amazonaws.com/join_classes/aoii_needs_classes.png"
-    ]
-
-    ConversionEmail.send_email(
-      user.email,
-      "The " <> @aopi_foundation <> " is waiting on you...",
-      :org_need_classes,
-      user.id,
-      params
+  def send_emails(email_job_id, emails) do
+    emails
+    |> Enum.map(&load_template_data(email_job_id, &1.user))
+    |> Enum.each(
+      &AwsEmailAdapter.send_batch_email(
+        &1,
+        template_name(email_job_id, &1)
+      )
     )
   end
 
-  def send_no_classes_email(%Organization{name: @asa_name} = _org, _subject, user) do
-    params = [
+  ###################
+  # Template loader #
+  ###################
+
+  defp load_template_data(email_job_id, user) do
+    email_job_id |> log_email_sent(user.id)
+
+    template_data =
+      Organizations.get_student_associated_organization(user.student_id)
+      |> template(email_job_id)
+      |> Map.put(:unsub_path, unsub_url(user.id))
+
+    %{to: user.email, form: template_data}
+  end
+
+  ####################
+  # Template builder #
+  ####################
+
+  # No classes
+  ############
+
+  defp template(%Organization{name: @asa_name}, @no_classes_id),
+    do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/join_classes/asa_join_classes.png"
-    ]
+    }
 
-    ConversionEmail.send_email(
-      user.email,
-      "The " <> @asa_foundation <> " is waiting on you...",
-      :org_need_classes,
-      user.id,
-      params
-    )
-  end
-
-  def send_no_classes_email(_, subject, user) do
-    ConversionEmail.send_email(user.email, subject, :need_classes, user.id)
-  end
-
-  # Class needs setup email sender
-  def send_needs_setup_email(user, class_name) do
-    @needs_setup_id |> log_email_sent(user.id)
-
-    Organizations.get_student_associated_organization(user.student_id)
-    |> send_needs_setup_email("Kickstart an easier semester!", user, class_name)
-  end
-
-  def send_needs_setup_email(%Organization{name: @aopi_name} = _org, subject, user, class_name) do
-    params = [
+  defp template(%Organization{name: @aopi_name}, @no_classes_id),
+    do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
       org_name: @aopi_name,
       header_img_url:
-        "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/setup_class_aopi.png",
-      class_name: class_name
-    ]
+        "https://classnav-email-images.s3.amazonaws.com/join_classes/aoii_needs_classes.png"
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_needs_setup, user.id, params)
-  end
+  # Needs setup
+  #############
 
-  def send_needs_setup_email(%Organization{name: @asa_name} = _org, subject, user, class_name) do
-    params = [
+  defp template(%Organization{name: @asa_name}, @needs_setup_id),
+    do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/asa_needs_setup.png",
       class_name: class_name
-    ]
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_needs_setup, user.id, params)
-  end
-
-  def send_needs_setup_email(_, subject, user, class_name) do
-    ConversionEmail.send_email(user.email, subject, :needs_setup, user.id, class_name: class_name)
-  end
-
-  # Grow class community email sender
-  def send_grow_community_email(user, class_name) do
-    @grow_community_id |> log_email_sent(user.id)
-
-    Organizations.get_student_associated_organization(user.student_id)
-    |> send_grow_community_email("Whoa you're missing out...", user, class_name)
-  end
-
-  def send_grow_community_email(%Organization{name: @aopi_name} = _org, subject, user, class_name) do
-    params = [
+  defp template(%Organization{name: @aopi_name}, @needs_setup_id),
+    do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
       org_name: @aopi_name,
       header_img_url:
-        "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png",
+        "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/setup_class_aopi.png",
       class_name: class_name
-    ]
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_unlock_community, user.id, params)
-  end
+  # TODO refactor to enable class_name
+  defp template(_, @needs_setup_id), do: %{class_name: "class_name"}
 
-  def send_grow_community_email(%Organization{name: @asa_name} = _org, subject, user, class_name) do
-    params = [
+  # Grow community
+  ################
+
+  defp template(%Organization{name: @asa_name}, @grow_community_id),
+    do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png",
       class_name: class_name
-    ]
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_unlock_community, user.id, params)
-  end
-
-  def send_grow_community_email(_, subject, user, class_name) do
-    ConversionEmail.send_email(user.email, subject, :unlock_community, user.id,
-      class_name: class_name
-    )
-  end
-
-  # Join second class email sender
-  def send_join_second_class_email(user) do
-    @join_second_class_id |> log_email_sent(user.id)
-
-    Organizations.get_student_associated_organization(user.student_id)
-    |> send_join_second_class_email("Overwhelmed with assignments? We can help.", user)
-  end
-
-  def send_join_second_class_email(%Organization{name: @aopi_name} = _org, subject, user) do
-    params = [
+  defp template(%Organization{name: @aopi_name}, @grow_community_id),
+    do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
+      org_name: @aopi_name,
       header_img_url:
-        "https://classnav-email-images.s3.amazonaws.com/second_class/second_class_aopi.png"
-    ]
+        "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png",
+      class_name: class_name
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_second_class, user.id, params)
-  end
+  # TODO refactor to enable class_name
+  defp template(_, @grow_community_id), do: %{class_name: "class_name"}
 
-  def send_join_second_class_email(%Organization{name: @asa_name} = _org, subject, user) do
-    params = [
+  # Join second class
+  ###################
+
+  defp template(%Organization{name: @asa_name}, @join_second_class_id),
+    do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/second_class/asa_second_class.png"
-    ]
+    }
 
-    ConversionEmail.send_email(user.email, subject, :org_second_class, user.id, params)
-  end
+  defp template(%Organization{name: @aopi_name}, @join_second_class_id),
+    do: %{
+      org_philanthropy_name: @aopi_foundation,
+      org_plus_skoller: @aopi_plus_skoller,
+      header_img_url:
+        "https://classnav-email-images.s3.amazonaws.com/second_class/second_class_aopi.png"
+    }
 
-  def send_join_second_class_email(_, subject, user) do
-    ConversionEmail.send_email(user.email, subject, :second_class, user.id)
-  end
+  defp template(_, _), do: %{}
+
+  ##################
+  # Template names #
+  ##################
+
+  # No classes
+  defp template_name(@no_classes_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@no_classes_id, _), do: :needs_classes
+
+  # Needs setup
+  defp template_name(@needs_setup_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@needs_setup_id, _), do: :needs_classes
+
+  # Grow community
+  defp template_name(@grow_community_id, %{form: %{org_name: org_name}}), do: :org_needs_classes
+  defp template_name(@grow_community_id, _), do: :needs_classes
+
+  # Join second class
+  defp template_name(@join_second_class_id, %{form: %{org_name: org_name}}),
+    do: :org_needs_classes
+
+  defp template_name(@join_second_class_id, _), do: :needs_classes
 
   # Email sent logger
   def log_email_sent(status_id, user_id) do
     Repo.insert(%EmailLog{user_id: user_id, email_type_id: status_id})
+  end
+
+  # Create unsub path
+  defp unsub_url(user_id) do
+    @env_url <> "/unsubscribe/" <> user_id
   end
 end
