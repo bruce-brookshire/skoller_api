@@ -20,7 +20,7 @@ defmodule Skoller.ClassStatuses.Emails do
         email: user.email,
         form: %{
           class_name: class.name,
-          web_home_path: System.get_env("WEB_URL") <> "/unsubscribe/" <> user_id
+          web_home_path: System.get_env("WEB_URL") <> "/unsubscribe/" <> user.id
         }
       },
       "wrong_syllabus"

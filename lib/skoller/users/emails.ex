@@ -5,12 +5,8 @@ defmodule Skoller.Users.Emails do
 
   alias Skoller.Services.SesMailer
 
-  @forgot_subject "Forgot Password"
-  @reset_password_route "/reset_password"
-
   def send_forgot_pass_email(user, token) do
-    reset_path =
-      to_string(System.get_env("WEB_URL")) <> @reset_password_route <> "?token=" <> token
+    reset_path = to_string(System.get_env("WEB_URL")) <> "/reset_password?token=" <> token
 
     SesMailer.send_individual_email(
       %{to: user.email, form: %{reset_path: reset_path}},

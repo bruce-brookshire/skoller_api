@@ -9,7 +9,7 @@ defmodule Skoller.StudentClasses.Emails do
   alias Skoller.EmailLogs.EmailLog
   alias Skoller.Users.EmailPreferences
   alias Skoller.Organizations.Organization
-  alias Skoller.Services.Mailer.AwsEmailAdapter
+  alias Skoller.Services.SesMailer
 
   @no_classes_id 100
   @needs_setup_id 200
@@ -99,7 +99,7 @@ defmodule Skoller.StudentClasses.Emails do
 
   def send_emails(email_job_id, emails) do
     emails
-    |> Enum.map(&load_template_data(email_job_id, &1.user))
+    |> Enum.map(&load_template_data(email_job_id, &1.user, &1.options))
     |> Enum.each(
       &SesMailer.send_batch_email(
         &1,
@@ -112,12 +112,12 @@ defmodule Skoller.StudentClasses.Emails do
   # Template loader #
   ###################
 
-  defp load_template_data(email_job_id, user) do
+  defp load_template_data(email_job_id, user, opts) do
     email_job_id |> log_email_sent(user.id)
 
     template_data =
       Organizations.get_student_associated_organization(user.student_id)
-      |> template(email_job_id)
+      |> template(email_job_id, opts)
       |> Map.put(:unsub_path, unsub_url(user.id))
 
     %{to: user.email, form: template_data}
@@ -130,7 +130,7 @@ defmodule Skoller.StudentClasses.Emails do
   # No classes
   ############
 
-  defp template(%Organization{name: @asa_name}, @no_classes_id),
+  defp template(%Organization{name: @asa_name}, @no_classes_id, _opts),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -139,7 +139,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/join_classes/asa_join_classes.png"
     }
 
-  defp template(%Organization{name: @aopi_name}, @no_classes_id),
+  defp template(%Organization{name: @aopi_name}, @no_classes_id, _opts),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -151,63 +151,57 @@ defmodule Skoller.StudentClasses.Emails do
   # Needs setup
   #############
 
-  # TODO refactor to enable class_name
-  defp template(%Organization{name: @asa_name}, @needs_setup_id),
+  defp template(%Organization{name: @asa_name}, @needs_setup_id, opts),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/asa_needs_setup.png",
-      class_name: "class_name"
+      class_name: opts
     }
 
-  # TODO refactor to enable class_name
-  defp template(%Organization{name: @aopi_name}, @needs_setup_id),
+  defp template(%Organization{name: @aopi_name}, @needs_setup_id, opts),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
       org_name: @aopi_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/syllabus_needed/setup_class_aopi.png",
-      class_name: "class_name"
+      class_name: opts
     }
 
-  # TODO refactor to enable class_name
-  defp template(_, @needs_setup_id), do: %{class_name: "class_name"}
+  defp template(_, @needs_setup_id, opts), do: %{class_name: opts}
 
   # Grow community
   ################
 
-  # TODO refactor to enable class_name
-  defp template(%Organization{name: @asa_name}, @grow_community_id),
+  defp template(%Organization{name: @asa_name}, @grow_community_id, opts),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
       org_name: @asa_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png",
-      class_name: "class_name"
+      class_name: opts
     }
 
-  # TODO refactor to enable class_name
-  defp template(%Organization{name: @aopi_name}, @grow_community_id),
+  defp template(%Organization{name: @aopi_name}, @grow_community_id, opts),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
       org_name: @aopi_name,
       header_img_url:
         "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png",
-      class_name: "class_name"
+      class_name: opts
     }
 
-  # TODO refactor to enable class_name
-  defp template(_, @grow_community_id), do: %{class_name: "class_name"}
+  defp template(_, @grow_community_id, opts), do: %{class_name: opts}
 
   # Join second class
   ###################
 
-  defp template(%Organization{name: @asa_name}, @join_second_class_id),
+  defp template(%Organization{name: @asa_name}, @join_second_class_id, _opts),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -215,7 +209,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/second_class/asa_second_class.png"
     }
 
-  defp template(%Organization{name: @aopi_name}, @join_second_class_id),
+  defp template(%Organization{name: @aopi_name}, @join_second_class_id, _opts),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -223,7 +217,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/second_class/second_class_aopi.png"
     }
 
-  defp template(_, _), do: %{}
+  defp template(_, _, _), do: %{}
 
   ##################
   # Template names #

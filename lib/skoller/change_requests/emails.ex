@@ -5,8 +5,6 @@ defmodule Skoller.ChangeRequests.Emails do
 
   alias Skoller.Services.SesMailer
 
-  @change_approved " info change has been approved!"
-
   def send_request_completed_email(email, student, class) do
     SesMailer.send_individual_email(
       %{

@@ -4,7 +4,7 @@ defmodule Skoller.StudentPoints.Emails do
   """
 
   alias Skoller.Users.EmailPreferences
-  alias Skoller.Services.Mailer.SesMailer
+  alias Skoller.Services.SesMailer
   alias Skoller.EmailLogs
   alias Skoller.Users.Students
   alias Skoller.EmailTypes
@@ -66,7 +66,6 @@ defmodule Skoller.StudentPoints.Emails do
 
   defp send_no_classes_email(user) do
     user_id = user.id |> to_string
-    subject = "Sign up for your classes so you can party harder!  🍻"
 
     SesMailer.send_individual_email(%{to: user.email, form: %{}}, "one_thousand_points")
   end
