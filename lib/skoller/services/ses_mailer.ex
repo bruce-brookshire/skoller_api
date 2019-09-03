@@ -43,4 +43,10 @@ defmodule Skoller.Services.SesMailer do
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
     do: %{destination: %{to: email_address}, replacement_template_data: replacement_data}
+
+  def render_template_data(form) do
+    IO.inspect(form)
+
+    raise "oops"
+  end
 end
