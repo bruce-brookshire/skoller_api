@@ -7,8 +7,6 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send_batch_email(users :: list(user_template_data), template_name :: binary) :: atom
   def send_batch_email(users, template_name) do
-    IO.inspect(users)
-
     template_data = users |> Enum.map(&render_template_data/1)
 
     template_name
@@ -42,11 +40,5 @@ defmodule Skoller.Services.SesMailer do
   end
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
-    do: %{destination: %{to: email_address}, replacement_template_data: replacement_data}
-
-  defp render_template_data(form) do
-    IO.inspect(form)
-
-    raise "oops"
-  end
+    do: %{destination: %{to: [email_address]}, replacement_template_data: replacement_data}
 end
