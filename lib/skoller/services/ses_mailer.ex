@@ -35,7 +35,9 @@ defmodule Skoller.Services.SesMailer do
   @spec send(ExAws.Operation.Query.t()) :: :ok
   defp send(email) do
     if @sending_env == :prod do
-      email |> ExAws.request()
+      email
+      |> ExAws.request()
+      |> IO.inspect()
     end
   end
 
