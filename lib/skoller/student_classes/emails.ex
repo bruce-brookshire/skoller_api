@@ -248,7 +248,6 @@ defmodule Skoller.StudentClasses.Emails do
 
   # Create unsub path
   defp unsub_url(user_id) do
-    IO.inspect @env_url
-    @env_url <> "/unsubscribe/" <> user_id
+    @env_url <> "/unsubscribe/" <> (user_id |> to_string)
   end
 end
