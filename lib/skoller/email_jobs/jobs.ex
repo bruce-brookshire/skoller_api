@@ -28,10 +28,15 @@ defmodule Skoller.EmailJobs.Jobs do
   end
 
   def start_email_job(job) do
+    id = job[:id]
+    Logger.info "Starting email job #{id}"
+
     job
     |> mark_running()
     |> send_email()
     |> remove_on_complete()
+
+    Logger.info "Email job #{id} complete"
   end
 
   defp mark_running(%{emails: emails} = job) do
