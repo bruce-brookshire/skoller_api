@@ -98,13 +98,30 @@ defmodule Skoller.StudentClasses.Emails do
   ################
 
   def send_emails(email_job_id, emails) do
-    emails
-    |> Enum.map(&load_template_data(email_job_id, &1.user, &1.options))
-    |> Enum.each(
-      &SesMailer.send_batch_email(
-        &1,
-        template_name(email_job_id, &1)
-      )
+    template_info =
+      emails
+      |> Enum.map(&load_template_data(email_job_id, &1.user, &1.options))
+
+    # Separate org emails from non_org emails
+
+    template_id = template_name(email_job_id)
+
+    # First, org emails
+    org_template_data = template_info |> Enum.filter(& &1[:is_org]) |> Enum.map(& &1[:template_data])
+
+    # Now, non-org emails
+    non_org_template_data = template_info |> Enum.filter(&(!&1[:is_org]))
+    |> Enum.map(& &1[:template_data])
+
+    # Send both
+    SesMailer.send_batch_email(
+      org_template_data
+      "org_" <> template_id,
+    )
+
+    SesMailer.send_batch_email(
+      non_org_template_data,
+      template_id
     )
   end
 
@@ -115,12 +132,17 @@ defmodule Skoller.StudentClasses.Emails do
   defp load_template_data(email_job_id, user, opts) do
     email_job_id |> log_email_sent(user.id)
 
+    org = Organizations.get_student_associated_organization(user.student_id)
+
     template_data =
-      Organizations.get_student_associated_organization(user.student_id)
+      org
       |> template(email_job_id, opts)
       |> Map.put(:unsub_path, unsub_url(user.id))
 
-    %{to: user.email, form: template_data}
+    %{
+      is_org: org != nil,
+      template_data: %{to: user.email, form: template_data}
+    }
   end
 
   ####################
@@ -223,26 +245,13 @@ defmodule Skoller.StudentClasses.Emails do
   # Template names #
   ##################
 
-  # No classes
-  defp template_name(@no_classes_id, %{form: %{org_name: _}}), do: "org_needs_classes"
-  defp template_name(@no_classes_id, _), do: :needs_classes
-
-  # Needs setup
-  defp template_name(@needs_setup_id, %{form: %{org_name: _}}), do: "org_needs_setup"
-  defp template_name(@needs_setup_id, _), do: "needs_setup"
-
-  # Grow community
-  defp template_name(@grow_community_id, %{form: %{org_name: _}}), do: "org_unlock_community"
-  defp template_name(@grow_community_id, _), do: "unlock_community"
-
-  # Join second class
-  defp template_name(@join_second_class_id, %{form: %{org_name: _}}),
-    do: "needs_classes"
-
-  defp template_name(@join_second_class_id, _), do: "needs_classes"
+  defp template_name(@no_classes_id), do: "needs_classes"
+  defp template_name(@needs_setup_id), do: "needs_setup"
+  defp template_name(@grow_community_id), do: "unlock_community"
+  defp template_name(@join_second_class_id), do: "second_class"
 
   # Email sent logger
-  def log_email_sent(status_id, user_id) do
+  defp log_email_sent(status_id, user_id) do
     Repo.insert(%EmailLog{user_id: user_id, email_type_id: status_id})
   end
 
