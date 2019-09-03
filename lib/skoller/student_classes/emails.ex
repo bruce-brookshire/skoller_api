@@ -120,8 +120,6 @@ defmodule Skoller.StudentClasses.Emails do
       |> template(email_job_id, opts)
       |> Map.put(:unsub_path, unsub_url(user.id))
 
-    IO.inspect(%{to: user.email, form: template_data})
-
     %{to: user.email, form: template_data}
   end
 
