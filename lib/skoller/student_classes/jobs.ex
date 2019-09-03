@@ -28,9 +28,6 @@ defmodule Skoller.StudentClasses.Jobs do
   def send_no_classes_messages(datetime) do
     email_type = EmailTypes.get!(@no_classes_id)
 
-    IO.inspect datetime
-    IO.inspect email_type
-
     case check_sending_time(datetime, email_type) do
       :eq ->
         Logger.info("Sending no classes emails and notifications.")
@@ -44,8 +41,8 @@ defmodule Skoller.StudentClasses.Jobs do
           students |> Emails.queue_no_classes_emails()
         end
 
-      error ->
-        IO.inspect error
+      _ ->
+        nil
     end
   end
 
