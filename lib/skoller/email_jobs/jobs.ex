@@ -28,6 +28,8 @@ defmodule Skoller.EmailJobs.Jobs do
   end
 
   def start_email_job(job) do
+    require Logger
+    
     id = job[:id]
     Logger.info "Starting email job #{id}"
 

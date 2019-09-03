@@ -15,14 +15,21 @@ defmodule Skoller.Services.SesMailer do
   end
 
   @spec send_individual_email(user :: user_template_data, template_name :: binary) :: atom
-  def send_individual_email(%{to: email_address, form: replacement_data}, template_name) do
-    %{to: email_address}
-    |> send_templated_email(
-      "support@skoller.co",
-      template_name,
-      replacement_data |> Poison.encode()
-    )
-    |> send
+  def send_individual_email(%{to: email_address, form: template_data}, template_name) do
+    case Poison.encode(template_data) do
+      {:ok, template_string} ->
+        %{to: email_address}
+        |> send_templated_email(
+          "support@skoller.co",
+          template_name,
+          template_string
+        )
+        |> send
+
+      error ->
+        require Logger
+        Logger.error(error)
+    end
   end
 
   @spec send(ExAws.Operation.Query.t()) :: :ok
