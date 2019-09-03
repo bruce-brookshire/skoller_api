@@ -9,6 +9,8 @@ defmodule Skoller.Services.SesMailer do
   def send_batch_email(users, template_name) do
     template_data = users |> Enum.map(&render_template_data/1)
 
+    IO.inspect template_data
+    
     template_name
     |> send_bulk_templated_email("support@skoller.co", template_data)
     |> send
@@ -16,22 +18,13 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send_individual_email(user :: user_template_data, template_name :: binary) :: atom
   def send_individual_email(%{to: email_address, form: template_data}, template_name) do
-    IO.inspect(template_data)
-
-    case Poison.encode(template_data) do
-      {:ok, template_string} ->
-        %{to: [email_address]}
-        |> send_templated_email(
-          "support@skoller.co",
-          template_name,
-          template_data
-        )
-        |> send
-
-      error ->
-        require Logger
-        Logger.error(error)
-    end
+    %{to: [email_address]}
+    |> send_templated_email(
+      "support@skoller.co",
+      template_name,
+      template_data
+    )
+    |> send
   end
 
   @spec send(ExAws.Operation.Query.t()) :: :ok
