@@ -16,6 +16,8 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send_individual_email(user :: user_template_data, template_name :: binary) :: atom
   def send_individual_email(%{to: email_address, form: template_data}, template_name) do
+    IO.inspect(template_data)
+
     case Poison.encode(template_data) do
       {:ok, template_string} ->
         %{to: [email_address]}
@@ -34,12 +36,11 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send(ExAws.Operation.Query.t()) :: :ok
   defp send(email) do
-    IO.inspect email
-    
+    IO.inspect(email)
+
     if @sending_env == "prod" do
       email
       |> ExAws.request()
-      |> IO.inspect
     end
   end
 
