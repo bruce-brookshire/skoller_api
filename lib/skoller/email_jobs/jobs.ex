@@ -18,27 +18,29 @@ defmodule Skoller.EmailJobs.Jobs do
       %{id: @grow_community_id},
       %{id: @join_second_class_id}
     ]
-    |> Enum.each(fn %{id: id} = job ->
+    |> Enum.map(fn %{id: id} = job ->
       emails = EmailJobs.get_next_jobs(id, @aws_batch_max_recipients)
 
       job = Map.put(job, :emails, emails)
-
-      spawn(Skoller.EmailJobs.Jobs, :start_email_job, [job])
     end)
+    |> Enum.filter(fn job ->
+      job[:emails] |> Enum.count() > 0
+    end)
+    |> Enum.each(&spawn(Skoller.EmailJobs.Jobs, :start_email_job, [&1]))
   end
 
   def start_email_job(job) do
     require Logger
-    
+
     id = job[:id]
-    Logger.info "Starting email job #{id}"
+    Logger.info("Starting email job #{id}")
 
     job
     |> mark_running()
     |> send_email()
     |> remove_on_complete()
 
-    Logger.info "Email job #{id} complete"
+    Logger.info("Email job #{id} complete")
   end
 
   defp mark_running(%{emails: emails} = job) do
