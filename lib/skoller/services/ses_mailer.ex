@@ -24,7 +24,7 @@ defmodule Skoller.Services.SesMailer do
         |> send_templated_email(
           "support@skoller.co",
           template_name,
-          template_string
+          template_data
         )
         |> send
 
