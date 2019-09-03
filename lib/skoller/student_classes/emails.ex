@@ -115,8 +115,8 @@ defmodule Skoller.StudentClasses.Emails do
 
     # Send both
     SesMailer.send_batch_email(
-      org_template_data
-      "org_" <> template_id,
+      org_template_data,
+      "org_" <> template_id
     )
 
     SesMailer.send_batch_email(
