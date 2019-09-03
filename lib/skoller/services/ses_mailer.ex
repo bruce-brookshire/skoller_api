@@ -7,6 +7,8 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send_batch_email(users :: list(user_template_data), template_name :: binary) :: atom
   def send_batch_email(users, template_name) do
+    IO.inspect(users)
+
     template_data = users |> Enum.map(&render_template_data/1)
 
     template_name
