@@ -18,7 +18,7 @@ defmodule Skoller.Services.SesMailer do
   def send_individual_email(%{to: email_address, form: template_data}, template_name) do
     case Poison.encode(template_data) do
       {:ok, template_string} ->
-        %{to: email_address}
+        %{to: [email_address]}
         |> send_templated_email(
           "support@skoller.co",
           template_name,
@@ -37,7 +37,6 @@ defmodule Skoller.Services.SesMailer do
     if @sending_env == :prod do
       email
       |> ExAws.request()
-      |> IO.inspect()
     end
   end
 
