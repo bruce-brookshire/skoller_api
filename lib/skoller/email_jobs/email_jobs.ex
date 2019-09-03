@@ -22,20 +22,6 @@ defmodule Skoller.EmailJobs do
   end
 
   @doc """
-  Gets all the email jobs currently running
-
-  ## Returns
-  [Int] count.
-  """
-  def get_number_of_running_jobs() do
-    query = from e in EmailJob,
-            where: e.is_running == true,
-            select: count(e.id)
-
-    query |> Repo.one()
-  end
-
-  @doc """
   Gets the next jobs to run
 
   ## Params
@@ -43,12 +29,12 @@ defmodule Skoller.EmailJobs do
   ## Returns
   [Int] count.
   """
-  def get_next_jobs(limit) do
+  def get_next_jobs(email_type_id, limit) do
     query = from e in EmailJob,
-            where: e.is_running == false,
+            where: e.is_running == false and e.email_type_id == ^email_type_id,
             order_by: [asc: e.updated_at],
             limit: ^limit,
-            preload: [:user, :email_type]
+            preload: [:user]
 
     query |> Repo.all()
   end
@@ -77,5 +63,4 @@ defmodule Skoller.EmailJobs do
     email_job = Repo.get!(EmailJob, id)
     Repo.delete!(email_job)
   end
-
 end

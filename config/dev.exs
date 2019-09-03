@@ -43,8 +43,7 @@ config :skoller, Skoller.Repo,
   database: "skoller_dev",
   hostname: "localhost",
   pool_size: 10,
-  timeout: 200_000,
-  pool_timeout: 200_000
+  timeout: 200_000
 
 # Configure Guardian Token Generation
 config :skoller, Skoller.Auth,
