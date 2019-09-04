@@ -9,8 +9,6 @@ defmodule Skoller.Services.SesMailer do
   def send_batch_email(users, template_name) do
     template_data = users |> Enum.map(&render_template_data/1)
 
-    IO.inspect template_data
-    
     template_name
     |> send_bulk_templated_email("support@skoller.co", template_data)
     |> send
