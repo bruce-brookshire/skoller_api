@@ -19,10 +19,10 @@ defmodule Skoller.Services.SesMailer do
   def send_individual_email(%{to: email_address, form: template_data}, template_name) do
     %{to: [email_address]}
     |> send_templated_email(
-      "Skoller <support@skoller.co>",
+      ["Skoller <support@skoller.co>"],
       template_name,
       template_data,
-      reply_to: "noreply@skoller.co"
+      reply_to: ["noreply@skoller.co"]
     )
     |> send
   end
