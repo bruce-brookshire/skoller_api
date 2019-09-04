@@ -7,16 +7,18 @@ defmodule Skoller.Services.SesMailer do
   @type user_template_data :: %{to: binary, form: Map}
 
   @spec send_batch_email(users :: list(user_template_data), template_name :: binary) :: atom
+  def send_batch_email([], template_name), do: :ok
+
   def send_batch_email(users, template_name) do
     template_data = users |> Enum.map(&render_template_data/1)
 
-    IO.inspect users
+    IO.inspect(users)
 
     template_name
     |> send_bulk_templated_email("Skoller <support@skoller.co>", template_data,
       reply_to: ["noreply@skoller.co"]
     )
-    |> IO.inspect
+    |> IO.inspect()
     |> send
   end
 
@@ -34,7 +36,6 @@ defmodule Skoller.Services.SesMailer do
 
   @spec send(ExAws.Operation.Query.t()) :: :ok
   defp send(email) do
-
     if @sending_env == "prod" do
       email
       |> ExAws.request()
@@ -42,7 +43,7 @@ defmodule Skoller.Services.SesMailer do
     end
   end
 
-  defp process_response({:error, term}), do: IO.inspect term
+  defp process_response({:error, term}), do: IO.inspect(term)
   defp process_response(_), do: :ok
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
