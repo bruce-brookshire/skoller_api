@@ -6,8 +6,6 @@ defmodule Skoller.EmailManagerJob do
 
   alias Skoller.EmailJobs.Jobs, as: EmailJobs
 
-  @interval_min 1
-
 
   # This puts :jobs on the state for future calls.
   def start_link do
@@ -34,6 +32,6 @@ defmodule Skoller.EmailManagerJob do
 
   # This creates a :work event to be processed after get_time_diff/1 milliseconds.
   defp schedule_work() do
-    Process.send_after(self(), :work, 60 * 1000 * @interval_min)
+    Process.send_after(self(), :work, 30 * 1000)
   end
 end
