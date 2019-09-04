@@ -7,7 +7,7 @@ defmodule Skoller.Services.SesMailer do
   @type user_template_data :: %{to: binary, form: Map}
 
   @spec send_batch_email(users :: list(user_template_data), template_name :: binary) :: atom
-  def send_batch_email([], template_name), do: :ok
+  def send_batch_email([], _), do: :ok
 
   def send_batch_email(users, template_name) do
     template_data = users |> Enum.map(&render_template_data/1)
