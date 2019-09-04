@@ -107,11 +107,14 @@ defmodule Skoller.StudentClasses.Emails do
     template_id = template_name(email_job_id)
 
     # First, org emails
-    org_template_data = template_info |> Enum.filter(& &1[:is_org]) |> Enum.map(& &1[:template_data])
+    org_template_data =
+      template_info |> Enum.filter(& &1[:is_org]) |> Enum.map(& &1[:template_data])
 
     # Now, non-org emails
-    non_org_template_data = template_info |> Enum.filter(&(!&1[:is_org]))
-    |> Enum.map(& &1[:template_data])
+    non_org_template_data =
+      template_info
+      |> Enum.filter(&(!&1[:is_org]))
+      |> Enum.map(& &1[:template_data])
 
     # Send both
     SesMailer.send_batch_email(
@@ -151,6 +154,8 @@ defmodule Skoller.StudentClasses.Emails do
 
   # No classes
   ############
+
+  defp template(org, email_type_id, nil), do: template(org, email_type_id, "your class")
 
   defp template(%Organization{name: @asa_name}, @no_classes_id, _opts),
     do: %{

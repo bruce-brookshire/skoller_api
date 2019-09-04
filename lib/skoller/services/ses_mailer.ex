@@ -1,5 +1,6 @@
 defmodule Skoller.Services.SesMailer do
   import ExAws.SES
+  require Logger
 
   @sending_env System.get_env("MIX_ENV")
 
@@ -18,9 +19,10 @@ defmodule Skoller.Services.SesMailer do
   def send_individual_email(%{to: email_address, form: template_data}, template_name) do
     %{to: [email_address]}
     |> send_templated_email(
-      "support@skoller.co",
+      "Skoller <support@skoller.co>",
       template_name,
-      template_data
+      template_data,
+      reply_to: "noreply@skoller.co"
     )
     |> send
   end
@@ -32,8 +34,11 @@ defmodule Skoller.Services.SesMailer do
     if @sending_env == "prod" do
       email
       |> ExAws.request()
+      |> process_response
     end
   end
+
+  defp process_response({:error, term}), do: Logger.error(term)
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
     do: %{destination: %{to: [email_address]}, replacement_template_data: replacement_data}
