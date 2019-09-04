@@ -11,8 +11,9 @@ defmodule Skoller.Services.SesMailer do
     template_data = users |> Enum.map(&render_template_data/1)
 
     template_name
-    |> send_bulk_templated_email("Skoller <support@skoller.co>", template_data,
-      reply_to: ["noreply@skoller.co"]
+    |> send_bulk_templated_email("Skoller <support@skoller.co>", template_data
+    # TODO implement when pull request to ex_aws_ses is accepted  
+    # reply_to: ["noreply@skoller.co"]
     )
     |> send
   end
@@ -41,6 +42,7 @@ defmodule Skoller.Services.SesMailer do
   end
 
   defp process_response({:error, term}), do: Logger.error(term)
+  defp process_response(_), do: :ok
 
   defp render_template_data(%{to: email_address, form: replacement_data}),
     do: %{destination: %{to: [email_address]}, replacement_template_data: replacement_data}
