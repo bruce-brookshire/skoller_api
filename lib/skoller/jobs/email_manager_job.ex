@@ -26,10 +26,8 @@ defmodule Skoller.EmailManagerJob do
   def handle_info(:work, state) do
     # Do the work you desire here
     schedule_work() # Reschedule once more
-    require Logger
-    Logger.info("Running Email Job: " <> to_string(Time.utc_now))
-
-    EmailJobs.run_manager()
+    
+    EmailJobs.run_jobs()
 
     {:noreply, state}
   end

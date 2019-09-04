@@ -11,7 +11,7 @@ defmodule Skoller.EmailJobs.Jobs do
   @grow_community_id 500
   @join_second_class_id 600
 
-  def run_manager do
+  def run_jobs do
     [
       %{id: @no_classes_id},
       %{id: @needs_setup_id},
@@ -21,7 +21,7 @@ defmodule Skoller.EmailJobs.Jobs do
     |> Enum.map(fn %{id: id} = job ->
       emails = EmailJobs.get_next_jobs(id, @aws_batch_max_recipients)
 
-      job = Map.put(job, :emails, emails)
+      Map.put(job, :emails, emails)
     end)
     |> Enum.filter(fn job ->
       job[:emails] |> Enum.count() > 0
@@ -33,14 +33,14 @@ defmodule Skoller.EmailJobs.Jobs do
     require Logger
 
     id = job[:id]
-    Logger.info("Starting email job #{id}")
+    Logger.info("Starting: email job #{id}")
 
     job
     |> mark_running()
     |> send_email()
     |> remove_on_complete()
 
-    Logger.info("Email job #{id} complete")
+    Logger.info("Finished: email job #{id}")
   end
 
   defp mark_running(%{emails: emails} = job) do
