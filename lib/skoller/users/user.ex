@@ -31,7 +31,7 @@ defmodule Skoller.Users.User do
   @upd_req [:is_unsubscribed]
   @upd_opt [:password, :pic_path, :last_login]
   @upd_fields @upd_req ++ @upd_opt
-  @adm_upd_req [:is_active, :is_unsubscribed]
+  @adm_upd_req [:is_active, :is_unsubscribed, :email]
   @adm_upd_opt [:password, :pic_path, :last_login]
   @adm_upd_fields @adm_upd_req ++ @adm_upd_opt
 

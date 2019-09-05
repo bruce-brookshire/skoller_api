@@ -100,8 +100,8 @@ defmodule Skoller.Users do
         {:ok, user}
 
       {:error, _, failed_val, _} ->
-        IO.puts "ATTENTION SIGNUP 404:"
-        IO.inspect failed_val
+        IO.puts("ATTENTION SIGNUP 404:")
+        IO.inspect(failed_val)
         {:error, failed_val}
     end
   end
@@ -111,13 +111,19 @@ defmodule Skoller.Users do
 
   ## Opts
    * `[admin: true]`, will allow admin changes.
+   * `[admin_update: true]`, will allow admin only changes.
 
   # Returns
   `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
   or `{:error, _, failed_val, _}`
   """
   def update_user(user_old, params, opts \\ []) do
-    changeset = User.changeset_update_admin(user_old, params)
+    IO.inspect opts
+    changeset =
+      if(Keyword.get(opts, :admin_update, false),
+        do: User.changeset_update_admin(user_old, params),
+        else: User.changeset_update(user_old, params)
+      )
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, changeset)
