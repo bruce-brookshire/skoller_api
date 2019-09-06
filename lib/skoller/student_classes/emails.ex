@@ -33,7 +33,7 @@ defmodule Skoller.StudentClasses.Emails do
   def queue_no_classes_emails(user_info) do
     user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @no_classes_id))
-    |> Enum.map(&queue_no_classes_email(&1))
+    |> Enum.map(&EmailJobs.create_email_job(&1.user.id, @no_classes_id, &1.class_name))
   end
 
   @doc """
@@ -42,7 +42,7 @@ defmodule Skoller.StudentClasses.Emails do
   def queue_needs_setup_emails(user_info) do
     user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @needs_setup_id))
-    |> Enum.map(&queue_needs_setup_email(&1))
+    |> Enum.map(&EmailJobs.create_email_job(&1.user.id, @needs_setup_id, &1.class_name))
   end
 
   @doc """
@@ -51,7 +51,8 @@ defmodule Skoller.StudentClasses.Emails do
   def queue_grow_community_emails(user_info) do
     user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @grow_community_id))
-    |> Enum.map(&queue_grow_community_email(&1))
+    |> IO.inspect()
+    |> Enum.each(&EmailJobs.create_email_job(&1.user.id, @grow_community_id, &1.class_name))
   end
 
   @doc """
@@ -62,35 +63,7 @@ defmodule Skoller.StudentClasses.Emails do
     |> Enum.filter(
       &EmailPreferences.check_email_subscription_status(&1.user, @join_second_class_id)
     )
-    |> Enum.map(&queue_join_second_class_email(&1))
-  end
-
-  @doc """
-  Queues a no classes email for a user
-  """
-  def queue_no_classes_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @no_classes_id)
-  end
-
-  @doc """
-  Queues needs setup email for a user
-  """
-  def queue_needs_setup_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @needs_setup_id, user_info.class_name)
-  end
-
-  @doc """
-  Queues grow community email for a user 
-  """
-  def queue_grow_community_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @grow_community_id, user_info.class_name)
-  end
-
-  @doc """
-  Queues join second class email for a user
-  """
-  def queue_join_second_class_email(user_info) do
-    EmailJobs.create_email_job(user_info.user.id, @grow_community_id)
+    |> Enum.map(&EmailJobs.create_email_job(&1.user.id, @grow_community_id))
   end
 
   ################

@@ -94,7 +94,6 @@ defmodule Skoller.StudentClasses.ConversionQueries do
         "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
-    |> distinct([c, cp, s, sc, u, sl, o, a], u.id)
     |> select([c, cp, s, sc, u, sl, o, a], %{
       user: u,
       class_name: c.name,
