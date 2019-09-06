@@ -21,6 +21,8 @@ defmodule Skoller.EmailJobs.Jobs do
     |> Enum.map(fn %{id: id} = job ->
       emails = EmailJobs.get_next_jobs(id, @aws_batch_max_recipients)
 
+      IO.inspect emails
+
       Map.put(job, :emails, emails)
     end)
     |> Enum.filter(fn job ->
