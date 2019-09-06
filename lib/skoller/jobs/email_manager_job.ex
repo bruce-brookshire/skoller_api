@@ -32,6 +32,6 @@ defmodule Skoller.EmailManagerJob do
 
   # This creates a :work event to be processed after get_time_diff_minute/1 milliseconds.
   defp schedule_work() do
-    Process.send_after(self(), :work, 120 * 1000)
+    Process.send_after(self(), :work, 30 * 1000)
   end
 end

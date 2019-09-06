@@ -17,7 +17,6 @@ defmodule Skoller.EmailJobs do
       email_type_id: email_type_id,
       options: options
     })
-    |> IO.inspect
 
     Repo.insert!(changeset)
   end
@@ -37,7 +36,7 @@ defmodule Skoller.EmailJobs do
             limit: ^limit,
             preload: [:user]
 
-    query |> Repo.all() |> IO.inspect
+    query |> Repo.all()
   end
 
   @doc """
