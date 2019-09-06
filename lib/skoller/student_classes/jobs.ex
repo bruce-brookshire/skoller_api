@@ -15,7 +15,7 @@ defmodule Skoller.StudentClasses.Jobs do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
   alias Skoller.StudentClasses.ConversionQueries
-  
+
   require Logger
 
   @no_classes_id 100

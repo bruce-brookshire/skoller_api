@@ -100,7 +100,6 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       org: o
     })
     |> Repo.all()
-    |> IO.inspect
   end
 
   @doc """

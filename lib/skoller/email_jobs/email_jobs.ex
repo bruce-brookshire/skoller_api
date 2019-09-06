@@ -17,6 +17,7 @@ defmodule Skoller.EmailJobs do
       email_type_id: email_type_id,
       options: options
     })
+    |> IO.inspect
 
     Repo.insert!(changeset)
   end

@@ -51,7 +51,6 @@ defmodule Skoller.StudentClasses.Emails do
   def queue_grow_community_emails(user_info) do
     user_info
     |> Enum.filter(&EmailPreferences.check_email_subscription_status(&1.user, @grow_community_id))
-    |> IO.inspect()
     |> Enum.each(&EmailJobs.create_email_job(&1.user.id, @grow_community_id, &1.class_name))
   end
 
