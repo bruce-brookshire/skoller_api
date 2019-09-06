@@ -37,7 +37,7 @@ defmodule Skoller.EmailJobs do
             limit: ^limit,
             preload: [:user]
 
-    query |> Repo.all()
+    query |> Repo.all() |> IO.inspect
   end
 
   @doc """
