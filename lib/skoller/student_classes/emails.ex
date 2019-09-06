@@ -62,7 +62,7 @@ defmodule Skoller.StudentClasses.Emails do
     |> Enum.filter(
       &EmailPreferences.check_email_subscription_status(&1.user, @join_second_class_id)
     )
-    |> Enum.map(&EmailJobs.create_email_job(&1.user.id, @grow_community_id))
+    |> Enum.map(&EmailJobs.create_email_job(&1.user.id, @join_second_class_id))
   end
 
   ################
