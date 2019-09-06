@@ -98,6 +98,8 @@ defmodule Skoller.StudentClasses.Emails do
   ################
 
   def send_emails(email_job_id, emails) do
+    IO.inspect emails
+    
     template_info =
       emails
       |> Enum.map(&load_template_data(email_job_id, &1.user, &1.options))
