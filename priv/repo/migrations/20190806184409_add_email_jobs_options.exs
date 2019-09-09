@@ -25,9 +25,9 @@ defmodule Skoller.Repo.Migrations.AddEmailJobsOptions do
       is_active_notification: false
     })
 
-    EmailType
-    |> Repo.get_by(id: 400)
-    |> Repo.delete()
+    # EmailType
+    # |> Repo.get_by(id: 400)
+    # |> Repo.delete()
   end
 
   def down do
