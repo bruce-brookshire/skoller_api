@@ -79,14 +79,12 @@ defmodule Skoller.StudentClasses.Emails do
 
     template_data =
       opts
-      |> IO.inspect()
       |> template(email_job_id)
-      |> IO.inspect()
       |> Map.put(:unsub_path, unsub_url(user.id))
       |> IO.inspect()
 
     %{
-      is_org: Map.has_key?(opts, :org),
+      is_org: Map.get(opts, "org_name") != nil,
       template_data: %{to: user.email, form: template_data}
     }
   end
@@ -98,7 +96,7 @@ defmodule Skoller.StudentClasses.Emails do
   # No classes
   ############
 
-  defp template(%{org_name: @asa_name}, @no_classes_id),
+  defp template(%{"org_name" => @asa_name}, @no_classes_id),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -107,7 +105,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/join_classes/asa_join_classes.png"
     }
 
-  defp template(%{org_name: @aopi_name}, @no_classes_id),
+  defp template(%{"org_name" => @aopi_name}, @no_classes_id),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -119,7 +117,7 @@ defmodule Skoller.StudentClasses.Emails do
   # Needs setup
   #############
 
-  defp template(%{org_name: @asa_name, class_name: class_name}, @needs_setup_id),
+  defp template(%{"org_name" => @asa_name, "class_name" => class_name}, @needs_setup_id),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -129,7 +127,7 @@ defmodule Skoller.StudentClasses.Emails do
       class_name: class_name
     }
 
-  defp template(%{org_name: @aopi_name, class_name: class_name}, @needs_setup_id),
+  defp template(%{"org_name" => @aopi_name, "class_name" => class_name}, @needs_setup_id),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
@@ -139,15 +137,15 @@ defmodule Skoller.StudentClasses.Emails do
       class_name: class_name
     }
 
-  defp template(opts, @needs_setup_id), do: opts |> Map.take([:class_name])
+  defp template(opts, @needs_setup_id), do: opts |> Map.take(["class_name"])
 
   # Grow community
   ################
 
-  defp template(%{org_name: @asa_name, student_class_link: link} = opts, @grow_community_id),
+  defp template(%{"org_name" => @asa_name, "student_class_link" => link} = opts, @grow_community_id),
     do:
       opts
-      |> Map.take([:org_name, :class_name])
+      |> Map.take(["org_name", "class_name"])
       |> Map.put(:student_class_link, share_url(link))
       |> Map.merge(%{
         org_philanthropy_name: @asa_foundation,
@@ -156,11 +154,11 @@ defmodule Skoller.StudentClasses.Emails do
           "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png"
       })
 
-  defp template(%{org_name: @aopi_name, student_class_link: link} = opts, @grow_community_id),
+  defp template(%{"org_name" => @aopi_name, "student_class_link" => link} = opts, @grow_community_id),
     do:
       opts
-      |> Map.take([:org_name, :class_name])
-      |> Map.put(:student_class_link, share_url(link))
+      |> Map.take(["org_name", "class_name"])
+      |> Map.put("student_class_link", share_url(link))
       |> Map.merge(%{
         org_philanthropy_name: @aopi_foundation,
         org_plus_skoller: @aopi_plus_skoller,
@@ -168,13 +166,13 @@ defmodule Skoller.StudentClasses.Emails do
           "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png"
       })
 
-  defp template(%{student_class_link: link} = opts, @grow_community_id),
-    do: opts |> Map.take([:class_name]) |> Map.put(:student_class_link, share_url(link))
+  defp template(%{"student_class_link" => link} = opts, @grow_community_id),
+    do: opts |> Map.take(["class_name"]) |> Map.put("student_class_link", share_url(link))
 
   # Join second class
   ###################
 
-  defp template(%{org_name: @asa_name}, @join_second_class_id),
+  defp template(%{"org_name" => @asa_name}, @join_second_class_id),
     do: %{
       org_philanthropy_name: @asa_foundation,
       org_plus_skoller: @asa_plus_skoller,
@@ -182,7 +180,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/second_class/asa_second_class.png"
     }
 
-  defp template(%{org_name: @aopi_name}, @join_second_class_id),
+  defp template(%{"org_name" => @aopi_name}, @join_second_class_id),
     do: %{
       org_philanthropy_name: @aopi_foundation,
       org_plus_skoller: @aopi_plus_skoller,
