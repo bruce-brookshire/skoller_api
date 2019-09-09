@@ -35,19 +35,19 @@ defmodule Skoller.Repo.Migrations.AddEmailJobsOptions do
       remove(:options)
     end
 
-    EmailType
-    |> Repo.get_by(id: 500)
-    |> Repo.delete()
+    # EmailType
+    # |> Repo.get_by(id: 500)
+    # |> Repo.delete()
 
-    EmailType
-    |> Repo.get_by(id: 600)
-    |> Repo.delete()
+    # EmailType
+    # |> Repo.get_by(id: 600)
+    # |> Repo.delete()
 
-    Repo.insert!(%EmailType{
-      id: 400,
-      name: "Class Start Airdrop",
-      category: "Class.Start",
-      is_active_notification: false
-    })
+    # Repo.insert!(%EmailType{
+    #   id: 400,
+    #   name: "Class Start Airdrop",
+    #   category: "Class.Start",
+    #   is_active_notification: false
+    # })
   end
 end
