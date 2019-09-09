@@ -24,8 +24,6 @@ defmodule Skoller.StudentClasses.ConversionQueries do
   @class_setup_status_id 1400
   @class_issue_status_id 1500
 
-
-
   @doc """
   Gets a list of users that are not enrolled in a class.
   """
@@ -41,7 +39,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> where([u, sc, sl, o], is_nil(sc.id) and not is_nil(u.student_id))
     |> select([u, sc, sl, o], %{
       user: u,
-      org: o
+      opts: %{org_name: o.name}
     })
     |> Repo.all()
   end
@@ -67,8 +65,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     )
     |> select([c, cp, s, sc, u, sl, o], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name, class_name: c.name}
     })
     |> Repo.all()
   end
@@ -101,8 +98,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     )
     |> select([c, cp, s, sc, u, sl, o, a], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link}
     })
     |> Repo.all()
   end
@@ -144,11 +140,12 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> where([c, cp, s, sc, u, sl, o, a_s, a_n, c_stat], c_stat.count >= @party_size)
     |> select([c, cp, s, sc, u, sl, o, a_s, a_n, c_stat], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name}
     })
     |> Repo.all()
   end
+
+  # student_class_link
 
   defp base_student_class_query() do
     from(c in Class)
