@@ -42,7 +42,6 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       opts: %{org_name: o.name}
     })
     |> Repo.all()
-    |> IO.inspect
   end
 
   @doc """
@@ -69,6 +68,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       opts: %{org_name: o.name, class_name: c.name}
     })
     |> Repo.all()
+    |> IO.inspect
   end
 
   @doc """
@@ -102,6 +102,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link}
     })
     |> Repo.all()
+    |> IO.inspect
   end
 
   @doc """
