@@ -24,7 +24,9 @@ defmodule Skoller.EmailJobs.Jobs do
       Map.put(job, :emails, emails)
     end)
     |> Enum.filter(fn job ->
-      job[:emails] |> Enum.count() > 0
+      job[:emails]
+      |> (Enum.count() > 0)
+      |> IO.inspect()
     end)
     |> Enum.each(&spawn(Skoller.EmailJobs.Jobs, :start_email_job, [&1]))
   end

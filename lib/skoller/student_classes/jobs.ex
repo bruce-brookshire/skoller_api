@@ -50,7 +50,7 @@ defmodule Skoller.StudentClasses.Jobs do
     email_type = EmailTypes.get!(@needs_setup_id)
     Logger.info("Sending needs setup emails and notifications.")
 
-    user_class_info = ConversionQueries.get_users_needs_setup_classes()
+    user_class_info = ConversionQueries.get_users_needs_setup_classes() |> IO.inspect
 
     # Send emails after notifications because emails are blocking
     if email_type.is_active_notification do
