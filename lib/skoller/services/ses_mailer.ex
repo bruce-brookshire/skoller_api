@@ -36,7 +36,6 @@ defmodule Skoller.Services.SesMailer do
     if @sending_env == "prod" do
       email
       |> ExAws.request()
-      |> IO.inspect
       |> process_response
     end
   end

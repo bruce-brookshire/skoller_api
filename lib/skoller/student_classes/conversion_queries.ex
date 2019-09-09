@@ -57,10 +57,10 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       c.class_status_id == @needs_setup_status_id and sc.is_dropped == false
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
     |> select([c, cp, s, sc, u, sl, o], %{
@@ -90,10 +90,10 @@ defmodule Skoller.StudentClasses.ConversionQueries do
         sc.is_dropped == false and a.active < @party_size
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
     |> select([c, cp, s, sc, u, sl, o, a], %{
@@ -131,10 +131,10 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       a_s.enrollment_count == 1 and (is_nil(a_n.enrollment_count) or a_n.enrollment_count == 0) and
         sc.is_dropped == false
     )
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
     |> where([c, cp, s, sc, u, sl, o, a_s, a_n, c_stat], c_stat.count >= @party_size)

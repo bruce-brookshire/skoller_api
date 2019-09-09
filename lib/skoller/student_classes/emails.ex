@@ -81,7 +81,6 @@ defmodule Skoller.StudentClasses.Emails do
       opts
       |> template(email_job_id)
       |> Map.put(:unsub_path, unsub_url(user.id))
-      |> IO.inspect()
 
     %{
       is_org: Map.get(opts, "org_name") != nil,
@@ -142,29 +141,35 @@ defmodule Skoller.StudentClasses.Emails do
   # Grow community
   ################
 
-  defp template(%{"org_name" => @asa_name, "student_class_link" => link} = opts, @grow_community_id),
-    do:
-      opts
-      |> Map.take(["org_name", "class_name"])
-      |> Map.put(:student_class_link, share_url(link))
-      |> Map.merge(%{
-        org_philanthropy_name: @asa_foundation,
-        org_plus_skoller: @asa_plus_skoller,
-        header_img_url:
-          "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png"
-      })
+  defp template(
+         %{"org_name" => @asa_name, "student_class_link" => link} = opts,
+         @grow_community_id
+       ),
+       do:
+         opts
+         |> Map.take(["org_name", "class_name"])
+         |> Map.put(:student_class_link, share_url(link))
+         |> Map.merge(%{
+           org_philanthropy_name: @asa_foundation,
+           org_plus_skoller: @asa_plus_skoller,
+           header_img_url:
+             "https://classnav-email-images.s3.amazonaws.com/community_features/asa_grow_community.png"
+         })
 
-  defp template(%{"org_name" => @aopi_name, "student_class_link" => link} = opts, @grow_community_id),
-    do:
-      opts
-      |> Map.take(["org_name", "class_name"])
-      |> Map.put("student_class_link", share_url(link))
-      |> Map.merge(%{
-        org_philanthropy_name: @aopi_foundation,
-        org_plus_skoller: @aopi_plus_skoller,
-        header_img_url:
-          "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png"
-      })
+  defp template(
+         %{"org_name" => @aopi_name, "student_class_link" => link} = opts,
+         @grow_community_id
+       ),
+       do:
+         opts
+         |> Map.take(["org_name", "class_name"])
+         |> Map.put("student_class_link", share_url(link))
+         |> Map.merge(%{
+           org_philanthropy_name: @aopi_foundation,
+           org_plus_skoller: @aopi_plus_skoller,
+           header_img_url:
+             "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png"
+         })
 
   defp template(%{"student_class_link" => link} = opts, @grow_community_id),
     do: opts |> Map.take(["class_name"]) |> Map.put("student_class_link", share_url(link))
@@ -188,12 +193,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/second_class/second_class_aopi.png"
     }
 
-  defp template(one, two) do
-    IO.puts("here")
-    IO.inspect(one)
-    IO.inspect(two)
-    %{}
-  end
+  defp template(one, two), do: %{}
 
   ##################
   # Template names #
