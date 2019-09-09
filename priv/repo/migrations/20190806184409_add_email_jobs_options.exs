@@ -9,21 +9,21 @@ defmodule Skoller.Repo.Migrations.AddEmailJobsOptions do
       add(:options, {:map, :string})
     end
 
-    Repo.insert!(%EmailType{
-      id: 500,
-      name: "Grow Community Email",
-      category: "Class.Community",
-      is_active_email: false,
-      is_active_notification: false
-    })
+    # Repo.insert!(%EmailType{
+    #   id: 500,
+    #   name: "Grow Community Email",
+    #   category: "Class.Community",
+    #   is_active_email: false,
+    #   is_active_notification: false
+    # })
 
-    Repo.insert!(%EmailType{
-      id: 600,
-      name: "Join Second Class",
-      category: "Class.JoinSecond",
-      is_active_email: false,
-      is_active_notification: false
-    })
+    # Repo.insert!(%EmailType{
+    #   id: 600,
+    #   name: "Join Second Class",
+    #   category: "Class.JoinSecond",
+    #   is_active_email: false,
+    #   is_active_notification: false
+    # })
 
     # EmailType
     # |> Repo.get_by(id: 400)
