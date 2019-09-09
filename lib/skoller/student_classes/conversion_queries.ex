@@ -42,6 +42,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       opts: %{org_name: o.name}
     })
     |> Repo.all()
+    |> IO.inspect
   end
 
   @doc """
