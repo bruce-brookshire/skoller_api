@@ -51,7 +51,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     day_str = Enum.at(@days_of_week, Date.day_of_week(Date.utc_today()) - 1)
     day_of_week = "%#{day_str}%"
 
-    qry = "select (CURRENT_TIME(0) AT TIME ZONE 'America/Chicago')::time >= (select meet_start_time from classes where id = 783042) and ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time < (select meet_start_time from classes where id = 783042)"
+    qry = "select (CURRENT_TIME(0) AT TIME ZONE 'America/Chicago')::time >= (select meet_start_time from classes where id = 783042) and ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE 'America/Chicago')::time < (select meet_start_time from classes where id = 783042)"
     res = Ecto.Adapters.SQL.query!(Repo, qry, [])
 
     res.rows |> List.first() |> List.first() |> IO.inspect()
