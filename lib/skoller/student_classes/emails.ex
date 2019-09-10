@@ -193,7 +193,7 @@ defmodule Skoller.StudentClasses.Emails do
         "https://classnav-email-images.s3.amazonaws.com/second_class/second_class_aopi.png"
     }
 
-  defp template(one, two), do: %{}
+  defp template(_, _), do: %{}
 
   ##################
   # Template names #
