@@ -54,7 +54,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     qry = "select (CURRENT_TIME(0) AT TIME ZONE 'America/Chicago')::time"
     res = Ecto.Adapters.SQL.query!(Repo, qry, [])
 
-    res.rows |> Enum.first() |> Enum.first() |> IO.inspect()
+    res.rows |> List.first() |> List.first() |> IO.inspect()
 
     Time.utc_now() |> IO.inspect()
 
