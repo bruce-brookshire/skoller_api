@@ -51,12 +51,43 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     day_str = Enum.at(@days_of_week, Date.day_of_week(Date.utc_today()) - 1)
     day_of_week = "%#{day_str}%"
 
-    qry = "select (CURRENT_TIME(0) AT TIME ZONE 'America/Chicago')::time"
+    qry = "select (CURRENT_TIME(0) AT TIME ZONE 'America/Chicago')::time = (select meet_start_time from classes where id = 783042)"
     res = Ecto.Adapters.SQL.query!(Repo, qry, [])
 
     res.rows |> List.first() |> List.first() |> IO.inspect()
 
     Time.utc_now() |> IO.inspect()
+
+    base_student_class_query()
+    |> where(
+      [c, cp, s, sc, u, sl, o],
+      c.class_status_id == @needs_setup_status_id and sc.is_dropped == false
+    )
+    |> where(fragment("meet_days LIKE ?", ^day_of_week))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
+    |> select([c, cp, s, sc, u, sl, o], %{
+      user: u,
+      opts: %{org_name: o.name, class_name: c.name}
+    })
+    |> Repo.all()
+    |> IO.inspect
+    base_student_class_query()
+    |> where(
+      [c, cp, s, sc, u, sl, o],
+      c.class_status_id == @needs_setup_status_id and sc.is_dropped == false
+    )
+    |> where(fragment("meet_days LIKE ?", ^day_of_week))
+    |> where(
+      fragment(
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+      )
+    )
+    |> select([c, cp, s, sc, u, sl, o], %{
+      user: u,
+      opts: %{org_name: o.name, class_name: c.name}
+    })
+    |> Repo.all()
+    |> IO.inspect
 
     base_student_class_query()
     |> where(
