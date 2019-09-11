@@ -27,7 +27,9 @@ defmodule SkollerWeb.Api.V1.UserController do
         params |> Map.put("pic_path", location)
     end
 
-    case Users.update_user(user_old, params) do
+    is_admin = Enum.any?(conn.assigns.user.roles, & &1.id == @admin_role)
+
+    case Users.update_user(user_old, params, admin_update: is_admin) do
       {:ok, %{user: user}} ->
         user = user |> Repo.preload(:student, force: true)
         render(conn, UserView, "show.json", user: user)

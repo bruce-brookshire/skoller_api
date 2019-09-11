@@ -10,7 +10,7 @@ defmodule Skoller.EmailJobs.EmailJob do
     field :user_id, :id
     field :email_type_id, :id
     field :is_running, :boolean
-    field :options, :string
+    field :options, :map
 
     belongs_to :user, User, define_field: false
     belongs_to :email_type, EmailType, define_field: false
@@ -18,10 +18,15 @@ defmodule Skoller.EmailJobs.EmailJob do
     timestamps()
   end
 
+
+  @opt_attr [:is_running, :options]
+  @req_attr [:user_id, :email_type_id]
+  @all_attr @opt_attr ++ @req_attr
+
   @doc false
   def changeset(email_log, attrs) do
     email_log
-    |> cast(attrs, [:user_id, :email_type_id, :is_running, :options])
-    |> validate_required([:user_id, :email_type_id])
+    |> cast(attrs, @all_attr)
+    |> validate_required(@req_attr)
   end
 end

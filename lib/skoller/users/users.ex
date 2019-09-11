@@ -87,6 +87,7 @@ defmodule Skoller.Users do
       |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.user) end)
       |> Repo.transaction()
       |> send_link_used_notification()
+      |> IO.inspect()
       |> send_verification_text()
 
     case result do
@@ -100,8 +101,8 @@ defmodule Skoller.Users do
         {:ok, user}
 
       {:error, _, failed_val, _} ->
-        IO.puts "ATTENTION SIGNUP 404:"
-        IO.inspect failed_val
+        IO.puts("ATTENTION SIGNUP 404:")
+        IO.inspect(failed_val)
         {:error, failed_val}
     end
   end
@@ -111,13 +112,20 @@ defmodule Skoller.Users do
 
   ## Opts
    * `[admin: true]`, will allow admin changes.
+   * `[admin_update: true]`, will allow admin only changes.
 
   # Returns
   `{:ok, %{user: Skoller.Users.User, roles: [Skoller.UserRoles.UserRole], field_of_study: Skoller.Students.FieldOfStudy, link: String}}`
   or `{:error, _, failed_val, _}`
   """
   def update_user(user_old, params, opts \\ []) do
-    changeset = User.changeset_update_admin(user_old, params)
+    IO.inspect(opts)
+
+    changeset =
+      if(Keyword.get(opts, :admin_update, false),
+        do: User.changeset_update_admin(user_old, params),
+        else: User.changeset_update(user_old, params)
+      )
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, changeset)
@@ -205,8 +213,12 @@ defmodule Skoller.Users do
 
   defp send_link_used_notification(result), do: result
 
-  defp send_verification_text({:ok, %{user: %{student: student}}} = result) do
-    student.phone |> Sms.verify_phone(student.verification_code)
+  defp send_verification_text(
+         {:ok, %{user: %{student: %{phone: phone, verification_code: verification_code}}}} =
+           result
+       ) do
+    IO.puts "hi"
+    phone |> Sms.verify_phone(verification_code)
     result
   end
 

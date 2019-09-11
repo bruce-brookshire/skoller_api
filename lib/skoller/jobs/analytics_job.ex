@@ -42,8 +42,8 @@ defmodule Skoller.AnalyticsJob do
       {:noreply, state}
     end
   
-    # This creates a :work event to be processed after get_time_diff/1 milliseconds.
+    # This creates a :work event to be processed after get_time_diff_minute/1 milliseconds.
     defp schedule_work() do
-      Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_time_diff(@interval_min))
+      Process.send_after(self(), :work, Time.utc_now |> Skoller.JobHelper.get_time_diff_minute(@interval_min))
     end
   end

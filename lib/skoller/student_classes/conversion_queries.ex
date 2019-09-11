@@ -17,6 +17,9 @@ defmodule Skoller.StudentClasses.ConversionQueries do
   import Ecto.Query
 
   @days_of_week ["M", "T", "W", "R", "F", "S", "U"]
+
+  @party_size 4
+
   @needs_setup_status_id 1100
   @class_setup_status_id 1400
   @class_issue_status_id 1500
@@ -36,7 +39,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> where([u, sc, sl, o], is_nil(sc.id) and not is_nil(u.student_id))
     |> select([u, sc, sl, o], %{
       user: u,
-      org: o
+      opts: %{org_name: o.name}
     })
     |> Repo.all()
   end
@@ -54,16 +57,15 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       c.class_status_id == @needs_setup_status_id and sc.is_dropped == false
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
     |> select([c, cp, s, sc, u, sl, o], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name, class_name: c.name}
     })
     |> Repo.all()
   end
@@ -85,19 +87,18 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> where(
       [c, cp, s, sc, u, sl, o, a],
       (c.class_status_id == @class_setup_status_id or c.class_status_id == @class_issue_status_id) and
-        sc.is_dropped == false and a.active < 4
+        sc.is_dropped == false and a.active < @party_size
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
     |> select([c, cp, s, sc, u, sl, o, a], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link}
     })
     |> Repo.all()
   end
@@ -119,40 +120,32 @@ defmodule Skoller.StudentClasses.ConversionQueries do
       a_n in subquery(student_enrollment_not_setup_subquery()),
       on: a_n.student_id == u.student_id
     )
-    |> where(
+    |> join(
+      :left,
       [c, cp, s, sc, u, sl, o, a_s, a_n],
+      class_stat in subquery(party_sized_classes_subquery()),
+      on: c.id == class_stat.class_id
+    )
+    |> where(
+      [c, cp, s, sc, u, sl, o, a_s, a_n, c_stat],
       a_s.enrollment_count == 1 and (is_nil(a_n.enrollment_count) or a_n.enrollment_count == 0) and
         sc.is_dropped == false
     )
-    |> where(fragment("meet_start_time <= (CURRENT_TIME AT TIME ZONE timezone)::time"))
+    |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
       fragment(
-        "meet_start_time > ((CURRENT_TIME - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
+        "meet_start_time > ((CURRENT_TIME(0) - INTERVAL '1 minutes' * 5) AT TIME ZONE timezone)::time"
       )
     )
-    |> select([c, cp, s, sc, u, sl, o, a_s, a_n], %{
+    |> where([c, cp, s, sc, u, sl, o, a_s, a_n, c_stat], c_stat.count >= @party_size)
+    |> select([c, cp, s, sc, u, sl, o, a_s, a_n, c_stat], %{
       user: u,
-      class_name: c.name,
-      org: o
+      opts: %{org_name: o.name}
     })
     |> Repo.all()
   end
 
-  def student_enrollment_setup_subquery() do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
-    |> where([sc, c], sc.is_dropped == false and c.class_status_id == @class_setup_status_id)
-    |> group_by([sc, c], sc.student_id)
-    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
-  end
-
-  def student_enrollment_not_setup_subquery() do
-    from(sc in StudentClass)
-    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
-    |> where([sc, c], sc.is_dropped == false and c.class_status_id != @class_setup_status_id)
-    |> group_by([sc, c], sc.student_id)
-    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
-  end
+  # student_class_link
 
   defp base_student_class_query() do
     from(c in Class)
@@ -164,5 +157,27 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> join(:left, [c, cp, s, sc, u, sl], o in Organization,
       on: sl.custom_signup_link_id == o.custom_signup_link_id
     )
+  end
+
+  defp student_enrollment_setup_subquery() do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
+    |> where([sc, c], sc.is_dropped == false and c.class_status_id == @class_setup_status_id)
+    |> group_by([sc, c], sc.student_id)
+    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
+  end
+
+  defp student_enrollment_not_setup_subquery() do
+    from(sc in StudentClass)
+    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
+    |> where([sc, c], sc.is_dropped == false and c.class_status_id != @class_setup_status_id)
+    |> group_by([sc, c], sc.student_id)
+    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
+  end
+
+  defp party_sized_classes_subquery() do
+    from(sc in StudentClass)
+    |> group_by([sc], sc.class_id)
+    |> select([sc], %{class_id: sc.class_id, count: count(sc.class_id)})
   end
 end

@@ -22,3 +22,5 @@ erl_crash.dump
 
 # version management asdf
 /.tool-versions
+
+**/.DS_Store

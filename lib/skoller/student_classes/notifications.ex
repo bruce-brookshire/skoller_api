@@ -5,14 +5,12 @@ defmodule Skoller.StudentClasses.Notifications do
 
   alias Skoller.Devices
   alias Skoller.Services.Notification
-  alias Skoller.Organizations.Organization
   alias Skoller.Users.Students
 
   @link_used_msg "More points earned! Someone just joined "
   @link_used_msg2 " using your link. 🤩  "
   @link_used_category "SignupLink.Used"
 
-  @no_classes "Don't take on this semester alone! Join a class and let Skoller get you organized."
   @needs_setup "Kickstart an easier semester! All you need to do is drop your syllabus for "
   @grow_community_1 "You're missing out... Unlock hidden community features for "
   @grow_community_2 " when you share Skoller with your classmates."
@@ -30,30 +28,26 @@ defmodule Skoller.StudentClasses.Notifications do
   def send_no_classes_notification(
         %{
           devices: devices,
-          org: org
+          org_name: org_name,
+          opts: %{org_name: org_name}
         },
         email_type
       ) do
-    case org do
-      %Organization{name: @aopi_name} ->
-        create_notifications(
-          devices,
+    message =
+      case org_name do
+        @aopi_name ->
           "You're so close! Sign up & join your first class on Skoller to earn a $1 donation to the " <>
-            @aopi_foundation <> "!",
-          email_type.category
-        )
+            @aopi_foundation <> "!"
 
-      %Organization{name: @asa_name} ->
-        create_notifications(
-          devices,
+        @asa_name ->
           "You're so close! Sign up & join your first class on Skoller to earn a $1 donation to the " <>
-            @asa_foundation <> "!",
-          email_type.category
-        )
+            @asa_foundation <> "!"
 
-      _ ->
-        create_notifications(devices, @no_classes, email_type.category)
-    end
+        _ ->
+          "Don't take on this semester alone! Join a class and let Skoller get you organized."
+      end
+
+    create_notifications(devices, message, email_type.category)
   end
 
   def send_no_classes_notification(user_info, email_type) do
@@ -65,24 +59,26 @@ defmodule Skoller.StudentClasses.Notifications do
   # Needs setup notifications
   def send_needs_setup_notification(
         %{
-          class_name: class_name,
           devices: devices,
-          org: org
+          opts: %{class_name: class_name, org_name: nil}
         },
         email_type
-      ) do
-    case org do
-      %Organization{} ->
+      ),
+      do: create_notifications(devices, @needs_setup <> class_name, email_type.category)
+
+  def send_needs_setup_notification(
+        %{
+          devices: devices,
+          opts: %{class_name: class_name, org_name: _}
+        },
+        email_type
+      ),
+      do:
         create_notifications(
           devices,
           "Halfway there! You joined " <> class_name <> ", now just submit the syllabus",
           email_type.category
         )
-
-      _ ->
-        create_notifications(devices, @needs_setup <> class_name, email_type.category)
-    end
-  end
 
   def send_needs_setup_notification(user_info, email_type) do
     user_info
@@ -93,28 +89,31 @@ defmodule Skoller.StudentClasses.Notifications do
   # Grow community notifications
   def send_grow_community_notification(
         %{
-          class_name: class_name,
           devices: devices,
-          org: org
+          opts: %{class_name: class_name, org_name: nil}
         },
         email_type
-      ) do
-    case org do
-      %Organization{} ->
-        create_notifications(
-          devices,
-          @grow_community_org,
-          email_type.category
-        )
-
-      _ ->
+      ),
+      do:
         create_notifications(
           devices,
           @grow_community_1 <> class_name <> @grow_community_2,
           email_type.category
         )
-    end
-  end
+
+  def send_grow_community_notification(
+        %{
+          devices: devices,
+          opts: %{class_name: _, org_name: _}
+        },
+        email_type
+      ),
+      do:
+        create_notifications(
+          devices,
+          @grow_community_org,
+          email_type.category
+        )
 
   def send_grow_community_notification(user_info, email_type) do
     user_info
@@ -125,20 +124,21 @@ defmodule Skoller.StudentClasses.Notifications do
   # Needs setup notifications
   def send_join_second_class_notification(
         %{
-          class_name: class_name,
           devices: devices,
-          org: org
+          opts: %{class_name: class_name, org_name: nil}
         },
         email_type
-      ) do
-    case org do
-      %Organization{} ->
-        create_notifications(devices, @second_class_org, email_type.category)
+      ),
+      do: create_notifications(devices, @second_class <> class_name, email_type.category)
 
-      _ ->
-        create_notifications(devices, @second_class <> class_name, email_type.category)
-    end
-  end
+  def send_join_second_class_notification(
+        %{
+          devices: devices,
+          opts: %{class_name: _, org_name: _}
+        },
+        email_type
+      ),
+      do: create_notifications(devices, @second_class_org, email_type.category)
 
   # Join second class
   def send_join_second_class_notification(user_info, email_type) do

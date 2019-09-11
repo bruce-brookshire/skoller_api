@@ -15,7 +15,7 @@ defmodule Skoller.StudentClasses.Jobs do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
   alias Skoller.StudentClasses.ConversionQueries
-  
+
   require Logger
 
   @no_classes_id 100
@@ -38,7 +38,7 @@ defmodule Skoller.StudentClasses.Jobs do
         end
 
         if email_type.is_active_email do
-          students |> Emails.queue_no_classes_emails()
+          students |> Emails.queue_email_jobs(@no_classes_id)
         end
 
       _ ->
@@ -58,7 +58,7 @@ defmodule Skoller.StudentClasses.Jobs do
     end
 
     if email_type.is_active_email do
-      user_class_info |> Emails.queue_needs_setup_emails()
+      user_class_info |> Emails.queue_email_jobs(@needs_setup_id)
     end
   end
 
@@ -74,7 +74,7 @@ defmodule Skoller.StudentClasses.Jobs do
     end
 
     if email_type.is_active_email do
-      user_class_info |> Emails.queue_grow_community_emails()
+      user_class_info |> Emails.queue_email_jobs(@grow_community_id)
     end
   end
 
@@ -90,7 +90,7 @@ defmodule Skoller.StudentClasses.Jobs do
     end
 
     if email_type.is_active_email do
-      user_class_info |> Emails.queue_join_second_class_emails()
+      user_class_info |> Emails.queue_email_jobs(@join_second_class_id)
     end
   end
 
