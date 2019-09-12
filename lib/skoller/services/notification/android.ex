@@ -23,7 +23,7 @@ defmodule Skoller.Services.Notification.Android do
     device
     |> new()
     |> put_notification(%{"title" => title, "body" => body})
-    |> put_collapse_key(category)
+    |> put_collapse_key(data["category"])
     |> put_data(data)
     |> FCM.push(on_response: &log_result(&1))
   end
@@ -32,7 +32,7 @@ defmodule Skoller.Services.Notification.Android do
     device
     |> new()
     |> put_notification(%{"body" => msg})
-    |> put_collapse_key(category)
+    |> put_collapse_key(data["category"])
     |> put_data(data)
     |> FCM.push(on_response: &log_result(&1))
   end
