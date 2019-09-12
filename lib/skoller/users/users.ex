@@ -118,8 +118,6 @@ defmodule Skoller.Users do
   or `{:error, _, failed_val, _}`
   """
   def update_user(user_old, params, opts \\ []) do
-    IO.inspect(opts)
-
     changeset =
       if(Keyword.get(opts, :admin_update, false),
         do: User.changeset_update_admin(user_old, params),

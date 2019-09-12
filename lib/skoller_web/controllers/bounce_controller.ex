@@ -11,8 +11,10 @@ defmodule SkollerWeb.Api.BounceController do
   def bounce(conn, %{"Message" => message} = params) do
     case params["SubscribeURL"] do
       nil ->
-        Poison.decode!(message)
+        IO.puts "Bounce ##"
+        message
         |> IO.inspect()
+        |> Poison.decode!()
         |> handle_notification
 
       url ->

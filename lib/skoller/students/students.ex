@@ -149,7 +149,7 @@ defmodule Skoller.Students do
     dateTime =
       DateTime.utc_now()
       |> DateTime.truncate(:second)
-      
+
     result =
       student
       |> Ecto.Changeset.change(%{verification_code: code, login_attempt: dateTime})
@@ -191,4 +191,8 @@ defmodule Skoller.Students do
   def get_main_school_students(school) do
     from(student in Student, where: student.primary_school_id == ^school.id) |> Repo.all()
   end
+
+  @doc """
+  Create
+  """
 end
