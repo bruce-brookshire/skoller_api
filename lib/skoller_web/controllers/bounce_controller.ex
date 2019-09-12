@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.BounceController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.Users.EmailPreferences
@@ -10,12 +10,17 @@ defmodule SkollerWeb.Api.BounceController do
 
   def bounce(conn, %{"Message" => message} = params) do
     case params["SubscribeURL"] do
-      nil -> 
-        decoded_message = Poison.decode!(message)
-        handle_notification(decoded_message)
+      nil ->
+        IO.puts "Bounce ##"
+        message
+        |> IO.inspect()
+        |> Poison.decode!()
+        |> handle_notification
+
       url ->
         HTTPoison.get(url)
     end
+
     conn |> send_resp(204, "")
   end
 
@@ -24,6 +29,7 @@ defmodule SkollerWeb.Api.BounceController do
 
     complaint["complainedRecipients"] |> Enum.each(&unsubscribe_email(&1["emailAddress"]))
   end
+
   defp handle_notification(%{"notificationType" => "Bounce", "bounce" => bounce}) do
     Logger.info("Recieved bounce for email " <> inspect(bounce["bouncedRecipients"]))
 
@@ -34,7 +40,8 @@ defmodule SkollerWeb.Api.BounceController do
     case Users.get_user_by_email(email) do
       nil ->
         nil
-      user -> 
+
+      user ->
         EmailPreferences.update_user_subscription(user.id, true)
     end
   end

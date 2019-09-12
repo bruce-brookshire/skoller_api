@@ -98,7 +98,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     )
     |> select([c, cp, s, sc, u, sl, o, a], %{
       user: u,
-      opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link}
+      opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link, class_id: c.id}
     })
     |> Repo.all()
   end

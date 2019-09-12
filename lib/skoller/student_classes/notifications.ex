@@ -90,7 +90,7 @@ defmodule Skoller.StudentClasses.Notifications do
   def send_grow_community_notification(
         %{
           devices: devices,
-          opts: %{class_name: class_name, org_name: nil}
+          opts: %{class_name: class_name, org_name: nil, class_id: class_id}
         },
         email_type
       ),
@@ -98,13 +98,14 @@ defmodule Skoller.StudentClasses.Notifications do
         create_notifications(
           devices,
           @grow_community_1 <> class_name <> @grow_community_2,
-          email_type.category
+          email_type.category,
+          class_id
         )
 
   def send_grow_community_notification(
         %{
           devices: devices,
-          opts: %{class_name: _, org_name: _}
+          opts: %{class_name: _, org_name: _, class_id: class_id}
         },
         email_type
       ),
@@ -112,7 +113,8 @@ defmodule Skoller.StudentClasses.Notifications do
         create_notifications(
           devices,
           @grow_community_org,
-          email_type.category
+          email_type.category,
+          class_id
         )
 
   def send_grow_community_notification(user_info, email_type) do
@@ -170,6 +172,19 @@ defmodule Skoller.StudentClasses.Notifications do
         &1.type,
         message,
         category
+      )
+    )
+  end
+
+  defp create_notifications(devices, message, category, class_id) do
+    devices
+    |> Enum.each(
+      &Notification.create_notification(
+        &1.udid,
+        &1.type,
+        message,
+        category,
+        %{class_id: class_id}
       )
     )
   end

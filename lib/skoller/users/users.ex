@@ -87,7 +87,6 @@ defmodule Skoller.Users do
       |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.user) end)
       |> Repo.transaction()
       |> send_link_used_notification()
-      |> IO.inspect()
       |> send_verification_text()
 
     case result do
@@ -119,8 +118,6 @@ defmodule Skoller.Users do
   or `{:error, _, failed_val, _}`
   """
   def update_user(user_old, params, opts \\ []) do
-    IO.inspect(opts)
-
     changeset =
       if(Keyword.get(opts, :admin_update, false),
         do: User.changeset_update_admin(user_old, params),
@@ -217,7 +214,6 @@ defmodule Skoller.Users do
          {:ok, %{user: %{student: %{phone: phone, verification_code: verification_code}}}} =
            result
        ) do
-    IO.puts "hi"
     phone |> Sms.verify_phone(verification_code)
     result
   end

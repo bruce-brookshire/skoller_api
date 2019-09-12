@@ -2,10 +2,11 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   @moduledoc """
   A context module for student class enrollment links
   """
-  
+
   alias Skoller.Repo
-  alias Skoller.StudentClasses.StudentClass
+  alias Skoller.Students
   alias Skoller.StudentClasses
+  alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
 
   @link_length 5
@@ -18,6 +19,7 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   """
   def get_student_class_by_enrollment_link(link) do
     student_class_id = link |> String.split_at(@link_length) |> elem(1)
+
     Repo.get_by!(StudentClass, enrollment_link: link, id: student_class_id)
     |> Repo.preload([:student, :class])
   end
@@ -30,8 +32,8 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   """
   def generate_link(id) do
     @link_length
-    |> :crypto.strong_rand_bytes() 
-    |> Base.url_encode64 
+    |> :crypto.strong_rand_bytes()
+    |> Base.url_encode64()
     |> binary_part(0, @link_length)
     |> Kernel.<>(to_string(id))
   end
@@ -46,13 +48,18 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   """
   def enroll_by_link(link, student_id, params) do
     sc = get_student_class_by_enrollment_link(link)
-    params = params |> Map.put("class_id", sc.class_id) |> Map.put("student_id", student_id)
-    case StudentClasses.enroll(student_id, sc.class_id, params, [enrolled_by: sc.id]) do
-      nil -> nil
+    params = params |> Map.merge(%{"class_id" => sc.class_id, "student_id" => student_id})
+
+    case StudentClasses.enroll(student_id, sc.class_id, params, enrolled_by: sc.id) do
+      nil ->
+        nil
+
       {:ok, %{enrolled_by: enrolled_by} = student_class} when not is_nil(enrolled_by) ->
         Task.start(Notifications, :send_link_used_notification, [sc, sc.class])
         {:ok, student_class}
-      resp -> resp
+
+      resp ->
+        resp
     end
   end
 end
