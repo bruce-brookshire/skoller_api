@@ -50,7 +50,7 @@ defmodule Skoller.Mixfile do
       {:arc_ecto, "~> 0.11.1"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
-      {:ex_aws_ses, "~> 2.1.0"},
+      {:ex_aws_ses, "~> 2.1.1"},
       {:poison, "~> 3.1"},
       {:sweet_xml, "~> 0.6"},
       {:comeonin, "~> 4.0"},
