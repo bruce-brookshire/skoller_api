@@ -87,7 +87,6 @@ defmodule Skoller.Users do
       |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.user) end)
       |> Repo.transaction()
       |> send_link_used_notification()
-      |> IO.inspect()
       |> send_verification_text()
 
     case result do
@@ -217,7 +216,6 @@ defmodule Skoller.Users do
          {:ok, %{user: %{student: %{phone: phone, verification_code: verification_code}}}} =
            result
        ) do
-    IO.puts "hi"
     phone |> Sms.verify_phone(verification_code)
     result
   end
