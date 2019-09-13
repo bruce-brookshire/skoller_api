@@ -227,7 +227,7 @@ defmodule Skoller.StudentClasses do
       from(student in Student)
       |> join(:inner, [s], student_class in StudentClass, on: student_class.student_id == s.id)
       |> join(:inner, [s, sc], class in Class, on: sc.class_id == class.id)
-      |> join(:inner, [s, sc, c], period in Period, on: period.id == c.class_period_id)
+      |> join(:inner, [s, sc, c], period in ClassPeriod, on: period.id == c.class_period_id)
       |> join(:inner, [s, sc, c, p], school in School, on: school.id == p.school_id)
       |> where(
         [s, sc, c, p, school],
