@@ -55,6 +55,8 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
         nil
 
       {:ok, %{enrolled_by: enrolled_by} = student_class} when not is_nil(enrolled_by) ->
+        StudentClasses.set_student_period_school_on_enroll(student_id, sc.class_id)
+
         Task.start(Notifications, :send_link_used_notification, [sc, sc.class])
         {:ok, student_class}
 

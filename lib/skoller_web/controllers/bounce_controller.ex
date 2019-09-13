@@ -9,13 +9,12 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"Message" => message} = params) do
+    Logger.warn("Recieved BOUNCE from SES")
+    IO.inspect(message)
+
     case params["SubscribeURL"] do
       nil ->
-        IO.puts "Bounce ##"
-        message
-        |> IO.inspect()
-        |> Poison.decode!()
-        |> handle_notification
+        handle_notification(message)
 
       url ->
         HTTPoison.get(url)
@@ -35,6 +34,9 @@ defmodule SkollerWeb.Api.BounceController do
 
     bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1["emailAddress"]))
   end
+
+  defp handle_notification(msg) when is_binary(msg), do: IO.puts(msg)
+  defp handle_notification(msg), do: IO.inspect(msg)
 
   defp unsubscribe_email(email) do
     case Users.get_user_by_email(email) do

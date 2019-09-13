@@ -191,8 +191,4 @@ defmodule Skoller.Students do
   def get_main_school_students(school) do
     from(student in Student, where: student.primary_school_id == ^school.id) |> Repo.all()
   end
-
-  @doc """
-  Create
-  """
 end
