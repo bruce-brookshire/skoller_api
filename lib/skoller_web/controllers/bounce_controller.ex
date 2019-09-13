@@ -9,6 +9,8 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"Message" => message} = params) do
+    IO.inspect params
+    
     case params["SubscribeURL"] do
       nil ->
         IO.puts "Bounce ##"
