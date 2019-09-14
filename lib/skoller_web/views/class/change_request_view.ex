@@ -15,7 +15,7 @@ defmodule SkollerWeb.Class.ChangeRequestView do
     change_request = change_request |> Repo.preload([:class_change_type, :user])
     %{
       id: change_request.id,
-      change_type: render_one(change_request.class_change_type, TypeView, "type.json")
+      change_type: render_one(change_request.class_change_type, TypeView, "type.json"),
       data: change_request.data,
       inserted_at: change_request.inserted_at,
       is_completed: change_request.is_completed,
