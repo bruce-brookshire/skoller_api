@@ -44,11 +44,9 @@ defmodule SkollerWeb.Api.BounceController do
   defp handle_notification(msg), do: IO.puts("Failed without binary msg")
 
   defp unsubscribe_email(email) do
-    IO.inspect(email)
-
     case Users.get_user_by_email(email) do
       nil ->
-        IO.puts("Failed to get user")
+        Logger.warn("Failed to get bounced user")
 
       user ->
         EmailPreferences.update_user_subscription(user.id, true)
