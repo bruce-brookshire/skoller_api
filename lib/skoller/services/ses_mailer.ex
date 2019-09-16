@@ -14,7 +14,8 @@ defmodule Skoller.Services.SesMailer do
 
     template_name
     |> send_bulk_templated_email("Skoller <support@skoller.co>", template_data,
-      reply_to: ["noreply@skoller.co"]
+      reply_to: ["noreply@skoller.co"],
+      configuration_set_name: "notification_on_error"
     )
     |> send
   end
@@ -26,7 +27,8 @@ defmodule Skoller.Services.SesMailer do
       "Skoller <support@skoller.co>",
       template_name,
       template_data,
-      reply_to: ["noreply@skoller.co"]
+      reply_to: ["noreply@skoller.co"],
+      configuration_set_name: "notification_on_error"
     )
     |> send
   end
