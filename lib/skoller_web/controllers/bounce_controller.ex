@@ -9,11 +9,11 @@ defmodule SkollerWeb.Api.BounceController do
   require Logger
 
   def bounce(conn, %{"Message" => message} = params) do
-    Logger.warn("Recieved BOUNCE from SES")
-    IO.inspect(message)
+    Logger.warn("Recieved SNS message")
 
     case params["SubscribeURL"] do
       nil ->
+        IO.inspect(message["eventType"])
         handle_notification(message)
 
       url ->
@@ -35,13 +35,17 @@ defmodule SkollerWeb.Api.BounceController do
     bounce["bouncedRecipients"] |> Enum.each(&unsubscribe_email(&1["emailAddress"]))
   end
 
-  defp handle_notification(msg) when is_binary(msg), do: IO.puts(msg)
-  defp handle_notification(msg), do: IO.inspect(msg)
+  defp handle_notification(msg) when is_binary(msg),
+    do: IO.puts("Failed with binary msg: " <> msg)
+
+  defp handle_notification(msg), do: IO.puts("Failed without binary msg")
 
   defp unsubscribe_email(email) do
+    IO.inspect(email)
+
     case Users.get_user_by_email(email) do
       nil ->
-        nil
+        IO.puts("Failed to get user")
 
       user ->
         EmailPreferences.update_user_subscription(user.id, true)

@@ -85,6 +85,7 @@ defmodule Skoller.Users.EmailPreferences do
   def update_user_subscription(user_id, is_unsubscribed) do
     Users.get_user_by_id!(user_id)
     |> Users.update_user(%{is_unsubscribed: is_unsubscribed})
+    |> IO.inspect
   end
 
   @doc """
