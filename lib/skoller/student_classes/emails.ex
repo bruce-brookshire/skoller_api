@@ -22,7 +22,7 @@ defmodule Skoller.StudentClasses.Emails do
   @asa_foundation "Alpha Sigma Alpha Foundation"
 
   @aopi_name "AOII"
-  @asa_name "ASA"
+  @asa_name "Alpha Sigma Alpha"
 
   @env_url System.get_env("WEB_URL")
 
