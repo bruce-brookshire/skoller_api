@@ -136,14 +136,6 @@ defmodule Skoller.StudentClasses.Emails do
       class_name: class_name
     }
 
-  defp template(%{"org_name" => name} = opts, job_id) when not is_nil(name) do
-    IO.puts("LOOK AT ME")
-
-    opts
-    |> IO.inspect()
-    |> Map.take(["class_name"])
-  end
-
   defp template(opts, @needs_setup_id), do: opts |> Map.take(["class_name"])
 
   # Grow community
@@ -178,6 +170,16 @@ defmodule Skoller.StudentClasses.Emails do
            header_img_url:
              "https://classnav-email-images.s3.amazonaws.com/community_features/grow_community_aopi.png"
          })
+
+  defp template(%{"org_name" => name, "student_class_link" => link} = opts, @grow_community_id)
+       when not is_nil(name) do
+    IO.puts("LOOK AT ME")
+
+    opts
+    |> IO.inspect()
+    |> Map.take(["class_name"])
+    |> Map.put("student_class_link", share_url(link))
+  end
 
   defp template(%{"student_class_link" => link} = opts, @grow_community_id),
     do: opts |> Map.take(["class_name"]) |> Map.put("student_class_link", share_url(link))
