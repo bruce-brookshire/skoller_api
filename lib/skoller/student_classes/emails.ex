@@ -136,6 +136,14 @@ defmodule Skoller.StudentClasses.Emails do
       class_name: class_name
     }
 
+  defp template(%{"org_name" => name} = opts, job_id) when not is_nil(name) do
+    IO.puts("LOOK AT ME")
+
+    opts
+    |> IO.inspect()
+    |> Map.take(["class_name"])
+  end
+
   defp template(opts, @needs_setup_id), do: opts |> Map.take(["class_name"])
 
   # Grow community
