@@ -13,10 +13,11 @@ defmodule SkollerWeb.Api.BounceController do
 
     case params["SubscribeURL"] do
       nil ->
-        message
-        |> Poison.decode()
-        |> IO.inspect()
-        |> handle_notification()
+        {:ok, event} =
+          message
+          |> Poison.decode()
+
+        handle_notification(event)
 
       url ->
         HTTPoison.get(url)
