@@ -18,6 +18,7 @@ defmodule SkollerWeb.Class.ChangeRequestView do
       change_type: render_one(change_request.class_change_type, TypeView, "type.json"),
       data: change_request.data,
       inserted_at: change_request.inserted_at,
+      updated_at: change_request.updated_at,
       is_completed: change_request.is_completed,
       note: change_request.note,
       user: render_one(change_request.user, UserView, "user.json"),
