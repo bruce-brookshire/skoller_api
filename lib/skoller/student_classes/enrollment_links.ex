@@ -4,7 +4,6 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
   """
 
   alias Skoller.Repo
-  alias Skoller.Students
   alias Skoller.StudentClasses
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications

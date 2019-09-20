@@ -19,4 +19,7 @@ defmodule Skoller.EmailLogs do
     |> where([l], l.user_id == ^user_id and l.email_type_id == ^email_type_id)
     |> Repo.all()
   end
+
+  def log_email(user_id, email_type_id),
+    do: Repo.insert(%EmailLog{user_id: user_id, email_type_id: email_type_id})
 end

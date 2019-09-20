@@ -40,7 +40,7 @@ defmodule Skoller.Syllabi do
    * The default is to serve a class regardless of status or lock.
    * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
   """
-  def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
+  def serve_class(user, lock_type \\ nil, _status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] ->
         # TODO, is this needed? get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
@@ -57,15 +57,16 @@ defmodule Skoller.Syllabi do
   def syllabi_class_count() do
     # count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
 
-    now = DateTime.utc_now()
-
     from(class in Class)
     |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
     |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
     |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == sc.class_id)
-    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id)) # Where the class is ready for review and does not have a lock
-    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id) # Ensure that the class period isnt over yet
-    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id))) # Remove any double counting, and get the total
+    # Where the class is ready for review and does not have a lock
+    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id))
+    # Ensure that the class period isnt over yet
+    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id)
+    # Remove any double counting, and get the total
+    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id)))
     |> Repo.one()
   end
 

@@ -5,7 +5,6 @@ defmodule Skoller.Periods do
 
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
-  alias Skoller.Periods.Notifications
   alias Skoller.Periods.Generator
   alias Skoller.Schools
   alias Skoller.Classes.Class
