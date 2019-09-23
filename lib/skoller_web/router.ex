@@ -197,6 +197,7 @@ defmodule SkollerWeb.Router do
       end
 
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
+      post "/changes/member/:id/complete", Admin.Class.ChangeRequestMemberController, :complete
       post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]

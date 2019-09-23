@@ -1,13 +1,13 @@
 defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
-  alias Skoller.Repo
+  alias Skoller.ChangeRequests.ChangeRequestMember
   alias Skoller.ChangeRequests.ChangeRequest
-  alias Skoller.ChangeRequests.ChangeRequest.ChangeRequestMember
+  alias Skoller.Repo
 
   import Ecto.Query
 
   use Ecto.Migration
 
-  def change do
+  def up do
     create table(:class_change_request_members) do
       add(:class_change_request_id, references(:class_change_requests, on_delete: :delete_all))
       add(:name, :string)
@@ -17,16 +17,53 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
       timestamps()
     end
 
+    create(index(:class_change_request_members, [:class_change_request_id]))
+
     flush()
 
     Repo.all(ChangeRequest)
-    |> Enum.map(&ChangeRequestMember.changeset(%ChangeRequestMember{}, &1.data))
+    |> Enum.flat_map(&distill_data/1)
     |> Enum.each(&Repo.insert/1)
-
-    flush()
 
     alter table(:class_change_requests) do
       remove(:data)
+      remove(:is_completed)
     end
   end
+
+  def down do
+    alter table(:class_change_requests) do
+      add(:data, {:map, :string})
+      add(:is_completed, :boolean, default: false)
+    end
+
+    flush()
+
+    from(c in ChangeRequest)
+    |> preload([c], [:class_change_request_members])
+    |> Repo.all()
+    |> Enum.map(&create_data/1)
+    |> Enum.each(&Repo.update/1)
+
+    drop(table(:class_change_request_members))
+  end
+
+  defp distill_data(%{data: data, id: id}) when not(is_nil(data)), do: Enum.map(data, &distill_data(&1, id))
+
+  defp distill_data({k, v}, change_request_id),
+    do:
+      %ChangeRequestMember{}
+      |> ChangeRequestMember.changeset(%{
+        name: k,
+        value: v,
+        class_change_request_id: change_request_id
+      })
+
+  defp create_data(%ChangeRequest{class_change_request_members: members} = request) do
+    data = Enum.map(members, &create_data/1) |> Map.new()
+
+    request |> ChangeRequest.update_changeset(%{data: data})
+  end
+
+  defp create_data(%ChangeRequestMember{name: name, value: value}), do: {name, value}
 end

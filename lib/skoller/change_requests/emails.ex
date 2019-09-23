@@ -4,6 +4,13 @@ defmodule Skoller.ChangeRequests.Emails do
   """
 
   alias Skoller.Services.SesMailer
+  alias Skoller.ChangeRequests.ChangeRequest
+
+  def send_request_completed_email(%ChangeRequest{
+        user: %{email: email, student: student},
+        class: class
+      }),
+      do: send_request_completed_email(email, student, class)
 
   def send_request_completed_email(email, student, class) do
     SesMailer.send_individual_email(
