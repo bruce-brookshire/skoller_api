@@ -75,7 +75,13 @@ defmodule SkollerWeb.ClassView do
   def render("class_detail.json", %{class: class}) do
     class =
       class
-      |> Repo.preload([:class_status, :help_requests, :change_requests, :student_requests],
+      |> Repo.preload(
+        [
+          :class_status,
+          :help_requests,
+          :student_requests,
+          change_requests: :class_change_request_members
+        ],
         force: true
       )
 
