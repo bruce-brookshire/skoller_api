@@ -48,7 +48,13 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
     drop(table(:class_change_request_members))
   end
 
-  defp distill_data(%{data: data, id: id}) when not(is_nil(data)), do: Enum.map(data, &distill_data(&1, id))
+  defp distill_data(%{data: data, id: id}) when not is_nil(data),
+    do: Enum.map(data, &distill_data(&1, id))
+
+  defp distill_data(%{id: id}) do
+    IO.puts("Change Request #{id} has no data")
+    []
+  end
 
   defp distill_data({k, v}, change_request_id),
     do:

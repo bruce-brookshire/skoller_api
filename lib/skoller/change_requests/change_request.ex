@@ -15,7 +15,8 @@ defmodule Skoller.ChangeRequests.ChangeRequest do
     field :note, :string
     field :class_id, :id
     field :class_change_type_id, :id
-
+    # field :data, :map
+    # field :is_completed, :boolean, default: false
     field :user_id, :id
     belongs_to :class, Class, define_field: false
     belongs_to :class_change_type, Type, define_field: false
