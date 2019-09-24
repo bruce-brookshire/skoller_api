@@ -1,4 +1,5 @@
 defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
+  alias Skoller.ChangeRequests.ChangeRequestDeprecated
   alias Skoller.ChangeRequests.ChangeRequestMember
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.Repo
@@ -21,7 +22,7 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
 
     flush()
 
-    Repo.all(ChangeRequest)
+    Repo.all(ChangeRequestDeprecated)
     |> Enum.flat_map(&distill_data/1)
     |> Enum.each(&Repo.insert/1)
 
@@ -39,7 +40,7 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
 
     flush()
 
-    from(c in ChangeRequest)
+    from(c in ChangeRequestDeprecated)
     |> preload([c], [:class_change_request_members])
     |> Repo.all()
     |> Enum.map(&create_data/1)
@@ -66,10 +67,10 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
         class_change_request_id: change_request_id
       })
 
-  defp create_data(%ChangeRequest{class_change_request_members: members} = request) do
+  defp create_data(%ChangeRequestDeprecated{class_change_request_members: members} = request) do
     data = Enum.map(members, &create_data/1) |> Map.new()
 
-    request |> ChangeRequest.update_changeset(%{data: data})
+    request |> ChangeRequestDeprecated.changeset(%{data: data})
   end
 
   defp create_data(%ChangeRequestMember{name: name, value: value}), do: {name, value}
