@@ -17,8 +17,8 @@ defmodule Skoller.ChangeRequests.ChangeRequest do
     field :class_change_type_id, :id
     
     # TODO remove this after we are certain migration is good
-    field :data, :map
-    field :is_completed, :boolean, default: false
+    # field :data, :map
+    # field :is_completed, :boolean, default: false
 
     field :user_id, :id
     belongs_to :class, Class, define_field: false
