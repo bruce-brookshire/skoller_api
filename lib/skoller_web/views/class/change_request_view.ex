@@ -27,7 +27,6 @@ defmodule SkollerWeb.Class.ChangeRequestView do
       inserted_at: change_request.inserted_at,
       updated_at: change_request.updated_at,
       members: render_many(change_request.class_change_request_members, ChangeRequestView, "change_request_member.json", as: :member),
-      is_completed: change_request.is_completed,
       note: change_request.note,
       user: render_one(change_request.user, UserView, "user.json"),
     }
@@ -38,7 +37,8 @@ defmodule SkollerWeb.Class.ChangeRequestView do
       id: member.id, 
       member_name: member.name,
       member_value: member.value,
-      change_request_id: member.class_change_request_id
+      change_request_id: member.class_change_request_id,
+      is_completed: member.is_completed
     }
   end
 end

@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestMemberController do
   use SkollerWeb, :controller
 
-  alias Skoller.Class.ChangeRequestView
+  alias SkollerWeb.Class.ChangeRequestView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.ChangeRequests.ChangeRequestMembers
 
