@@ -15,7 +15,12 @@ defmodule Skoller.Services.Notification.Android do
    * `msg` as a `String` will send a simple message.
   """
   def create_notification(device, msg, category, data),
-    do: create_notification(device, msg, Map.put(data, "category", category))
+    do:
+      create_notification(
+        device,
+        msg,
+        Map.merge(data, %{"category" => category, "click_action" => "FLUTTER_NOTIFICATION_CLICK"})
+      )
 
   def create_notification(device, msg, data \\ %{})
 
