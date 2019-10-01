@@ -22,43 +22,47 @@ defmodule Skoller.ChangeRequests.ChangeRequestMembers do
       Repo.get(ChangeRequestMember, id)
       |> Repo.preload(class_change_request: [:class, user: :student])
 
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    if !member_old.is_completed do
+      now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
-    change_request_changeset =
-      change_request
-      |> ChangeRequest.changeset(%{updated_at: now})
+      change_request_changeset =
+        change_request
+        |> ChangeRequest.changeset(%{updated_at: now})
 
-    member_changeset =
-      member_old
-      |> ChangeRequestMember.changeset(%{is_completed: true})
+      member_changeset =
+        member_old
+        |> ChangeRequestMember.changeset(%{is_completed: true})
 
-    multi =
-      Multi.new()
-      |> Multi.update(:change_request, change_request_changeset)
-      |> Multi.update(:change_request_member_update, member_changeset)
-      |> Multi.run(
-        :change_request_members,
-        fn _, _ ->
-          members =
-            Repo.preload(change_request, :class_change_request_members).class_change_request_members
+      multi =
+        Multi.new()
+        |> Multi.update(:change_request, change_request_changeset)
+        |> Multi.update(:change_request_member_update, member_changeset)
+        |> Multi.run(
+          :change_request_members,
+          fn _, _ ->
+            members =
+              Repo.preload(change_request, :class_change_request_members).class_change_request_members
 
-          {:ok, members}
-        end
-      )
-      |> Multi.run(:class, fn _, changes ->
-        ClassStatuses.check_status(change_request.class, changes)
-      end)
-      |> Repo.transaction()
+            {:ok, members}
+          end
+        )
+        |> Multi.run(:class, fn _, changes ->
+          ClassStatuses.check_status(change_request.class, changes)
+        end)
+        |> Repo.transaction()
 
-    case multi do
-      {:ok, %{change_request_members: members}} ->
-        check_needs_send_email(members, change_request)
+      case multi do
+        {:ok, %{change_request_members: members}} ->
+          check_needs_send_email(members, change_request)
 
-      _ ->
-        nil
+        _ ->
+          nil
+      end
+
+      multi
+    else
+      nil
     end
-
-    multi
   end
 
   defp check_needs_send_email(members, change_request) when is_list(members) do

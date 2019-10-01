@@ -152,8 +152,7 @@ defmodule Skoller.ClassStatuses.Classes do
   #TODO: Standardize return objects
   # A new class has been added, and it is a class that will never have a syllabus.
   def check_status(class, params) do
-    Logger.info("Checking status for class: " <> to_string(class.id) <> " and params:")
-    Logger.info(inspect(params))
+    Logger.info("Checking status for class: " <> to_string(class.id))
     class = class |> Repo.preload(:class_status)
     case match_params(class, params) do
       :ok ->

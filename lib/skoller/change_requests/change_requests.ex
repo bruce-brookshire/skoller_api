@@ -73,36 +73,43 @@ defmodule Skoller.ChangeRequests do
    * `{:class_status, Skoller.Classes.Class}`
   """
   def complete_change_request(id) do
-    change_request =
+    %{class_change_request_members: members} =
+      change_request =
       Repo.get!(ChangeRequest, id)
-      |> Repo.preload([:class, user: :student])
+      |> Repo.preload([:class, :class_change_request_members, user: :student])
 
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    any_incomplete = members |> Enum.any?(&(!&1.is_completed))
 
-    change_request_changeset = change_request |> ChangeRequest.changeset(%{updated_at: now})
+    if any_incomplete do
+      now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
-    update_member_query = ChangeRequestMember |> where([m], m.class_change_request_id == ^id)
+      change_request_changeset = change_request |> ChangeRequest.changeset(%{updated_at: now})
 
-    updates = [set: [is_completed: true, updated_at: DateTime.utc_now()]]
+      update_member_query = ChangeRequestMember |> where([m], m.class_change_request_id == ^id)
 
-    multi =
-      Multi.new()
-      |> Multi.update(:change_request, change_request_changeset)
-      |> Multi.update_all(:change_request_members, update_member_query, updates)
-      |> Multi.run(:class_status, fn _, changes ->
-        ClassStatuses.check_status(change_request.class, changes)
-      end)
-      |> Repo.transaction()
+      updates = [set: [is_completed: true, updated_at: DateTime.utc_now()]]
 
-    case multi do
-      {:ok, _} ->
-        Emails.send_request_completed_email(change_request)
+      multi =
+        Multi.new()
+        |> Multi.update(:change_request, change_request_changeset)
+        |> Multi.update_all(:change_request_members, update_member_query, updates)
+        |> Multi.run(:class_status, fn _, changes ->
+          ClassStatuses.check_status(change_request.class, changes)
+        end)
+        |> Repo.transaction()
 
-      failure ->
-        IO.inspect(failure)
+      case multi do
+        {:ok, _} ->
+          Emails.send_request_completed_email(change_request)
+
+        failure ->
+          IO.inspect(failure)
+      end
+
+      multi
+    else
+      nil
     end
-
-    multi
   end
 
   @doc """
