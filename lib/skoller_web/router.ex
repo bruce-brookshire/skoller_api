@@ -252,8 +252,10 @@ defmodule SkollerWeb.Router do
         resources "/posts", Assignment.PostController, only: [:create, :update]
 
         # Assignment Grade routes
-        resources "/grades", Student.Class.GradeController, only: [:create]
+        # TODO deprecate the post
+        post "/grades", Student.Class.GradeController, :create
         put "/grades", Student.Class.GradeController, :create
+        put "/add-due-date", Student.Class.AssignmentController, :add_due_date
 
         # Class Mod routes
         get "/mods", Assignment.ModController, :index
