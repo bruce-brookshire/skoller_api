@@ -189,6 +189,7 @@ defmodule Skoller.StudentAssignments do
       {:error, _, changeset, _} ->
         {:error, changeset}
     end
+    |> IO.inspect
   end
 
   @doc """

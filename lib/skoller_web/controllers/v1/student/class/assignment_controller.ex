@@ -49,7 +49,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   end
 
   def update(conn, %{"id" => id} = params) do
+    IO.inspect params
     student_assignment = StudentClasses.get_student_assignment_by_id!(id)
+    IO.inspect student_assignment
 
     case StudentAssignments.update_student_assignment(student_assignment, params) do
       {:ok, student_assignment} ->
