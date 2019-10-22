@@ -36,23 +36,49 @@ defmodule Skoller.Periods do
     |> Repo.all()
   end
 
-  def get_classes_by_period_id(period_id, filters \\ %{}) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod,
-      on:
-        period.id == ^period_id and class.class_period_id == period.id and
-          period.is_hidden == false
-    )
-    |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
-    |> where([class, period, prof], ^class_filter(filters))
-    |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
-    |> order_by([class], desc: class.inserted_at)
-    |> limit(50)
-    |> Repo.all()
-    |> Enum.map(fn class ->
-      Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
-    end)
+  def get_classes_by_period_id(period_id, %{"class_name" => name}) do
+    {classes, occs} =
+      name
+      |> String.split(" ", trim: true)
+      |> Enum.map(&search_classes_by_period_id(period_id, %{"class_name" => &1}))
+      |> Enum.concat()
+      |> Enum.reduce({%{}, %{}}, fn elem, {t_classes, t_occs} ->
+        class_id = elem.class.id
+
+        if Map.has_key?(t_occs, class_id) do
+          {t_classes, %{t_occs | class_id => t_occs[class_id] + 1}}
+        else
+          {Map.put(t_classes, class_id, elem), Map.put(t_occs, class_id, 1)}
+        end
+      end)
+      |> IO.inspect()
+
+    occs
+    |> Map.keys()
+    |> Enum.sort_by(&{classes[&1].enrollment, occs[&1]})
+    |> Enum.reverse()
+    |> Enum.take(50)
+    |> Enum.map(&classes[&1])
   end
+
+  def get_classes_by_period_id(period_id, _), do: search_classes_by_period_id(period_id, %{}) |> Enum.take(50)
+
+  defp search_classes_by_period_id(period_id, filters),
+    do:
+      from(class in Class)
+      |> join(:inner, [class], period in ClassPeriod,
+        on:
+          period.id == ^period_id and class.class_period_id == period.id and
+            period.is_hidden == false
+      )
+      |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
+      |> where([class, period, prof], ^class_filter(filters))
+      |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
+      |> order_by([class], desc: class.inserted_at)
+      |> Repo.all()
+      |> Enum.map(fn class ->
+        Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
+      end)
 
   @doc """
   Creates a period

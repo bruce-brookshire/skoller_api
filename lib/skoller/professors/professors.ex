@@ -73,14 +73,11 @@ defmodule Skoller.Professors do
     |> Map.keys()
     |> Enum.sort_by(&occs[&1])
     |> Enum.reverse()
-    |> Enum.map(fn id ->
-      profs[id]
-    end)
+    |> Enum.take(50)
+    |> Enum.map(&profs[&1])
   end
 
-  def get_professors(school_id, _) do
-    search_professors(school_id, %{})
-  end
+  def get_professors(school_id, _), do: search_professors(school_id, %{}) |> Enum.take(50)
 
   @doc """
   Gets professor by name and school
@@ -105,7 +102,6 @@ defmodule Skoller.Professors do
     from(p in Professor)
     |> where([p], p.school_id == ^school_id)
     |> filters(params)
-    |> limit(50)
     |> Repo.all()
   end
 
