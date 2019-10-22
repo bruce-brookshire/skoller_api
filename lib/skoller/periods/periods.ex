@@ -36,6 +36,7 @@ defmodule Skoller.Periods do
     |> Repo.all()
   end
 
+  def get_classes_by_period_id(period_id, params \\ %{})
   def get_classes_by_period_id(period_id, %{"class_name" => name}) do
     {classes, occs} =
       name
@@ -61,7 +62,7 @@ defmodule Skoller.Periods do
     |> Enum.map(&classes[&1])
   end
 
-  def get_classes_by_period_id(period_id, _), do: search_classes_by_period_id(period_id, %{}) |> Enum.take(50)
+  def get_classes_by_period_id(period_id, params), do: search_classes_by_period_id(period_id, params) |> Enum.take(50)
 
   defp search_classes_by_period_id(period_id, filters),
     do:

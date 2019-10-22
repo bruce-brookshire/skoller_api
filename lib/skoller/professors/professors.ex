@@ -53,6 +53,7 @@ defmodule Skoller.Professors do
   ## Returns
   `[Skoller.Professors.Professor]` or `[]`
   """
+  def get_professors(school_id, params \\ %{})
   def get_professors(school_id, %{"professor_name" => name}) do
     {profs, occs} =
       name
@@ -77,7 +78,7 @@ defmodule Skoller.Professors do
     |> Enum.map(&profs[&1])
   end
 
-  def get_professors(school_id, _), do: search_professors(school_id, %{}) |> Enum.take(50)
+  def get_professors(school_id, params), do: search_professors(school_id, params) |> Enum.take(50)
 
   @doc """
   Gets professor by name and school

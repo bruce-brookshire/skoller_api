@@ -83,6 +83,7 @@ defmodule Skoller.Schools do
       * short_name
         * Gets schools by short_name (for scripting generally).
   """
+  def get_schools(params \\ %{})
   def get_schools(%{"name" => name}) do
     {schools, occs} =
       name
@@ -107,7 +108,7 @@ defmodule Skoller.Schools do
     |> Enum.map(&schools[&1])
   end
   
-  def get_schools(_), do: search_schools(%{}) |> Enum.take(50)
+  def get_schools(params), do: search_schools(params) |> Enum.take(50)
 
   defp search_schools(filters),
     do:
