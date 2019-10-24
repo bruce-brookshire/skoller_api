@@ -21,6 +21,7 @@ defmodule Skoller.ChangeRequests.ChangeRequestMembers do
       member_old =
       Repo.get(ChangeRequestMember, id)
       |> Repo.preload(class_change_request: [:class, user: :student])
+      |> IO.inspect()
 
     if !member_old.is_completed do
       now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
@@ -31,9 +32,7 @@ defmodule Skoller.ChangeRequests.ChangeRequestMembers do
 
       member_changeset =
         member_old
-        |> IO.inspect()
         |> ChangeRequestMember.changeset(%{is_completed: true})
-        |> IO.inspect()
 
       multi =
         Multi.new()
