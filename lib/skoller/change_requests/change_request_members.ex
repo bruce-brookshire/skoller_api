@@ -32,6 +32,7 @@ defmodule Skoller.ChangeRequests.ChangeRequestMembers do
       member_changeset =
         member_old
         |> ChangeRequestMember.changeset(%{is_completed: true})
+        |> IO.inspect
 
       multi =
         Multi.new()
@@ -50,6 +51,7 @@ defmodule Skoller.ChangeRequests.ChangeRequestMembers do
           ClassStatuses.check_status(change_request.class, changes)
         end)
         |> Repo.transaction()
+        |> IO.inspect
 
       case multi do
         {:ok, %{change_request_members: members}} ->
