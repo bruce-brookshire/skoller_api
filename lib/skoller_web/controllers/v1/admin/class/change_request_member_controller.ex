@@ -12,8 +12,8 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestMemberController do
 
   plug :verify_role, %{roles: [@change_req_role, @admin_role]}
 
-  def complete(conn, %{"id" => id} = params) do
-    case ChangeRequestMembers.set_completed(id) |> IO.inspect do
+  def complete(conn, %{"id" => id}) do
+    case ChangeRequestMembers.set_completed(id) do
       {:ok, %{change_request_member_update: member}} ->
         render(conn, ChangeRequestView, "show.json", change_request_member: member)
 

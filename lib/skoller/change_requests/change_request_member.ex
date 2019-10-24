@@ -18,8 +18,8 @@ defmodule Skoller.ChangeRequests.ChangeRequestMember do
     timestamps()
   end
 
-  @req_fields [:name, :value, :class_change_request_id]
-  @opt_fields [:is_completed]
+  @req_fields [:name, :class_change_request_id]
+  @opt_fields [:is_completed, :value]
   @all_fields @req_fields ++ @opt_fields
 
   def changeset(%ChangeRequestMember{} = member, attrs) do
