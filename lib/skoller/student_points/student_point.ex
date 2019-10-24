@@ -8,11 +8,12 @@ defmodule Skoller.StudentPoints.StudentPoint do
     field :value, :integer
     field :student_id, :id
     field :student_point_type_id, :id
+    field :link_consumer_student_id, :id
 
     timestamps()
   end
 
-  @req_fields [:value, :student_id, :student_point_type_id]
+  @req_fields [:value, :student_id, :student_point_type_id, :link_consumer_student_id]
   @all_fields @req_fields
 
   @doc false

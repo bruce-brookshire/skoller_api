@@ -49,7 +49,7 @@ defmodule Skoller.StudentClasses.EnrollmentLinks do
     sc = get_student_class_by_enrollment_link(link)
     params = params |> Map.merge(%{"class_id" => sc.class_id, "student_id" => student_id})
 
-    case StudentClasses.enroll(student_id, sc.class_id, params, enrolled_by: sc.id) do
+    case StudentClasses.enroll(student_id, sc.class_id, params, enrolled_by: sc.id, link_owner_student_id: sc.student_id) do
       nil ->
         nil
 
