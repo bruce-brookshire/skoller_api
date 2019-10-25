@@ -40,7 +40,6 @@ defmodule Skoller.CustomSignups do
       sec_deg,
       fn _, x1, x2 -> %{link: x1.link, signup_count: x1.signup_count + x2.signup_count} end
     )
-    |> IO.inspect()
     |> Map.values()
     |> IO.inspect()
   end
@@ -147,48 +146,24 @@ defmodule Skoller.CustomSignups do
     |> Enum.reduce(%{}, fn elem, acc ->
       Map.put(acc, elem.link.id, elem)
     end)
-    |> IO.inspect()
   end
 
   defp get_links_second_degree() do
     from(p in StudentPoint)
     |> join(:inner, [p], s in Signup, on: s.student_id == p.student_id)
-    |> join(:inner, [p, s, l], l in Link, on: l.id == s.custom_signup_link_id)
-    |> where([p, s, l], not( is_nil(p.link_consumer_student_id)) and p.student_point_type_id == @user_referral_point_id)
+    |> join(:inner, [p, s], l in Link, on: l.id == s.custom_signup_link_id)
+    |> where(
+      [p, s, l],
+      p.student_point_type_id == @user_referral_point_id
+    )
+    |> group_by([p, s, l], l.id)
     |> select([p, s, l], %{
       link: l,
-      link_consumer_student_id: p.link_consumer_student_id,
-      inserted_at: p.inserted_at
+      signup_count: count(l.id)
     })
     |> Repo.all()
-    |> Enum.reduce(%{}, fn %{link_consumer_student_id: s_id} = elem, acc ->
-      new_elem =
-        acc
-        |> Map.get(s_id)
-        |> compare_and_select(elem)
-
-      acc |> Map.put(s_id, new_elem)
+    |> Enum.reduce(%{}, fn elem, acc ->
+      Map.put(acc, elem.link.id, elem)
     end)
-    |> Enum.reduce(%{}, fn {_, %{link: %{id: id} = link}}, acc ->
-      if Map.has_key?(acc, id) do
-        cur_count = acc[id].signup_count
-        %{acc | id => %{link: link, signup_count: cur_count + 1}}
-      else
-        Map.put(acc, id, %{link: link, signup_count: 1})
-      end
-    end)
-  end
-
-  defp compare_and_select(nil, new), do: new
-
-  defp compare_and_select(
-         %{inserted_at: c_date, link_consumer_student_id: c_id} = current,
-         %{inserted_at: n_date, link_consumer_student_id: n_id} = new
-       )
-       when c_id == n_id do
-    case NaiveDateTime.compare(n_date, c_date) do
-      :lt -> new
-      _ -> current
-    end
   end
 end
