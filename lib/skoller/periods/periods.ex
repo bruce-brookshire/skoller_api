@@ -37,6 +37,7 @@ defmodule Skoller.Periods do
   end
 
   def get_classes_by_period_id(period_id, params \\ %{})
+
   def get_classes_by_period_id(period_id, %{"class_name" => name}) do
     {classes, occs} =
       name
@@ -62,7 +63,8 @@ defmodule Skoller.Periods do
     |> Enum.map(&classes[&1])
   end
 
-  def get_classes_by_period_id(period_id, params), do: search_classes_by_period_id(period_id, params) |> Enum.take(50)
+  def get_classes_by_period_id(period_id, params),
+    do: search_classes_by_period_id(period_id, params) |> Enum.take(50)
 
   defp search_classes_by_period_id(period_id, filters),
     do:
@@ -184,10 +186,68 @@ defmodule Skoller.Periods do
   end
 
   @doc """
+
+  """
+  def duplicate_previous_periods_for_all_schools_for_year(year) do
+    start_date_test = get_datetime_string("#{year - 1}-01-01 00:00:00Z")
+    end_date_test = get_datetime_string("#{year - 1}-12-31 00:00:00Z")
+
+    entries =
+      from(c in ClassPeriod)
+      |> where(
+        [c],
+        c.start_date >= ^start_date_test and c.start_date < ^end_date_test
+      )
+      |> Repo.all()
+      |> Enum.map(&adjust_period_to_new_year(&1, year))
+
+    Repo.insert_all(ClassPeriod, entries)
+  end
+
+  defp adjust_period_to_new_year(
+         %ClassPeriod{name: name, start_date: start_date, end_date: end_date} = period,
+         year
+       ) do
+    start_date_str = start_date |> DateTime.to_string()
+    end_date_str = end_date |> DateTime.to_string()
+
+    utc_now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    updated_values = %{
+      name: Regex.replace(~r/#{year - 1}/, name, "#{year}"),
+      start_date: convert_datetime(year, start_date_str),
+      end_date: convert_datetime(year, end_date_str),
+      inserted_at: utc_now,
+      updated_at: utc_now,
+      class_period_status_id: @future_status
+    }
+
+    period
+    |> Map.take([
+      :school_id,
+      :is_main_period
+    ])
+    |> Map.merge(updated_values)
+  end
+
+  defp get_datetime_string(datetime),
+    do:
+      DateTime.from_iso8601(datetime)
+      |> Kernel.elem(1)
+      |> DateTime.to_string()
+
+  defp convert_datetime(year, datetime_str),
+    do:
+      Regex.replace(~r/#{year - 1}/, datetime_str, "#{year}")
+      |> DateTime.from_iso8601()
+      |> Kernel.elem(1)
+
+  @doc """
   Generates a year's worth of periods for all schools.
   """
   def generate_periods_for_all_schools_for_year(year) do
     Schools.get_schools()
+    |> IO.inspect()
     |> Enum.each(&generate_periods_for_year_for_school(&1.id, year))
   end
 
@@ -195,12 +255,9 @@ defmodule Skoller.Periods do
   Generates a year's worth of periods for `school_id`.
   """
   def generate_periods_for_year_for_school(school_id, year) do
-    get_generators()
+    Generator
+    |> Repo.all()
     |> Enum.map(&create_period_from_generator(&1, school_id, year))
-  end
-
-  defp get_generators() do
-    Repo.all(Generator)
   end
 
   defp create_period_from_generator(generator, school_id, year) do
