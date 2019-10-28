@@ -31,8 +31,13 @@ defmodule Skoller.CustomSignups do
   `[%{link: Skoller.CustomSignups.Link, signup_count: Integer}]` or `[]`
   """
   def get_links() do
-    first_deg = get_links_first_degree()
-    sec_deg = get_links_second_degree()
+    first_deg =
+      get_links_first_degree()
+      |> IO.inspect()
+
+    sec_deg =
+      get_links_second_degree()
+      |> IO.inspect()
 
     Map.merge(
       first_deg,
@@ -49,8 +54,8 @@ defmodule Skoller.CustomSignups do
   `Integer`
   """
   def get_link_signups_by_id(link_id) do
-    first_deg = get_links_first_degree() |> Map.get(link_id, 0) |> IO.inspect
-    sec_deg = get_links_second_degree() |> Map.get(link_id, 0) |> IO.inspect
+    first_deg = get_links_first_degree() |> Map.get(link_id, 0)
+    sec_deg = get_links_second_degree() |> Map.get(link_id, 0)
 
     first_deg.signup_count + sec_deg.signup_count
   end
