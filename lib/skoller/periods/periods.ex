@@ -252,7 +252,6 @@ defmodule Skoller.Periods do
   """
   def generate_periods_for_all_schools_for_year(year) do
     Schools.get_schools()
-    |> IO.inspect()
     |> Enum.each(&generate_periods_for_year_for_school(&1.id, year))
   end
 

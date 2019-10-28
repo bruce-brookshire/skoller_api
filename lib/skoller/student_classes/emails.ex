@@ -175,7 +175,6 @@ defmodule Skoller.StudentClasses.Emails do
     IO.puts("LOOK AT ME")
 
     opts
-    |> IO.inspect()
     |> Map.take(["class_name"])
     |> Map.put("student_class_link", share_url(link))
   end

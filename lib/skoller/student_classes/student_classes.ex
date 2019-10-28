@@ -245,7 +245,6 @@ defmodule Skoller.StudentClasses do
 
       _ ->
         result
-        |> IO.inspect()
     end
   end
 

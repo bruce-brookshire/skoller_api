@@ -49,8 +49,8 @@ defmodule Skoller.CustomSignups do
   `Integer`
   """
   def get_link_signups_by_id(link_id) do
-    first_deg = get_links_first_degree() |> Map.get(link_id, 0)
-    sec_deg = get_links_second_degree() |> Map.get(link_id, 0)
+    first_deg = get_links_first_degree() |> Map.get(link_id, 0) |> IO.inspect
+    sec_deg = get_links_second_degree() |> Map.get(link_id, 0) |> IO.inspect
 
     first_deg.signup_count + sec_deg.signup_count
   end

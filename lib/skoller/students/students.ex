@@ -206,7 +206,6 @@ defmodule Skoller.Students do
       |> where([s, o], s.student_id == ^student_id)
       |> select([s, o], o)
       |> Repo.one()
-      |> IO.inspect
 
     case org do
       %Organization{name: org_name, id: org_id, custom_signup_link_id: link_id} ->
@@ -228,7 +227,6 @@ defmodule Skoller.Students do
           org_id: org_id,
           org_name: org_name
         }
-        |> IO.inspect()
 
       nil ->
         nil
