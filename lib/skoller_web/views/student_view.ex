@@ -5,7 +5,6 @@ defmodule SkollerWeb.StudentView do
   alias SkollerWeb.StudentView
   alias Skoller.Repo
   alias Skoller.Schools
-  alias Skoller.Students
   alias SkollerWeb.School.FieldOfStudyView
   alias SkollerWeb.SchoolView
   alias SkollerWeb.PeriodView

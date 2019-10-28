@@ -6,7 +6,6 @@ defmodule Skoller.CustomSignups do
   alias Skoller.CustomSignups.Link
   alias Skoller.CustomSignups.Signup
   alias Skoller.Repo
-  alias Skoller.Students.Student
   alias Skoller.StudentPoints.StudentPoint
 
   import Ecto.Query

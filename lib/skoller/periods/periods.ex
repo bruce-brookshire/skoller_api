@@ -200,6 +200,7 @@ defmodule Skoller.Periods do
       )
       |> Repo.all()
       |> Enum.map(&adjust_period_to_new_year(&1, year))
+      |> Enum.filter(&(&1 != nil))
 
     Repo.insert_all(ClassPeriod, entries)
   end
@@ -222,12 +223,16 @@ defmodule Skoller.Periods do
       class_period_status_id: @future_status
     }
 
-    period
-    |> Map.take([
-      :school_id,
-      :is_main_period
-    ])
-    |> Map.merge(updated_values)
+    if updated_values.name == name do
+      nil
+    else
+      period
+      |> Map.take([
+        :school_id,
+        :is_main_period
+      ])
+      |> Map.merge(updated_values)
+    end
   end
 
   defp get_datetime_string(datetime),
