@@ -41,7 +41,19 @@ defmodule Skoller.CustomSignups do
       fn _, x1, x2 -> %{link: x1.link, signup_count: x1.signup_count + x2.signup_count} end
     )
     |> Map.values()
-    |> IO.inspect()
+  end
+
+  @doc """
+  Gets the number of first and second degree signups for a link id
+
+  ## Returns
+  `Integer`
+  """
+  def get_link_signups_by_id(link_id) do
+    first_deg = get_links_first_degree() |> Map.get(link_id, 0)
+    sec_deg = get_links_second_degree() |> Map.get(link_id, 0)
+
+    first_deg.signup_count + sec_deg.signup_count
   end
 
   @doc """
