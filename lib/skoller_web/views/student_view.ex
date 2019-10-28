@@ -27,7 +27,7 @@ defmodule SkollerWeb.StudentView do
   def render("link.json", %{student: student}) do
     student = student |> Repo.preload([:users])
     %{
-      student_id: student.id
+      student_id: student.id,
       student_name_first: student.name_first,
       student_name_last: student.name_last,
       student_image_path: (student.users |> List.first).pic_path
