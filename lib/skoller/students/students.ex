@@ -223,7 +223,7 @@ defmodule Skoller.Students do
 
         %{
           org_singups: org_signups,
-          personal_signups: personal_signups,
+          personal_signups: personal_signups || 0,
           org_id: org_id,
           org_name: org_name
         }

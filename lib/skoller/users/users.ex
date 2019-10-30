@@ -74,6 +74,8 @@ defmodule Skoller.Users do
   `{:ok, Skoller.Users.User}` or `{:error, changeset}`
   """
   def create_user(params, opts \\ []) do
+    IO.inspect(params)
+
     result =
       %User{}
       |> User.changeset_insert(params)
@@ -222,7 +224,11 @@ defmodule Skoller.Users do
 
   defp add_points_to_student(%{student: %{enrolled_by: enrolled_by, id: link_consumer_student_id}})
        when not is_nil(enrolled_by) do
-        StudentPoints.add_points_to_student(enrolled_by, link_consumer_student_id, @student_referral_points_name)
+    StudentPoints.add_points_to_student(
+      enrolled_by,
+      link_consumer_student_id,
+      @student_referral_points_name
+    )
   end
 
   defp add_points_to_student(_student_class), do: {:ok, nil}

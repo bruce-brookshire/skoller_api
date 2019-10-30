@@ -31,13 +31,9 @@ defmodule Skoller.CustomSignups do
   `[%{link: Skoller.CustomSignups.Link, signup_count: Integer}]` or `[]`
   """
   def get_links() do
-    first_deg =
-      get_links_first_degree()
-      |> IO.inspect()
+    first_deg = get_links_first_degree()
 
-    sec_deg =
-      get_links_second_degree()
-      |> IO.inspect()
+    sec_deg = get_links_second_degree()
 
     Map.merge(
       first_deg,
@@ -54,8 +50,10 @@ defmodule Skoller.CustomSignups do
   `Integer`
   """
   def get_link_signups_by_id(link_id) do
-    first_deg = get_links_first_degree() |> Map.get(link_id, 0)
-    sec_deg = get_links_second_degree() |> Map.get(link_id, 0)
+    default = %{signup_count: 0}
+    
+    first_deg = get_links_first_degree() |> Map.get(link_id, default)
+    sec_deg = get_links_second_degree() |> Map.get(link_id, default)
 
     first_deg.signup_count + sec_deg.signup_count
   end
@@ -104,11 +102,14 @@ defmodule Skoller.CustomSignups do
   `{:ok, Skoller.CustomSignups.Signup}` or `{:error, Ecto.Changeset}`
   """
   def track_signup(student_id, link_id) do
-    link = get_link_by_id!(link_id)
+    link =
+      get_link_by_id!(link_id)
+      |> IO.inspect()
 
     case link |> is_active do
       true ->
         Repo.insert(%Signup{custom_signup_link_id: link_id, student_id: student_id})
+        |> IO.inspect()
 
       false ->
         {:ok, nil}
