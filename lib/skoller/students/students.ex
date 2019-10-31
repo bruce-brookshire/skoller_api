@@ -198,6 +198,8 @@ defmodule Skoller.Students do
   @student_point_signup_type 2
 
   def get_org_raise_effort_for_student(%Student{id: student_id}) do
+    IO.puts("====ORG====")
+
     org =
       from(s in Signup)
       |> join(:inner, [s], o in Organization,
@@ -206,10 +208,13 @@ defmodule Skoller.Students do
       |> where([s, o], s.student_id == ^student_id)
       |> select([s, o], o)
       |> Repo.one()
+      |> IO.inspect()
 
     case org do
       %Organization{name: org_name, id: org_id, custom_signup_link_id: link_id} ->
         org_signups = Skoller.CustomSignups.get_link_signups_by_id(link_id)
+
+        IO.puts("====PERSONAL SIGNUPS====")
 
         personal_signups =
           from(s in StudentPoint)
@@ -220,6 +225,9 @@ defmodule Skoller.Students do
           |> group_by([s], s.student_id)
           |> select([s], count(s.student_id))
           |> Repo.one()
+          |> IO.inspect()
+
+        IO.puts("now why the eff")
 
         %{
           org_singups: org_signups,
@@ -227,6 +235,7 @@ defmodule Skoller.Students do
           org_id: org_id,
           org_name: org_name
         }
+        |> IO.inspect()
 
       nil ->
         nil
