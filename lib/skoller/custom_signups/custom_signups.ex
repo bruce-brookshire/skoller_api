@@ -51,11 +51,11 @@ defmodule Skoller.CustomSignups do
   """
   def get_link_signups_by_id(link_id) do
     default = %{signup_count: 0}
-    IO.puts "====ORG SIGNUPS===="
-    first_deg = get_links_first_degree() |> Map.get(link_id, default) |> IO.inspect
-    sec_deg = get_links_second_degree() |> Map.get(link_id, default) |> IO.inspect
-    IO.puts "====RESULT===="
-    (first_deg.signup_count + sec_deg.signup_count) |> IO.inspect
+
+    first_deg = get_links_first_degree() |> Map.get(link_id, default)
+    sec_deg = get_links_second_degree() |> Map.get(link_id, default)
+
+    first_deg.signup_count + sec_deg.signup_count
   end
 
   @doc """
