@@ -9,6 +9,17 @@ defmodule SkollerWeb.AuthView do
     render_one(auth, AuthView, "auth.json")
   end
 
+  def render("show.json", %{token: token, user: %{student: student} = user}) when not(is_nil(student)) do
+    user = render_one(user, UserView, "user_detail.json")
+
+    auth =
+      Map.new()
+      |> Map.put(:token, token)
+      |> Map.put(:user, user)
+
+    render_one(auth, AuthView, "auth.json")
+  end
+  
   def render("show.json", %{token: token, user: user}) do
     auth = Map.new()
     |> Map.put(:token, token)

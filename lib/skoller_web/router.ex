@@ -197,6 +197,7 @@ defmodule SkollerWeb.Router do
       end
 
       post "/changes/:id/complete", Admin.Class.ChangeRequestController, :complete
+      post "/changes/member/:id/complete", Admin.Class.ChangeRequestMemberController, :complete
       post "/student-requests/:id/complete", Admin.Class.StudentRequestController, :complete
       resources "/class-help-types", Class.Help.TypeController, only: [:index]
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
@@ -251,8 +252,10 @@ defmodule SkollerWeb.Router do
         resources "/posts", Assignment.PostController, only: [:create, :update]
 
         # Assignment Grade routes
-        resources "/grades", Student.Class.GradeController, only: [:create]
+        # TODO deprecate the post
+        post "/grades", Student.Class.GradeController, :create
         put "/grades", Student.Class.GradeController, :create
+        put "/add-due-date", Student.Class.AssignmentController, :add_due_date
 
         # Class Mod routes
         get "/mods", Assignment.ModController, :index

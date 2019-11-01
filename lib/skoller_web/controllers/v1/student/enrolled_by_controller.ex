@@ -7,7 +7,7 @@ defmodule SkollerWeb.Api.V1.Student.EnrolledByController do
   alias Skoller.CustomSignups.Link
   alias SkollerWeb.LinkView
 
-  def signup_organization(conn, %{"student_id" => student_id} = params) do
+  def signup_organization(conn, %{"student_id" => student_id}) do
     #TODO make sure we are checking that a student can only get their own org
     case student_id |> CustomSignups.link_for_student_id() do
       %Link{} = link -> conn |> render(LinkView, "link_base.json", link: link)

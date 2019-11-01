@@ -4,13 +4,14 @@ defmodule Skoller.ClassStatuses.Classes do
   """
 
   alias Skoller.Repo
+  alias Skoller.Classes
+  alias Skoller.Syllabi
   alias Skoller.Classes.Class
   alias Skoller.ClassStatuses.Status
   alias Skoller.Classes.Notifications
-  alias Skoller.Syllabi
   alias Skoller.ChangeRequests.ChangeRequest
   alias Skoller.StudentRequests.StudentRequest
-  alias Skoller.Classes
+  alias Skoller.ChangeRequests.ChangeRequestMember
   alias Skoller.Assignments.Classes, as: ClassAssignments
 
   import Ecto.Query
@@ -151,8 +152,7 @@ defmodule Skoller.ClassStatuses.Classes do
   #TODO: Standardize return objects
   # A new class has been added, and it is a class that will never have a syllabus.
   def check_status(class, params) do
-    Logger.info("Checking status for class: " <> to_string(class.id) <> " and params:")
-    Logger.info(inspect(params))
+    Logger.info("Checking status for class: " <> to_string(class.id))
     class = class |> Repo.preload(:class_status)
     case match_params(class, params) do
       :ok ->
@@ -177,11 +177,11 @@ defmodule Skoller.ClassStatuses.Classes do
   # A syllabus has been added to a class that needs a syllabus.
   defp cl_check_status(%Class{class_status_id: @needs_setup_status} = class, %{doc: %{is_syllabus: true}}), do: class |> set_status(@syllabus_submitted_status)
   # A class in the change status has a change request completed.
-  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{change_request: %{is_completed: true}}), do: check_req_status(class)
+  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{change_request: _}), do: check_req_status(class)
   # A class in the change status has a student request completed.
   defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{student_request: %{is_completed: true}}), do: check_req_status(class)
   # A class has a change request created.
-  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{change_request: %{is_completed: false}}), do: class |> set_status(@class_issue_status)
+  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{change_request: _}), do: set_status(class, @class_issue_status)
   # A class has a help request created.
   defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{class_help_type_id: type_id}}) when type_id in [@bad_file_type, @wrong_syllabus_type], do: class |> set_status(@needs_setup_status)
   defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{class_help_type_id: @no_weights_or_assign_type}}), do: class |> set_status(@needs_student_input_status)
@@ -211,21 +211,23 @@ defmodule Skoller.ClassStatuses.Classes do
   end
 
   #Check to see if there are other incomplete change requests.
-  defp check_req_status(%Class{} = class) do
-    cr_query = from(cr in ChangeRequest)
-    |> where([cr], cr.class_id == ^class.id and cr.is_completed == false)
-    |> Repo.all()
+  defp check_req_status(%Class{id: class_id} = class) do
 
-    sr_query = from(sr in StudentRequest)
+    cr_exists = ChangeRequest 
+    |> join(:inner, [c], m in ChangeRequestMember, on: c.id == m.class_change_request_id)
+    |> where([c, m], c.class_id == ^class_id and not(m.is_completed))
+    |> Repo.exists?()
+
+    sr_exists = from(sr in StudentRequest)
     |> where([sr], sr.class_id == ^class.id and sr.is_completed == false)
-    |> Repo.all()
+    |> Repo.exists?()
 
-    results = cr_query ++ sr_query
+    results = cr_exists or sr_exists
 
     case results do
-      [] -> 
+      false -> 
         class |> set_status(@class_complete_status)
-      _results -> 
+      true -> 
         {:ok, nil}
     end
   end

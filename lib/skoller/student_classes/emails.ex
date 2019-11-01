@@ -3,10 +3,9 @@ defmodule Skoller.StudentClasses.Emails do
   Defines emails based on student classes
   """
 
-  alias Skoller.Repo
   alias Skoller.EmailJobs
   alias Skoller.EmailJobs.EmailJob
-  alias Skoller.EmailLogs.EmailLog
+  alias Skoller.EmailLogs
   alias Skoller.Users.EmailPreferences
   alias Skoller.Services.SesMailer
 
@@ -176,7 +175,6 @@ defmodule Skoller.StudentClasses.Emails do
     IO.puts("LOOK AT ME")
 
     opts
-    |> IO.inspect()
     |> Map.take(["class_name"])
     |> Map.put("student_class_link", share_url(link))
   end
@@ -215,9 +213,8 @@ defmodule Skoller.StudentClasses.Emails do
   defp template_name(@join_second_class_id), do: "second_class"
 
   # Email sent logger
-  defp log_email_sent(status_id, user_id) do
-    Repo.insert(%EmailLog{user_id: user_id, email_type_id: status_id})
-  end
+  defp log_email_sent(email_type_id, user_id),
+    do: user_id |> EmailLogs.log_email(email_type_id)
 
   # Create unsub path
   defp unsub_url(user_id), do: @env_url <> "/unsubscribe/" <> (user_id |> to_string)

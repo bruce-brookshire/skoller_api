@@ -65,7 +65,7 @@ defmodule Skoller.StudentPoints.Emails do
   defp send_email(params), do: params
 
   defp send_no_classes_email(user) do
-    user_id = user.id |> to_string
+    EmailLogs.log_email(user.id, @one_thousand_points_id)
 
     SesMailer.send_individual_email(%{to: user.email, form: %{}}, "one_thousand_points")
   end

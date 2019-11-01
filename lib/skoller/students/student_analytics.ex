@@ -4,7 +4,6 @@ defmodule Skoller.Students.StudentAnalytics do
     alias Skoller.Users.User
     alias Skoller.Students.Student
     alias Skoller.Schools.School
-    alias Skoller.Organizations.Organization
     alias Skoller.Students.FieldOfStudy, as: StudentField
     alias Skoller.FieldsOfStudy.FieldOfStudy
 

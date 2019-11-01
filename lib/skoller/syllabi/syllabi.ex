@@ -11,8 +11,6 @@ defmodule Skoller.Syllabi do
   alias Skoller.Locks.Lock
   alias Skoller.ClassDocs.Doc
   alias Skoller.Schools.School
-  alias Skoller.EnrolledStudents
-  alias Skoller.ClassStatuses.Status
   alias Skoller.Locks
   alias Skoller.Settings
   alias Skoller.FourDoor.FourDoorOverride
@@ -40,7 +38,7 @@ defmodule Skoller.Syllabi do
    * The default is to serve a class regardless of status or lock.
    * To lock (and find) classes based on a single status, pass in `lock_type` and `status_type`
   """
-  def serve_class(user, lock_type \\ nil, status_type \\ @syllabus_submitted_status) do
+  def serve_class(user, lock_type \\ nil, _status_type \\ @syllabus_submitted_status) do
     case Users.get_user_lock(user, lock_type) do
       [] ->
         # TODO, is this needed? get_workers(lock_type) |> get_classes(lock_type, status_type) |> get_one_class()
@@ -57,15 +55,16 @@ defmodule Skoller.Syllabi do
   def syllabi_class_count() do
     # count = get_classes([], nil, @syllabus_submitted_status) |> get_class_count()
 
-    now = DateTime.utc_now()
-
     from(class in Class)
     |> join(:inner, [c], p in ClassPeriod, on: p.id == c.class_period_id)
     |> join(:left, [c, p], l in Lock, on: c.id == l.class_id)
     |> join(:inner, [c, p, l], sc in StudentClass, on: c.id == sc.class_id)
-    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id)) # Where the class is ready for review and does not have a lock
-    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id) # Ensure that the class period isnt over yet
-    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id))) # Remove any double counting, and get the total
+    # Where the class is ready for review and does not have a lock
+    |> where([c, p, l, sc], c.class_status_id == @syllabus_submitted_status and is_nil(l.id))
+    # Ensure that the class period isnt over yet
+    |> where([c, p, l, sc], p.class_period_status_id != @class_period_past_status_id)
+    # Remove any double counting, and get the total
+    |> select([c, p, l, sc], count(fragment("DISTINCT ?", c.id)))
     |> Repo.one()
   end
 
@@ -126,201 +125,202 @@ defmodule Skoller.Syllabi do
     Locks.lock_class(id, user.id, type)
   end
 
+  # TODO: Can I delete everything?
   # Tries to find an enrolled class, then a non enrolled class, of the lock and status type.
-  defp get_classes(workers, lock_type, status_type) do
-    case workers |> find_classes(lock_type, status_type, enrolled: true) do
-      nil -> workers |> find_classes(lock_type, status_type, [])
-      class -> class
-    end
-  end
+  # defp get_classes(workers, lock_type, status_type) do
+  #   case workers |> find_classes(lock_type, status_type, enrolled: true) do
+  #     nil -> workers |> find_classes(lock_type, status_type, [])
+  #     class -> class
+  #   end
+  # end
 
-  # This gets a ratio of workers to avaliable classes at each school, finds the school with the most need,
-  # and then gets the oldest class at the school.
-  defp find_classes(workers, lock_type, status_type, opts) do
-    status_type
-    |> get_ratios(opts)
-    |> biggest_difference(workers)
-    |> get_oldest(status_type, lock_type, opts)
-  end
+  # # This gets a ratio of workers to avaliable classes at each school, finds the school with the most need,
+  # # and then gets the oldest class at the school.
+  # defp find_classes(workers, lock_type, status_type, opts) do
+  #   status_type
+  #   |> get_ratios(opts)
+  #   |> biggest_difference(workers)
+  #   |> get_oldest(status_type, lock_type, opts)
+  # end
 
-  # Gets the oldest class at a school with the params below.
-  defp get_oldest(school_id, status, type, opts) do
-    t = get_oldest_classes_by_school(type, status, school_id, opts)
-    Logger.info("Get oldest")
-    Logger.info(inspect(t))
-    t
-  end
+  # # Gets the oldest class at a school with the params below.
+  # defp get_oldest(school_id, status, type, opts) do
+  #   t = get_oldest_classes_by_school(type, status, school_id, opts)
+  #   Logger.info("Get oldest")
+  #   Logger.info(inspect(t))
+  #   t
+  # end
 
   # This gets the oldest class at a school.
   # The class must have a doc, must not be locked, must be editable.
-  defp get_oldest_classes_by_school(lock_type, class_status, school_id, opts) do
-    from(class in Class)
-    |> join(:inner, [class], doc in subquery(doc_subquery(school_id)),
-      on: class.id == doc.class_id
-    )
-    |> lock_join(lock_type)
-    |> join(:inner, [class], s in Status, on: class.class_status_id == s.id)
-    |> enrolled_classes(opts)
-    |> where([class], class.is_editable == true)
-    # trying to avoid clashing with manual admin changes
-    |> where([class, doc, lock], is_nil(lock.id))
-    |> where_oldest_status(class_status)
-  end
+  # defp get_oldest_classes_by_school(lock_type, class_status, school_id, opts) do
+  #   from(class in Class)
+  #   |> join(:inner, [class], doc in subquery(doc_subquery(school_id)),
+  #     on: class.id == doc.class_id
+  #   )
+  #   |> lock_join(lock_type)
+  #   |> join(:inner, [class], s in Status, on: class.class_status_id == s.id)
+  #   |> enrolled_classes(opts)
+  #   |> where([class], class.is_editable == true)
+  #   # trying to avoid clashing with manual admin changes
+  #   |> where([class, doc, lock], is_nil(lock.id))
+  #   |> where_oldest_status(class_status)
+  # end
 
-  defp doc_subquery(school_id) do
-    from(d in Doc)
-    |> join(:inner, [d], c in Class, on: c.id == d.class_id)
-    |> join(:inner, [d, class], period in ClassPeriod, on: class.class_period_id == period.id)
-    |> where([d, class, period], period.school_id == ^school_id)
-    |> group_by([d], [d.class_id, d.inserted_at])
-    |> order_by([d], asc: d.inserted_at)
-    |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
-  end
+  # defp doc_subquery(school_id) do
+  #   from(d in Doc)
+  #   |> join(:inner, [d], c in Class, on: c.id == d.class_id)
+  #   |> join(:inner, [d, class], period in ClassPeriod, on: class.class_period_id == period.id)
+  #   |> where([d, class, period], period.school_id == ^school_id)
+  #   |> group_by([d], [d.class_id, d.inserted_at])
+  #   |> order_by([d], asc: d.inserted_at)
+  #   |> select([d], %{inserted_at: d.inserted_at, class_id: d.class_id})
+  # end
 
   # Helper methods to cap the query for syllabi classes
-  defp get_one_class(query) do
-    query
-    |> order_by([class, doc], asc: doc.inserted_at)
-    |> limit(1)
-    |> Repo.one()
-  end
+  # defp get_one_class(query) do
+  #   query
+  #   |> order_by([class, doc], asc: doc.inserted_at)
+  #   |> limit(1)
+  #   |> Repo.one()
+  # end
 
-  defp get_class_count(query) do
-    query
-    |> select([class], count(class.id))
-    |> Repo.one()
-  end
+  # defp get_class_count(query) do
+  #   query
+  #   |> select([class], count(class.id))
+  #   |> Repo.one()
+  # end
 
   # Gets a list of classes that are valid for a syllabus worker to work.
   # Must have a doc, be editable, and be set to have a syllabus.
-  defp get_processable_classes(status_id, opts) do
-    from(class in subquery(get_servable_classes_subquery()))
-    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
-    |> join(:inner, [class, peroiod, sch], s in Status, on: class.class_status_id == s.id)
-    |> enrolled_classes(opts)
-    |> where([class], class.is_editable == true and class.is_syllabus == true)
-    |> where([class], fragment("exists (select 1 from docs where class_id = ?)", class.id))
-    |> where_processable_status(status_id)
-    |> group_by([class, period], period.school_id)
-    |> select([class, period], %{count: count(period.school_id), school: period.school_id})
-    |> Repo.all()
-  end
+  # defp get_processable_classes(status_id, opts) do
+  #   from(class in subquery(get_servable_classes_subquery()))
+  #   |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
+  #   |> join(:inner, [class, peroiod, sch], s in Status, on: class.class_status_id == s.id)
+  #   |> enrolled_classes(opts)
+  #   |> where([class], class.is_editable == true and class.is_syllabus == true)
+  #   |> where([class], fragment("exists (select 1 from docs where class_id = ?)", class.id))
+  #   |> where_processable_status(status_id)
+  #   |> group_by([class, period], period.school_id)
+  #   |> select([class, period], %{count: count(period.school_id), school: period.school_id})
+  #   |> Repo.all()
+  # end
 
   # Gets a ratio of school_classes : total_classes for all schools.
-  defp get_ratios(status, opts) do
-    t =
-      get_processable_classes(status, opts)
-      |> get_enum_ratio()
+  # defp get_ratios(status, opts) do
+  #   t =
+  #     get_processable_classes(status, opts)
+  #     |> get_enum_ratio()
 
-    Logger.info("get ratios")
-    Logger.info(inspect(t))
-    t
-  end
+  #   Logger.info("get ratios")
+  #   Logger.info(inspect(t))
+  #   t
+  # end
 
   # Gets a ratio of currently working users per school over total workers.
-  defp get_workers(type) do
-    t =
-      from(lock in subquery(unique_class_locks()))
-      |> join(:inner, [lock], class in Class, on: lock.class_id == class.id)
-      |> join(:inner, [lock, class], period in ClassPeriod, on: period.id == class.class_period_id)
-      |> where_lock_type(type)
-      |> group_by([lock, class, period], period.school_id)
-      |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
-      |> Repo.all()
-      |> get_enum_ratio()
+  # defp get_workers(type) do
+  #   t =
+  #     from(lock in subquery(unique_class_locks()))
+  #     |> join(:inner, [lock], class in Class, on: lock.class_id == class.id)
+  #     |> join(:inner, [lock, class], period in ClassPeriod, on: period.id == class.class_period_id)
+  #     |> where_lock_type(type)
+  #     |> group_by([lock, class, period], period.school_id)
+  #     |> select([lock, class, period], %{count: count(period.school_id), school: period.school_id})
+  #     |> Repo.all()
+  #     |> get_enum_ratio()
 
-    Logger.info("get workers")
-    Logger.info(inspect(t))
-    t
-  end
+  #   Logger.info("get workers")
+  #   Logger.info(inspect(t))
+  #   t
+  # end
 
-  defp unique_class_locks() do
-    from(lock in Lock)
-    |> distinct([lock], lock.user_id)
-  end
+  # defp unique_class_locks() do
+  #   from(lock in Lock)
+  #   |> distinct([lock], lock.user_id)
+  # end
 
-  # Takes in an enum where each element has a count, and returns
-  # the enum with a :ratio field.
-  defp get_enum_ratio(enumerable) do
-    sum = enumerable |> Enum.reduce(0, &(&1.count + &2))
+  # # Takes in an enum where each element has a count, and returns
+  # # the enum with a :ratio field.
+  # defp get_enum_ratio(enumerable) do
+  #   sum = enumerable |> Enum.reduce(0, &(&1.count + &2))
 
-    enumerable |> Enum.map(&Map.put(&1, :ratio, &1.count / sum))
-  end
+  #   enumerable |> Enum.map(&Map.put(&1, :ratio, &1.count / sum))
+  # end
 
   # If opts are passed in with enrolled: true, then add a join to only get enrolled classes.
-  defp enrolled_classes(query, []), do: query
+  # defp enrolled_classes(query, []), do: query
 
-  defp enrolled_classes(query, opts) do
-    case opts |> List.keytake(:enrolled, 0) |> elem(0) do
-      {:enrolled, true} ->
-        query
-        |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_subquery()),
-          on: sc.class_id == class.id
-        )
+  # defp enrolled_classes(query, opts) do
+  #   case opts |> List.keytake(:enrolled, 0) |> elem(0) do
+  #     {:enrolled, true} ->
+  #       query
+  #       |> join(:inner, [class], sc in subquery(EnrolledStudents.get_enrolled_classes_subquery()),
+  #         on: sc.class_id == class.id
+  #       )
 
-      _ ->
-        query
-    end
-  end
+  #     _ ->
+  #       query
+  #   end
+  # end
 
-  defp lock_join(query, nil) do
-    query
-    |> join(:left, [class, doc], lock in Lock, on: class.id == lock.class_id)
-  end
+  # defp lock_join(query, nil) do
+  #   query
+  #   |> join(:left, [class, doc], lock in Lock, on: class.id == lock.class_id)
+  # end
 
-  defp lock_join(query, lock_type) do
-    query
-    |> join(:left, [class, doc], lock in Lock,
-      on: class.id == lock.class_id and lock.class_lock_section_id == ^lock_type
-    )
-  end
+  # defp lock_join(query, lock_type) do
+  #   query
+  #   |> join(:left, [class, doc], lock in Lock,
+  #     on: class.id == lock.class_id and lock.class_lock_section_id == ^lock_type
+  #   )
+  # end
 
-  defp where_oldest_status(query, nil) do
-    query
-    |> where([class, doc, lock, s], s.is_maintenance == false and s.is_complete == false)
-  end
+  # defp where_oldest_status(query, nil) do
+  #   query
+  #   |> where([class, doc, lock, s], s.is_maintenance == false and s.is_complete == false)
+  # end
 
-  defp where_oldest_status(query, status_id) do
-    query
-    |> where([class, doc, lock, s], s.id == ^status_id)
-  end
+  # defp where_oldest_status(query, status_id) do
+  #   query
+  #   |> where([class, doc, lock, s], s.id == ^status_id)
+  # end
 
-  defp where_processable_status(query, nil) do
-    query
-    |> where([class, period, s], s.is_maintenance == false and s.is_complete == false)
-  end
+  # defp where_processable_status(query, nil) do
+  #   query
+  #   |> where([class, period, s], s.is_maintenance == false and s.is_complete == false)
+  # end
 
-  defp where_processable_status(query, status_id) do
-    query
-    |> where([class, period, s], s.id == ^status_id)
-  end
+  # defp where_processable_status(query, status_id) do
+  #   query
+  #   |> where([class, period, s], s.id == ^status_id)
+  # end
 
-  defp where_lock_type(query, nil), do: query
+  # defp where_lock_type(query, nil), do: query
 
-  defp where_lock_type(query, type) do
-    query |> where([lock], lock.class_lock_section_id == ^type)
-  end
+  # defp where_lock_type(query, type) do
+  #   query |> where([lock], lock.class_lock_section_id == ^type)
+  # end
 
   # Finds the biggest need in schools.
-  defp biggest_difference(needed, workers) do
-    max =
-      needed
-      |> Enum.map(&Map.put(&1, :need, get_difference(&1, workers)))
-      |> Enum.reduce(
-        %{need: 0, school: 0},
-        &case &1.need >= &2.need do
-          true -> &1
-          false -> &2
-        end
-      )
+  # defp biggest_difference(needed, workers) do
+  #   max =
+  #     needed
+  #     |> Enum.map(&Map.put(&1, :need, get_difference(&1, workers)))
+  #     |> Enum.reduce(
+  #       %{need: 0, school: 0},
+  #       &case &1.need >= &2.need do
+  #         true -> &1
+  #         false -> &2
+  #       end
+  #     )
 
-    Logger.info("biggest_difference")
-    Logger.info(inspect(max))
-    max.school
-  end
+  #   Logger.info("biggest_difference")
+  #   Logger.info(inspect(max))
+  #   max.school
+  # end
 
-  defp get_difference(needed, workers) do
-    worker_school = workers |> Enum.find(%{ratio: 0}, &(&1.school == needed.school))
-    needed.ratio - worker_school.ratio
-  end
+  # defp get_difference(needed, workers) do
+  #   worker_school = workers |> Enum.find(%{ratio: 0}, &(&1.school == needed.school))
+  #   needed.ratio - worker_school.ratio
+  # end
 end

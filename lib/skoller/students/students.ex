@@ -8,6 +8,9 @@ defmodule Skoller.Students do
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.StudentClasses.EnrollmentLinks
   alias Skoller.Students.Sms
+  alias Skoller.StudentPoints.StudentPoint
+  alias Skoller.CustomSignups.Signup
+  alias Skoller.Organizations.Organization
 
   import Ecto.Query
 
@@ -190,5 +193,43 @@ defmodule Skoller.Students do
   """
   def get_main_school_students(school) do
     from(student in Student, where: student.primary_school_id == ^school.id) |> Repo.all()
+  end
+
+  @student_point_signup_type 2
+
+  def get_org_raise_effort_for_student(%Student{id: student_id}) do
+    org =
+      from(s in Signup)
+      |> join(:inner, [s], o in Organization,
+        on: o.custom_signup_link_id == s.custom_signup_link_id
+      )
+      |> where([s, o], s.student_id == ^student_id)
+      |> select([s, o], o)
+      |> Repo.one()
+
+    case org do
+      %Organization{name: org_name, id: org_id, custom_signup_link_id: link_id} ->
+        org_signups = Skoller.CustomSignups.get_link_signups_by_id(link_id)
+
+        personal_signups =
+          from(s in StudentPoint)
+          |> where(
+            [s],
+            s.student_id == ^student_id and s.student_point_type_id == @student_point_signup_type
+          )
+          |> group_by([s], s.student_id)
+          |> select([s], count(s.student_id))
+          |> Repo.one()
+
+        %{
+          org_singups: org_signups,
+          personal_signups: personal_signups || 0,
+          org_id: org_id,
+          org_name: org_name
+        }
+
+      nil ->
+        nil
+    end
   end
 end

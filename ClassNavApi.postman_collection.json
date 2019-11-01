@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b9dcecc3-9e25-4ea9-239f-f2d824e03770",
+		"_postman_id": "1dc72ee8-1050-4232-b1f2-3c1c023b3396",
 		"name": "ClassNavApi",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -20,7 +20,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"dev@skoller.co\",\n\"password\":\"password\"}"
+							"raw": "{\"email\":\"dev_admin@skoller.co\", \"password\": \"IGxs1Px9BY1x\"}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users/login",
@@ -69,6 +69,38 @@
 							]
 						},
 						"description": "Uses a token to get user info."
+					},
+					"response": []
+				},
+				{
+					"name": "Student Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"phone\":\"9032452355\", \"verification_code\": \"76405\"}"
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/students/login",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"students",
+								"login"
+							]
+						},
+						"description": "For logging in with a phone number"
 					},
 					"response": []
 				},
@@ -304,7 +336,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/analytics?date_start=2012-01-01&date_end=2019-01-01",
 							"host": [
@@ -344,7 +375,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/auto-updates/",
 							"host": [
@@ -369,7 +399,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/auto-updates/",
 									"host": [
@@ -490,7 +519,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/auto-updates/forecast?auto_upd_approval_thresh=0",
 							"host": [
@@ -680,10 +708,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/reminder-messages/",
 									"host": [
@@ -746,10 +770,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/reminder-messages/topics",
 									"host": [
@@ -781,7 +801,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/assignments/19/mods",
 									"host": [
@@ -1176,10 +1195,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/assignments/2",
 							"host": [
@@ -1209,10 +1224,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/assignments/1",
 									"host": [
@@ -1305,7 +1316,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/chat-sort-algorithms",
 							"host": [
@@ -1454,10 +1464,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"test 1\",\n  \"due\": \"2017-10-12\",\n  \"relative_weight\": 100\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1/assignments",
 									"host": [
@@ -1763,7 +1769,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/changes/1/complete",
 									"host": [
@@ -1778,6 +1783,39 @@
 									]
 								},
 								"description": "Marks a change request as complete.\n\n## Path Params\n* change request id\n\n## Behavior\nThis will not change class statuses. The class status needs to be set once all change requests are complete, or once an appropriate status is determined."
+							},
+							"response": []
+						},
+						{
+							"name": "Resolve Change Request Member",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/changes/member/9/complete",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"changes",
+										"member",
+										"9",
+										"complete"
+									]
+								}
 							},
 							"response": []
 						}
@@ -1837,7 +1875,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/comments/5",
 											"host": [
@@ -2056,7 +2093,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/posts",
 											"host": [
@@ -2119,7 +2155,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/posts/1",
 											"host": [
@@ -2184,7 +2219,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/posts/2",
 											"host": [
@@ -2442,7 +2476,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/replies/5",
 											"host": [
@@ -2599,8 +2632,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"type": "file",
-											"src": ""
+											"value": "",
+											"type": "file"
 										}
 									]
 								},
@@ -2638,16 +2671,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "file",
-											"type": "file",
-											"src": ""
-										}
-									]
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1/docs",
 									"host": [
@@ -2674,16 +2697,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {
-											"mode": "formdata",
-											"formdata": [
-												{
-													"key": "file",
-													"type": "file",
-													"src": null
-												}
-											]
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/1/docs",
 											"host": [
@@ -2760,7 +2773,7 @@
 										{
 											"key": "file",
 											"type": "file",
-											"src": null
+											"src": []
 										}
 									]
 								},
@@ -2796,7 +2809,7 @@
 												{
 													"key": "file",
 													"type": "file",
-													"src": null
+													"src": []
 												}
 											]
 										},
@@ -2893,8 +2906,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"type": "file",
-											"src": ""
+											"value": "",
+											"type": "file"
 										},
 										{
 											"key": "sammi",
@@ -2940,8 +2953,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"type": "file",
-											"src": ""
+											"value": "",
+											"type": "file"
 										}
 									]
 								},
@@ -3004,83 +3017,6 @@
 								"description": "Adds a help request to a class.\n\n## Path Params\n* class id\n* help type id\n\n## Body Params\n* note\n\n## Behavior\nThis will change class status.\n\n## Note\nThis is meant to be used when a class is <b>not</b> complete. If a class is complete, use a change request."
 							},
 							"response": [
-								{
-									"name": "Add Help Request Error",
-									"originalRequest": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"note\": \"It broke.\"\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/classes/2/help/100",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"classes",
-												"2",
-												"help",
-												"100"
-											]
-										}
-									},
-									"status": "Unprocessable Entity",
-									"code": 422,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "60",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Tue, 28 Nov 2017 20:16:36 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "cushidgg3suj6132gmihueo4hpjpsoni",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"body": "{\"error\":{\"error\":\"Class is complete, use Change Request.\"}}"
-								},
 								{
 									"name": "Add Help Request",
 									"originalRequest": {
@@ -3157,6 +3093,83 @@
 									],
 									"cookie": [],
 									"body": "{\"type\":null,\"status\":{\"name\":\"Needs Syllabus\",\"id\":200},\"seat_count\":200,\"number\":\"8001-01\",\"name\":\"Cryptocurrencies 101\",\"meet_start_time\":\"8:30\",\"meet_end_time\":\"12\",\"meet_days\":\"MWF\",\"location\":null,\"length\":\"Custom\",\"is_syllabus\":true,\"is_enrollable\":true,\"is_editable\":true,\"id\":2,\"help_requests\":[{\"note\":\"It broke.\",\"is_completed\":false,\"id\":3,\"help_type\":{\"name\":\"Incorrect\",\"id\":100}}],\"grade_scale\":\"A,90|B,80|C,70|D,60\",\"crn\":null,\"credits\":null,\"class_start\":\"2017-08-30\",\"class_end\":\"2017-12-11\",\"change_requests\":[]}"
+								},
+								{
+									"name": "Add Help Request Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"note\": \"It broke.\"\n}"
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/classes/2/help/100",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"classes",
+												"2",
+												"help",
+												"100"
+											]
+										}
+									},
+									"status": "Unprocessable Entity",
+									"code": 422,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "60",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Tue, 28 Nov 2017 20:16:36 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "cushidgg3suj6132gmihueo4hpjpsoni",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"body": "{\"error\":{\"error\":\"Class is complete, use Change Request.\"}}"
 								}
 							]
 						},
@@ -3170,7 +3183,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/help/1/complete",
 									"host": [
@@ -3197,7 +3209,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/help/1/complete",
 											"host": [
@@ -3348,10 +3359,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/2/locks",
 									"host": [
@@ -3382,10 +3389,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": ""
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/classes/2/locks",
 											"host": [
@@ -3593,7 +3596,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/class-statuses",
 									"host": [
@@ -3618,7 +3620,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/class-statuses",
 											"host": [
@@ -3687,7 +3688,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/class-statuses/hub",
 									"host": [
@@ -3713,7 +3713,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/class-statuses/hub",
 											"host": [
@@ -3783,7 +3782,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/class-help-types",
 									"host": [
@@ -3808,7 +3806,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/class-help-types",
 											"host": [
@@ -3877,7 +3874,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/class-change-types",
 									"host": [
@@ -3902,7 +3898,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/class-change-types",
 											"host": [
@@ -4121,7 +4116,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/student-requests/26/complete",
 									"host": [
@@ -4148,7 +4142,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/student-requests/26/complete",
 											"host": [
@@ -4247,10 +4240,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1/weights",
 									"host": [
@@ -4643,7 +4632,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/classes",
 							"host": [
@@ -4669,7 +4657,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/classes/1",
 							"host": [
@@ -4695,7 +4682,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/classes/1",
 									"host": [
@@ -4783,7 +4769,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/classes/1/admin",
 							"host": [
@@ -4919,10 +4904,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/custom-links",
 							"host": [
@@ -4982,10 +4963,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/custom-links/1",
 							"host": [
@@ -5017,7 +4994,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/email-types",
 							"host": [
@@ -5075,7 +5051,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/email-types/list",
 							"host": [
@@ -5114,8 +5089,8 @@
 									"formdata": [
 										{
 											"key": "file",
-											"type": "file",
-											"src": ""
+											"value": "",
+											"type": "file"
 										}
 									]
 								},
@@ -5279,10 +5254,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/fields-of-study",
 							"host": [
@@ -5310,10 +5281,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/fields-of-study",
 									"host": [
@@ -5529,10 +5496,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"field\": \"Computer Science\"\n}"
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/fields-of-study/list",
 							"host": [
@@ -5563,7 +5526,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/four-door/",
 							"host": [
@@ -5624,7 +5586,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/4/four-door/",
 							"host": [
@@ -5685,7 +5646,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/four-door/overrides",
 							"host": [
@@ -5716,7 +5676,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/locations/",
 							"host": [
@@ -5748,7 +5707,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/notifications/syllabus-needed",
 							"host": [
@@ -5774,7 +5732,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/notifications/",
 							"host": [
@@ -5849,10 +5806,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/organizations",
 							"host": [
@@ -5984,10 +5937,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/periods/1",
 							"host": [
@@ -6016,10 +5965,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/periods/1",
 									"host": [
@@ -6243,10 +6188,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/professors/1",
 							"host": [
@@ -6275,10 +6216,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/professors/1",
 									"host": [
@@ -6503,7 +6440,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/roles/",
 							"host": [
@@ -6533,7 +6469,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/roles/",
 									"host": [
@@ -6626,7 +6561,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/roles/100",
 							"host": [
@@ -6656,7 +6590,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/roles/100",
 									"host": [
@@ -6749,7 +6682,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/sammi",
 							"host": [
@@ -6774,7 +6706,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/sammi/train",
 							"host": [
@@ -6941,10 +6872,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/periods/",
 									"host": [
@@ -6975,10 +6902,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/schools/1/periods/",
 											"host": [
@@ -7207,10 +7130,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/professors/",
 									"host": [
@@ -7242,10 +7161,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
 											"host": [
@@ -7337,10 +7252,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"name\": \"Quarter 1\",\n  \"start_date\": \"2017-10-12T18:51:53Z\",\n  \"end_date\": \"2018-10-12T18:51:53Z\"\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/periods/1/professors/",
 											"host": [
@@ -7436,7 +7347,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/email_domains",
 									"host": [
@@ -7463,7 +7373,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/email_domains",
 									"host": [
@@ -7688,7 +7597,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/",
 							"host": [
@@ -7714,7 +7622,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/",
 									"host": [
@@ -7800,7 +7707,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/",
 									"host": [
@@ -7888,7 +7794,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/1",
 							"host": [
@@ -7913,7 +7818,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1",
 									"host": [
@@ -8128,7 +8032,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/hub?name=hard",
 							"host": [
@@ -8159,7 +8062,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/hub",
 									"host": [
@@ -8247,7 +8149,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/school/list",
 							"host": [
@@ -8268,7 +8169,6 @@
 							"originalRequest": {
 								"method": "GET",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/school/list",
 									"host": [
@@ -8356,7 +8256,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/1/classes",
 							"host": [
@@ -8383,7 +8282,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/schools/1/classes",
 									"host": [
@@ -8472,7 +8370,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/1/classes/min",
 							"host": [
@@ -8510,8 +8407,8 @@
 							"formdata": [
 								{
 									"key": "file",
-									"type": "file",
-									"src": ""
+									"value": "",
+									"type": "file"
 								}
 							]
 						},
@@ -8541,7 +8438,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/email_domains/test.edu/check",
 							"host": [
@@ -8580,10 +8476,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
 									"host": [
@@ -8608,7 +8500,7 @@
 							},
 							"response": [
 								{
-									"name": "Speculate Grades Complete Class",
+									"name": "Speculate Grades by Grade",
 									"originalRequest": {
 										"method": "GET",
 										"header": [
@@ -8621,10 +8513,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
 											"host": [
@@ -8677,7 +8565,7 @@
 										},
 										{
 											"key": "content-length",
-											"value": "38",
+											"value": "45",
 											"name": "content-length",
 											"description": "The length of the response body in octets (8-bit bytes)"
 										},
@@ -8689,7 +8577,7 @@
 										},
 										{
 											"key": "date",
-											"value": "Tue, 28 Nov 2017 21:06:39 GMT",
+											"value": "Tue, 28 Nov 2017 22:36:36 GMT",
 											"name": "date",
 											"description": "The date and time that the message was sent"
 										},
@@ -8701,13 +8589,13 @@
 										},
 										{
 											"key": "x-request-id",
-											"value": "gulbouj69vp8q78jkjpjep2bkj15ob15",
+											"value": "p6mnq8ql1np6ac9jhsh6e800ik1a9p2t",
 											"name": "x-request-id",
 											"description": "Custom header"
 										}
 									],
 									"cookie": [],
-									"body": "{\"error\":\"Class is already complete.\"}"
+									"body": "{\"speculation\":93.33333333333333,\"grade\":\"A\"}"
 								},
 								{
 									"name": "Speculate Grades",
@@ -8723,10 +8611,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
 											"host": [
@@ -8812,7 +8696,7 @@
 									"body": "[{\"speculation\":93.33333333333333,\"grade\":\"A\"},{\"speculation\":0.0,\"grade\":\"B\"},{\"speculation\":0.0,\"grade\":\"C\"},{\"speculation\":0.0,\"grade\":\"D\"}]"
 								},
 								{
-									"name": "Speculate Grades by Grade",
+									"name": "Speculate Grades Complete Class",
 									"originalRequest": {
 										"method": "GET",
 										"header": [
@@ -8825,10 +8709,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/1/classes/1/speculate?grade=A",
 											"host": [
@@ -8881,7 +8761,7 @@
 										},
 										{
 											"key": "content-length",
-											"value": "45",
+											"value": "38",
 											"name": "content-length",
 											"description": "The length of the response body in octets (8-bit bytes)"
 										},
@@ -8893,7 +8773,7 @@
 										},
 										{
 											"key": "date",
-											"value": "Tue, 28 Nov 2017 22:36:36 GMT",
+											"value": "Tue, 28 Nov 2017 21:06:39 GMT",
 											"name": "date",
 											"description": "The date and time that the message was sent"
 										},
@@ -8905,13 +8785,13 @@
 										},
 										{
 											"key": "x-request-id",
-											"value": "p6mnq8ql1np6ac9jhsh6e800ik1a9p2t",
+											"value": "gulbouj69vp8q78jkjpjep2bkj15ob15",
 											"name": "x-request-id",
 											"description": "Custom header"
 										}
 									],
 									"cookie": [],
-									"body": "{\"speculation\":93.33333333333333,\"grade\":\"A\"}"
+									"body": "{\"error\":\"Class is already complete.\"}"
 								}
 							]
 						},
@@ -8929,10 +8809,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
 									"host": [
@@ -8950,100 +8826,6 @@
 							},
 							"response": [
 								{
-									"name": "Get Student Assignments Class",
-									"originalRequest": {
-										"method": "GET",
-										"header": [
-											{
-												"key": "Authorization",
-												"value": "Bearer {{token}}"
-											},
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
-										"url": {
-											"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
-											"host": [
-												"{{BaseUrl}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"students",
-												"2",
-												"assignments"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "json",
-									"header": [
-										{
-											"key": "access-control-allow-credentials",
-											"value": "true",
-											"name": "access-control-allow-credentials",
-											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-										},
-										{
-											"key": "access-control-allow-origin",
-											"value": "*",
-											"name": "access-control-allow-origin",
-											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-										},
-										{
-											"key": "access-control-expose-headers",
-											"value": "",
-											"name": "access-control-expose-headers",
-											"description": "Lets a server whitelist headers that browsers are allowed to access."
-										},
-										{
-											"key": "cache-control",
-											"value": "max-age=0, private, must-revalidate",
-											"name": "cache-control",
-											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-										},
-										{
-											"key": "content-length",
-											"value": "753",
-											"name": "content-length",
-											"description": "The length of the response body in octets (8-bit bytes)"
-										},
-										{
-											"key": "content-type",
-											"value": "application/json; charset=utf-8",
-											"name": "content-type",
-											"description": "The mime type of this content"
-										},
-										{
-											"key": "date",
-											"value": "Thu, 30 Nov 2017 21:54:52 GMT",
-											"name": "date",
-											"description": "The date and time that the message was sent"
-										},
-										{
-											"key": "server",
-											"value": "Cowboy",
-											"name": "server",
-											"description": "A name for the server"
-										},
-										{
-											"key": "x-request-id",
-											"value": "bmuq4iabvo9qoens4urjn0le0bgknsqk",
-											"name": "x-request-id",
-											"description": "Custom header"
-										}
-									],
-									"cookie": [],
-									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
-								},
-								{
 									"name": "Get Student Assignments",
 									"originalRequest": {
 										"method": "GET",
@@ -9057,10 +8839,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
 											"host": [
@@ -9138,6 +8916,96 @@
 									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":1,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_notifications\":true,\"is_completed\":false,\"id\":1,\"grade\":80.0,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":1,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_notifications\":true,\"is_completed\":false,\"id\":2,\"grade\":80.0,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":1,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_notifications\":true,\"is_completed\":false,\"id\":3,\"grade\":80.0,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":1,\"name\":\"Final\",\"is_pending_mods\":false,\"is_notifications\":true,\"is_completed\":false,\"id\":4,\"grade\":100.0,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
 								},
 								{
+									"name": "Get Student Assignments Class",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"students",
+												"2",
+												"assignments"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "access-control-allow-credentials",
+											"value": "true",
+											"name": "access-control-allow-credentials",
+											"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+										},
+										{
+											"key": "access-control-allow-origin",
+											"value": "*",
+											"name": "access-control-allow-origin",
+											"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+										},
+										{
+											"key": "access-control-expose-headers",
+											"value": "",
+											"name": "access-control-expose-headers",
+											"description": "Lets a server whitelist headers that browsers are allowed to access."
+										},
+										{
+											"key": "cache-control",
+											"value": "max-age=0, private, must-revalidate",
+											"name": "cache-control",
+											"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+										},
+										{
+											"key": "content-length",
+											"value": "753",
+											"name": "content-length",
+											"description": "The length of the response body in octets (8-bit bytes)"
+										},
+										{
+											"key": "content-type",
+											"value": "application/json; charset=utf-8",
+											"name": "content-type",
+											"description": "The mime type of this content"
+										},
+										{
+											"key": "date",
+											"value": "Thu, 30 Nov 2017 21:54:52 GMT",
+											"name": "date",
+											"description": "The date and time that the message was sent"
+										},
+										{
+											"key": "server",
+											"value": "Cowboy",
+											"name": "server",
+											"description": "A name for the server"
+										},
+										{
+											"key": "x-request-id",
+											"value": "bmuq4iabvo9qoens4urjn0le0bgknsqk",
+											"name": "x-request-id",
+											"description": "Custom header"
+										}
+									],
+									"cookie": [],
+									"body": "[{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 1\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":8,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":1},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 2\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":7,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":2},{\"weight_id\":1,\"weight\":0.07692307692307693,\"student_class_id\":2,\"name\":\"Assignment 3\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":6,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":3},{\"weight_id\":2,\"weight\":0.7692307692307693,\"student_class_id\":2,\"name\":\"Final\",\"is_pending_mods\":false,\"is_completed\":false,\"id\":5,\"grade\":null,\"due\":\"2018-10-12\",\"assignment_id\":4}]"
+								},
+								{
 									"name": "Get Student Assignments Date",
 									"originalRequest": {
 										"method": "GET",
@@ -9151,10 +9019,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
 											"host": [
@@ -9245,10 +9109,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"assignment_id\": 1,\n\t\"grade\": 68.75\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/2/assignments",
 											"host": [
@@ -9484,10 +9344,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"student_id\": 1\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/3/classes/1/mods",
 											"host": [
@@ -9506,102 +9362,6 @@
 									},
 									"response": [
 										{
-											"name": "Get Pending New Assignments",
-											"originalRequest": {
-												"method": "GET",
-												"header": [
-													{
-														"key": "Authorization",
-														"value": "Bearer {{token}}"
-													},
-													{
-														"key": "Content-Type",
-														"value": "application/json"
-													}
-												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n\t\"student_id\": 1\n}"
-												},
-												"url": {
-													"raw": "{{BaseUrl}}/api/v1/students/3/classes/1/mods",
-													"host": [
-														"{{BaseUrl}}"
-													],
-													"path": [
-														"api",
-														"v1",
-														"students",
-														"3",
-														"classes",
-														"1",
-														"mods"
-													]
-												}
-											},
-											"status": "OK",
-											"code": 200,
-											"_postman_previewlanguage": "json",
-											"header": [
-												{
-													"key": "access-control-allow-credentials",
-													"value": "true",
-													"name": "access-control-allow-credentials",
-													"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
-												},
-												{
-													"key": "access-control-allow-origin",
-													"value": "*",
-													"name": "access-control-allow-origin",
-													"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
-												},
-												{
-													"key": "access-control-expose-headers",
-													"value": "",
-													"name": "access-control-expose-headers",
-													"description": "Lets a server whitelist headers that browsers are allowed to access."
-												},
-												{
-													"key": "cache-control",
-													"value": "max-age=0, private, must-revalidate",
-													"name": "cache-control",
-													"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
-												},
-												{
-													"key": "content-length",
-													"value": "59",
-													"name": "content-length",
-													"description": "The length of the response body in octets (8-bit bytes)"
-												},
-												{
-													"key": "content-type",
-													"value": "application/json; charset=utf-8",
-													"name": "content-type",
-													"description": "The mime type of this content"
-												},
-												{
-													"key": "date",
-													"value": "Tue, 28 Nov 2017 21:13:55 GMT",
-													"name": "date",
-													"description": "The date and time that the message was sent"
-												},
-												{
-													"key": "server",
-													"value": "Cowboy",
-													"name": "server",
-													"description": "A name for the server"
-												},
-												{
-													"key": "x-request-id",
-													"value": "87ke0c6vb06r2c2fvaoc8e46h2ge5hn6",
-													"name": "x-request-id",
-													"description": "Custom header"
-												}
-											],
-											"cookie": [],
-											"body": "[{\"weight_id\":1,\"name\":\"Test 2\",\"id\":5,\"due\":\"2017-11-11\"}]"
-										},
-										{
 											"name": "Get Pending New Assignments None",
 											"originalRequest": {
 												"method": "GET",
@@ -9615,10 +9375,6 @@
 														"value": "application/json"
 													}
 												],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n\t\"student_id\": 1\n}"
-												},
 												"url": {
 													"raw": "{{BaseUrl}}/api/v1/students/3/classes/1/mods",
 													"host": [
@@ -9696,6 +9452,98 @@
 											],
 											"cookie": [],
 											"body": "[]"
+										},
+										{
+											"name": "Get Pending New Assignments",
+											"originalRequest": {
+												"method": "GET",
+												"header": [
+													{
+														"key": "Authorization",
+														"value": "Bearer {{token}}"
+													},
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{BaseUrl}}/api/v1/students/3/classes/1/mods",
+													"host": [
+														"{{BaseUrl}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"students",
+														"3",
+														"classes",
+														"1",
+														"mods"
+													]
+												}
+											},
+											"status": "OK",
+											"code": 200,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "access-control-allow-credentials",
+													"value": "true",
+													"name": "access-control-allow-credentials",
+													"description": "Indicates whether or not the response to the request can be exposed when the credentials flag is true. When used as part of a response to a preflight request, this indicates whether or not the actual request can be made using credentials."
+												},
+												{
+													"key": "access-control-allow-origin",
+													"value": "*",
+													"name": "access-control-allow-origin",
+													"description": "Specifies a URI that may access the resource. For requests without credentials, the server may specify '*' as a wildcard, thereby allowing any origin to access the resource."
+												},
+												{
+													"key": "access-control-expose-headers",
+													"value": "",
+													"name": "access-control-expose-headers",
+													"description": "Lets a server whitelist headers that browsers are allowed to access."
+												},
+												{
+													"key": "cache-control",
+													"value": "max-age=0, private, must-revalidate",
+													"name": "cache-control",
+													"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+												},
+												{
+													"key": "content-length",
+													"value": "59",
+													"name": "content-length",
+													"description": "The length of the response body in octets (8-bit bytes)"
+												},
+												{
+													"key": "content-type",
+													"value": "application/json; charset=utf-8",
+													"name": "content-type",
+													"description": "The mime type of this content"
+												},
+												{
+													"key": "date",
+													"value": "Tue, 28 Nov 2017 21:13:55 GMT",
+													"name": "date",
+													"description": "The date and time that the message was sent"
+												},
+												{
+													"key": "server",
+													"value": "Cowboy",
+													"name": "server",
+													"description": "A name for the server"
+												},
+												{
+													"key": "x-request-id",
+													"value": "87ke0c6vb06r2c2fvaoc8e46h2ge5hn6",
+													"name": "x-request-id",
+													"description": "Custom header"
+												}
+											],
+											"cookie": [],
+											"body": "[{\"weight_id\":1,\"name\":\"Test 2\",\"id\":5,\"due\":\"2017-11-11\"}]"
 										}
 									]
 								}
@@ -9716,10 +9564,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"student_id\": 1\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/classes/",
 									"host": [
@@ -9751,10 +9595,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"student_id\": 1\n}"
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
 									"host": [
@@ -9785,10 +9625,6 @@
 												"value": "application/json"
 											}
 										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"student_id\": 1\n}"
-										},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/1/classes/1",
 											"host": [
@@ -10172,7 +10008,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/enrollment-link/HNyQu7",
 									"host": [
@@ -10198,7 +10033,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/enrollment-link/LrGFP7",
 									"host": [
@@ -10359,7 +10193,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
 									"host": [
@@ -10386,7 +10219,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/students/1/fields/1",
 											"host": [
@@ -10611,10 +10443,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/mods/",
 									"host": [
@@ -10646,10 +10474,6 @@
 										"value": "application/json"
 									}
 								],
-								"body": {
-									"mode": "raw",
-									"raw": ""
-								},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/mods/1",
 									"host": [
@@ -10683,7 +10507,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/chat?sort=500",
 									"host": [
@@ -10717,7 +10540,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/students/1/inbox",
 									"host": [
@@ -11004,10 +10826,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/students/1/notifications/",
 							"host": [
@@ -11039,10 +10857,6 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/students/1/school/",
 							"host": [
@@ -11121,7 +10935,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
 									"host": [
@@ -11153,7 +10966,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
 											"host": [
@@ -11248,7 +11060,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1/roles/",
 									"host": [
@@ -11280,7 +11091,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/users/1/roles/",
 											"host": [
@@ -11375,7 +11185,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
 									"host": [
@@ -11407,7 +11216,6 @@
 												"value": "Bearer {{token}}"
 											}
 										],
-										"body": {},
 										"url": {
 											"raw": "{{BaseUrl}}/api/v1/users/1/roles/200",
 											"host": [
@@ -11492,7 +11300,6 @@
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1/email-preferences",
 									"host": [
@@ -11584,7 +11391,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users",
 							"host": [
@@ -11610,7 +11416,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users/1",
 							"host": [
@@ -11636,7 +11441,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1",
 									"host": [
@@ -11704,7 +11508,6 @@
 										"value": "Bearer {{token}}"
 									}
 								],
-								"body": {},
 								"url": {
 									"raw": "{{BaseUrl}}/api/v1/users/1",
 									"host": [
@@ -12133,7 +11936,6 @@
 								"value": "Bearer {{token}}"
 							}
 						],
-						"body": {},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/report",
 							"host": [
@@ -12160,10 +11962,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{BaseUrl}}/api/v1/min-version",
 					"host": [

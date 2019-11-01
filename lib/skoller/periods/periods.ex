@@ -5,7 +5,6 @@ defmodule Skoller.Periods do
 
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
-  alias Skoller.Periods.Notifications
   alias Skoller.Periods.Generator
   alias Skoller.Schools
   alias Skoller.Classes.Class
@@ -37,23 +36,52 @@ defmodule Skoller.Periods do
     |> Repo.all()
   end
 
-  def get_classes_by_period_id(period_id, filters \\ %{}) do
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod,
-      on:
-        period.id == ^period_id and class.class_period_id == period.id and
-          period.is_hidden == false
-    )
-    |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
-    |> where([class, period, prof], ^class_filter(filters))
-    |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
-    |> order_by([class], desc: class.inserted_at)
-    |> limit(50)
-    |> Repo.all()
-    |> Enum.map(fn class ->
-      Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
-    end)
+  def get_classes_by_period_id(period_id, params \\ %{})
+
+  def get_classes_by_period_id(period_id, %{"class_name" => name}) do
+    {classes, occs} =
+      name
+      |> String.split(" ", trim: true)
+      |> Enum.map(&search_classes_by_period_id(period_id, %{"class_name" => &1}))
+      |> Enum.concat()
+      |> Enum.reduce({%{}, %{}}, fn elem, {t_classes, t_occs} ->
+        class_id = elem.class.id
+
+        if Map.has_key?(t_occs, class_id) do
+          {t_classes, %{t_occs | class_id => t_occs[class_id] + 1}}
+        else
+          {Map.put(t_classes, class_id, elem), Map.put(t_occs, class_id, 1)}
+        end
+      end)
+      |> IO.inspect()
+
+    occs
+    |> Map.keys()
+    |> Enum.sort_by(&{classes[&1].enrollment, occs[&1]})
+    |> Enum.reverse()
+    |> Enum.take(50)
+    |> Enum.map(&classes[&1])
   end
+
+  def get_classes_by_period_id(period_id, params),
+    do: search_classes_by_period_id(period_id, params) |> Enum.take(50)
+
+  defp search_classes_by_period_id(period_id, filters),
+    do:
+      from(class in Class)
+      |> join(:inner, [class], period in ClassPeriod,
+        on:
+          period.id == ^period_id and class.class_period_id == period.id and
+            period.is_hidden == false
+      )
+      |> join(:left, [class], prof in Professor, on: class.professor_id == prof.id)
+      |> where([class, period, prof], ^class_filter(filters))
+      |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
+      |> order_by([class], desc: class.inserted_at)
+      |> Repo.all()
+      |> Enum.map(fn class ->
+        Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
+      end)
 
   @doc """
   Creates a period
@@ -158,6 +186,68 @@ defmodule Skoller.Periods do
   end
 
   @doc """
+
+  """
+  def duplicate_previous_periods_for_all_schools_for_year(year) do
+    start_date_test = get_datetime_string("#{year - 1}-01-01 00:00:00Z")
+    end_date_test = get_datetime_string("#{year - 1}-12-31 00:00:00Z")
+
+    entries =
+      from(c in ClassPeriod)
+      |> where(
+        [c],
+        c.start_date >= ^start_date_test and c.start_date < ^end_date_test
+      )
+      |> Repo.all()
+      |> Enum.map(&adjust_period_to_new_year(&1, year))
+      |> Enum.filter(&(&1 != nil))
+
+    Repo.insert_all(ClassPeriod, entries)
+  end
+
+  defp adjust_period_to_new_year(
+         %ClassPeriod{name: name, start_date: start_date, end_date: end_date} = period,
+         year
+       ) do
+    start_date_str = start_date |> DateTime.to_string()
+    end_date_str = end_date |> DateTime.to_string()
+
+    utc_now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    updated_values = %{
+      name: Regex.replace(~r/#{year - 1}/, name, "#{year}"),
+      start_date: convert_datetime(year, start_date_str),
+      end_date: convert_datetime(year, end_date_str),
+      inserted_at: utc_now,
+      updated_at: utc_now,
+      class_period_status_id: @future_status
+    }
+
+    if updated_values.name == name do
+      nil
+    else
+      period
+      |> Map.take([
+        :school_id,
+        :is_main_period
+      ])
+      |> Map.merge(updated_values)
+    end
+  end
+
+  defp get_datetime_string(datetime),
+    do:
+      DateTime.from_iso8601(datetime)
+      |> Kernel.elem(1)
+      |> DateTime.to_string()
+
+  defp convert_datetime(year, datetime_str),
+    do:
+      Regex.replace(~r/#{year - 1}/, datetime_str, "#{year}")
+      |> DateTime.from_iso8601()
+      |> Kernel.elem(1)
+
+  @doc """
   Generates a year's worth of periods for all schools.
   """
   def generate_periods_for_all_schools_for_year(year) do
@@ -169,12 +259,9 @@ defmodule Skoller.Periods do
   Generates a year's worth of periods for `school_id`.
   """
   def generate_periods_for_year_for_school(school_id, year) do
-    get_generators()
+    Generator
+    |> Repo.all()
     |> Enum.map(&create_period_from_generator(&1, school_id, year))
-  end
-
-  defp get_generators() do
-    Repo.all(Generator)
   end
 
   defp create_period_from_generator(generator, school_id, year) do

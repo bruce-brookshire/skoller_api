@@ -16,9 +16,10 @@ defmodule Skoller.StudentPoints do
   Returns an `integer`
   """
   def get_points_by_student_id(student_id) do
-    points = from(sp in StudentPoint)
-    |> where([sp], sp.student_id == ^student_id)
-    |> Repo.aggregate(:sum, :value)
+    points =
+      from(sp in StudentPoint)
+      |> where([sp], sp.student_id == ^student_id)
+      |> Repo.aggregate(:sum, :value)
 
     case is_nil(points) do
       true -> 0
@@ -31,13 +32,21 @@ defmodule Skoller.StudentPoints do
 
   Returns `{:ok, StudentPoint}` or `{:error, changeset}`
   """
-  def add_points_to_student(student_id, point_name) do
+  def add_points_to_student(link_owner_student_id, link_consumer_student_id, point_name) do
     point_type = Repo.get_by!(PointType, name: point_name)
 
-    case Repo.insert(%StudentPoint{student_id: student_id, student_point_type_id: point_type.id, value: point_type.value}) do
+    fields = %{
+      student_id: link_owner_student_id,
+      link_consumer_student_id: link_consumer_student_id,
+      student_point_type_id: point_type.id,
+      value: point_type.value
+    }
+
+    case Repo.insert(StudentPoint.changeset(%StudentPoint{}, fields)) do
       {:ok, points} ->
-        check_1000_point_threshold(student_id) 
+        check_1000_point_threshold(link_owner_student_id)
         {:ok, points}
+
       {:error, changeset} ->
         {:error, changeset}
     end
@@ -45,6 +54,7 @@ defmodule Skoller.StudentPoints do
 
   def check_1000_point_threshold(student_id) do
     points = get_points_by_student_id(student_id)
+
     if points >= 1000 do
       Task.start(Emails, :send_one_thousand_points_email, [student_id])
     end

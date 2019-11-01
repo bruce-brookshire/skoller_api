@@ -178,18 +178,19 @@ defmodule Skoller.StudentClasses do
   end
 
   @doc false
-  def enroll(student_id, class_id, params, opts \\ []) do
+  def enroll(link_consumer_student_id, class_id, params, opts \\ []) do
     Logger.info(
-      "Enrolling class: " <> to_string(class_id) <> " student: " <> to_string(student_id)
+      "Enrolling class: " <> to_string(class_id) <> " student: " <> to_string(link_consumer_student_id)
     )
 
     changeset =
       StudentClass.changeset(%StudentClass{}, params)
       |> add_enrolled_by(opts)
-      |> check_enrollment_limit(student_id)
+      |> check_enrollment_limit(link_consumer_student_id)
 
     class = Classes.get_class_by_id(class_id) |> Repo.preload(:school)
-    student = Students.get_student_by_id!(student_id)
+    student = Students.get_student_by_id!(link_consumer_student_id)
+    link_owner_student_id = Keyword.get(opts, :link_owner_student_id)
 
     multi =
       Ecto.Multi.new()
@@ -205,7 +206,7 @@ defmodule Skoller.StudentClasses do
         StudentClassMods.add_public_mods_for_student_class(changes)
       end)
       |> Ecto.Multi.run(:auto_approve, fn _, changes -> auto_approve_mods(changes) end)
-      |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.student_class) end)
+      |> Ecto.Multi.run(:points, fn _, _ -> add_points_to_student(link_owner_student_id, link_consumer_student_id) end)
       |> Ecto.Multi.run(:primary_school, fn _, _trans ->
         Students.conditional_primary_school_set(student, class.school.id)
       end)
@@ -244,7 +245,6 @@ defmodule Skoller.StudentClasses do
 
       _ ->
         result
-        |> IO.inspect()
     end
   end
 
@@ -295,12 +295,10 @@ defmodule Skoller.StudentClasses do
 
   defp auto_approve_mods(_params), do: {:ok, nil}
 
-  defp add_points_to_student(%{enrolled_by: enrolled_by}) when not is_nil(enrolled_by) do
-    sc = get_student_class_by_id!(enrolled_by)
-
-    sc.student_id
-    |> StudentPoints.add_points_to_student(@class_referral_points_name)
+  defp add_points_to_student(link_owner_student_id, link_consumer_student_id) when not is_nil(link_owner_student_id) do
+    link_owner_student_id
+    |> StudentPoints.add_points_to_student(link_consumer_student_id, @class_referral_points_name)
   end
 
-  defp add_points_to_student(_student_class), do: {:ok, nil}
+  defp add_points_to_student(_, _), do: {:ok, nil}
 end
