@@ -221,7 +221,7 @@ defmodule Skoller.StudentClasses do
   end
 
   @doc """
-  Set a classes primary school and term to the ones that the class enrolled in via link belongs to
+  Set a students primary school and term to the ones that the class enrolled in via link belongs to
   """
   def set_student_period_school_on_enroll(student_id, class_id) do
     result =
