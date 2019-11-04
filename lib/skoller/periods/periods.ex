@@ -191,6 +191,8 @@ defmodule Skoller.Periods do
     |> Enum.map(&adjust_period_to_new_year(&1, year))
     |> Enum.filter(&(&1 != nil && &1.valid?))
     |> Enum.map(&Repo.insert/1)
+    |> Enum.filter(& Kernel.elem(&1, 0) != :ok)
+    |> IO.inspect
   end
 
   defp adjust_period_to_new_year(
