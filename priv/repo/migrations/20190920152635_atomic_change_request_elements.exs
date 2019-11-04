@@ -24,8 +24,6 @@ defmodule Skoller.Repo.Migrations.AtomicChangeRequestElements do
 
     Repo.all(ChangeRequestDeprecated)
     |> Enum.flat_map(&distill_data/1)
-    |> Enum.filter(& &1.valid?)
-    |> IO.inspect
     |> Enum.each(&Repo.insert/1)
 
     alter table(:class_change_requests) do
