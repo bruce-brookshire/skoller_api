@@ -24,7 +24,8 @@ defmodule Skoller.Periods.ClassPeriod do
   end
 
   @req_fields [:name, :school_id, :start_date, :end_date]
-  @all_fields @req_fields
+  @opt_fields [:class_period_status_id, :is_main_period]
+  @all_fields @req_fields ++ @opt_fields
   @upd_req [:name, :start_date, :end_date]
   @upd_all @upd_req
   

@@ -182,17 +182,15 @@ defmodule Skoller.Periods do
     start_date_test = get_datetime_string("#{year - 1}-01-01 00:00:00Z")
     end_date_test = get_datetime_string("#{year - 1}-12-31 00:00:00Z")
 
-    entries =
-      from(c in ClassPeriod)
-      |> where(
-        [c],
-        c.start_date >= ^start_date_test and c.start_date < ^end_date_test
-      )
-      |> Repo.all()
-      |> Enum.map(&adjust_period_to_new_year(&1, year))
-      |> Enum.filter(&(&1 != nil))
-
-    Repo.insert_all(ClassPeriod, entries)
+    from(c in ClassPeriod)
+    |> where(
+      [c],
+      c.start_date >= ^start_date_test and c.start_date < ^end_date_test
+    )
+    |> Repo.all()
+    |> Enum.map(&adjust_period_to_new_year(&1, year))
+    |> Enum.filter(&(&1 != nil && &1.valid?))
+    |> Enum.map(&Repo.insert/1)
   end
 
   defp adjust_period_to_new_year(
@@ -216,12 +214,14 @@ defmodule Skoller.Periods do
     if updated_values.name == name do
       nil
     else
-      period
-      |> Map.take([
-        :school_id,
-        :is_main_period
-      ])
-      |> Map.merge(updated_values)
+      Map.merge(
+        %ClassPeriod{},
+        Map.take(period, [
+          :school_id,
+          :is_main_period
+        ])
+      )
+      |> ClassPeriod.changeset_insert(updated_values)
     end
   end
 
