@@ -5,9 +5,11 @@ defmodule Skoller.Notifications do
 
   alias Skoller.Repo
   alias Skoller.Users.User
+  alias Skoller.Classes.Class
   alias Skoller.Devices.Device
   alias Skoller.Students.Student
   alias Skoller.EnrolledStudents
+  alias Skoller.Periods.ClassPeriod
   alias Skoller.ChatComments.Comment
   alias Skoller.Assignments.Assignment
   alias Skoller.Classes.EditableClasses
@@ -18,6 +20,8 @@ defmodule Skoller.Notifications do
   alias Skoller.ClassStatuses.Classes, as: ClassStatusesClasses
 
   import Ecto.Query
+
+  @active_period_status_id 200
 
   @doc """
   Gets devices where the students have not disabled notifications.
@@ -134,39 +138,37 @@ defmodule Skoller.Notifications do
     {:ok, time} = Time.new(time.hour, time.minute, 0, 0)
     now = DateTime.utc_now() |> DateTime.to_date()
 
-    from(student in Student)
-    |> join(:inner, [student], sclass in StudentClass,
-      on: student.id == sclass.student_id and sclass.is_notifications == true
-    )
-    |> join(:inner, [student, sclass], sassign in StudentAssignment,
-      on: sassign.student_class_id == sclass.id and sassign.is_reminder_notifications == true
-    )
-    |> join(:inner, [student, sclass, sassign], user in User, on: user.student_id == student.id)
-    |> join(:inner, [student, sclass, sassign, user], device in Device,
-      on: user.id == device.user_id
+    from(s in Student)
+    |> join(:inner, [s], sc in StudentClass, on: s.id == sc.student_id)
+    |> join(:inner, [s, sc], c in Class, on: c.id == sc.class_id)
+    |> join(:inner, [s, sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
+    |> join(:inner, [s, sc, c, p], sa in StudentAssignment, on: sa.student_class_id == sc.id)
+    |> join(:inner, [s, sc, c, p, sa], u in User, on: u.student_id == s.id)
+    |> join(:inner, [s, sc, c, p, sa, u], d in Device, on: d.user_id == u.id)
+    |> where(
+      [s, sc, c, p, sa, u, d],
+      sc.is_notifications == true and sa.is_reminder_notifications == true and
+        s.is_notifications == true and s.is_reminder_notifications == true
     )
     |> where(
-      [student],
-      student.is_notifications == true and student.is_reminder_notifications == true
-    )
-    |> where(
-      [student, sclass, sassign],
-      not is_nil(sassign.due) and sassign.is_completed == false
+      [s, sc, c, p, sa, u, d],
+      not is_nil(sa.due) and sa.is_completed == false and sc.is_dropped == false and
+        p.class_period_status_id == @active_period_status_id
     )
     |> filter_due_date(now, atom, time)
-    |> where([student, sclass], sclass.is_dropped == false)
-    |> group_by([student, sclass, sassign, user, device], [
-      device.udid,
-      device.type,
-      student.notification_days_notice
+    |> group_by([s, sc, c, p, sa, u, d], [
+      d.udid,
+      d.type,
+      s.notification_days_notice
     ])
-    |> select([student, sclass, sassign, user, device], %{
-      udid: device.udid,
-      type: device.type,
-      days: student.notification_days_notice,
-      count: count(sassign.id)
+    |> select([s, sc, c, p, sa, u, d], %{
+      udid: d.udid,
+      type: d.type,
+      days: s.notification_days_notice,
+      count: count(sa.id)
     })
     |> Repo.all()
+    |> IO.inspect()
   end
 
   @doc """
@@ -288,18 +290,17 @@ defmodule Skoller.Notifications do
 
   defp filter_due_date(query, date, :today, time) do
     query
-    |> where([student, sclass, sassign], fragment("?::date", sassign.due) == ^date)
-    |> where([student], student.notification_time == ^time)
+    |> where([s, sc, c, p, sa, u, d], fragment("?::date", sa.due) == ^date)
+    |> where([s], s.notification_time == ^time)
   end
 
   defp filter_due_date(query, date, :future, time) do
     query
     |> where(
-      [student, sclass, sassign],
-      fragment("?::date", sassign.due) > ^date and
-        fragment("?::date", sassign.due) <=
-          date_add(^date, student.notification_days_notice, "day")
+      [s, sc, c, p, sa, u, d],
+      fragment("?::date", sa.due) > ^date and
+        fragment("?::date", sa.due) <= date_add(^date, s.notification_days_notice, "day")
     )
-    |> where([student], student.future_reminder_notification_time == ^time)
+    |> where([s], s.future_reminder_notification_time == ^time)
   end
 end

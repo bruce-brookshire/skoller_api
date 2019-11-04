@@ -5,14 +5,10 @@ defmodule Skoller.StudentClasses.Jobs do
 
   """
 
-  import Ecto.Query
-
   use Timex
 
-  alias Skoller.Repo
   alias Skoller.EmailTypes
   alias Skoller.StudentClasses.Emails
-  alias Skoller.StudentClasses.StudentClass
   alias Skoller.StudentClasses.Notifications
   alias Skoller.StudentClasses.ConversionQueries
 
@@ -22,8 +18,6 @@ defmodule Skoller.StudentClasses.Jobs do
   @needs_setup_id 200
   @grow_community_id 500
   @join_second_class_id 600
-
-  @past_status 100
 
   def send_no_classes_messages(datetime) do
     email_type = EmailTypes.get!(@no_classes_id)
@@ -101,15 +95,5 @@ defmodule Skoller.StudentClasses.Jobs do
     email_time = email_type.send_time |> Time.from_iso8601!()
 
     Time.compare(time, email_time)
-  end
-
-  def drop_past_classes() do
-    from(sc in StudentClass,
-      join: c in assoc(sc, :class),
-      join: p in assoc(c, :class_period),
-      where: sc.is_dropped == false and p.class_period_status_id == @past_status,
-      update: [set: [is_dropped: true]]
-    )
-    |> Repo.update_all([])
   end
 end

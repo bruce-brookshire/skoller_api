@@ -8,7 +8,6 @@ defmodule Skoller.Periods do
   alias Skoller.Periods.Generator
   alias Skoller.Schools
   alias Skoller.Classes.Class
-  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Professors.Professor
   alias Skoller.EnrolledStudents
 
@@ -18,6 +17,11 @@ defmodule Skoller.Periods do
   @active_status 200
   @prompt_status 300
   @future_status 400
+
+  def past_status_id(), do: @past_status
+  def active_status_id(), do: @active_status
+  def prompt_status_id(), do: @prompt_status
+  def future_status_id(), do: @future_status
 
   @doc """
   Gets class periods by school.
@@ -121,20 +125,6 @@ defmodule Skoller.Periods do
       _ ->
         {:error, %{}}
     end
-  end
-
-  def drop_past_classes() do
-    from(sc in StudentClass)
-    |> join(:left, [sc], c in Class, on: sc.class_id == c.id)
-    |> join(:left, [sc, c], p in ClassPeriod, on: c.class_period_id == p.id)
-    |> where([sc, c, p], p.class_period_status_id == @past_status and sc.is_dropped == false)
-    |> select([sc, c, p], sc)
-    |> Repo.all()
-    |> Enum.each(&drop_and_update/1)
-  end
-
-  defp drop_and_update(student_class) do
-    student_class |> Ecto.Changeset.change(%{is_dropped: true}) |> Repo.update()
   end
 
   @doc """
