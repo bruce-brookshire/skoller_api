@@ -29,6 +29,7 @@ defmodule Skoller.StudentClasses do
   require Logger
 
   @class_referral_points_name "Class Referral"
+  @past_period_status_id 100
 
   @doc """
   Gets a grade for a student class.
@@ -180,7 +181,8 @@ defmodule Skoller.StudentClasses do
   @doc false
   def enroll(link_consumer_student_id, class_id, params, opts \\ []) do
     Logger.info(
-      "Enrolling class: " <> to_string(class_id) <> " student: " <> to_string(link_consumer_student_id)
+      "Enrolling class: " <>
+        to_string(class_id) <> " student: " <> to_string(link_consumer_student_id)
     )
 
     changeset =
@@ -206,7 +208,9 @@ defmodule Skoller.StudentClasses do
         StudentClassMods.add_public_mods_for_student_class(changes)
       end)
       |> Ecto.Multi.run(:auto_approve, fn _, changes -> auto_approve_mods(changes) end)
-      |> Ecto.Multi.run(:points, fn _, _ -> add_points_to_student(link_owner_student_id, link_consumer_student_id) end)
+      |> Ecto.Multi.run(:points, fn _, _ ->
+        add_points_to_student(link_owner_student_id, link_consumer_student_id)
+      end)
       |> Ecto.Multi.run(:primary_school, fn _, _trans ->
         Students.conditional_primary_school_set(student, class.school.id)
       end)
@@ -232,7 +236,8 @@ defmodule Skoller.StudentClasses do
       |> join(:inner, [s, sc, c, p], school in School, on: school.id == p.school_id)
       |> where(
         [s, sc, c, p, school],
-        s.id == ^student_id and c.id == ^class_id and sc.is_dropped == false
+        s.id == ^student_id and c.id == ^class_id and sc.is_dropped == false and
+          p.class_period_status_id != @past_period_status_id
       )
       |> select([s, sc, c, p, school], {s, p.id, school.id})
       |> Repo.one()
@@ -295,7 +300,8 @@ defmodule Skoller.StudentClasses do
 
   defp auto_approve_mods(_params), do: {:ok, nil}
 
-  defp add_points_to_student(link_owner_student_id, link_consumer_student_id) when not is_nil(link_owner_student_id) do
+  defp add_points_to_student(link_owner_student_id, link_consumer_student_id)
+       when not is_nil(link_owner_student_id) do
     link_owner_student_id
     |> StudentPoints.add_points_to_student(link_consumer_student_id, @class_referral_points_name)
   end
