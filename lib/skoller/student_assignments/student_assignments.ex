@@ -222,7 +222,7 @@ defmodule Skoller.StudentAssignments do
 
     result =
       Ecto.Multi.new()
-      |> Ecto.Multi.run(:assignment, fn _, changes ->
+      |> Ecto.Multi.run(:assignment, fn _, _ ->
         assignment = Repo.get(Assignment, student_assignment.assignment_id)
 
         if due != nil and assignment.due == nil do
@@ -249,6 +249,7 @@ defmodule Skoller.StudentAssignments do
       {:error, _, changeset, _} ->
         {:error, changeset}
     end
+    |> IO.inspect
   end
 
   @doc """

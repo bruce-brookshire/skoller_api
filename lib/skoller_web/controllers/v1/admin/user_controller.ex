@@ -49,7 +49,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   end
 
   def points(conn, _params) do
-    points = Skoller.Analytics.Students.get_student_points()
+    points = Skoller.EnrolledStudents.get_student_points()
       
     conn 
       |> put_status(:ok)

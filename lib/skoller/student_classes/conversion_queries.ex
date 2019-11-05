@@ -23,6 +23,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
   @needs_setup_status_id 1100
   @class_setup_status_id 1400
   @class_issue_status_id 1500
+  @class_period_active_id 200
 
   @doc """
   Gets a list of users that are not enrolled in a class.
@@ -54,7 +55,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     base_student_class_query()
     |> where(
       [c, cp, s, sc, u, sl, o],
-      c.class_status_id == @needs_setup_status_id and sc.is_dropped == false
+      c.class_status_id == @needs_setup_status_id
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
     |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
@@ -87,7 +88,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> where(
       [c, cp, s, sc, u, sl, o, a],
       (c.class_status_id == @class_setup_status_id or c.class_status_id == @class_issue_status_id) and
-        sc.is_dropped == false and a.active < @party_size
+        a.active < @party_size
     )
     |> where(fragment("meet_days LIKE ?", ^day_of_week))
     |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
@@ -98,7 +99,12 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     )
     |> select([c, cp, s, sc, u, sl, o, a], %{
       user: u,
-      opts: %{org_name: o.name, class_name: c.name, student_class_link: sc.enrollment_link, class_id: c.id}
+      opts: %{
+        org_name: o.name,
+        class_name: c.name,
+        student_class_link: sc.enrollment_link,
+        class_id: c.id
+      }
     })
     |> Repo.all()
   end
@@ -128,8 +134,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     )
     |> where(
       [c, cp, s, sc, u, sl, o, a_s, a_n, c_stat],
-      a_s.enrollment_count == 1 and (is_nil(a_n.enrollment_count) or a_n.enrollment_count == 0) and
-        sc.is_dropped == false
+      a_s.enrollment_count == 1 and (is_nil(a_n.enrollment_count) or a_n.enrollment_count == 0)
     )
     |> where(fragment("meet_start_time <= (CURRENT_TIME(0) AT TIME ZONE timezone)::time"))
     |> where(
@@ -145,34 +150,46 @@ defmodule Skoller.StudentClasses.ConversionQueries do
     |> Repo.all()
   end
 
-  # student_class_link
-
   defp base_student_class_query() do
     from(c in Class)
-    |> join(:left, [c], cp in ClassPeriod, on: cp.id == c.class_period_id)
-    |> join(:left, [c, cp], s in School, on: cp.school_id == s.id)
-    |> join(:inner, [c, cp, s], sc in StudentClass, on: c.id == sc.class_id)
-    |> join(:left, [c, cp, s, sc], u in User, on: sc.student_id == u.student_id)
-    |> join(:left, [c, cp, s, sc, u], sl in Signup, on: u.student_id == sl.student_id)
-    |> join(:left, [c, cp, s, sc, u, sl], o in Organization,
+    |> join(:left, [c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> join(:left, [c, p], s in School, on: p.school_id == s.id)
+    |> join(:inner, [c, p, s], sc in StudentClass, on: c.id == sc.class_id)
+    |> join(:left, [c, p, s, sc], u in User, on: sc.student_id == u.student_id)
+    |> join(:left, [c, p, s, sc, u], sl in Signup, on: u.student_id == sl.student_id)
+    |> join(:left, [c, p, s, sc, u, sl], o in Organization,
       on: sl.custom_signup_link_id == o.custom_signup_link_id
+    )
+    |> where(
+      [c, p, s, sc, u, sl, o],
+      p.class_period_status_id == @class_period_active_id and sc.is_dropped == false
     )
   end
 
   defp student_enrollment_setup_subquery() do
     from(sc in StudentClass)
     |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
-    |> where([sc, c], sc.is_dropped == false and c.class_status_id == @class_setup_status_id)
-    |> group_by([sc, c], sc.student_id)
-    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
+    |> join(:inner, [sc, c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> where(
+      [sc, c, p],
+      sc.is_dropped == false and c.class_status_id == @class_setup_status_id and
+        p.class_period_status_id == @class_period_active_id
+    )
+    |> group_by([sc, c, p], sc.student_id)
+    |> select([sc, c, p], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
   end
 
   defp student_enrollment_not_setup_subquery() do
     from(sc in StudentClass)
     |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
-    |> where([sc, c], sc.is_dropped == false and c.class_status_id != @class_setup_status_id)
-    |> group_by([sc, c], sc.student_id)
-    |> select([sc, c], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
+    |> join(:inner, [sc, c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> where(
+      [sc, c, p],
+      sc.is_dropped == false and c.class_status_id != @class_setup_status_id and
+        p.class_period_status_id == @class_period_active_id
+    )
+    |> group_by([sc, c, p], sc.student_id)
+    |> select([sc, c, p], %{student_id: sc.student_id, enrollment_count: count(sc.student_id)})
   end
 
   defp party_sized_classes_subquery() do
