@@ -53,8 +53,7 @@ defmodule Skoller.EnrolledStudents do
     |> where([sc, c, p], sc.is_dropped == false)
     |> where(
       [sc, c, p],
-      fragment("(? - current_timestamp) < interval '30 days'", p.start_date) and
-        fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
+      fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
     )
     |> select([sc, c, p], sc)
   end
@@ -69,8 +68,7 @@ defmodule Skoller.EnrolledStudents do
     |> where([sc, c, p], sc.student_id == ^student_id and sc.is_dropped == false)
     |> where(
       [sc, c, p],
-      fragment("(? - current_timestamp) < interval '30 days'", p.start_date) and
-        fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
+      fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
     )
     |> select([sc, c, p], sc)
   end
@@ -200,11 +198,20 @@ defmodule Skoller.EnrolledStudents do
   def get_student_points() do
     from(s in Student)
     |> join(:inner, [s], p in StudentPoint, on: s.id == p.student_id)
-    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType, on: p.student_point_type_id == t.id)
+    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType,
+      on: p.student_point_type_id == t.id
+    )
     |> join(:inner, [s, p, t], u in Skoller.Users.User, on: s.id == u.student_id)
     |> group_by([s, p, t, u], [s.id, u.id, t.id])
     |> order_by([s, p, t, u], asc: s.name_first)
-    |> select([s, p, t, u], %{"student_id" => s.id, "first_name" => s.name_first, "last_name" => s.name_last, "user_email" => u.email, "points" => sum(p.value), "type" =>  t.name})
+    |> select([s, p, t, u], %{
+      "student_id" => s.id,
+      "first_name" => s.name_first,
+      "last_name" => s.name_last,
+      "user_email" => u.email,
+      "points" => sum(p.value),
+      "type" => t.name
+    })
     |> Repo.all()
   end
 
