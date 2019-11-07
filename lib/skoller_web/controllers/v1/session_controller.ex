@@ -10,7 +10,7 @@ defmodule SkollerWeb.Api.V1.SessionController do
         conn
         |> put_view(SessionView)
         |> render("show.json", session: session)
-      {:error, session} -> 
+      {:error, _} -> 
         conn |> send_resp(422, "Unable to create session")
     end
   end

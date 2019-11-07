@@ -19,7 +19,7 @@ defmodule Skoller.Repo.Migrations.CreateSessions do
     |> Enum.each(&Skoller.Repo.insert/1)
 
     create table(:sessions) do
-      add(:student_id, references(:students, on_delete: :delete_all))
+      add(:user_id, references(:users, on_delete: :delete_all))
       add(:session_platform_id, references(:session_platforms, on_delete: :nilify_all))
 
       timestamps()

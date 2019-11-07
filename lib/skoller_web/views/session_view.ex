@@ -5,7 +5,7 @@ defmodule SkollerWeb.SessionView do
     session_platform = session_platform |> Map.take([:id, :type])
 
     session
-    |> Map.take([:id, :student_id, :updated_at, :inserted_at])
+    |> Map.take([:id, :user_id, :updated_at, :inserted_at])
     |> Map.put(:session_platform, session_platform)
   end
 end
