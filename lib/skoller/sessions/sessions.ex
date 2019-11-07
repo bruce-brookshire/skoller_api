@@ -15,11 +15,11 @@ defmodule Skoller.Sessions do
   def insert(%{"platform" => "android", "user_id" => user_id}),
     do: insert(user_id, @android_session_platform)
 
-  def insert(user_id, session_platform_id) when is_integer(user_id) and is_integer(session_platform_id) do
+  def insert(user_id, session_platform_id)
+      when is_integer(user_id) and is_integer(session_platform_id) do
     %{user_id: user_id, session_platform_id: session_platform_id}
     |> Session.insert_changeset()
     |> Repo.insert()
-    |> Repo.preload([:session_platform])
   end
 
   def get_by_user_id(user_id) when is_integer(user_id) do
