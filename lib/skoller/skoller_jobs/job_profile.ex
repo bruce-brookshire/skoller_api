@@ -1,4 +1,4 @@
-defmodule Skoller.SkollerJobs.JobProfile do
+defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   use Ecto.Schema
 
   import Ecto.Changeset
@@ -6,7 +6,7 @@ defmodule Skoller.SkollerJobs.JobProfile do
   alias Skoller.Users.User
   alias Skoller.SkollerJobs.JobProfileStatus
   alias Skoller.SkollerJobs.EthnicityType
-  alias Skoller.SkollerJobs.JobProfile
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.SkollerJobs.DegreeType
 
   schema "job_profiles" do

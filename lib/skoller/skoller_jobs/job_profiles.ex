@@ -1,8 +1,6 @@
 defmodule Skoller.SkollerJobs.JobProfiles do
-  import Ecto.Query
-
   alias Skoller.Repo
-  alias Skoller.SkollerJobs.JobProfile
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.Users.User
 
   def insert(params) do
@@ -16,7 +14,7 @@ defmodule Skoller.SkollerJobs.JobProfiles do
     |> Repo.get(job_profile_id)
   end
 
-  def get_profile_by_user(%User{id: user_id}) do
+  def get_by_user(%User{id: user_id}) do
     JobProfile
     |> Repo.get_by(user_id: user_id)
   end
@@ -25,5 +23,9 @@ defmodule Skoller.SkollerJobs.JobProfiles do
     profile
     |> JobProfile.update_changeset(params)
     |> Repo.update()
+  end
+
+  def delete(%JobProfile{} = profile) do
+    profile |> Repo.delete()
   end
 end

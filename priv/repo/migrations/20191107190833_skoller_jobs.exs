@@ -1,6 +1,12 @@
 defmodule Skoller.Repo.Migrations.SkollerJobs do
   use Ecto.Migration
 
+  alias Skoller.Repo
+  alias Skoller.SkollerJobs.DegreeType
+  alias Skoller.SkollerJobs.EthnicityType
+  alias Skoller.SkollerJobs.JobProfileStatus
+  alias Skoller.SkollerJobs.JobCandidateActivityType
+
   def up do
     # Types and Statuses
     create table(:ethnicity_types) do
@@ -18,6 +24,46 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     create table(:job_candidate_activity_types) do
       add(:name, :string)
     end
+
+    flush()
+
+    # Insert types
+
+    [
+      %JobProfileStatus{id: 100, name: "ACTIVE"},
+      %JobProfileStatus{id: 200, name: "SLEEPING"},
+      %JobProfileStatus{id: 300, name: "DISABLED"}
+    ]
+    |> Enum.each(&Repo.insert/1)
+
+    [
+      %DegreeType{id: 100, name: "Bachelors"},
+      %DegreeType{id: 200, name: "Masters"},
+      %DegreeType{id: 300, name: "Ph. D."},
+      %DegreeType{id: 400, name: "MBA"},
+      %DegreeType{id: 500, name: "JD"}
+    ]
+    |> Enum.each(&Repo.insert/1)
+
+    [
+      %EthnicityType{id: 100, name: "White"},
+      %EthnicityType{id: 200, name: "Black or African American"},
+      %EthnicityType{id: 300, name: "American Indian or Alaska Native"},
+      %EthnicityType{id: 400, name: "Asian"},
+      %EthnicityType{id: 500, name: "Native Hawaiian or other Pacific Islander"},
+      %EthnicityType{id: 600, name: "Hispanic or Latino"},
+      %EthnicityType{id: 700, name: "Other"},
+      %EthnicityType{id: 800, name: "Not specified"}
+    ]
+    |> Enum.each(&Repo.insert/1)
+
+    [
+      %JobCandidateActivityType{id: 100, name: "Volunteer"},
+      %JobCandidateActivityType{id: 200, name: "Clubs"},
+      %JobCandidateActivityType{id: 300, name: "Achievements"},
+      %JobCandidateActivityType{id: 400, name: "Experience"},
+    ]
+    |> Enum.each(&Repo.insert/1)
 
     create table(:job_profiles) do
       add(:alt_email, :string)
@@ -78,11 +124,11 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
-    drop(table(:degree_types))
     drop(table(:job_candidate_activities))
     drop(table(:job_candidate_activity_types))
     drop(table(:job_profiles))
     drop(table(:ethnicity_types))
     drop(table(:job_profile_statuses))
+    drop(table(:degree_types))
   end
 end
