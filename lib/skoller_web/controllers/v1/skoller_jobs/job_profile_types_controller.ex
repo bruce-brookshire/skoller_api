@@ -8,11 +8,11 @@ defmodule SkollerWeb.Api.V1.Jobs.JobProfileTypesController do
   alias Skoller.SkollerJobs.JobProfileStatus
   alias SkollerWeb.SkollerJobs.JobProfileTypesView
 
-  def get_types(conn, %{"type" => "degrees"}), do: get_and_render(DegreeType, conn)
-  def get_types(conn, %{"type" => "statuses"}), do: get_and_render(JobProfileStatus, conn)
-  def get_types(conn, %{"type" => "activities"}), do: get_and_render(JobCandidateActivity, conn)
-  def get_types(conn, %{"type" => "ethnicities"}), do: get_and_render(EthnicityType, conn)
-  def get_types(conn, %{"type" => type}), do: send_resp(conn, 422, "#{type} not a resource")
+  def show(conn, %{"type" => "degrees"}), do: get_and_render(DegreeType, conn)
+  def show(conn, %{"type" => "statuses"}), do: get_and_render(JobProfileStatus, conn)
+  def show(conn, %{"type" => "activities"}), do: get_and_render(JobCandidateActivity, conn)
+  def show(conn, %{"type" => "ethnicities"}), do: get_and_render(EthnicityType, conn)
+  def show(conn, %{"type" => type}), do: send_resp(conn, 422, "#{type} not a resource")
 
   defp get_and_render(type_atom, conn) do
     types = Repo.all(type_atom)

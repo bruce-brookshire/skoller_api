@@ -5,5 +5,6 @@ defmodule SkollerWeb.SkollerJobs.JobProfileTypesView do
 
   def render("show.json", %{type: type}), do: Map.take(type, [:id, :name])
 
-  def render("index.json", %{types: types}), do: render_many(types, JobProfileTypesView, "show.json", as: :type)
+  def render("index.json", %{types: types}),
+    do: render_many(types, JobProfileTypesView, "show.json", as: :type)
 end

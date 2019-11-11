@@ -14,6 +14,9 @@ defmodule Skoller.SkollerJobs.JobProfiles do
     |> Repo.get(job_profile_id)
   end
 
+  def get_by_id(job_profile_id) when is_binary(job_profile_id),
+    do: job_profile_id |> String.to_integer() |> get_by_id() |> IO.inspect
+
   def get_by_user(%User{id: user_id}) do
     JobProfile
     |> Repo.get_by(user_id: user_id)
@@ -26,6 +29,7 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   end
 
   def delete(%JobProfile{} = profile) do
-    profile |> Repo.delete()
+    profile
+    |> Repo.delete()
   end
 end

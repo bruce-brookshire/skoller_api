@@ -4,15 +4,16 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   import Ecto.Changeset
 
   alias Skoller.Users.User
-  alias Skoller.SkollerJobs.JobProfileStatus
-  alias Skoller.SkollerJobs.EthnicityType
-  alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.SkollerJobs.DegreeType
+  alias Skoller.SkollerJobs.EthnicityType
+  alias Skoller.SkollerJobs.JobProfileStatus
+  alias Skoller.SkollerJobs.JobCandidateActivity
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
   schema "job_profiles" do
     field :user_id, :id
 
-    field :job_profile_status_id, :id
+    field :job_profile_status_id, :id, default: 100
     field :wakeup_date, :naive_datetime
 
     field :alt_email, :string
@@ -57,9 +58,10 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
     belongs_to :ethnicity_type, EthnicityType, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false
+    has_many :job_activities, JobCandidateActivity, foreign_key: :job_profile_id
   end
 
-  @req_fields [:user_id, :job_profile_status_id, :degree_type_id]
+  @req_fields [:user_id, :degree_type_id]
   @opt_fields [
     :wakeup_date,
     :alt_email,
@@ -69,6 +71,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :skills,
     :work_auth,
     :sponsorship_required,
+    :job_profile_status_id,
     :played_sports,
     :transcript_url,
     :resume_url,
@@ -94,12 +97,14 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   def insert_changeset(%{} = params) do
     %JobProfile{}
     |> cast(params, @all_fields)
+    |> unique_constraint(:user_id)
     |> validate_required(@req_fields)
   end
 
   def update_changeset(%JobProfile{id: _id} = profile, %{} = params) do
     profile
     |> cast(params, @all_fields)
+    |> unique_constraint(:user_id)
     |> validate_required(@req_fields)
   end
 end

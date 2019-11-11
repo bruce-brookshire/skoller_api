@@ -2,6 +2,7 @@ defmodule SkollerWeb.Api.V1.JobsController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
+  alias SkollerWeb.JobsView
   alias Skoller.SkollerJobs.JobProfiles
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
@@ -12,44 +13,21 @@ defmodule SkollerWeb.Api.V1.JobsController do
   plug :verify_role, %{role: @student_role}
 
   def create(conn, params) do
-    case JobProfiles.insert(params) do
-      {:ok, profile} ->
-        profile
-
-      val ->
-        IO.inspect(val)
-        nil
-    end
+    params
+    |> Map.put("user_id", conn.assigns[:user].id)
+    |> JobProfiles.insert()
     |> construct_response(conn)
   end
 
   def show(conn, %{"id" => id}) do
-    case JobProfiles.get_by_id(id) do
-      {:ok, profile} ->
-        profile
-
-      _ ->
-        nil
-    end
+    JobProfiles.get_by_id(id)
     |> construct_response(conn)
   end
 
   def update(conn, %{"id" => id} = params) do
-    profile =
-      id
-      |> JobProfiles.get_by_id()
-      |> JobProfile.update_changeset(params)
-
-    case profile do
-      {:ok, profile} ->
-        profile
-
-      {:error, changeset} ->
-        changeset
-
-      _ ->
-        nil
-    end
+    id
+    |> JobProfiles.get_by_id()
+    |> JobProfile.update_changeset(params)
     |> construct_response(conn)
   end
 
@@ -68,32 +46,36 @@ defmodule SkollerWeb.Api.V1.JobsController do
   end
 
   def get_by_user(conn, _params) do
-    profile =
-      conn.assigns[:user]
-      |> JobProfiles.get_by_user()
-
-    case profile do
-      {:ok, profile} ->
-        profile
-
-      _ ->
-        nil
-    end
+    conn.assigns[:user]
+    |> JobProfiles.get_by_user()
     |> construct_response(conn)
   end
 
-  defp construct_response(%JobProfile{} = profile, conn) do
+  defp construct_response(nil, conn), do: send_resp(conn, 404, "Profile not found")
+
+  defp construct_response(%JobProfile{} = profile, conn),
+    do: construct_response({:ok, profile}, conn)
+
+  defp construct_response({:ok, %JobProfile{} = profile}, conn) do
     profile =
       profile
-      |> Repo.preload([:job_profile_status, :ethnicity_type, :degree_type])
+      |> Repo.preload([:job_profile_status, :ethnicity_type, :degree_type, :job_activities])
 
     conn
     |> put_view(JobsView)
     |> render("show.json", profile: profile)
   end
 
-  defp construct_response(nil, conn), do: send_resp(conn, 404, "Profile not found")
+  defp construct_response({:error, %{errors: errors}}, conn),
+    do:
+      put_status(conn, 422)
+      |> json(%{errors: changeset_error_reducer(errors)})
 
   defp construct_response(_error, conn),
-    do: send_resp(conn, 422, "Issue changing or inserting object")
+    do: send_resp(conn, 422, "Issue getting, changing, or inserting object")
+
+  defp changeset_error_reducer(errors),
+    do:
+      Enum.map(errors, fn {k, v} -> {to_string(k), elem(v, 0)} end)
+      |> Map.new()
 end

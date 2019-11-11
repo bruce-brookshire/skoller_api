@@ -30,9 +30,9 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     # Insert types
 
     [
-      %JobProfileStatus{id: 100, name: "ACTIVE"},
-      %JobProfileStatus{id: 200, name: "SLEEPING"},
-      %JobProfileStatus{id: 300, name: "DISABLED"}
+      %JobProfileStatus{id: 100, name: "Active"},
+      %JobProfileStatus{id: 200, name: "Sleeping"},
+      %JobProfileStatus{id: 300, name: "Disabled"}
     ]
     |> Enum.each(&Repo.insert/1)
 
@@ -61,11 +61,18 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       %JobCandidateActivityType{id: 100, name: "Volunteer"},
       %JobCandidateActivityType{id: 200, name: "Clubs"},
       %JobCandidateActivityType{id: 300, name: "Achievements"},
-      %JobCandidateActivityType{id: 400, name: "Experience"},
+      %JobCandidateActivityType{id: 400, name: "Experience"}
     ]
     |> Enum.each(&Repo.insert/1)
 
     create table(:job_profiles) do
+      # Foreign keys
+      add(:user_id, references(:users, on_delete: :delete_all))
+      add(:ethnicity_type_id, references(:ethnicity_types, on_delete: :nilify_all))
+      add(:job_profile_status_id, references(:job_profile_statuses, on_delete: :nilify_all))
+      add(:degree_type_id, references(:degree_types, on_delete: :nilify_all))
+
+      # Basic details
       add(:alt_email, :string)
       add(:state_code, :string, length: 2)
       add(:region, :string)
@@ -101,11 +108,6 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:first_gen_college, :boolean)
       add(:fin_aid, :boolean)
       add(:pell_grant, :boolean)
-
-      # Foreign keys
-      add(:ethnicity_type_id, references(:ethnicity_types, on_delete: :nilify_all))
-      add(:job_profile_status_id, references(:job_profile_statuses, on_delete: :nilify_all))
-      add(:degree_type_id, references(:degree_types, on_delete: :nilify_all))
     end
 
     create table(:job_candidate_activities) do
@@ -121,6 +123,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
         references(:job_candidate_activity_types, on_delete: :delete_all)
       )
     end
+
+    flush()
+
+    create(unique_index(:job_profiles, [:user_id]))
   end
 
   def down do
