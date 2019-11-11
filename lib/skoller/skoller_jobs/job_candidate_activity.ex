@@ -1,7 +1,7 @@
 defmodule Skoller.SkollerJobs.JobCandidateActivity do
   use Ecto.Schema
 
-  alias Skoller.SkollerJobs.JobProfile
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.SkollerJobs.JobCandidateActivityType
 
   schema "job_candidate_activities" do

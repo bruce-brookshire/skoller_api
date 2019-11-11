@@ -29,6 +29,17 @@ defmodule SkollerWeb.Api.V1.JobsController do
     |> JobProfiles.get_by_id()
     |> JobProfile.update_changeset(params)
     |> construct_response(conn)
+
+    # case JobProfiles.get_by_id(id) do
+    #   nil -> 
+    #     construct_response(nil, conn)
+
+    #   profile ->
+    #     plug :verify_member,
+
+    # end
+    # |> JobProfiles.update(params)
+    # |> construct_response(conn)
   end
 
   def delete(conn, %{"id" => id}) do
