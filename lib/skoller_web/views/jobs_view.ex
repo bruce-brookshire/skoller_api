@@ -6,6 +6,7 @@ defmodule SkollerWeb.JobsView do
   def render("show.json", %{profile: profile}) do
     profile
     |> Map.take([
+      :id,
       :wakeup_date,
       :alt_email,
       :state_code,
@@ -22,8 +23,8 @@ defmodule SkollerWeb.JobsView do
       :personality,
       :company_values,
       :gpa,
-      :act,
-      :sat,
+      :act_score,
+      :sat_score,
       :startup_interest,
       :gender,
       :veteran,

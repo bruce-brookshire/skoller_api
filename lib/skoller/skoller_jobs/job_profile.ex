@@ -40,8 +40,8 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
 
     # Numbers
     field :gpa, :float
-    field :act, :integer
-    field :sat, :integer
+    field :act_score, :integer
+    field :sat_score, :integer
     field :startup_interest, :integer
 
     # Equal opportunity
@@ -80,8 +80,8 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :personality,
     :company_values,
     :gpa,
-    :act,
-    :sat,
+    :act_score,
+    :sat_score,
     :startup_interest,
     :gender,
     :ethnicity_type_id,

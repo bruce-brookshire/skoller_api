@@ -97,8 +97,8 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
 
       # Numbers
       add(:gpa, :float)
-      add(:act, :integer)
-      add(:sat, :integer)
+      add(:act_score, :integer)
+      add(:sat_score, :integer)
       add(:startup_interest, :integer)
 
       # Equal opportunity booleans
@@ -112,7 +112,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
 
     create table(:job_candidate_activities) do
       add(:name, :string)
-      add(:description, :string)
+      add(:description, :string, length: 750)
       add(:organization_name, :string)
       add(:start_date, :date)
       add(:end_date, :date)

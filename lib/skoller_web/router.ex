@@ -284,7 +284,7 @@ defmodule SkollerWeb.Router do
       get "/users/:user_id/jobs-profile", JobsController, :get_by_user
 
       # Skoller Jobs
-      resources "/skoller-jobs", JobsController, only: [:create, :show, :update, :delete]
+      resources "/skoller-jobs/profile", JobsController, only: [:create, :show, :update, :delete]
       get "/skoller-jobs/types/:type", Jobs.JobProfileTypesController, :show
     end
   end
