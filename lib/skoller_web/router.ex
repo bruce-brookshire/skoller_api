@@ -281,11 +281,16 @@ defmodule SkollerWeb.Router do
       delete "/users/:user_id", UserController, :delete
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
-      get "/users/:user_id/jobs-profile", JobsController, :get_by_user
+      get "/users/:user_id/job-profile", Jobs.JobController, :get_by_user
 
       # Skoller Jobs
-      resources "/skoller-jobs/profile", JobsController, only: [:create, :show, :update, :delete]
-      get "/skoller-jobs/types/:type", Jobs.JobProfileTypesController, :show
+      scope "/skoller-jobs", Jobs do
+        resources "/profiles", JobController, only: [:create, :show, :update, :delete]
+        get "/types/:type", JobProfileTypeController, :show
+
+        resources "/activities", JobProfileActivityController,
+          only: [:create, :show, :update, :delete]
+      end
     end
   end
 

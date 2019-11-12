@@ -7,8 +7,10 @@ defmodule SkollerWeb.Plugs.Auth do
   alias Skoller.Users
   alias Skoller.Students
   alias Skoller.Assignments
-  alias Skoller.Classes.EditableClasses
   alias Skoller.EnrolledStudents
+  alias Skoller.Classes.EditableClasses
+  alias Skoller.SkollerJobs.JobProfiles
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
   import Plug.Conn
 
@@ -122,6 +124,7 @@ defmodule SkollerWeb.Plugs.Auth do
       _ -> conn
     end
   end
+
   def verify_user_exists(conn, _), do: conn
 
   def verify_student_exists(%{params: %{"phone" => phone}} = conn, _) do
@@ -130,7 +133,23 @@ defmodule SkollerWeb.Plugs.Auth do
       _ -> conn
     end
   end
+
   def verify_student_exists(conn, _), do: conn
+
+  def verify_owner(
+        %{params: %{"id" => id}, assigns: %{user: %{id: user_id}}} = conn,
+        :jobs_profile
+      ) do
+    case JobProfiles.get_by_id(id) do
+      %JobProfile{user_id: test_user_id} = profile when test_user_id == user_id ->
+        assign(conn, :profile, profile)
+
+      _ ->
+        conn |> unauth
+    end
+  end
+
+  def verify_owner(conn, :jobs_profile), do: conn |> unauth
 
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do

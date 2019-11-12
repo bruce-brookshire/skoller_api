@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Api.V1.Jobs.JobProfileTypesController do
+defmodule SkollerWeb.Api.V1.Jobs.JobProfileTypeController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
@@ -14,11 +14,8 @@ defmodule SkollerWeb.Api.V1.Jobs.JobProfileTypesController do
   def show(conn, %{"type" => "ethnicities"}), do: get_and_render(EthnicityType, conn)
   def show(conn, %{"type" => type}), do: send_resp(conn, 422, "#{type} not a resource")
 
-  defp get_and_render(type_atom, conn) do
-    types = Repo.all(type_atom)
-
-    conn
-    |> put_view(JobProfileTypesView)
-    |> render("index.json", types: types)
-  end
+  defp get_and_render(type_atom, conn),
+    do:
+      put_view(conn, JobProfileTypesView)
+      |> render("index.json", types: Repo.all(type_atom))
 end

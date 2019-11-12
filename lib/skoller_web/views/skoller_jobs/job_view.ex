@@ -1,7 +1,7 @@
-defmodule SkollerWeb.JobsView do
+defmodule SkollerWeb.Jobs.JobView do
   use SkollerWeb, :view
 
-  alias SkollerWeb.JobsView
+  alias SkollerWeb.Jobs.JobView
 
   def render("show.json", %{profile: profile}) do
     profile
@@ -41,7 +41,7 @@ defmodule SkollerWeb.JobsView do
   end
 
   def render("index.json", %{profiles: profiles}),
-    do: render_many(profiles, JobsView, "show.json", as: :profiles)
+    do: render_many(profiles, JobView, "show.json", as: :profiles)
 
   defp convert_object_parts({:degree_type, _} = entry), do: render_type_objects(entry)
   defp convert_object_parts({:ethnicity_type, _} = entry), do: render_type_objects(entry)

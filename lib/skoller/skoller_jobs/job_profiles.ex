@@ -2,7 +2,6 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   alias Skoller.Repo
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.Users.User
-  alias Ecto.Changeset
 
   @doc """
   Creates a job profile
@@ -29,6 +28,7 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   # Returns `Ecto.Schema.t() | nil`
   """
   def get_by_user(%User{id: user_id}), do: Repo.get_by(JobProfile, user_id: user_id)
+  def get_by_user(_), do: nil
 
   @doc """
   Update job profile
