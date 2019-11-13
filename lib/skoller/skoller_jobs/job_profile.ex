@@ -7,7 +7,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   alias Skoller.SkollerJobs.DegreeType
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.JobProfileStatus
-  alias Skoller.SkollerJobs.JobCandidateActivity
+  alias Skoller.SkollerJobs.CareerActivity
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
   schema "job_profiles" do
@@ -58,7 +58,9 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
     belongs_to :ethnicity_type, EthnicityType, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false
-    has_many :job_activities, JobCandidateActivity, foreign_key: :job_profile_id
+    has_many :career_activities, CareerActivity, foreign_key: :job_profile_id
+
+    timestamps()
   end
 
   @req_fields [:user_id, :degree_type_id]

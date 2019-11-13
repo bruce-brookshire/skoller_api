@@ -285,7 +285,10 @@ defmodule SkollerWeb.Router do
 
       # Skoller Jobs
       scope "/skoller-jobs", Jobs do
-        resources "/profiles", JobController, only: [:create, :show, :update, :delete]
+        resources "/profiles", JobController, only: [:create, :show, :update, :delete] do
+          put "/documents/:type", DocController, :upload
+        end
+
         get "/types/:type", JobProfileTypeController, :show
 
         resources "/activities", JobProfileActivityController,

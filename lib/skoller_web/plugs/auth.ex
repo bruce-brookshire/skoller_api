@@ -140,12 +140,9 @@ defmodule SkollerWeb.Plugs.Auth do
         %{params: %{"id" => id}, assigns: %{user: %{id: user_id}}} = conn,
         :jobs_profile
       ) do
-    case JobProfiles.get_by_id(id) do
-      %JobProfile{user_id: test_user_id} = profile when test_user_id == user_id ->
-        assign(conn, :profile, profile)
-
-      _ ->
-        conn |> unauth
+    case JobProfiles.get_by_id_and_user_id(id, user_id) do
+      %JobProfile{} = profile -> assign(conn, :profile, profile)
+      _ -> conn |> unauth
     end
   end
 

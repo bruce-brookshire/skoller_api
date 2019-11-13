@@ -5,7 +5,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   alias Skoller.SkollerJobs.DegreeType
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.JobProfileStatus
-  alias Skoller.SkollerJobs.JobCandidateActivityType
+  alias Skoller.SkollerJobs.CareerActivityType
 
   def up do
     # Types and Statuses
@@ -21,7 +21,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:name, :string)
     end
 
-    create table(:job_candidate_activity_types) do
+    create table(:career_activity_types) do
       add(:name, :string)
     end
 
@@ -58,10 +58,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     |> Enum.each(&Repo.insert/1)
 
     [
-      %JobCandidateActivityType{id: 100, name: "Volunteer"},
-      %JobCandidateActivityType{id: 200, name: "Clubs"},
-      %JobCandidateActivityType{id: 300, name: "Achievements"},
-      %JobCandidateActivityType{id: 400, name: "Experience"}
+      %CareerActivityType{id: 100, name: "Volunteer"},
+      %CareerActivityType{id: 200, name: "Clubs"},
+      %CareerActivityType{id: 300, name: "Achievements"},
+      %CareerActivityType{id: 400, name: "Experience"}
     ]
     |> Enum.each(&Repo.insert/1)
 
@@ -108,9 +108,11 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:first_gen_college, :boolean)
       add(:fin_aid, :boolean)
       add(:pell_grant, :boolean)
+
+      timestamps()
     end
 
-    create table(:job_candidate_activities) do
+    create table(:career_activities) do
       add(:name, :string)
       add(:description, :string, length: 750)
       add(:organization_name, :string)
@@ -119,9 +121,11 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:job_profile_id, references(:job_profiles, on_delete: :delete_all))
 
       add(
-        :job_candidate_activity_type_id,
-        references(:job_candidate_activity_types, on_delete: :delete_all)
+        :career_activity_type_id,
+        references(:career_activity_types, on_delete: :delete_all)
       )
+
+      timestamps()
     end
 
     flush()
@@ -130,8 +134,8 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
-    drop(table(:job_candidate_activities))
-    drop(table(:job_candidate_activity_types))
+    drop(table(:career_activities))
+    drop(table(:career_activity_types))
     drop(table(:job_profiles))
     drop(table(:ethnicity_types))
     drop(table(:job_profile_statuses))

@@ -31,6 +31,13 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   def get_by_user(_), do: nil
 
   @doc """
+  Get job profile by its user's id
+  # Returns `Ecto.Schema.t() | nil`
+  """
+  def get_by_id_and_user_id(profile_id, user_id),
+    do: Repo.get_by(JobProfile, user_id: user_id, id: profile_id)
+
+  @doc """
   Update job profile
   # Returns `{:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}`
   """

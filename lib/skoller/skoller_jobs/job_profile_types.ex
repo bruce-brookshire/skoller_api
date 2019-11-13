@@ -14,10 +14,10 @@ defmodule Skoller.SkollerJobs.EthnicityType do
   end
 end
 
-defmodule Skoller.SkollerJobs.JobCandidateActivityType do
+defmodule Skoller.SkollerJobs.CareerActivityType do
   use Ecto.Schema
 
-  schema "job_candidate_activity_types" do
+  schema "career_activity_types" do
     field :name, :string
   end
 end
