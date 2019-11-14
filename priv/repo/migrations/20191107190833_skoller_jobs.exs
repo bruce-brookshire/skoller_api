@@ -134,11 +134,11 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
-    # TODO take care of this
-    drop(table(:job_candidate_activities))
-    drop(table(:job_candidate_activity_types))
-    # drop(table(:career_activities))
-    # drop(table(:career_activity_types))
+    # # TODO take care of this
+    # drop(table(:job_candidate_activities))
+    # drop(table(:job_candidate_activity_types))
+    drop(table(:career_activities))
+    drop(table(:career_activity_types))
     drop(table(:job_profiles))
     drop(table(:ethnicity_types))
     drop(table(:job_profile_statuses))

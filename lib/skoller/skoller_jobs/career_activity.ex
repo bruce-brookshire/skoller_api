@@ -14,7 +14,7 @@ defmodule Skoller.SkollerJobs.CareerActivity do
     field :start_date, :date
     field :end_date, :date
     field :job_profile_id, :id
-    field :activity_type_id, :id
+    field :career_activity_type_id, :id
 
     belongs_to :job_profile, JobProfile, define_field: false
     belongs_to :career_activity_type, CareerActivityType, define_field: false
@@ -22,7 +22,7 @@ defmodule Skoller.SkollerJobs.CareerActivity do
     timestamps()
   end
 
-  @req_fields [:name, :organization_name, :start_date, :job_profile_id, :activity_type_id]
+  @req_fields [:name, :organization_name, :start_date, :job_profile_id, :career_activity_type_id]
   @opt_fields [:end_date, :description]
   @all_fields @req_fields ++ @opt_fields
 
