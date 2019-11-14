@@ -34,7 +34,8 @@ defmodule SkollerWeb.Jobs.JobView do
       :pell_grant,
       :job_profile_status,
       :ethnicity_type,
-      :degree_type
+      :degree_type,
+      :user_id
     ])
     |> Enum.map(&convert_object_parts/1)
     |> Map.new()
