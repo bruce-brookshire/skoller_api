@@ -50,5 +50,6 @@ defmodule SkollerWeb.Jobs.JobView do
 
   # defp convert_object_parts({:degree_type, body}), do: {:degree_type, render_type_objects(body)}
 
-  defp render_type_objects({key, body}), do: {key, Map.take(body, [:id, :name])}
+  defp render_type_objects({key, %{} = body}), do: {key, Map.take(body, [:id, :name])}
+  defp render_type_objects({key, nil}), do: {key, nil}
 end
