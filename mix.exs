@@ -47,7 +47,6 @@ defmodule Skoller.Mixfile do
       {:plug, "~> 1.7"},
       {:guardian, "~> 1.0-beta"},
       {:arc, "~> 0.11.0"},
-      {:arc_ecto, "~> 0.11.1"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_ses, "~> 2.1.1"},

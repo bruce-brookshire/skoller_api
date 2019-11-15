@@ -2,7 +2,7 @@ defmodule SkollerWeb.Api.V1.Jobs.JobController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo
-  alias SkollerWeb.Jobs.JobView
+  alias SkollerWeb.SkollerJobs.JobView
   alias Skoller.SkollerJobs.JobProfiles
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
@@ -51,10 +51,7 @@ defmodule SkollerWeb.Api.V1.Jobs.JobController do
 
   defp construct_response(nil, conn), do: send_resp(conn, 404, "Profile not found")
 
-  defp construct_response(%JobProfile{} = profile, conn),
-    do: construct_response({:ok, profile}, conn)
-
-  defp construct_response({:ok, %JobProfile{} = profile}, conn) do
+  defp construct_response(%JobProfile{} = profile, conn) do
     profile =
       profile
       |> Repo.preload([:job_profile_status, :ethnicity_type, :degree_type, :career_activities])
@@ -63,6 +60,9 @@ defmodule SkollerWeb.Api.V1.Jobs.JobController do
     |> put_view(JobView)
     |> render("show.json", profile: profile)
   end
+
+  defp construct_response({:ok, %JobProfile{} = profile}, conn),
+    do: construct_response(profile, conn)
 
   defp construct_response({:error, %{errors: errors}}, conn),
     do:
@@ -74,6 +74,7 @@ defmodule SkollerWeb.Api.V1.Jobs.JobController do
 
   defp changeset_error_reducer(errors),
     do:
-      Enum.map(errors, fn {k, v} -> {to_string(k), elem(v, 0)} end)
+      errors
+      |> Enum.map(fn {k, v} -> {to_string(k), elem(v, 0)} end)
       |> Map.new()
 end

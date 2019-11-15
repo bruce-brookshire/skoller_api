@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.UserController do
   alias Skoller.Users
   alias SkollerWeb.UserView
   alias SkollerWeb.Responses.MultiError
-  alias Skoller.PicUpload
+  alias Skoller.FileUploaders.ProfilePics
   alias Skoller.Repo
   alias Ecto.UUID
 
@@ -55,9 +55,9 @@ defmodule SkollerWeb.Api.V1.UserController do
   defp upload_pic(%{"file" => ""}), do: ""
   defp upload_pic(%{"file" => file}) do
     scope = %{"id" => UUID.generate()} 
-    case PicUpload.store({file, scope}) do
+    case ProfilePics.store({file, scope}) do
       {:ok, inserted} ->
-        PicUpload.url({inserted, scope}, :thumb)
+        ProfilePics.url({inserted, scope}, :thumb)
       _ ->
         nil
     end

@@ -1,7 +1,7 @@
-defmodule SkollerWeb.Jobs.JobView do
+defmodule SkollerWeb.SkollerJobs.JobView do
   use SkollerWeb, :view
 
-  alias SkollerWeb.Jobs.JobView
+  alias SkollerWeb.SkollerJobs.JobView
 
   def render("show.json", %{profile: profile}) do
     profile

@@ -1,4 +1,4 @@
-defmodule Skoller.DocUpload do
+defmodule Skoller.FileUploaders.ClassDocs do
   @moduledoc false
   # Provides doc upload utilities.
   # Defines valid extensions, filename, and storage path.
@@ -6,7 +6,6 @@ defmodule Skoller.DocUpload do
   # S3 buckets are defined in env vars.
 
   use Arc.Definition
-  use Arc.Ecto.Definition
 
   @versions [:original]
   @extensions ~w(.pdf .txt .rtf .jpg .png .jpeg .doc .docx .pages)

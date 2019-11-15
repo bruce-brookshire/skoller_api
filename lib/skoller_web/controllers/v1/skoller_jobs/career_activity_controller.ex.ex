@@ -15,7 +15,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
   # Only require ownership when profile is not being created
   plug :verify_owner, :jobs_profile
 
-  def create(%{assigns: %{profile: profile}} = conn, %{"user_id" => user_id} = params) do
+  def create(%{assigns: %{profile: profile}} = conn, params) do
     case CareerActivities.insert(profile) do
       %CareerActivity{} = activity ->
         conn
@@ -23,7 +23,32 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
         |> render("show.json", activity: activity)
 
       _ ->
-        conn |> send_resp(404, "unable to insert")
+        send_resp(conn, 422, "unable to insert")
+    end
+  end
+
+  def update(conn, %{"activity_id" => activity_id} = params) do
+    case CareerActivities.get_by_id(activity_id) do
+      %CareerActivity{} = activity ->
+        updated_activity =
+          activity
+          |> CareerActivities.update(params)
+
+        put_view(conn, CareerActivityView) |> render("show.json", activity: updated_activity)
+
+      _ ->
+        send_resp(conn, 404, "Activity not found")
+    end
+  end
+
+  def delete(conn, %{"activity_id" => activity_id}) do
+    case CareerActivities.get_by_id(activity_id) do
+      %CareerActivity{} = activity ->
+        CareerActivities.delete!(activity)
+        send_resp(conn, 204, "")
+
+      _ ->
+        send_resp(conn, 404, "Activity not found")
     end
   end
 end
