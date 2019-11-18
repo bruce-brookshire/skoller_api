@@ -3,7 +3,6 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
 
   alias Skoller.SkollerJobs.CareerActivity
   alias Skoller.SkollerJobs.CareerActivities
-  alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias SkollerWeb.SkollerJobs.CareerActivityView
 
   import SkollerWeb.Plugs.Auth
@@ -73,7 +72,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
   def update(conn, %{"activity_id" => activity_id} = params) do
     case CareerActivities.get_by_id(activity_id) do
       %CareerActivity{} = activity ->
-        updated_activity =
+        {:ok, updated_activity} =
           activity
           |> CareerActivities.update(params)
 
