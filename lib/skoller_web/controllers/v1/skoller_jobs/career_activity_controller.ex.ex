@@ -18,7 +18,12 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
   plug :verify_member, :job_activity when action in [:show, :update, :delete]
 
   def create(%{assigns: %{profile: profile}} = conn, params) do
-    case CareerActivities.insert(profile) do
+    result =
+      params
+      |> Map.put("job_profile_id", profile.id)
+      |> CareerActivities.insert()
+
+    case result do
       {:ok, %CareerActivity{} = activity} ->
         conn
         |> put_view(CareerActivityView)

@@ -13,7 +13,7 @@ defmodule SkollerWeb.SkollerJobs.CareerActivityView do
         :start_date,
         :end_date,
         :job_profile_id,
-        :activity_type_id,
+        :career_activity_type_id,
         :description
       ])
 
