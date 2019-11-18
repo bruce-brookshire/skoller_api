@@ -6738,7 +6738,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/activities/1",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities?type_id=200",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -6746,8 +6746,15 @@
 								"api",
 								"v1",
 								"skoller-jobs",
-								"activities",
-								"1"
+								"profiles",
+								"4",
+								"activities"
+							],
+							"query": [
+								{
+									"key": "type_id",
+									"value": "200"
+								}
 							]
 						}
 					},
@@ -6771,7 +6778,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/1",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -6780,7 +6787,7 @@
 								"v1",
 								"skoller-jobs",
 								"profiles",
-								"1"
+								"4"
 							]
 						}
 					},
@@ -6803,17 +6810,8 @@
 								"value": "application/json"
 							}
 						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"job_profile_status_id\": 200,\n    \"degree_type_id\": 100,\n    \"wakeup_date\": \"2019-12-15 00:00:00\",\n    \"alt_email\": \"bruce.t.brookshire@gmail.com\",\n    \"state_code\": \"TX\",\n    \"region\": \"Southwest,Northeast\",\n    \"short_sell\": \"lol hi\",\n    \"skills\": \"skill 1, skill 2, etc\",\n    \"work_auth\": true,\n    \"sponsorship_required\": false,\n    \"played_sports\": false,\n    \"transcript_url\": \"https://aws.amazon.com/s3/buckets/skoller_jobs_transcripts/1234u384y5u\",\n    \"resume_url\": \"https://aws.amazon.com/s3/buckets/skoller_jobs_resumes/13240in801\",\n    \"social_links\": {\n        \"linkedin\": \"https://linked.com/in/brucebrookshire\"\n    },\n    \"update_at_timestamps\": {\n        \"basic_info_updated_at\": \"2019-11-11 17:51:32\"\n    },\n    \"personality\": {\n        \"Extrovert\": \"5\"\n    },\n    \"company_values\": {\n        \"compensation\": 5\n    },\n    \"gpa\": 3.97,\n    \"act\": 32,\n    \"sat\": 1920,\n    \"startup_interest\": 5,\n    \"gender\": \"Male\",\n    \"ethnicity_type_id\": 100,\n    \"veteran\": false,\n    \"disability\": false,\n    \"first_gen_college\": false,\n    \"fin_aid\": false,\n    \"pell_grant\": false\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/1",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/3",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -6822,7 +6820,7 @@
 								"v1",
 								"skoller-jobs",
 								"profiles",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -6932,6 +6930,49 @@
 								"v1",
 								"skoller-jobs",
 								"types",
+								"activities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Career Activity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"start_date\": \"2019-11-18\",\n        \"organization_name\": \"skoller 2\",\n        \"name\": \"name 2\",\n        \"end_date\": \"2019-11-18\",\n        \"description\": \"description 2\",\n        \"career_activity_type_id\": 200\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"4",
 								"activities"
 							]
 						}
