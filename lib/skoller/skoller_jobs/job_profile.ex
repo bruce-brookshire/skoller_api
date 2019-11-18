@@ -53,6 +53,8 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     field :fin_aid, :boolean
     field :pell_grant, :boolean
 
+    field :airtable_object_id, :string
+
     # Relations
     belongs_to :user, User, define_field: false
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
@@ -94,7 +96,10 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :pell_grant
   ]
 
+  @airtable_fields [:airtable_object_id]
+
   @all_fields @req_fields ++ @opt_fields
+  @all_airtable_fields @all_fields ++ @airtable_fields
 
   def insert_changeset(%{} = params) do
     %JobProfile{}
@@ -103,9 +108,16 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     |> validate_required(@req_fields)
   end
 
-  def update_changeset(%JobProfile{id: _id} = profile, %{} = params) do
+  def update_changeset(%JobProfile{} = profile, %{} = params) do
     profile
     |> cast(params, @all_fields)
+    |> unique_constraint(:user_id)
+    |> validate_required(@req_fields)
+  end
+
+  def airtable_changeset(%JobProfile{} = profile, %{} = params) do
+    profile
+    |> cast(params, @all_airtable_fields)
     |> unique_constraint(:user_id)
     |> validate_required(@req_fields)
   end

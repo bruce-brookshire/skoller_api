@@ -6,6 +6,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.JobProfileStatus
   alias Skoller.SkollerJobs.CareerActivityType
+  alias Skoller.SkollerJobs.AirtableJobType
 
   def up do
     # Types and Statuses
@@ -22,6 +23,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     end
 
     create table(:career_activity_types) do
+      add(:name, :string)
+    end
+
+    create table(:airtable_job_types) do
       add(:name, :string)
     end
 
@@ -62,6 +67,13 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       %CareerActivityType{id: 200, name: "Clubs"},
       %CareerActivityType{id: 300, name: "Achievements"},
       %CareerActivityType{id: 400, name: "Experience"}
+    ]
+    |> Enum.each(&Repo.insert/1)
+
+    [
+      %AirtableJobType{id: 100, name: "Create"},
+      %AirtableJobType{id: 200, name: "Update"},
+      %AirtableJobType{id: 300, name: "Delete"}
     ]
     |> Enum.each(&Repo.insert/1)
 
@@ -108,6 +120,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:first_gen_college, :boolean)
       add(:fin_aid, :boolean)
       add(:pell_grant, :boolean)
+      add(:airtable_object_id, :string, length: 25)
 
       timestamps()
     end
@@ -130,15 +143,25 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
 
     flush()
 
+    create table(:airtable_jobs) do
+      add(:is_running, :boolean)
+      add(:job_profile_id, references(:job_profiles, on_delete: :delete_all))
+      add(:airtable_object_id, :string, length: 25)
+      add(:airtable_job_type_id, references(:airtable_job_types, on_delete: :delete_all))
+    end
+
+    flush()
+
     create(unique_index(:job_profiles, [:user_id]))
+    create(unique_index(:airtable_jobs, [:airtable_object_id]))
+    create(unique_index(:airtable_jobs, [:job_profile_id]))
   end
 
   def down do
-    # # TODO take care of this
-    # drop(table(:job_candidate_activities))
-    # drop(table(:job_candidate_activity_types))
     drop(table(:career_activities))
     drop(table(:career_activity_types))
+    drop(table(:airtable_jobs))
+    drop(table(:airtable_job_types))
     drop(table(:job_profiles))
     drop(table(:ethnicity_types))
     drop(table(:job_profile_statuses))
