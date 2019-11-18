@@ -284,15 +284,15 @@ defmodule SkollerWeb.Router do
       get "/users/:user_id/job-profile", Jobs.JobController, :get_by_user
 
       # Skoller Jobs
-      scope "/skoller-jobs", Jobs do
-        resources "/profiles", JobController, only: [:create, :show, :update, :delete] do
+      scope "/skoller-jobs", SkollerJobs do
+        resources "/profiles", JobController, only: [:create, :show, :update, :delete], param: "profile_id" do
           put "/documents/:type", DocController, :upload
+
+          resources "/activities", CareerActivityController,
+            only: [:create, :index, :show, :update, :delete], param: "activity_id"
         end
 
         get "/types/:type", JobProfileTypeController, :show
-
-        resources "/activities", JobProfileActivityController,
-          only: [:create, :show, :update, :delete]
       end
     end
   end

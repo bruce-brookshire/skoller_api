@@ -10,7 +10,9 @@ defmodule SkollerWeb.Plugs.Auth do
   alias Skoller.EnrolledStudents
   alias Skoller.Classes.EditableClasses
   alias Skoller.SkollerJobs.JobProfiles
+  alias Skoller.SkollerJobs.CareerActivities
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
+  alias Skoller.SkollerJobs.CareerActivity
 
   import Plug.Conn
 
@@ -91,6 +93,20 @@ defmodule SkollerWeb.Plugs.Auth do
     end
   end
 
+  def verify_member(
+        %{assigns: %{profile: %{id: profile_id}}, path_params: %{"activity_id" => activity_id}} =
+          conn,
+        :job_activity
+      ) do
+    case CareerActivities.get_by_id(activity_id) do
+      %CareerActivity{job_profile_id: parent_profile_id} when profile_id == parent_profile_id ->
+        conn
+
+      _ ->
+        conn |> unauth
+    end
+  end
+
   def verify_member(conn, atom) do
     case conn |> get_items(atom) do
       nil -> conn |> not_in_role(@student_role)
@@ -137,7 +153,7 @@ defmodule SkollerWeb.Plugs.Auth do
   def verify_student_exists(conn, _), do: conn
 
   def verify_owner(
-        %{params: %{"id" => id}, assigns: %{user: %{id: user_id}}} = conn,
+        %{params: %{"job_profile_id" => id}, assigns: %{user: %{id: user_id}}} = conn,
         :jobs_profile
       ) do
     case JobProfiles.get_by_id_and_user_id(id, user_id) do

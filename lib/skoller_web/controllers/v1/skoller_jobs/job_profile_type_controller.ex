@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Api.V1.Jobs.JobProfileTypeController do
+defmodule SkollerWeb.Api.V1.SkollerJobs.JobProfileTypeController do
   use SkollerWeb, :controller
 
   alias Skoller.Repo

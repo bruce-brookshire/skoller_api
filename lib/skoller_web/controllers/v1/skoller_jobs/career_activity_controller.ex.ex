@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
   alias Skoller.SkollerJobs.CareerActivity
   alias Skoller.SkollerJobs.CareerActivities
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
-  alias SKollerWeb.SkollerJobs.CareerActivityView
+  alias SkollerWeb.SkollerJobs.CareerActivityView
 
   import SkollerWeb.Plugs.Auth
 
@@ -12,18 +12,56 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
 
   # Require access to be by a student
   plug :verify_role, %{role: @student_role}
-  # Only require ownership when profile is not being created
+  # Require ownership to work with activities
   plug :verify_owner, :jobs_profile
+  # Require activity to be a member of the profile its attached to
+  plug :verify_member, :job_activity when action in [:show, :update, :delete]
 
   def create(%{assigns: %{profile: profile}} = conn, params) do
     case CareerActivities.insert(profile) do
-      %CareerActivity{} = activity ->
+      {:ok, %CareerActivity{} = activity} ->
         conn
         |> put_view(CareerActivityView)
         |> render("show.json", activity: activity)
 
       _ ->
         send_resp(conn, 422, "unable to insert")
+    end
+  end
+
+  def show(conn, %{"activity_id" => activity_id}) do
+    case CareerActivities.get_by_id(activity_id) do
+      %CareerActivity{} = activity ->
+        conn
+        |> put_view(CareerActivityView)
+        |> render("show.json", activity: activity)
+
+      _ ->
+        send_resp(conn, 404, "Activity not found")
+    end
+  end
+
+  def index(%{assigns: %{profile: profile}} = conn, %{"type_id" => type_id}) do
+    case CareerActivities.get_by_profile_id_and_type_id(profile.id, String.to_integer(type_id)) do
+      activities when is_list(activities) ->
+        conn
+        |> put_view(CareerActivityView)
+        |> render("index.json", activities: activities)
+
+      _ ->
+        send_resp(conn, 404, "Something went wrong")
+    end
+  end
+
+  def index(%{assigns: %{profile: profile}} = conn, _params) do
+    case CareerActivities.get_by_profile_id(profile.id) do
+      activities when is_list(activities) ->
+        conn
+        |> put_view(CareerActivityView)
+        |> render("index.json", activities: activities)
+
+      _ ->
+        send_resp(conn, 404, "Something went wrong")
     end
   end
 

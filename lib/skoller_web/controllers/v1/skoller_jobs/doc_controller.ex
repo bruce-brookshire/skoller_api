@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Api.V1.Jobs.DocController do
+defmodule SkollerWeb.Api.V1.SkollerJobs.DocController do
   use SkollerWeb, :controller
 
   alias Ecto.UUID
