@@ -21,6 +21,7 @@ defmodule Skoller.SkollerJobs.AirtableJobs.AirtableJob do
     field :airtable_object_id, :string
     field :airtable_job_type_id, :id
     field :job_profile_id, :id
+    # airtable_jobs_airtable_object_id_index
 
     timestamps()
 
@@ -36,7 +37,7 @@ defmodule Skoller.SkollerJobs.AirtableJobs.AirtableJob do
     %AirtableJob{}
     |> cast(params, @all_fields)
     |> validate_required(@req_fields)
-    |> unique_constraint(:airtable_job_type_id)
+    |> unique_constraint(:airtable_object_id)
     |> unique_constraint(:job_profile_id)
   end
 
