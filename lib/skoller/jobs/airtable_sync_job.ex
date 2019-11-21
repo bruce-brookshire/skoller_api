@@ -3,13 +3,25 @@ defmodule Skoller.AirtableSyncJob do
 
   alias Skoller.Repo
   alias Skoller.SkollerJobs.AirtableJobs
-  alias Skoller.SkollerJobs.JobProfiles
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
+  alias Skoller.SkollerJobs.AirtableJobs.AirtableJob
 
-  import Ecto.Query
+  import SkollerWeb.HttpRequest
 
-  # This will currently run on every 5 minute interval in an hour.
-  # It is NOT every 5 minutes from spin up.
-  @max_rate_per_sec 5
+  # Number of times a second to check
+  @max_rate_per_sec 1
+
+  # Airtable single request object limit
+  @max_body_objects 10
+
+  # Operation types
+  @create_type_id 100
+  @update_type_id 200
+  @delete_type_id 300
+
+  # Airtable reference information
+  @airtable_base_id System.get_env("AIRTABLE_BASE_ID")
+  @airtable_api_token System.get_env("AIRTABLE_API_TOKEN")
 
   # This puts :jobs on the state for future calls.
   def start_link do
@@ -19,27 +31,257 @@ defmodule Skoller.AirtableSyncJob do
   # This is the first call after start_link/1
   def init(state) do
     # Schedule work to be performed at some point
-    schedule_work()
+    schedule_work(100)
     {:ok, state}
   end
 
   # This is triggered whenever an event with :work is created.
   # It immediately reschedules itself, and then runs module.run.
-  def handle_info(:work, state) do
+  def handle_info({:work, job_type_id}, state) do
     # Do the work you desire here
     # Reschedule once more
-    schedule_work()
-    require Logger
-    Logger.info("Running Airtable Syncing Job: " <> to_string(Time.utc_now()))
+    schedule_work(job_type_id)
 
+    require Logger
+    # Logger.info("Running Airtable Syncing Job: " <> to_string(Time.utc_now()))
+
+    jobs = AirtableJobs.get_outstanding_jobs(job_type_id, @max_body_objects)
+
+    Enum.each(jobs, &AirtableJobs.start_job!/1)
+
+    perform_operation(jobs, job_type_id)
+
+    Enum.each(jobs, &AirtableJobs.complete_job!/1)
+
+    {:noreply, state}
   end
 
   # This creates a :work event to be processed after get_time_diff_minute/1 milliseconds.
-  defp schedule_work() do
+  defp schedule_work(curr_job_type_id) do
+    next_job_type_id = rem(curr_job_type_id, 300) + 100
+
     Process.send_after(
       self(),
-      :work,
-      (60 / @max_rate_per_sec)
+      {:work, next_job_type_id},
+      # div(1000, @max_rate_per_sec)
+      10000
     )
+  end
+
+  defp perform_operation([], _), do: []
+
+  defp perform_operation(jobs, @create_type_id) do
+    body = Enum.map(jobs, &convert_to_airtable_schema/1)
+
+    post()
+    |> build_base()
+    |> add_body(body)
+    |> IO.inspect()
+
+    # |> send_request()
+    # |> handle_new_profile_ids(jobs)
+  end
+
+  defp perform_operation(jobs, @update_type_id) do
+    body = Enum.map(jobs, &convert_to_airtable_schema/1)
+
+    put()
+    |> build_base()
+    |> add_body(body)
+    |> IO.inspect()
+
+    # |> send_request()
+  end
+
+  defp perform_operation(jobs, @delete_type_id) do
+    body = Enum.map(jobs, & &1.job_profile.airtable_object_id)
+
+    delete()
+    |> build_base()
+    |> add_body(body)
+    |> IO.inspect()
+
+    # |> send_request()
+  end
+
+  defp convert_to_airtable_schema(%AirtableJob{
+         airtable_job_type_id: @create_type_id,
+         job_profile: %JobProfile{} = profile
+       }),
+       do: %{
+         "fields" => generate_fields(profile)
+       }
+
+  defp convert_to_airtable_schema(%AirtableJob{
+         airtable_job_type_id: @update_type_id,
+         job_profile: %JobProfile{airtable_object_id: airtable_id} = profile
+       }),
+       do: %{
+         "id" => airtable_id,
+         "fields" => generate_fields(profile)
+       }
+
+  # ethnicity_type: %{name: ethnicity}, 
+
+  defp generate_fields(
+         %JobProfile{
+           user:
+             %{
+               student:
+                 %{
+                   primary_school: school,
+                   fields_of_study: fields_of_study,
+                   name_first: name_first,
+                   name_last: name_last
+                 } = student
+             } = user,
+           degree_type: %{name: degree}
+         } = profile
+       ) do
+    career_interests = (profile.career_interests || "") |> String.split("|")
+    regions = (profile.regions || "") |> String.split("|")
+    majors = fields_of_study |> Enum.map(& &1.field)
+
+    %{
+      "Names" => "#{name_first} #{name_last}",
+      "Graduation Year" => student.grad_year,
+      "Major" => majors,
+      "Minor(s)" => nil,
+      "Home State?" => translate_state_code(profile.state_code),
+      "Career interests (up to 5):" => career_interests,
+      "What region of the country do you want to work in?" => regions,
+      # "Upload your Resume or CV" => [
+      #     {
+      #         "id": "attgkhRHZPEZRm5Lf",
+      #         "url": "https://dl.airtable.com/.attachments/2e7718f605e62919b7d7be4cdeb3cc76/81423796/Elizabeth-Bouranis.pdf",
+      #         "filename": "Elizabeth-Bouranis.pdf",
+      #         "size": 37918,
+      #         "type": "application/pdf",
+      #         "thumbnails": {
+      #             "small": {
+      #                 "url": "https://dl.airtable.com/.attachmentThumbnails/78e32795fb1fda66f6fbe503b5742336/4caeb5a3",
+      #                 "width": 28,
+      #                 "height": 36
+      #             },
+      #             "large": {
+      #                 "url": "https://dl.airtable.com/.attachmentThumbnails/6e7ccda738c75ead4350306f005bff91/0dee52e4",
+      #                 "width": 396,
+      #                 "height": 512
+      #             }
+      #         }
+      #     }
+      # ],
+      "Gender" => profile.gender,
+      # "Compensation" => 5,
+      # "Company Prestige" => 3,
+      # "Social Impact" => 4,
+      # "Professional Development" => 5,
+      # "Work-life Balance" => 5,
+      # "Upward Mobility" => 3,
+      # "Job Stability" => 4,
+      # "What is your Myers-Briggs personality type?" => "ISFP",
+      "Phone Number" => student.phone,
+      "Email" => user.email,
+      "School" => school.name,
+      # "Current Classes (enroll)" => 0,
+      # "Total Classes (enroll)" => 0,
+      "Pursuing Degree?" => degree,
+      "GPA" => profile.gpa,
+      "SAT Score" => profile.sat_score,
+      "ACT Score" => profile.act_score,
+      "Skoller Account?" => "Yes",
+      "job_profile_id" => profile.id
+    }
+  end
+
+  defp build_base(request),
+    do:
+      request
+      |> add_url("https://api.airtable.com/v0/" <> @airtable_base_id <> "/Candidates")
+      |> add_headers([
+        {"Content-Type", "application/json"},
+        {"Authorization", "Bearer " <> @airtable_api_token}
+      ])
+
+  @state_code_translator %{
+    "AL" => "Alabama",
+    "AK" => "Alaska",
+    "AZ" => "Arizona",
+    "AR" => "Arkansas",
+    "CA" => "California",
+    "CO" => "Colorado",
+    "CT" => "Connecticut",
+    "DE" => "Delaware",
+    "DC" => "District Of Columbia",
+    "FL" => "Florida",
+    "GA" => "Georgia",
+    "HI" => "Hawaii",
+    "ID" => "Idaho",
+    "IL" => "Illinois",
+    "IN" => "Indiana",
+    "IA" => "Iowa",
+    "KS" => "Kansas",
+    "KY" => "Kentucky",
+    "LA" => "Louisiana",
+    "ME" => "Maine",
+    "MD" => "Maryland",
+    "MA" => "Massachusetts",
+    "MI" => "Michigan",
+    "MN" => "Minnesota",
+    "MS" => "Mississippi",
+    "MO" => "Missouri",
+    "MT" => "Montana",
+    "NE" => "Nebraska",
+    "NV" => "Nevada",
+    "NH" => "New Hampshire",
+    "NJ" => "New Jersey",
+    "NM" => "New Mexico",
+    "NY" => "New York",
+    "NC" => "North Carolina",
+    "ND" => "North Dakota",
+    "OH" => "Ohio",
+    "OK" => "Oklahoma",
+    "OR" => "Oregon",
+    "PA" => "Pennsylvania",
+    "RI" => "Rhode Island",
+    "SC" => "South Carolina",
+    "SD" => "South Dakota",
+    "TN" => "Tennessee",
+    "TX" => "Texas",
+    "UT" => "Utah",
+    "VT" => "Vermont",
+    "VA" => "Virginia",
+    "WA" => "Washington",
+    "WV" => "West Virginia",
+    "WI" => "Wisconsin",
+    "WY" => "Wyoming"
+  }
+  defp translate_state_code(code),
+    do: @state_code_translator[code]
+
+  defp handle_new_profile_ids(response, jobs) do
+    case response do
+      {:ok, %HTTPoison.Response{status_id: 200, body: body}} ->
+        IO.inspect(body)
+
+        mapped_jobs =
+          jobs
+          |> Enum.reduce(%{}, fn val, acc -> Map.put(acc, val.profile.id, val) end)
+          |> IO.inspect()
+
+        body
+        |> Poison.decode!()
+        |> Enum.map(fn profile ->
+          airtable_body = profile["fields"]
+
+          mapped_jobs[airtable_body["job_profile_id"]]
+          |> JobProfile.airtable_changeset(%{airtable_object_id: airtable_body["id"]})
+        end)
+        |> Enum.each(&Repo.update/1)
+
+      failed_value ->
+        failed_value
+        |> IO.inspect
+    end
   end
 end

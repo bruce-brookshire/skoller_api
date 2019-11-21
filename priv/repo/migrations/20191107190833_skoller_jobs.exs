@@ -87,10 +87,11 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       # Basic details
       add(:alt_email, :string)
       add(:state_code, :string, length: 2)
-      add(:region, :string)
+      add(:regions, :string)
       add(:wakeup_date, :naive_datetime)
       add(:short_sell, :string, length: 300)
       add(:skills, :string, length: 200)
+      add(:career_interests, :string, length: 200)
 
       # Work eligibility
       add(:work_auth, :boolean)
@@ -148,6 +149,8 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:job_profile_id, references(:job_profiles, on_delete: :delete_all))
       add(:airtable_object_id, :string, length: 25)
       add(:airtable_job_type_id, references(:airtable_job_types, on_delete: :delete_all))
+
+      timestamps()
     end
 
     flush()

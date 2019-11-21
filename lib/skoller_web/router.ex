@@ -281,7 +281,7 @@ defmodule SkollerWeb.Router do
       delete "/users/:user_id", UserController, :delete
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
-      get "/users/:user_id/job-profile", Jobs.JobController, :get_by_user
+      get "/users/:user_id/job-profile", SkollerJobs.JobController, :get_by_user
 
       # Skoller Jobs
       scope "/skoller-jobs", SkollerJobs do

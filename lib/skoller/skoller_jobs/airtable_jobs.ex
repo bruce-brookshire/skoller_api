@@ -39,11 +39,31 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
     |> Repo.insert()
   end
 
-  def start_job(%AirtableJob{is_running: false} = job) do
-    job
-    |> AirtableJob.changeset_update(%{is_running: true})
-    |> Repo.update()
+  def get_outstanding_jobs(type_id, count)
+      when type_id in [@create_type_id, @update_type_id, @delete_type_id] do
+    from(j in AirtableJob)
+    |> where([j], not j.is_running and j.airtable_job_type_id == ^type_id)
+    |> order_by([j], asc: j.inserted_at)
+    |> limit(^count)
+    |> preload([j],
+      job_profile: [
+        user: [
+          student: [:primary_school, :fields_of_study]
+        ],
+        degree_type: [],
+        ethnicity_type: []
+      ]
+    )
+    |> Repo.all()
   end
 
-  def complete_job(%AirtableJob{} = job), do: Repo.delete(job)
+  def start_job!(%AirtableJob{is_running: false} = job) do
+    job
+    |> AirtableJob.changeset_update(%{is_running: true})
+    |> Repo.update!()
+
+    job
+  end
+
+  def complete_job!(%AirtableJob{} = job), do: Repo.delete!(job)
 end

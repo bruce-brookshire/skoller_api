@@ -18,8 +18,9 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
 
     field :alt_email, :string
     field :state_code, :string
-    field :region, :string
+    field :regions, :string
     field :short_sell, :string
+    field :career_interests, :string
     field :skills, :string
     field :degree_type_id, :id
 
@@ -70,7 +71,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :wakeup_date,
     :alt_email,
     :state_code,
-    :region,
+    :regions,
     :short_sell,
     :skills,
     :work_auth,

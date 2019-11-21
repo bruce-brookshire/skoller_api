@@ -22,6 +22,8 @@ defmodule Skoller.SkollerJobs.AirtableJobs.AirtableJob do
     field :airtable_job_type_id, :id
     field :job_profile_id, :id
 
+    timestamps()
+
     belongs_to :airtable_job_type, AirtableJobType, define_field: false
     belongs_to :job_profile, JobProfile, define_field: false
   end
