@@ -1,6 +1,7 @@
 defmodule Skoller.SkollerJobs.JobProfiles do
   alias Skoller.Repo
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
+  alias Skoller.SkollerJobs.AirtableJobs
   alias Skoller.Users.User
 
   @doc """
@@ -8,9 +9,17 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   # Returns `{:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}`
   """
   def insert(params) do
-    params
-    |> JobProfile.insert_changeset()
-    |> Repo.insert()
+    result =
+      params
+      |> JobProfile.insert_changeset()
+      |> Repo.insert()
+
+    case result do
+      {:ok, %JobProfile{} = profile} -> AirtableJobs.on_profile_create(profile)
+      _ -> nil
+    end
+
+    result
   end
 
   @doc """
@@ -44,13 +53,29 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   def update(nil, _params), do: nil
 
   def update(%JobProfile{} = profile, params) do
-    profile
-    |> JobProfile.update_changeset(params)
-    |> Repo.update()
+    result =
+      profile
+      |> JobProfile.update_changeset(params)
+      |> Repo.update()
+
+    case result do
+      {:ok, %JobProfile{} = profile} -> AirtableJobs.on_profile_update(profile)
+      _ -> nil
+    end
+
+    result
   end
 
   def delete(%JobProfile{} = profile) do
-    profile
+    result = profile
     |> Repo.delete()
+
+    case result do
+      {:ok, %JobProfile{} = profile} -> 
+        AirtableJobs.on_profile_delete(profile)
+      _ -> nil
+    end
+
+    result
   end
 end

@@ -31,7 +31,7 @@ defmodule Skoller.AirtableSyncJob do
   # This is the first call after start_link/1
   def init(state) do
     # Schedule work to be performed at some point
-    schedule_work(100)
+    schedule_work(0)
     {:ok, state}
   end
 
@@ -40,10 +40,10 @@ defmodule Skoller.AirtableSyncJob do
   def handle_info({:work, job_type_id}, state) do
     # Do the work you desire here
     # Reschedule once more
-    schedule_work(job_type_id)
-
+    schedule_work(job_type_id |> IO.inspect())
     require Logger
-    # Logger.info("Running Airtable Syncing Job: " <> to_string(Time.utc_now()))
+
+    Logger.info("Running Airtable Syncing Job: #{job_type_id} @ " <> to_string(Time.utc_now()))
 
     jobs = AirtableJobs.get_outstanding_jobs(job_type_id, @max_body_objects)
 
@@ -63,8 +63,7 @@ defmodule Skoller.AirtableSyncJob do
     Process.send_after(
       self(),
       {:work, next_job_type_id},
-      # div(1000, @max_rate_per_sec)
-      10000
+      20000
     )
   end
 
@@ -75,11 +74,9 @@ defmodule Skoller.AirtableSyncJob do
 
     post()
     |> build_base()
-    |> add_body(body)
-    |> IO.inspect()
-
-    # |> send_request()
-    # |> handle_new_profile_ids(jobs)
+    |> add_body(%{"records" => body, "typecast" => true})
+    |> send_request()
+    |> handle_new_profile_ids(jobs)
   end
 
   defp perform_operation(jobs, @update_type_id) do
@@ -87,21 +84,17 @@ defmodule Skoller.AirtableSyncJob do
 
     put()
     |> build_base()
-    |> add_body(body)
-    |> IO.inspect()
-
-    # |> send_request()
+    |> add_body(%{"records" => body, "typecast" => true})
+    |> send_request()
   end
 
   defp perform_operation(jobs, @delete_type_id) do
-    body = Enum.map(jobs, & &1.job_profile.airtable_object_id)
+    params = Enum.map(jobs, &{"records[]", &1.airtable_object_id})
 
     delete()
     |> build_base()
-    |> add_body(body)
-    |> IO.inspect()
-
-    # |> send_request()
+    |> add_params(params)
+    |> send_request()
   end
 
   defp convert_to_airtable_schema(%AirtableJob{
@@ -121,8 +114,6 @@ defmodule Skoller.AirtableSyncJob do
          "fields" => generate_fields(profile)
        }
 
-  # ethnicity_type: %{name: ethnicity}, 
-
   defp generate_fields(
          %JobProfile{
            user:
@@ -138,15 +129,14 @@ defmodule Skoller.AirtableSyncJob do
            degree_type: %{name: degree}
          } = profile
        ) do
-    career_interests = (profile.career_interests || "") |> String.split("|")
-    regions = (profile.regions || "") |> String.split("|")
+    career_interests = (profile.career_interests || "") |> String.split("|", trim: true)
+    regions = (profile.regions || "") |> String.split("|", trim: true)
     majors = fields_of_study |> Enum.map(& &1.field)
 
     %{
       "Names" => "#{name_first} #{name_last}",
       "Graduation Year" => student.grad_year,
       "Major" => majors,
-      "Minor(s)" => nil,
       "Home State?" => translate_state_code(profile.state_code),
       "Career interests (up to 5):" => career_interests,
       "What region of the country do you want to work in?" => regions,
@@ -181,10 +171,8 @@ defmodule Skoller.AirtableSyncJob do
       # "Job Stability" => 4,
       # "What is your Myers-Briggs personality type?" => "ISFP",
       "Phone Number" => student.phone,
-      "Email" => user.email,
+      "Email" => profile.alt_email || user.email,
       "School" => school.name,
-      # "Current Classes (enroll)" => 0,
-      # "Total Classes (enroll)" => 0,
       "Pursuing Degree?" => degree,
       "GPA" => profile.gpa,
       "SAT Score" => profile.sat_score,
@@ -262,26 +250,25 @@ defmodule Skoller.AirtableSyncJob do
   defp handle_new_profile_ids(response, jobs) do
     case response do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        IO.inspect(body)
-
         mapped_jobs =
           jobs
-          |> Enum.reduce(%{}, fn val, acc -> Map.put(acc, val.profile.id, val) end)
-          |> IO.inspect()
+          |> Enum.reduce(%{}, fn val, acc -> Map.put(acc, val.job_profile.id, val) end)
 
         body
         |> Poison.decode!()
+        |> Map.get("records")
         |> Enum.map(fn profile ->
           airtable_body = profile["fields"]
 
           mapped_jobs[airtable_body["job_profile_id"]]
-          |> JobProfile.airtable_changeset(%{airtable_object_id: airtable_body["id"]})
+          |> Map.get(:job_profile)
+          |> JobProfile.airtable_changeset(%{airtable_object_id: profile["id"]})
         end)
         |> Enum.each(&Repo.update/1)
 
       failed_value ->
         failed_value
-        |> IO.inspect
+        |> IO.inspect()
     end
   end
 end

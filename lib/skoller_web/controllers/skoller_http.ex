@@ -1,10 +1,10 @@
 defmodule SkollerWeb.HttpRequest do
   alias SkollerWeb.HttpRequest
 
-  @body_methods [:delete, :post, :put]
+  @body_methods [:post, :put]
 
   @enforce_keys [:method]
-  defstruct [:url, :body, :method, :headers]
+  defstruct [:url, :body, :method, :headers, :params]
 
   # HTTP Methods
   def get, do: %HttpRequest{method: :get}
@@ -18,15 +18,26 @@ defmodule SkollerWeb.HttpRequest do
   def add_headers(%HttpRequest{} = request, headers) when is_list(headers),
     do: %{request | headers: headers}
 
-  def add_body(%HttpRequest{method: method} = request, body) when (is_map(body) or is_list(body)) and method in @body_methods,
-    do: %{request | body: body}
+  def add_body(%HttpRequest{method: method} = request, body)
+      when (is_map(body) or is_list(body)) and method in @body_methods,
+      do: %{request | body: body}
+
+  def add_params(%HttpRequest{} = request, params), do: %{request | params: params}
 
   # Sending request
   def send_request(%HttpRequest{method: :get, url: url, headers: headers}),
-      do: HTTPoison.get(url, headers)
+    do: HTTPoison.get(url, headers)
 
-  def send_request(%HttpRequest{method: method, url: url, headers: headers, body: body})
-      when method in @body_methods and (is_nil(body) or is_map(body) or is_list(body)) do
+  def send_request(%HttpRequest{method: :delete, url: url, headers: headers, params: params}),
+    do: HTTPoison.delete(url, headers, params: params)
+
+  def send_request(%HttpRequest{
+        method: method,
+        url: url,
+        headers: headers,
+        body: body
+      })
+      when method in @body_methods do
     case Poison.encode(body || "") do
       {:ok, encoded_body} ->
         Kernel.apply(HTTPoison, method, [url, encoded_body, headers])

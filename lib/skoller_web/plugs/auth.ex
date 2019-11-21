@@ -153,7 +153,17 @@ defmodule SkollerWeb.Plugs.Auth do
   def verify_student_exists(conn, _), do: conn
 
   def verify_owner(
-        %{params: %{"job_profile_id" => id}, assigns: %{user: %{id: user_id}}} = conn,
+        %{params: %{"profile_id" => id}, assigns: %{user: %{id: user_id}}} = conn,
+        :jobs_profile
+      ) do
+    case JobProfiles.get_by_id_and_user_id(id, user_id) do
+      %JobProfile{} = profile -> assign(conn, :profile, profile)
+      _ -> conn |> unauth
+    end
+  end
+  
+  def verify_owner(
+        %{params: %{"id" => id}, assigns: %{user: %{id: user_id}}} = conn,
         :jobs_profile
       ) do
     case JobProfiles.get_by_id_and_user_id(id, user_id) do
