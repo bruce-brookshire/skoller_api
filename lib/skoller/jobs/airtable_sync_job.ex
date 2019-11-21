@@ -261,7 +261,7 @@ defmodule Skoller.AirtableSyncJob do
 
   defp handle_new_profile_ids(response, jobs) do
     case response do
-      {:ok, %HTTPoison.Response{status_id: 200, body: body}} ->
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         IO.inspect(body)
 
         mapped_jobs =
