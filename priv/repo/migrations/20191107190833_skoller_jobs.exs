@@ -163,8 +163,8 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   def down do
     drop(table(:career_activities))
     drop(table(:career_activity_types))
-    drop(table(:airtable_jobs))
-    drop(table(:airtable_job_types))
+    # drop(table(:airtable_jobs))
+    # drop(table(:airtable_job_types))
     drop(table(:job_profiles))
     drop(table(:ethnicity_types))
     drop(table(:job_profile_statuses))
