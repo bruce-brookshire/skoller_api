@@ -224,7 +224,7 @@ defmodule Skoller.EnrolledStudents do
   `%{class_id: Id, count: Integer}`
   """
   def get_communities(threshold \\ @community_threshold) do
-    from(sc in enrolled_student_class_subquery())
+    from(sc in subquery(enrolled_student_class_subquery()))
     |> group_by([sc], sc.class_id)
     |> having([sc], count(sc.id) >= ^threshold)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
