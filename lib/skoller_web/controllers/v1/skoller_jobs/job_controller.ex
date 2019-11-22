@@ -54,7 +54,15 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
   defp construct_response(%JobProfile{} = profile, conn) do
     profile =
       profile
-      |> Repo.preload([:job_profile_status, :ethnicity_type, :degree_type, :career_activities])
+      |> Repo.preload([
+        :job_profile_status,
+        :ethnicity_type,
+        :degree_type,
+        :volunteer_activities,
+        :club_activities,
+        :achievement_activities,
+        :experience_activities
+      ])
 
     conn
     |> put_view(JobView)

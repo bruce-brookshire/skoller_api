@@ -3,6 +3,14 @@ defmodule SkollerWeb.SkollerJobs.JobView do
 
   alias SkollerWeb.SkollerJobs.JobView
 
+  @simple_types [:job_profile_status, :ethnicity_type, :degree_type]
+  @activity_types [
+    :volunteer_activities,
+    :club_activities,
+    :achievement_activities,
+    :experience_activities
+  ]
+
   def render("show.json", %{profile: profile}) do
     profile
     |> Map.take([
@@ -36,6 +44,10 @@ defmodule SkollerWeb.SkollerJobs.JobView do
       :job_profile_status,
       :ethnicity_type,
       :degree_type,
+      :volunteer_activities,
+      :club_activities,
+      :achievement_activities,
+      :experience_activities,
       :user_id
     ])
     |> Enum.map(&convert_object_parts/1)
@@ -45,13 +57,30 @@ defmodule SkollerWeb.SkollerJobs.JobView do
   def render("index.json", %{profiles: profiles}),
     do: render_many(profiles, JobView, "show.json", as: :profiles)
 
-  defp convert_object_parts({:degree_type, _} = entry), do: render_type_objects(entry)
-  defp convert_object_parts({:ethnicity_type, _} = entry), do: render_type_objects(entry)
-  defp convert_object_parts({:job_profile_status, _} = entry), do: render_type_objects(entry)
+  defp convert_object_parts({key, nil}), do: {key, nil}
+
+  defp convert_object_parts({key, list} = entry) when is_list(list) and key in @activity_types,
+    do: {key, Enum.map(list, &convert_activity_parts/1)}
+
+  defp convert_object_parts({key, entry}) when key in @simple_types,
+    do: {key, convert_type_parts(entry)}
+
   defp convert_object_parts(entry), do: entry
 
-  # defp convert_object_parts({:degree_type, body}), do: {:degree_type, render_type_objects(body)}
+  defp convert_type_parts(entry),
+    do: Map.take(entry, [:id, :name])
 
-  defp render_type_objects({key, %{} = body}), do: {key, Map.take(body, [:id, :name])}
-  defp render_type_objects({key, nil}), do: {key, nil}
+  defp convert_activity_parts(entry),
+    do:
+      Map.take(entry, [
+        :id,
+        :name,
+        :description,
+        :organization_name,
+        :start_date,
+        :end_date,
+        :career_activity_type_id,
+        :inserted_at,
+        :updated_at
+      ])
 end

@@ -61,7 +61,11 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
     belongs_to :ethnicity_type, EthnicityType, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false
-    has_many :career_activities, CareerActivity, foreign_key: :job_profile_id
+
+    has_many :volunteer_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 100]
+    has_many :club_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 200]
+    has_many :achievement_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 300]
+    has_many :experience_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 400]
 
     timestamps()
   end
