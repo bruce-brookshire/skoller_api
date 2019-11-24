@@ -16,7 +16,7 @@ defmodule Skoller.Students.StudentAnalytics do
             |> Repo.all()
             |> Enum.map(&aggregate_individual_metrics(&1))
     end
-
+# ? HERE
     defp aggregate_individual_metrics(user_id) do
         from(u in User)
             |> join(:inner, [u], s in Student, on: u.student_id == s.id)

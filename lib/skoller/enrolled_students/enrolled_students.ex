@@ -3,11 +3,13 @@ defmodule Skoller.EnrolledStudents do
   A context module based on enrolled students
   """
 
-  alias Skoller.StudentClasses.StudentClass
   alias Skoller.Repo
+  alias Skoller.Classes.Class
   alias Skoller.Classes.Schools
   alias Skoller.Students.Student
-  alias Skoller.Classes.Class
+  alias Skoller.Periods.ClassPeriod
+  alias Skoller.StudentPoints.StudentPoint
+  alias Skoller.StudentClasses.StudentClass
 
   import Ecto.Query
 
@@ -20,7 +22,9 @@ defmodule Skoller.EnrolledStudents do
   """
   def preload_enrolled_classes(student_id) do
     from(c in Class)
-    |> join(:inner, [c], sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)), on: sc.class_id == c.id)
+    |> join(:inner, [c], sc in subquery(get_enrolled_classes_by_student_id_subquery(student_id)),
+      on: sc.class_id == c.id
+    )
   end
 
   @doc """
@@ -31,7 +35,9 @@ defmodule Skoller.EnrolledStudents do
   """
   def get_students_by_class(class_id) do
     from(s in Student)
-    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)), on: s.id == sc.student_id)
+    |> join(:inner, [s], sc in subquery(get_enrollment_by_class_id_subquery(class_id)),
+      on: s.id == sc.student_id
+    )
     |> Repo.all()
   end
 
@@ -42,16 +48,29 @@ defmodule Skoller.EnrolledStudents do
   """
   def enrolled_student_class_subquery() do
     from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
+    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
+    |> join(:inner, [sc, c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> where([sc, c, p], sc.is_dropped == false)
+    |> where(
+      [sc, c, p],
+      fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
+    )
+    |> select([sc, c, p], sc)
   end
 
   @doc """
   Subquery for getting enrolled student classes by student.
   """
   def get_enrolled_classes_by_student_id_subquery(student_id) do
-    #TODO: Filter ClassPeriod
     from(sc in StudentClass)
-    |> where([sc], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> join(:inner, [sc], c in Class, on: c.id == sc.class_id)
+    |> join(:inner, [sc, c], p in ClassPeriod, on: p.id == c.class_period_id)
+    |> where([sc, c, p], sc.student_id == ^student_id and sc.is_dropped == false)
+    |> where(
+      [sc, c, p],
+      fragment("(current_timestamp - ?) < interval '15 days'", p.end_date)
+    )
+    |> select([sc, c, p], sc)
   end
 
   @doc """
@@ -64,7 +83,6 @@ defmodule Skoller.EnrolledStudents do
 
   """
   def get_enrolled_classes_by_student_id(student_id) do
-    #TODO: Filter ClassPeriod
     from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
     |> Repo.all()
     |> Repo.preload(:class)
@@ -77,8 +95,9 @@ defmodule Skoller.EnrolledStudents do
   `true` if a student can enroll in more classes, otherwise `false`
   """
   def check_enrollment_limit_for_student(student_id) do
-    class_count = from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
-    |> Repo.aggregate(:count, :id)
+    class_count =
+      from(classes in subquery(get_enrolled_classes_by_student_id_subquery(student_id)))
+      |> Repo.aggregate(:count, :id)
 
     class_count < @enrollment_limit
   end
@@ -156,36 +175,10 @@ defmodule Skoller.EnrolledStudents do
   """
   def get_enrolled_student_classes_subquery(params \\ %{}) do
     from(sc in StudentClass)
-    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == sc.class_id)
+    |> join(:inner, [sc], c in subquery(Schools.get_school_from_class_subquery(params)),
+      on: c.class_id == sc.class_id
+    )
     |> where([sc], sc.is_dropped == false)
-  end
-
-  @doc """
-  Returns a subquery that provides a list of enrolled students
-
-  ## Params
-   * `%{"school_id" => school_id}`, filters on school.
-  """
-  def get_student_subquery(_params \\ %{})
-  def get_student_subquery(%{"school_id" => _school_id} = params) do
-    from(s in Student)
-    |> join(:inner, [s], sc in StudentClass, on: sc.student_id == s.id)
-    |> join(:inner, [s, sc], c in subquery(Schools.get_school_from_class_subquery(params)), on: c.class_id == sc.class_id)
-    |> where([s, sc], sc.is_dropped == false)
-    |> distinct([s], s.id)
-  end
-  def get_student_subquery(_params) do
-    from(s in Student)
-  end
-
-  @doc """
-  Returns a subquery that provides a list of `Skoller.Classes.Class`
-
-  """
-  def get_enrolled_classes_subquery() do
-    from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == false)
-    |> distinct([sc], sc.class_id)
   end
 
   @doc """
@@ -200,6 +193,29 @@ defmodule Skoller.EnrolledStudents do
   end
 
   @doc """
+  Gets the points per student
+  """
+  def get_student_points() do
+    from(s in Student)
+    |> join(:inner, [s], p in StudentPoint, on: s.id == p.student_id)
+    |> join(:inner, [s, p], t in Skoller.StudentPoints.PointType,
+      on: p.student_point_type_id == t.id
+    )
+    |> join(:inner, [s, p, t], u in Skoller.Users.User, on: s.id == u.student_id)
+    |> group_by([s, p, t, u], [s.id, u.id, t.id])
+    |> order_by([s, p, t, u], asc: s.name_first)
+    |> select([s, p, t, u], %{
+      "student_id" => s.id,
+      "first_name" => s.name_first,
+      "last_name" => s.name_last,
+      "user_email" => u.email,
+      "points" => sum(p.value),
+      "type" => t.name
+    })
+    |> Repo.all()
+  end
+
+  @doc """
   Gets communities with a count of students.
 
   Communities are students with at least `threshold` enrolled students
@@ -208,7 +224,7 @@ defmodule Skoller.EnrolledStudents do
   `%{class_id: Id, count: Integer}`
   """
   def get_communities(threshold \\ @community_threshold) do
-    from(sc in enrolled_student_class_subquery())
+    from(sc in subquery(enrolled_student_class_subquery()))
     |> group_by([sc], sc.class_id)
     |> having([sc], count(sc.id) >= ^threshold)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.id)})
