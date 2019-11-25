@@ -6,6 +6,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.JobProfileStatus
   alias Skoller.SkollerJobs.CareerActivityType
+  alias Skoller.SkollerJobs.JobSearchType
   alias Skoller.SkollerJobs.AirtableJobType
 
   def up do
@@ -27,6 +28,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     end
 
     create table(:airtable_job_types) do
+      add(:name, :string)
+    end
+
+    create table(:job_search_types) do
       add(:name, :string)
     end
 
@@ -71,6 +76,14 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
     |> Enum.each(&Repo.insert/1)
 
     [
+      %JobSearchType{id: 100, name: "Internship"},
+      %JobSearchType{id: 200, name: "Graduate program"},
+      %JobSearchType{id: 300, name: "Part-time"},
+      %JobSearchType{id: 400, name: "Full-time"}
+    ]
+    |> Enum.each(&Repo.insert/1)
+
+    [
       %AirtableJobType{id: 100, name: "Create"},
       %AirtableJobType{id: 200, name: "Update"},
       %AirtableJobType{id: 300, name: "Delete"}
@@ -83,6 +96,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:ethnicity_type_id, references(:ethnicity_types, on_delete: :nilify_all))
       add(:job_profile_status_id, references(:job_profile_statuses, on_delete: :nilify_all))
       add(:degree_type_id, references(:degree_types, on_delete: :nilify_all))
+      add(:job_search_type_id, references(:job_search_types, on_delete: :nilify_all))
 
       # Basic details
       add(:alt_email, :string)
@@ -161,13 +175,14 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
-    drop(table(:career_activities))
-    drop(table(:career_activity_types))
-    drop(table(:airtable_jobs))
-    drop(table(:airtable_job_types))
-    drop(table(:job_profiles))
-    drop(table(:ethnicity_types))
-    drop(table(:job_profile_statuses))
-    drop(table(:degree_types))
+    drop_if_exists(table(:career_activities))
+    drop_if_exists(table(:career_activity_types))
+    drop_if_exists(table(:airtable_jobs))
+    drop_if_exists(table(:airtable_job_types))
+    drop_if_exists(table(:job_profiles))
+    drop_if_exists(table(:ethnicity_types))
+    drop_if_exists(table(:job_profile_statuses))
+    drop_if_exists(table(:degree_types))
+    drop_if_exists(table(:job_search_types))
   end
 end

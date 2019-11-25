@@ -6,8 +6,9 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   alias Skoller.Users.User
   alias Skoller.SkollerJobs.DegreeType
   alias Skoller.SkollerJobs.EthnicityType
-  alias Skoller.SkollerJobs.JobProfileStatus
+  alias Skoller.SkollerJobs.JobSearchType
   alias Skoller.SkollerJobs.CareerActivity
+  alias Skoller.SkollerJobs.JobProfileStatus
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
   schema "job_profiles" do
@@ -23,6 +24,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     field :career_interests, :string
     field :skills, :string
     field :degree_type_id, :id
+    field :job_search_type_id, :id
 
     # Work eligibility
     field :work_auth, :boolean
@@ -61,6 +63,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
     belongs_to :ethnicity_type, EthnicityType, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false
+    belongs_to :job_search_type, JobSearchType, define_field: false
 
     has_many :volunteer_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 100]
     has_many :club_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 200]
@@ -98,7 +101,8 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :disability,
     :first_gen_college,
     :fin_aid,
-    :pell_grant
+    :pell_grant,
+    :job_search_type_id
   ]
 
   @airtable_fields [:airtable_object_id]

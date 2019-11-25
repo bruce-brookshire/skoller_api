@@ -3,7 +3,7 @@ defmodule SkollerWeb.SkollerJobs.JobView do
 
   alias SkollerWeb.SkollerJobs.JobView
 
-  @simple_types [:job_profile_status, :ethnicity_type, :degree_type]
+  @simple_types [:job_profile_status, :ethnicity_type, :degree_type, :job_search_type]
   @activity_types [
     :volunteer_activities,
     :club_activities,
@@ -48,7 +48,8 @@ defmodule SkollerWeb.SkollerJobs.JobView do
       :club_activities,
       :achievement_activities,
       :experience_activities,
-      :user_id
+      :user_id,
+      :job_search_type,
     ])
     |> Enum.map(&convert_object_parts/1)
     |> Map.new()

@@ -6,12 +6,14 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobProfileTypeController do
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.CareerActivityType
   alias Skoller.SkollerJobs.JobProfileStatus
+  alias Skoller.SkollerJobs.JobSearchType
   alias SkollerWeb.SkollerJobs.JobProfileTypesView
 
   def show(conn, %{"type" => "degrees"}), do: get_and_render(DegreeType, conn)
   def show(conn, %{"type" => "statuses"}), do: get_and_render(JobProfileStatus, conn)
   def show(conn, %{"type" => "activities"}), do: get_and_render(CareerActivityType, conn)
   def show(conn, %{"type" => "ethnicities"}), do: get_and_render(EthnicityType, conn)
+  def show(conn, %{"type" => "job_search"}), do: get_and_render(JobSearchType, conn)
   def show(conn, %{"type" => type}), do: send_resp(conn, 422, "#{type} not a resource")
 
   defp get_and_render(type_atom, conn),

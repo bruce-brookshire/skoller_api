@@ -29,3 +29,11 @@ defmodule Skoller.SkollerJobs.DegreeType do
     field :name, :string
   end
 end
+
+defmodule Skoller.SkollerJobs.JobSearchType do
+  use Ecto.Schema
+
+  schema "job_search_types" do
+    field :name, :string
+  end
+end

@@ -61,7 +61,8 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
         :volunteer_activities,
         :club_activities,
         :achievement_activities,
-        :experience_activities
+        :experience_activities,
+        :job_search_type
       ])
 
     conn
