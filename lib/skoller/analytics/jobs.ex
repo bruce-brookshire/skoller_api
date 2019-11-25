@@ -1,5 +1,5 @@
 defmodule Skoller.Analytics.Jobs do
-    alias Skoller.AnalyticUpload
+    alias Skoller.FileUploaders.AnalyticsDocs
     alias Skoller.Analytics.Documents
     alias Skoller.Students.StudentAnalytics
     alias Skoller.Classes.ClassAnalytics
@@ -135,26 +135,26 @@ defmodule Skoller.Analytics.Jobs do
 
     defp upload_document(content, file_path, scope) do
         File.write(file_path, content)
-        result = AnalyticUpload.store({file_path, scope})
+        result = AnalyticsDocs.store({file_path, scope})
         File.rm(file_path)
         result
     end
 
     defp store_document({:ok, inserted}, %{:dir => "school_csv"} = scope) do
         Logger.info("Analytics completed successfully")
-        path = AnalyticUpload.url({inserted, scope})
+        path = AnalyticsDocs.url({inserted, scope})
         Documents.set_current_school_csv_path(path)
     end
 
     defp store_document({:ok, inserted}, %{:dir => "class_csv"} = scope) do
         Logger.info("Analytics completed successfully")
-        path = AnalyticUpload.url({inserted, scope})
+        path = AnalyticsDocs.url({inserted, scope})
         Documents.set_current_class_csv_path(path)
     end
 
     defp store_document({:ok, inserted}, %{:dir => "user_csv"} = scope) do
         Logger.info("Analytics completed successfully")
-        path = AnalyticUpload.url({inserted, scope})
+        path = AnalyticsDocs.url({inserted, scope})
         Documents.set_current_user_csv_path(path)
     end
 

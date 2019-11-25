@@ -1,4 +1,4 @@
-defmodule Skoller.AnalyticUpload do
+defmodule Skoller.FileUploaders.AnalyticsDocs do
   @moduledoc false
   # Provides doc upload utilities.
   # Defines valid extensions, filename, and storage path.
@@ -6,7 +6,6 @@ defmodule Skoller.AnalyticUpload do
   # S3 buckets are defined in env vars.
 
   use Arc.Definition
-  use Arc.Ecto.Definition
 
   @versions [:original]
   @acl :public_read

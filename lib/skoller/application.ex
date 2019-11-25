@@ -26,6 +26,7 @@ defmodule Skoller.Application do
       worker(Skoller.ClassSetupJob, []),
       worker(Skoller.NoClassesJob, []),
       worker(Skoller.EmailManagerJob, []),
+      worker(Skoller.AirtableSyncJob, []),
       worker(Skoller.AnalyticsJob, [])
     ]
 
