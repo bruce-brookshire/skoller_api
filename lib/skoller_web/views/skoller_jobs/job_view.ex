@@ -16,6 +16,7 @@ defmodule SkollerWeb.SkollerJobs.JobView do
     |> Map.take([
       :id,
       :wakeup_date,
+      :graduation_date,
       :alt_email,
       :state_code,
       :regions,
@@ -60,7 +61,7 @@ defmodule SkollerWeb.SkollerJobs.JobView do
 
   defp convert_object_parts({key, nil}), do: {key, nil}
 
-  defp convert_object_parts({key, list} = entry) when is_list(list) and key in @activity_types,
+  defp convert_object_parts({key, list}) when is_list(list) and key in @activity_types,
     do: {key, Enum.map(list, &convert_activity_parts/1)}
 
   defp convert_object_parts({key, entry}) when key in @simple_types,

@@ -36,7 +36,8 @@ defmodule Skoller.SkollerJobs.JobProfiles do
   Get job profile by its user's id
   # Returns `Ecto.Schema.t() | nil`
   """
-  def get_by_user(%User{id: user_id}), do: Repo.get_by(JobProfile, user_id: user_id)
+  def get_by_user(%User{id: user_id}), do: get_by_user(user_id)
+  def get_by_user(user_id) when is_integer(user_id), do: Repo.get_by(JobProfile, user_id: user_id)
   def get_by_user(_), do: nil
 
   @doc """

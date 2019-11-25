@@ -16,6 +16,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
 
     field :job_profile_status_id, :id, default: 100
     field :wakeup_date, :naive_datetime
+    field :graduation_date, :date
 
     field :alt_email, :string
     field :state_code, :string
@@ -76,6 +77,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   @req_fields [:user_id, :degree_type_id]
   @opt_fields [
     :wakeup_date,
+    :graduation_date,
     :alt_email,
     :state_code,
     :regions,

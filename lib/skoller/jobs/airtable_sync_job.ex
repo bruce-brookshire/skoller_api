@@ -86,6 +86,7 @@ defmodule Skoller.AirtableSyncJob do
     |> build_base()
     |> add_body(%{"records" => body, "typecast" => true})
     |> send_request()
+    |> IO.inspect()
   end
 
   defp perform_operation(jobs, @delete_type_id) do
@@ -140,27 +141,8 @@ defmodule Skoller.AirtableSyncJob do
       "Home State?" => translate_state_code(profile.state_code),
       "Career interests (up to 5):" => career_interests,
       "What region of the country do you want to work in?" => regions,
-      # "Upload your Resume or CV" => [
-      #     {
-      #         "id": "attgkhRHZPEZRm5Lf",
-      #         "url": "https://dl.airtable.com/.attachments/2e7718f605e62919b7d7be4cdeb3cc76/81423796/Elizabeth-Bouranis.pdf",
-      #         "filename": "Elizabeth-Bouranis.pdf",
-      #         "size": 37918,
-      #         "type": "application/pdf",
-      #         "thumbnails": {
-      #             "small": {
-      #                 "url": "https://dl.airtable.com/.attachmentThumbnails/78e32795fb1fda66f6fbe503b5742336/4caeb5a3",
-      #                 "width": 28,
-      #                 "height": 36
-      #             },
-      #             "large": {
-      #                 "url": "https://dl.airtable.com/.attachmentThumbnails/6e7ccda738c75ead4350306f005bff91/0dee52e4",
-      #                 "width": 396,
-      #                 "height": 512
-      #             }
-      #         }
-      #     }
-      # ],
+      "Profile Photo" => url_body(user.pic_path),
+      "Upload your Resume or CV" => url_body(profile.resume_url),
       "Gender" => profile.gender,
       # "Compensation" => 5,
       # "Company Prestige" => 3,
@@ -271,4 +253,7 @@ defmodule Skoller.AirtableSyncJob do
         |> IO.inspect()
     end
   end
+
+  def url_body(nil), do: nil
+  def url_body(url), do: [%{"url" => url}]
 end

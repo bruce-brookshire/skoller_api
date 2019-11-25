@@ -103,6 +103,7 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:state_code, :string, length: 2)
       add(:regions, :string)
       add(:wakeup_date, :naive_datetime)
+      add(:graduation_date, :date)
       add(:short_sell, :string, length: 300)
       add(:skills, :string, length: 200)
       add(:career_interests, :string, length: 200)

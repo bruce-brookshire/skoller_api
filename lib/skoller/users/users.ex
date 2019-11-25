@@ -19,6 +19,8 @@ defmodule Skoller.Users do
   alias Skoller.Users.Emails
   alias Skoller.Students.Organizations
   alias Skoller.Devices.Device
+  alias Skoller.SkollerJobs.JobProfiles
+  alias Skoller.SkollerJobs.AirtableJobs
 
   import Ecto.Query
 
@@ -125,6 +127,7 @@ defmodule Skoller.Users do
         do: User.changeset_update_admin(user_old, params),
         else: User.changeset_update(user_old, params)
       )
+      |> check_airtable_sync_job(user_old.id)
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, changeset)
@@ -133,6 +136,32 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:link, fn _, changes -> get_link(changes.user) end)
     |> Repo.transaction()
   end
+
+  defp check_airtable_sync_job(
+         %Ecto.Changeset{valid?: true, changes: changes} = changeset,
+         user_id
+       ) do
+    keys = Map.keys(changes)
+
+    student_changes? =
+      Enum.any?(keys, &(&1 == :student)) and (changes.student.valid? || false) and
+        Enum.any?(
+          Map.keys(changes.student.changes),
+          &(&1 in [:primary_school_id, :phone, :grad_year, :name_last, :name_first])
+        )
+
+    should_update = Enum.any?(keys, &(&1 in [:pic_path, :email])) or student_changes?
+
+    if should_update do
+      user_id
+      |> JobProfiles.get_by_user()
+      |> AirtableJobs.on_profile_update()
+    end
+
+    changeset
+  end
+
+  defp check_airtable_sync_job(changeset, _), do: changeset
 
   def delete_user(user_id) do
     user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)
