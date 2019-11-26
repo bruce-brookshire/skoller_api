@@ -2,7 +2,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   @moduledoc """
     Lock controller
   """
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.Responses.MultiError
@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
-  
+
   plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
   plug :verify_member, :class
 
@@ -27,7 +27,10 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   """
   def index(conn, %{"class_id" => class_id}) do
     locks = Users.get_user_locks_by_class(class_id)
-    render(conn, LockView, "index.json", locks: locks)
+
+    conn
+    |> put_view(LockView)
+    |> render("index.json", locks: locks)
   end
 
   @doc """
@@ -37,7 +40,9 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   """
   def lock(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
     case lock_class(user, class_id, nil, nil) do
-      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:ok, _lock} ->
+        conn |> send_resp(204, "")
+
       {:error, _error} ->
         conn
         |> send_resp(409, "")
@@ -52,9 +57,10 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
     is_completed = params["is_completed"] == true
 
     case Locks.unlock_class(old_class, user.id, is_completed) do
-      {:ok, %{status: class}} -> 
+      {:ok, %{status: class}} ->
         ClassStatuses.evaluate_class_completion(old_class, class)
         conn |> send_resp(204, "")
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
@@ -68,10 +74,13 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   """
   def weights(%{assigns: %{user: user}} = conn, %{"class_id" => class_id}) do
     case lock_class(user, class_id, :weights, nil) do
-      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:ok, _lock} ->
+        conn |> send_resp(204, "")
+
       {:error, _error} ->
         conn
         |> send_resp(409, "")
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
@@ -85,10 +94,13 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   """
   def assignments(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
     case lock_class(user, class_id, :assignments, params["subsection"]) do
-      {:ok, _lock} -> conn |> send_resp(204, "")
+      {:ok, _lock} ->
+        conn |> send_resp(204, "")
+
       {:error, _error} ->
         conn
         |> send_resp(409, "")
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
@@ -96,7 +108,7 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   end
 
   defp lock_class(%{roles: roles} = user, class_id, atom, subsection) do
-    case Enum.any?(roles, & &1.id == @student_role) do
+    case Enum.any?(roles, &(&1.id == @student_role)) do
       false -> Locks.lock_class(class_id, user.id, nil)
       true -> DIY.lock_class(user.id, class_id, atom, subsection)
     end

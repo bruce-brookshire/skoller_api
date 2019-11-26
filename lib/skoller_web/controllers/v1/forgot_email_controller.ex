@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.ForgotEmailController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.Users
@@ -15,7 +15,10 @@ defmodule SkollerWeb.Api.V1.ForgotEmailController do
   def reset(conn, %{"password" => password}) do
     case Users.change_password(conn.assigns[:user], password) do
       {:ok, %{} = auth} ->
-        render(conn, AuthView, "show.json", auth: auth)
+        conn
+        |> put_view(AuthView)
+        |> render("show.json", auth: auth)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)

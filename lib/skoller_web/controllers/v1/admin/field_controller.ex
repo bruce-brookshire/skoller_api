@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.FieldController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.School.FieldOfStudyView
@@ -8,25 +8,32 @@ defmodule SkollerWeb.Api.V1.Admin.FieldController do
   alias Skoller.Students.FieldsOfStudy, as: StudentFieldsOfStudy
 
   import SkollerWeb.Plugs.Auth
-  
+
   @admin_role 200
-  
+
   plug :verify_role, %{role: @admin_role}
 
   def create(conn, %{} = params) do
     case FieldsOfStudy.create_field_of_study(params) do
       {:ok, field} ->
-        render(conn, FieldOfStudyView, "show.json", field: field)
+        conn
+        |> put_view(FieldOfStudyView)
+        |> render("show.json", field: field)
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
   def index(conn, _params) do
     fields = StudentFieldsOfStudy.get_field_of_study_count()
-    render(conn, FieldOfStudyView, "index.json", fields: fields)
+
+    conn
+    |> put_view(FieldOfStudyView)
+    |> render("index.json", fields: fields)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -34,11 +41,15 @@ defmodule SkollerWeb.Api.V1.Admin.FieldController do
 
     case FieldsOfStudy.update_field_of_study(field_old, params) do
       {:ok, field} ->
-        render(conn, FieldOfStudyView, "show.json", field: field)
+        conn
+        |> put_view(FieldOfStudyView)
+        |> render("show.json", field: field)
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

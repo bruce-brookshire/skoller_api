@@ -1,8 +1,8 @@
 defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
-  
+
   alias SkollerWeb.ClassView
   alias SkollerWeb.Responses.MultiError
   alias Skoller.ChangeRequests
@@ -20,7 +20,10 @@ defmodule SkollerWeb.Api.V1.Class.ChangeRequestController do
 
     case ChangeRequests.create(class_id, params) do
       {:ok, %{class: class}} ->
-        render(conn, ClassView, "show.json", class: class)
+        conn
+        |> put_view(ClassView)
+        |> render("show.json", class: class)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)

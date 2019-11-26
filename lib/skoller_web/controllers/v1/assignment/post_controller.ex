@@ -1,8 +1,8 @@
 defmodule SkollerWeb.Api.V1.Assignment.PostController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
-  
+
   alias SkollerWeb.Assignment.PostView
   alias Skoller.AssignmentPosts
 
@@ -20,11 +20,15 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
     case AssignmentPosts.create_assignment_post(params) do
       {:ok, post} ->
-        render(conn, PostView, "show.json", %{post: post})
+        conn
+        |> put_view(PostView)
+        |> render("show.json", %{post: post})
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
@@ -33,11 +37,15 @@ defmodule SkollerWeb.Api.V1.Assignment.PostController do
 
     case AssignmentPosts.update_assignment_post(post_old, params) do
       {:ok, post} ->
-        render(conn, PostView, "show.json", %{post: post})
+        conn
+        |> put_view(PostView)
+        |> render("show.json", %{post: post})
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

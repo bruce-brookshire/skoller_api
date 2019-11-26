@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.ChatPostController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.ChatPostView
@@ -20,13 +20,21 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
     case ChatPosts.create_post(params, conn.assigns[:user].student_id) do
-      {:ok, post} -> 
+      {:ok, post} ->
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+
+        conn
+        |> put_view(ChatPostView)
+        |> render("show.json", %{
+          chat_post: %{chat_post: post, color: sc.color},
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
@@ -34,13 +42,21 @@ defmodule SkollerWeb.Api.V1.Class.ChatPostController do
     post_old = ChatPosts.get_post_by_student_and_id!(conn.assigns[:user].student_id, id)
 
     case ChatPosts.update(post_old, params) do
-      {:ok, post} -> 
+      {:ok, post} ->
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+
+        conn
+        |> put_view(ChatPostView)
+        |> render("show.json", %{
+          chat_post: %{chat_post: post, color: sc.color},
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

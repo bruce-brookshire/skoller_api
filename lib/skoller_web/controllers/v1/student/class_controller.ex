@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.ClassController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.StudentClassView
@@ -13,9 +13,9 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias Skoller.ClassDocs
 
   import SkollerWeb.Plugs.Auth
-  
+
   @student_role 100
-  
+
   plug :verify_role, %{role: @student_role}
   plug :verify_member, :student
   plug :verify_class_is_editable, :class_id
@@ -23,7 +23,10 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   def create(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
     case StudentClasses.enroll_in_class(student_id, class_id, params) do
       {:ok, student_class} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
+        conn
+        |> put_view(StudentClassView)
+        |> render("show.json", student_class: student_class)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
@@ -33,26 +36,35 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   def link(conn, %{"token" => token} = params) do
     case EnrollmentLinks.enroll_by_link(token, conn.assigns[:user].student.id, params) do
       {:ok, student_class} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
+        conn
+        |> put_view(StudentClassView)
+        |> render("show.json", student_class: student_class)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
     end
   end
 
-
   def show(conn, %{"student_id" => student_id, "class_id" => class_id}) do
     student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
-    student_class = student_class
-    |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
-    |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
-    |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(class_id))
-    |> Map.put(:new_assignments, get_new_class_assignments(student_class))
-    |> Map.put(:students, EnrolledStudents.get_students_by_class(class_id))
-    |> Map.put(:documents, ClassDocs.get_docs_by_class(student_class.class_id) |> Enum.map(fn elem -> %{name: elem.name, path: elem.path} end))
+    student_class =
+      student_class
+      |> Map.put(:grade, StudentClasses.get_class_grade(student_class.id))
+      |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
+      |> Map.put(:enrollment, EnrolledStudents.get_enrollment_by_class_id(class_id))
+      |> Map.put(:new_assignments, get_new_class_assignments(student_class))
+      |> Map.put(:students, EnrolledStudents.get_students_by_class(class_id))
+      |> Map.put(
+        :documents,
+        ClassDocs.get_docs_by_class(student_class.class_id)
+        |> Enum.map(fn elem -> %{name: elem.name, path: elem.path} end)
+      )
 
-    render(conn, StudentClassView, "show.json", student_class: student_class)
+    conn
+    |> put_view(StudentClassView)
+    |> render("show.json", student_class: student_class)
   end
 
   def update(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
@@ -60,11 +72,15 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
 
     case EnrolledStudents.update_enrolled_class(old, params) do
       {:ok, student_class} ->
-        render(conn, StudentClassView, "show.json", student_class: student_class)
+        conn
+        |> put_view(StudentClassView)
+        |> render("show.json", student_class: student_class)
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
@@ -74,10 +90,12 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
     case EnrolledStudents.drop_enrolled_class(student_class) do
       {:ok, _student_class} ->
         conn |> send_resp(204, "")
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 

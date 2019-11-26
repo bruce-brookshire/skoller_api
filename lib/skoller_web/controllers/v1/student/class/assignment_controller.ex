@@ -30,7 +30,10 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
 
   def index(conn, %{"student_id" => student_id} = params) do
     student_assignments = StudentClasses.get_student_assignments(student_id, params)
-    render(conn, StudentAssignmentView, "index.json", student_assignments: student_assignments)
+
+    conn
+    |> put_view(StudentAssignmentView)
+    |> render("index.json", student_assignments: student_assignments)
   end
 
   def show(conn, %{"id" => id}) do
@@ -39,7 +42,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
     pending_mods = StudentAssignmentMods.pending_mods_for_student_assignment(student_assignment)
     student_assignment = student_assignment |> Map.put(:pending_mods, pending_mods)
 
-    render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+    conn
+    |> put_view(StudentAssignmentView)
+    |> render("show.json", student_assignment: student_assignment)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -59,7 +64,8 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
@@ -72,12 +78,15 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   defp render_result(result, conn) do
     case result do
       {:ok, student_assignment} ->
-        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+        conn
+        |> put_view(StudentAssignmentView)
+        |> render("show.json", student_assignment: student_assignment)
 
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

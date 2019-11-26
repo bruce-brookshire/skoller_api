@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.LocationController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.Locations
@@ -8,6 +8,9 @@ defmodule SkollerWeb.Api.V1.LocationController do
 
   def index(conn, _params) do
     locations = Locations.get_states()
-    render(conn, LocationView, "index.json", locations: locations)
+
+    conn
+    |> put_view(LocationView)
+    |> render("index.json", locations: locations)
   end
 end

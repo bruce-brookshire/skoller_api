@@ -1,8 +1,8 @@
 defmodule SkollerWeb.Api.V1.ClassController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
-  
+
   alias SkollerWeb.ClassView
   alias SkollerWeb.Class.SearchView
   alias SkollerWeb.Responses.MultiError
@@ -11,13 +11,16 @@ defmodule SkollerWeb.Api.V1.ClassController do
   alias Skoller.Periods
 
   import SkollerWeb.Plugs.Auth
-  
+
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
   @change_req_role 400
-  
-  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
+
+  plug :verify_role, %{
+    roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]
+  }
+
   plug :verify_member, :class
   plug :verify_member, %{of: :class, using: :id}
   plug :verify_class_is_editable, :class_id
@@ -32,12 +35,16 @@ defmodule SkollerWeb.Api.V1.ClassController do
   * 200 `SkollerWeb.ClassView`
   """
   def create(conn, %{"period_id" => period_id} = params) do
-    params = params
-    |> Map.put("class_period_id", period_id)
+    params =
+      params
+      |> Map.put("class_period_id", period_id)
 
     case Classes.create_class(params, conn.assigns[:user]) do
       {:ok, %{class_status: class}} ->
-        render(conn, ClassView, "show.json", class: class)
+        conn
+        |> put_view(ClassView)
+        |> render("show.json", class: class)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)
@@ -54,8 +61,10 @@ defmodule SkollerWeb.Api.V1.ClassController do
   """
   def index(conn, %{"period_id" => period_id} = params) do
     classes = Periods.get_classes_by_period_id(period_id, params)
-    
-    render(conn, ClassView, "index.json", classes: classes)
+
+    conn
+    |> put_view(ClassView)
+    |> render("index.json", classes: classes)
   end
 
   @doc """
@@ -81,7 +90,9 @@ defmodule SkollerWeb.Api.V1.ClassController do
   def index(conn, params) do
     classes = EnrolledClasses.get_classes_with_enrollment(params)
 
-    render(conn, SearchView, "index.json", classes: classes)
+    conn
+    |> put_view(SearchView)
+    |> render("index.json", classes: classes)
   end
 
   @doc """
@@ -98,7 +109,10 @@ defmodule SkollerWeb.Api.V1.ClassController do
 
     case Classes.update_class(class_old, params, user.id) do
       {:ok, %{class: class}} ->
-        render(conn, ClassView, "show.json", class: class)
+        conn
+        |> put_view(ClassView)
+        |> render("show.json", class: class)
+
       {:error, _, failed_value, _} ->
         conn
         |> MultiError.render(failed_value)

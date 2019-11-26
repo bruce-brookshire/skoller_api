@@ -76,8 +76,6 @@ defmodule Skoller.Users do
   `{:ok, Skoller.Users.User}` or `{:error, changeset}`
   """
   def create_user(params, opts \\ []) do
-    IO.inspect(params)
-
     result =
       %User{}
       |> User.changeset_insert(params)
@@ -134,8 +132,7 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:fields_of_study, fn _, changes -> add_fields_of_study(changes, params) end)
     |> Ecto.Multi.run(:link, fn _, changes -> get_link(changes.user) end)
     |> Ecto.Multi.run(:airtable_sync, fn _, changes ->
-      IO.inspect(changes)
-      {:ok, check_airtable_sync_job(changeset, changes, user_old.id)} |> IO.inspect()
+      {:ok, check_airtable_sync_job(changeset, changes, user_old.id)}
     end)
     |> Repo.transaction()
   end
