@@ -25,7 +25,8 @@ defmodule SkollerWeb.Api.V1.Admin.Assignment.PostController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(ChangesetView, "error.json", changeset: changeset)
+        |> put_view(ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 

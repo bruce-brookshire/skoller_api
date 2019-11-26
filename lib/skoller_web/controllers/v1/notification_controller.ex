@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.NotificationController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.Classes.Notifications, as: ClassNotifications
@@ -10,9 +10,9 @@ defmodule SkollerWeb.Api.V1.NotificationController do
   alias Skoller.Services.Authentication
 
   import SkollerWeb.Plugs.Auth
-  
+
   @admin_role 200
-  
+
   plug :verify_role, %{role: @admin_role}
 
   def syllabus(conn, _params) do
@@ -22,7 +22,7 @@ defmodule SkollerWeb.Api.V1.NotificationController do
 
   def custom(conn, %{"message" => msg, "password" => password}) do
     if Authentication.check_password(password, conn.assigns[:user].password_hash) do
-      if msg |> String.length > 400 do
+      if msg |> String.length() > 400 do
         conn |> send_resp(422, "")
       else
         Task.start(Notifications, :send_custom_notification, [msg])
@@ -35,6 +35,9 @@ defmodule SkollerWeb.Api.V1.NotificationController do
 
   def index(conn, _params) do
     logs = ManualLogs.get_manual_logs()
-    render(conn, NotificationView, "index.json", notifications: logs)
+
+    conn
+    |> put_view(NotificationView)
+    |> render("index.json", notifications: logs)
   end
 end

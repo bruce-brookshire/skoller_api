@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.Admin.SchoolView
@@ -8,24 +8,33 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   alias Skoller.EnrolledSchools
 
   import SkollerWeb.Plugs.Auth
-  
+
   @admin_role 200
-  
+
   plug :verify_role, %{role: @admin_role}
 
   def index(conn, params) do
     schools = Schools.get_schools(params)
-    render(conn, SchoolView, "index.json", schools: schools)
+
+    conn
+    |> put_view(SchoolView)
+    |> render("index.json", schools: schools)
   end
 
   def show(conn, %{"id" => id}) do
     school = Schools.get_school_by_id!(id)
-    render(conn, SchoolView, "show.json", school: school)
+
+    conn
+    |> put_view(SchoolView)
+    |> render("show.json", school: school)
   end
 
   def hub(conn, params) do
     schools = EnrolledSchools.get_schools_with_enrollment(params)
-    render(conn, SchoolView, "index.json", schools: schools)
+
+    conn
+    |> put_view(SchoolView)
+    |> render("index.json", schools: schools)
   end
 
   def update(conn, %{"id" => id} = params) do
@@ -33,11 +42,15 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
 
     case Schools.update_school(school_old, params) do
       {:ok, school} ->
-        render(conn, SchoolView, "show.json", school: school)
+        conn
+        |> put_view(SchoolView)
+        |> render("show.json", school: school)
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

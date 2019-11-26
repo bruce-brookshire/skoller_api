@@ -20,9 +20,14 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
     if Authentication.check_password(password, user.password_hash) do
       {:ok, token} = Token.login(user.id)
+
       token = Map.new(%{token: token}) |> Map.merge(%{user: user})
+
       user |> Users.update_user(%{last_login: DateTime.utc_now()})
-      render(conn, AuthView, "show.json", auth: token)
+
+      conn
+      |> put_view(AuthView)
+      |> render("show.json", auth: token)
     else
       conn
       |> send_resp(401, "")
@@ -31,9 +36,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
   def student_login(conn, %{"verification_code" => code, "phone" => phone}) do
     case Students.get_student_by_phone(phone) do
-
       %{verification_code: verification_code, login_attempt: last_attempt} = student
-
       when verification_code == code ->
         if DateTime.diff(DateTime.utc_now(), last_attempt, :seconds) <= 300 do
           user = Users.get_user_by_student_id(student.id)
@@ -44,7 +47,8 @@ defmodule SkollerWeb.Api.V1.AuthController do
           token = Map.new(%{token: token}) |> Map.merge(%{user: user})
 
           conn
-          |> render(AuthView, "show.json", auth: token)
+          |> put_view(AuthView)
+          |> render("show.json", auth: token)
         else
           conn
           |> send_resp(401, "Verification code timed out")
@@ -70,7 +74,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
         end
 
       value ->
-        IO.inspect value
+        IO.inspect(value)
         conn |> send_resp(404, "User not found")
     end
   end
@@ -82,7 +86,9 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
-    render(conn, AuthView, "show.json", auth: conn.assigns[:user])
+    conn
+    |> put_view(AuthView)
+    |> render("show.json", auth: conn.assigns[:user])
   end
 
   def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid, "type" => type}) do

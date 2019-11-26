@@ -76,7 +76,9 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
           activity
           |> CareerActivities.update(params)
 
-        put_view(conn, CareerActivityView) |> render("show.json", activity: updated_activity)
+        conn
+        |> put_view(CareerActivityView)
+        |> render("show.json", activity: updated_activity)
 
       _ ->
         send_resp(conn, 404, "Activity not found")
