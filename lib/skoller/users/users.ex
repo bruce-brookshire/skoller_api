@@ -127,18 +127,22 @@ defmodule Skoller.Users do
         do: User.changeset_update_admin(user_old, params),
         else: User.changeset_update(user_old, params)
       )
-      |> check_airtable_sync_job(user_old.id)
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, changeset)
     |> Ecto.Multi.run(:roles, fn _, changes -> add_roles(changes, params, opts) end)
     |> Ecto.Multi.run(:fields_of_study, fn _, changes -> add_fields_of_study(changes, params) end)
     |> Ecto.Multi.run(:link, fn _, changes -> get_link(changes.user) end)
+    |> Ecto.Multi.run(:airtable_sync, fn _, changes ->
+      IO.inspect(changes)
+      {:ok, check_airtable_sync_job(changeset, changes, user_old.id)} |> IO.inspect()
+    end)
     |> Repo.transaction()
   end
 
   defp check_airtable_sync_job(
-         %Ecto.Changeset{valid?: true, changes: changes} = changeset,
+         %Ecto.Changeset{valid?: true, changes: changes},
+         %{fields_of_study: field_changes},
          user_id
        ) do
     keys = Map.keys(changes)
@@ -150,18 +154,21 @@ defmodule Skoller.Users do
           &(&1 in [:primary_school_id, :phone, :grad_year, :name_last, :name_first])
         )
 
-    should_update = Enum.any?(keys, &(&1 in [:pic_path, :email])) or student_changes?
+    user_changes? = Enum.any?(keys, &(&1 in [:pic_path, :email]))
+    field_changes? = field_changes != nil
 
-    if should_update do
+    should_update? = user_changes? or student_changes? or field_changes?
+
+    if should_update? do
       user_id
       |> JobProfiles.get_by_user()
       |> AirtableJobs.on_profile_update()
+    else
+      :noop
     end
-
-    changeset
   end
 
-  defp check_airtable_sync_job(changeset, _), do: changeset
+  defp check_airtable_sync_job(_, _, _), do: :noop
 
   def delete_user(user_id) do
     user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)

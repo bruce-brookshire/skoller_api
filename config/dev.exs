@@ -30,7 +30,7 @@ config :skoller, SkollerWeb.Endpoint,
 # different ports.
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console, format: "[$level] $message\n", level: :info
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -47,5 +47,5 @@ config :skoller, Skoller.Repo,
 
 # Configure Guardian Token Generation
 config :skoller, Skoller.Auth,
-            issuer: "Skoller",
-            secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"
+  issuer: "Skoller",
+  secret_key: "8noIgHlW3FlDPH8qM/jHzuOpbvidwx5cdg2RYrm08U2/eCBsGvEoD/vpi2DNCFPg"

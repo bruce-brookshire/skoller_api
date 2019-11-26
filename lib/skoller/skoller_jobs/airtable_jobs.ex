@@ -24,13 +24,25 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
   @doc """
   Profile updated
   """
-  def on_profile_update(%JobProfile{id: profile_id, airtable_object_id: airtable_object_id}),
-    do: create_sync_job(profile_id, airtable_object_id, @update_type_id)
+  def on_profile_update(%JobProfile{id: profile_id, airtable_object_id: airtable_object_id}) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:cond_create_job, fn _, _ ->
+      result =
+        if !job_exists?(profile_id) do
+          create_sync_job(profile_id, airtable_object_id, @update_type_id)
+        end
+
+      {:ok, result}
+    end)
+    |> Repo.transaction()
+  end
 
   def on_profile_update(nil), do: nil
 
   def on_profile_update(profile_id) when is_integer(profile_id) do
-    create_sync_job(profile_id, nil, @update_type_id)
+    profile_id
+    |> JobProfiles.get_by_id()
+    |> on_profile_update()
   end
 
   @doc """
@@ -42,8 +54,9 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
   def on_profile_delete(nil), do: nil
 
   def on_profile_delete(profile_id) when is_integer(profile_id) do
-    %JobProfile{airtable_object_id: airtable_object_id} = JobProfiles.get_by_id(profile_id)
-    create_sync_job(nil, airtable_object_id, @delete_type_id)
+    profile_id
+    |> JobProfiles.get_by_id()
+    |> on_profile_delete()
   end
 
   # Helper function to queue the job
@@ -86,12 +99,19 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
     job
     |> AirtableJob.changeset_update(%{is_running: true})
     |> Repo.update!()
-    
+
     job
   end
-  
+
   @doc """
   Completes the job by removing it from the `"airtable_jobs"` table
   """
   def complete_job!(%AirtableJob{} = job), do: Repo.delete!(job)
+
+  # Checks to see if an AirtableJob exists
+  defp job_exists?(profile_id) do
+    from(a in AirtableJob)
+    |> where([a], a.job_profile_id == ^profile_id)
+    |> Repo.exists?()
+  end
 end

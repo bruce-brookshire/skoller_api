@@ -40,7 +40,7 @@ defmodule Skoller.AirtableSyncJob do
   def handle_info({:work, job_type_id}, state) do
     # Do the work you desire here
     # Reschedule once more
-    schedule_work(job_type_id |> IO.inspect())
+    schedule_work(job_type_id)
     require Logger
 
     Logger.info("Running Airtable Syncing Job: #{job_type_id} @ " <> to_string(Time.utc_now()))
@@ -86,7 +86,7 @@ defmodule Skoller.AirtableSyncJob do
     |> build_base()
     |> add_body(%{"records" => body, "typecast" => true})
     |> send_request()
-    |> IO.inspect()
+    |> IO.inspect
   end
 
   defp perform_operation(jobs, @delete_type_id) do
@@ -250,7 +250,6 @@ defmodule Skoller.AirtableSyncJob do
 
       failed_value ->
         failed_value
-        |> IO.inspect()
     end
   end
 
