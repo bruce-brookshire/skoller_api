@@ -86,6 +86,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     :work_auth,
     :sponsorship_required,
     :job_profile_status_id,
+    :career_interests,
     :played_sports,
     :transcript_url,
     :resume_url,

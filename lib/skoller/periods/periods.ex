@@ -57,7 +57,6 @@ defmodule Skoller.Periods do
           {Map.put(t_classes, class_id, elem), Map.put(t_occs, class_id, 1)}
         end
       end)
-      |> IO.inspect()
 
     occs
     |> Map.keys()
@@ -192,7 +191,6 @@ defmodule Skoller.Periods do
     |> Enum.filter(&(&1 != nil && &1.valid?))
     |> Enum.map(&Repo.insert/1)
     |> Enum.filter(& Kernel.elem(&1, 0) != :ok)
-    |> IO.inspect
   end
 
   defp adjust_period_to_new_year(
