@@ -26,18 +26,28 @@ defmodule SkollerWeb.StudentView do
 
   def render("link.json", %{student: student}) do
     student = student |> Repo.preload([:users])
+
     %{
       student_id: student.id,
       student_name_first: student.name_first,
       student_name_last: student.name_last,
-      student_image_path: (student.users |> List.first).pic_path
+      student_image_path: (student.users |> List.first()).pic_path
     }
   end
 
   # TODO: remove is_verified once new app has been adopted
   def render("student.json", %{student: student}) do
-    student = student |> Repo.preload([:fields_of_study, :schools, :primary_school, :primary_organization, :primary_period])
-    raise_effort = Skoller.Students.get_org_raise_effort_for_student(student) 
+    student =
+      student
+      |> Repo.preload([
+        :fields_of_study,
+        :schools,
+        :primary_school,
+        :primary_organization,
+        :primary_period
+      ])
+
+    raise_effort = Skoller.Students.get_org_raise_effort_for_student(student)
 
     %{
       id: student.id,
@@ -59,18 +69,23 @@ defmodule SkollerWeb.StudentView do
       bio: student.bio,
       grad_year: student.grad_year,
       enrollment_link: System.get_env("WEB_URL") <> @signup_path <> student.enrollment_link,
-      schools: render_many(student.schools |> Schools.with_four_door(), SchoolView, "school-detail.json"),
-      fields_of_study: render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
+      schools:
+        render_many(student.schools |> Schools.with_four_door(), SchoolView, "school-detail.json"),
+      fields_of_study:
+        render_many(student.fields_of_study, FieldOfStudyView, "field.json", as: :field),
       points: Skoller.StudentPoints.get_points_by_student_id(student.id),
       raise_effort: raise_effort,
       primary_school: render_one(student.primary_school, SchoolView, "school.json"),
       primary_period: render_one(student.primary_period, PeriodView, "period.json"),
-      primary_organization: student |> primary_organization_name()
+      primary_organization: student |> primary_organization_name(),
+      todo_days_future: student.todo_days_future,
+      todo_days_past: student.todo_days_past
     }
   end
 
   def render("student-short.json", %{student: student}) do
     student = student |> Repo.preload(:users)
+
     %{
       id: student.id,
       name_first: student.name_first,
@@ -82,8 +97,10 @@ defmodule SkollerWeb.StudentView do
     }
   end
 
-  defp primary_organization_name(%{primary_organization: primary_organization}) when not is_nil(primary_organization) do
+  defp primary_organization_name(%{primary_organization: primary_organization})
+       when not is_nil(primary_organization) do
     primary_organization.name
   end
+
   defp primary_organization_name(_student), do: nil
 end

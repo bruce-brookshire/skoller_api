@@ -11,6 +11,9 @@ defmodule Skoller.EmailJobs.Jobs do
   @grow_community_id 500
   @join_second_class_id 600
 
+  @doc """
+  Grabs pending email jobs, marks them as running, executes the send, and removes the job
+  """
   def run_jobs do
     [
       %{id: @no_classes_id},

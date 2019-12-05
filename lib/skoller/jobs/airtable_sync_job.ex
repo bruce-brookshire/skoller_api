@@ -67,6 +67,7 @@ defmodule Skoller.AirtableSyncJob do
     )
   end
 
+  # Performs a job based on the job id passed
   defp perform_operation([], _), do: []
 
   defp perform_operation(jobs, @create_type_id) do
@@ -144,14 +145,6 @@ defmodule Skoller.AirtableSyncJob do
       "Profile Photo" => url_body(user.pic_path),
       "Upload your Resume or CV" => url_body(profile.resume_url),
       "Gender" => profile.gender,
-      # "Compensation" => 5,
-      # "Company Prestige" => 3,
-      # "Social Impact" => 4,
-      # "Professional Development" => 5,
-      # "Work-life Balance" => 5,
-      # "Upward Mobility" => 3,
-      # "Job Stability" => 4,
-      # "What is your Myers-Briggs personality type?" => "ISFP",
       "Phone Number" => student.phone,
       "Email" => profile.alt_email || user.email,
       "School" => school.name,

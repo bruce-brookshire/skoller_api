@@ -15,6 +15,9 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
   # Only require ownership when profile is not being created
   plug :verify_owner, :jobs_profile when not (action in [:create, :get_by_user])
 
+  @doc """
+  Creates a job profile with allowable params
+  """
   def create(conn, params) do
     params
     |> Map.put("user_id", conn.assigns[:user].id)
@@ -22,17 +25,26 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
     |> construct_response(conn)
   end
 
+  @doc """
+  Fetches the job profile
+  """
   def show(%{assigns: %{profile: profile}} = conn, _params) do
     profile
     |> construct_response(conn)
   end
 
+  @doc """
+  Updates the job profile with allowable params
+  """
   def update(%{assigns: %{profile: profile}} = conn, params) do
     profile
     |> JobProfiles.update(params)
     |> construct_response(conn)
   end
 
+  @doc """
+  Deletes the user profile
+  """
   def delete(%{assigns: %{profile: profile}} = conn, _params) do
     case JobProfiles.delete(profile) do
       {:ok, _profile} ->
@@ -43,12 +55,16 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
     end
   end
 
+  @doc """
+  Get a job profile by the user
+  """
   def get_by_user(conn, _params) do
     conn.assigns[:user]
     |> JobProfiles.get_by_user()
     |> construct_response(conn)
   end
 
+  # Single function to construct the appropriate response given operation result and input value
   defp construct_response(nil, conn), do: send_resp(conn, 404, "Profile not found")
 
   defp construct_response(%JobProfile{} = profile, conn) do

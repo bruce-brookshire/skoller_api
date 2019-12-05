@@ -41,10 +41,12 @@ defmodule Skoller.Students.Student do
     field :primary_school_id, :id
     field :primary_period_id, :id
     field :primary_organization_id, :id
-    
+    field :todo_days_past, :integer
+    field :todo_days_future, :integer
+
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
-    
+
     has_many :users, User
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
@@ -78,7 +80,9 @@ defmodule Skoller.Students.Student do
     :grad_year,
     :primary_school_id,
     :primary_period_id,
-    :primary_organization_id
+    :primary_organization_id,
+    :todo_days_past,
+    :todo_days_future
   ]
   @all_fields @req_fields ++ @opt_fields
 
