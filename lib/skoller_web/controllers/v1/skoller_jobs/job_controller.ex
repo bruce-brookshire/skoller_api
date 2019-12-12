@@ -73,7 +73,6 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
       |> Repo.preload([
         :job_profile_status,
         :ethnicity_type,
-        :degree_type,
         :volunteer_activities,
         :club_activities,
         :achievement_activities,
