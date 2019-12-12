@@ -83,9 +83,8 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
     |> preload([j],
       job_profile: [
         user: [
-          student: [:primary_school, :fields_of_study]
+          student: [:primary_school, :fields_of_study, :degree_type]
         ],
-        degree_type: [],
         ethnicity_type: []
       ]
     )

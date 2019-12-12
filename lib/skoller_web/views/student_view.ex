@@ -44,7 +44,8 @@ defmodule SkollerWeb.StudentView do
         :schools,
         :primary_school,
         :primary_organization,
-        :primary_period
+        :primary_period,
+        :degree_type
       ])
 
     raise_effort = Skoller.Students.get_org_raise_effort_for_student(student)
@@ -79,7 +80,8 @@ defmodule SkollerWeb.StudentView do
       primary_period: render_one(student.primary_period, PeriodView, "period.json"),
       primary_organization: student |> primary_organization_name(),
       todo_days_future: student.todo_days_future,
-      todo_days_past: student.todo_days_past
+      todo_days_past: student.todo_days_past,
+      degree_type: student.degree_type |> render_degree_type()
     }
   end
 
@@ -103,4 +105,7 @@ defmodule SkollerWeb.StudentView do
   end
 
   defp primary_organization_name(_student), do: nil
+
+  defp render_degree_type(nil), do: nil
+  defp render_degree_type(%{} = degree), do: Map.take(degree, [:id, :name])
 end

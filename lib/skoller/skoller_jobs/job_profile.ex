@@ -4,7 +4,6 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
   import Ecto.Changeset
 
   alias Skoller.Users.User
-  alias Skoller.SkollerJobs.DegreeType
   alias Skoller.SkollerJobs.EthnicityType
   alias Skoller.SkollerJobs.JobSearchType
   alias Skoller.SkollerJobs.CareerActivity
@@ -24,7 +23,6 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     field :short_sell, :string
     field :career_interests, :string
     field :skills, :string
-    field :degree_type_id, :id
     field :job_search_type_id, :id
 
     # Work eligibility
@@ -63,7 +61,6 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     belongs_to :user, User, define_field: false
     belongs_to :job_profile_status, JobProfileStatus, define_field: false
     belongs_to :ethnicity_type, EthnicityType, define_field: false
-    belongs_to :degree_type, DegreeType, define_field: false
     belongs_to :job_search_type, JobSearchType, define_field: false
 
     has_many :volunteer_activities, CareerActivity, foreign_key: :job_profile_id, where: [career_activity_type_id: 100]
@@ -74,7 +71,7 @@ defmodule Skoller.SkollerJobs.JobProfiles.JobProfile do
     timestamps()
   end
 
-  @req_fields [:user_id, :degree_type_id]
+  @req_fields [:user_id]
   @opt_fields [
     :wakeup_date,
     :graduation_date,

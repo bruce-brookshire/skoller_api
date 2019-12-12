@@ -95,7 +95,6 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       add(:user_id, references(:users, on_delete: :delete_all))
       add(:ethnicity_type_id, references(:ethnicity_types, on_delete: :nilify_all))
       add(:job_profile_status_id, references(:job_profile_statuses, on_delete: :nilify_all))
-      add(:degree_type_id, references(:degree_types, on_delete: :nilify_all))
       add(:job_search_type_id, references(:job_search_types, on_delete: :nilify_all))
 
       # Basic details
@@ -141,6 +140,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       timestamps()
     end
 
+    alter table(:students) do
+      add(:degree_type_id, references(:degree_types, on_delete: :nilify_all))
+    end
+
     create table(:career_activities) do
       add(:name, :string)
       add(:description, :string, length: 750)
@@ -176,6 +179,10 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
+    # alter table(:students) do
+    #   remove(:degree_type_id)
+    # end
+
     drop_if_exists(table(:career_activities))
     drop_if_exists(table(:career_activity_types))
     drop_if_exists(table(:airtable_jobs))

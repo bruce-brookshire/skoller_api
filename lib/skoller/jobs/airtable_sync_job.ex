@@ -87,7 +87,7 @@ defmodule Skoller.AirtableSyncJob do
     |> build_base()
     |> add_body(%{"records" => body, "typecast" => true})
     |> send_request()
-    |> IO.inspect
+    |> IO.inspect()
   end
 
   defp perform_operation(jobs, @delete_type_id) do
@@ -125,10 +125,10 @@ defmodule Skoller.AirtableSyncJob do
                    primary_school: school,
                    fields_of_study: fields_of_study,
                    name_first: name_first,
-                   name_last: name_last
+                   name_last: name_last,
+                   degree_type: %{name: degree}
                  } = student
-             } = user,
-           degree_type: %{name: degree}
+             } = user
          } = profile
        ) do
     career_interests = (profile.career_interests || "") |> String.split("|", trim: true)
