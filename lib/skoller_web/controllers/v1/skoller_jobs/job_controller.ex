@@ -82,7 +82,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
 
     conn
     |> put_view(JobView)
-    |> render("show.json", profile: profile)
+    |> render("show.json", profile: profile, user: conn.assigns.user)
   end
 
   defp construct_response({:ok, %JobProfile{} = profile}, conn),
