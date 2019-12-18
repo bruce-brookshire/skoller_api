@@ -2,6 +2,7 @@ defmodule SkollerWeb.SkollerJobs.JobView do
   use SkollerWeb, :view
 
   alias SkollerWeb.SkollerJobs.JobView
+  alias SkollerWeb.SkollerJobs.ProfileCalculator
 
   @simple_types [:job_profile_status, :ethnicity_type, :degree_type, :job_search_type]
   @activity_types [
@@ -10,6 +11,13 @@ defmodule SkollerWeb.SkollerJobs.JobView do
     :achievement_activities,
     :experience_activities
   ]
+
+  def render("show.json", %{profile: profile, user: user}) do
+    profile = render("show.json", %{profile: profile})
+    score = ProfileCalculator.calculate_score(profile, user)
+
+    Map.put(profile, :profile_score, score)
+  end
 
   def render("show.json", %{profile: profile}) do
     profile
@@ -50,7 +58,7 @@ defmodule SkollerWeb.SkollerJobs.JobView do
       :achievement_activities,
       :experience_activities,
       :user_id,
-      :job_search_type,
+      :job_search_type
     ])
     |> Enum.map(&convert_object_parts/1)
     |> Map.new()
