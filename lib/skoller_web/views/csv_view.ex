@@ -24,7 +24,7 @@ defmodule SkollerWeb.CSVView do
   end
 
   def render("csv.json", %{csv: {:ok, %School{} = school}}) do
-    render_one(school, SchoolView, "school.json")
+    render_one(school, SchoolView, "show.json")
   end
 
   def render("csv.json", %{csv: {:error, %Ecto.Changeset{} = changeset}}) do

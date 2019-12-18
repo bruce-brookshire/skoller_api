@@ -8,9 +8,6 @@ defmodule Skoller.AirtableSyncJob do
 
   import SkollerWeb.HttpRequest
 
-  # Number of times a second to check
-  @max_rate_per_sec 1
-
   # Airtable single request object limit
   @max_body_objects 10
 

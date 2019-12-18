@@ -7,7 +7,7 @@ defmodule Skoller.Schools do
   alias Skoller.Schools.School
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Timezone
-  alias Skoller.FourDoor
+  alias Skoller.Settings
   alias Skoller.Schools.Timezones
   alias Skoller.Schools.EmailDomain
   alias Skoller.Periods
@@ -23,8 +23,8 @@ defmodule Skoller.Schools do
     %School{}
     |> School.changeset_insert(params)
     |> Ecto.Changeset.change(%{timezone: timezone})
-    |> Repo.insert()
-    |> add_four_door()
+    |> Repo.insert!()
+    |> add_default_overload_settings()
     |> add_future_periods()
   end
 
@@ -32,9 +32,8 @@ defmodule Skoller.Schools do
     Gets a `Skoller.Schools.School` by id
   """
   def get_school_by_id!(id) do
-    school = Repo.get!(School, id)
-    {:ok, school} = add_four_door({:ok, school})
-    school
+    Repo.get!(School, id)
+    |> add_default_overload_settings()
   end
 
   @doc """
@@ -43,12 +42,14 @@ defmodule Skoller.Schools do
   ## Returns
   `{:ok, school}` or `{:error, changeset}`
   """
-  def update_school(school_old, params) do
+  def update_school(school_old, params, opts \\ []) do
     {:ok, timezone} = get_timezone(params)
 
     changeset =
-      school_old
-      |> School.changeset_update(params)
+      case Keyword.get(opts, :admin, false) do
+        true -> School.admin_changeset_update(school_old, params)
+        false -> School.changeset_update(school_old, params)
+      end
       |> process_timezone_updates(school_old, timezone)
 
     {:ok, results} =
@@ -57,23 +58,38 @@ defmodule Skoller.Schools do
       |> Ecto.Multi.merge(&update_school_times(&1.school, school_old))
       |> Repo.transaction()
 
-    {:ok, results.school}
-    |> add_four_door()
+    results.school
+    |> add_default_overload_settings()
+  end
+
+  def update_school_admin(school_old, params) do
+    {:ok, timezone} = get_timezone(params)
+
+    changeset =
+      school_old
+      |> School.admin_changeset_update(params)
+      |> process_timezone_updates(school_old, timezone)
+
+    {:ok, results} =
+      Ecto.Multi.new()
+      |> Ecto.Multi.update(:school, changeset)
+      |> Ecto.Multi.merge(&update_school_times(&1.school, school_old))
+      |> Repo.transaction()
+
+    results.school
+    |> add_default_overload_settings()
   end
 
   @doc """
     Gets a `Skoller.Schools.School` from a `Skoller.Periods.ClassPeriod`
   """
   def get_school_from_period(class_period_id) do
-    school =
-      from(cp in ClassPeriod)
-      |> join(:inner, [cp], s in School, on: s.id == cp.school_id)
-      |> where([cp], cp.id == ^class_period_id)
-      |> select([cp, s], s)
-      |> Repo.one()
-
-    {:ok, school} = add_four_door({:ok, school})
-    school
+    from(cp in ClassPeriod)
+    |> join(:inner, [cp], s in School, on: s.id == cp.school_id)
+    |> where([cp], cp.id == ^class_period_id)
+    |> select([cp, s], s)
+    |> Repo.one()
+    |> add_default_overload_settings()
   end
 
   @doc """
@@ -84,6 +100,7 @@ defmodule Skoller.Schools do
         * Gets schools by short_name (for scripting generally).
   """
   def get_schools(params \\ %{})
+
   def get_schools(%{"name" => name}) do
     {schools, occs} =
       name
@@ -107,7 +124,7 @@ defmodule Skoller.Schools do
     |> Enum.take(50)
     |> Enum.map(&schools[&1])
   end
-  
+
   def get_schools(params), do: search_schools(params) |> Enum.take(50)
 
   defp search_schools(filters),
@@ -226,16 +243,14 @@ defmodule Skoller.Schools do
     schools
   end
 
-  defp add_future_periods({:ok, school} = result) do
+  defp add_future_periods(school) do
     # Hard coded because this should not be the way this is done.
     # 2019 will be the default only for now.
     # TODO: Figure out the long term solution based on success or failure of new
     # onboarding.
-    Periods.generate_periods_for_year_for_school(school.id, 2019)
-    result
+    Periods.generate_periods_for_year_for_school(school.id, 2020)
+    school
   end
-
-  defp add_future_periods(result), do: result
 
   defp get_last_section_of_email_domain(domain) do
     domain
@@ -296,18 +311,16 @@ defmodule Skoller.Schools do
     Timezone.get_timezone(loc, country, region)
   end
 
-  defp add_four_door({:ok, school}) do
-    {:ok, with_four_door(school)}
-  end
+  defp add_default_overload_settings({:ok, school}), do: add_default_overload_settings(school)
 
-  defp add_four_door({:error, _school} = response), do: response
+  defp add_default_overload_settings(%{is_syllabus_overload: school_value} = school) do
+    case Settings.get_syllabus_overload_settings() do
+      %{value: "true"} when not school_value ->
+        %{school | is_syllabus_overload: true}
 
-  def with_four_door(%School{} = school) do
-    FourDoor.get_four_door_by_school(school.id) |> Map.merge(school)
-  end
-
-  def with_four_door(schools) when is_list(schools) do
-    for school <- schools, into: [], do: with_four_door(school)
+      _ ->
+        school
+    end
   end
 
   defp filter(query, params) do

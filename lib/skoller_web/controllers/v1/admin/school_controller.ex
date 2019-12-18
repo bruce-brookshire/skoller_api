@@ -40,7 +40,7 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   def update(conn, %{"id" => id} = params) do
     school_old = Schools.get_school_by_id!(id)
 
-    case Schools.update_school(school_old, params) do
+    case Schools.update_school(school_old, params, admin: true) do
       {:ok, school} ->
         conn
         |> put_view(SchoolView)

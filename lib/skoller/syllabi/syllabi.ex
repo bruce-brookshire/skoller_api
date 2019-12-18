@@ -10,17 +10,12 @@ defmodule Skoller.Syllabi do
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Locks.Lock
   alias Skoller.ClassDocs.Doc
-  alias Skoller.Schools.School
   alias Skoller.Locks
-  alias Skoller.Settings
-  alias Skoller.FourDoor.FourDoorOverride
   alias Skoller.Locks.Users
 
   import Ecto.Query
 
   require Logger
-
-  @syllabus_processing_setting "is_auto_syllabus"
 
   @syllabus_submitted_status 1200
   @class_period_past_status_id 100
@@ -68,19 +63,6 @@ defmodule Skoller.Syllabi do
     |> Repo.one()
   end
 
-  @doc """
-  Subquery that gets a list of classes where syllabus workers are allowed to work on them.
-  """
-  def get_servable_classes_subquery() do
-    subq =
-      Settings.get_setting_by_name!(@syllabus_processing_setting).value
-      |> generate_servable_schools_subquery()
-
-    from(class in Class)
-    |> join(:inner, [class], period in ClassPeriod, on: class.class_period_id == period.id)
-    |> join(:inner, [class, period], sch in subquery(subq), on: sch.id == period.school_id)
-  end
-
   defp get_oldest_syllabus() do
     from(class in Class)
     |> join(:inner, [c], d in Doc, on: d.class_id == c.id)
@@ -95,28 +77,6 @@ defmodule Skoller.Syllabi do
     |> limit(1)
     |> select([c, d, p, l], c)
     |> Repo.one()
-  end
-
-  # This function takes in the current admin setting as the parameter.
-  # If it is true, it needs to find a list of schools overriding it to false.
-  # If it is false, it gets a list of schools overriding it to true.
-  defp generate_servable_schools_subquery("true") do
-    exclude_list =
-      get_syllabus_overrides_subquery(false)
-      |> Repo.all()
-      |> Enum.reduce([], &(&2 ++ List.wrap(&1.school_id)))
-
-    from(s in School)
-    |> where([s], s.id not in ^exclude_list)
-  end
-
-  defp generate_servable_schools_subquery("false") do
-    get_syllabus_overrides_subquery(true)
-  end
-
-  defp get_syllabus_overrides_subquery(val) do
-    from(fdo in FourDoorOverride)
-    |> where([fdo], fdo.is_auto_syllabus == ^val)
   end
 
   defp lock_class(nil, _conn, _type), do: nil

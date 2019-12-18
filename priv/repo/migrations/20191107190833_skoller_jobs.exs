@@ -179,9 +179,9 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
   end
 
   def down do
-    # alter table(:students) do
-    #   remove(:degree_type_id)
-    # end
+    alter table(:students) do
+      remove(:degree_type_id)
+    end
 
     drop_if_exists(table(:career_activities))
     drop_if_exists(table(:career_activity_types))
