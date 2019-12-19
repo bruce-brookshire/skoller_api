@@ -71,24 +71,6 @@ defmodule Skoller.Schools do
     end
   end
 
-  def update_school_admin(school_old, params) do
-    {:ok, timezone} = get_timezone(params)
-
-    changeset =
-      school_old
-      |> School.admin_changeset_update(params)
-      |> process_timezone_updates(school_old, timezone)
-
-    {:ok, results} =
-      Ecto.Multi.new()
-      |> Ecto.Multi.update(:school, changeset)
-      |> Ecto.Multi.merge(&update_school_times(&1.school, school_old))
-      |> Repo.transaction()
-
-    results.school
-    |> add_default_overload_settings()
-  end
-
   @doc """
     Gets a `Skoller.Schools.School` from a `Skoller.Periods.ClassPeriod`
   """
