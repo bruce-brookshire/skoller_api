@@ -31,7 +31,10 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.DocController do
     end
   end
 
-  def upload(conn, _params), do: send_resp(conn, 422, "Unsupported type")
+  def upload(conn, %{"type" => type}) when type in @accepted_types,
+    do: send_resp(conn, 422, "No file in body")
+
+  def upload(conn, _params), do: send_resp(conn, 422, "Unsupported document type")
 
   defp process_doc(scope, file, profile) do
     updates =
