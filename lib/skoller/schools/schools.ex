@@ -52,14 +52,23 @@ defmodule Skoller.Schools do
       end
       |> process_timezone_updates(school_old, timezone)
 
-    {:ok, results} =
+    transaction_result =
       Ecto.Multi.new()
       |> Ecto.Multi.update(:school, changeset)
       |> Ecto.Multi.merge(&update_school_times(&1.school, school_old))
       |> Repo.transaction()
 
-    results.school
-    |> add_default_overload_settings()
+    case transaction_result do
+      {:ok, multi_results} ->
+        school =
+          multi_results.school
+          |> add_default_overload_settings()
+
+        {:ok, school}
+
+      error ->
+        error
+    end
   end
 
   def update_school_admin(school_old, params) do
