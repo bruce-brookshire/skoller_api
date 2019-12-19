@@ -20,7 +20,7 @@ defmodule Skoller.Application do
       # Skoller.Worker.start_link(arg1, arg2, arg3)
       # worker(Skoller.Worker, [arg1, arg2, arg3]),
       worker(Skoller.AssignmentReminderJob, []),
-      worker(Skoller.AssignmentCompletionJob, []),
+      # worker(Skoller.AssignmentCompletionJob, []),
       worker(Skoller.ClassLocksJob, []),
       worker(Skoller.ClassPeriodJob, []),
       worker(Skoller.ClassSetupJob, []),
