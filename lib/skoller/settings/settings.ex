@@ -35,10 +35,10 @@ defmodule Skoller.Settings do
   @doc """
   Gets the current syllabus overload settings from admin_settings.
 
-  Returns `[Skoller.Settings.Setting]` or `[]`
+  Returns `Skoller.Settings.Setting` or `nil`
   """
-  def get_syllabus_overload_settings(),
-    do: get_settings_by_topic(@syllabus_overload)
+  def get_syllabus_overload_setting(),
+    do: get_settings_by_topic(@syllabus_overload) |> List.first
 
   @doc """
   Gets the current notification settings from admin_settings.

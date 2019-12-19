@@ -305,7 +305,7 @@ defmodule Skoller.Schools do
   defp add_default_overload_settings({:ok, school}), do: add_default_overload_settings(school)
 
   defp add_default_overload_settings(%{is_syllabus_overload: school_value} = school) do
-    case Settings.get_syllabus_overload_settings() do
+    case Settings.get_syllabus_overload_setting() |> IO.inspect() do
       %{value: "true"} when not school_value ->
         %{school | is_syllabus_overload: true}
 
