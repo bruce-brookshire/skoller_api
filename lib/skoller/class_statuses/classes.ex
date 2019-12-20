@@ -175,7 +175,7 @@ defmodule Skoller.ClassStatuses.Classes do
   # A new class has been added.
   defp cl_check_status(%Class{class_status_id: nil} = class, _params), do: class |> set_status(@needs_setup_status)
   # A syllabus has been added to a class that needs a syllabus.
-  defp cl_check_status(%Class{class_status_id: @needs_setup_status} = class, %{doc: %{is_syllabus: true}}), do: class |> set_status(@syllabus_submitted_status)
+  defp cl_check_status(%Class{class_status_id: status_id} = class, %{doc: %{is_syllabus: true}}) when status_id < @class_complete_status, do: class |> set_status(@syllabus_submitted_status)
   # A class in the change status has a change request completed.
   defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{change_request: _}), do: check_req_status(class)
   # A class in the change status has a student request completed.
