@@ -23,11 +23,13 @@ defmodule Skoller.Services.Sms do
           from: @from_phone,
           body: body
         )
-      _ -> Message.create(
-          to: "+1" <> phone,
-          from: @test_phone,
-          body: body
-        )
+      _ -> 
+        IO.puts "hi"
+        # Message.create(
+        #   to: "+1" <> phone,
+        #   from: @test_phone,
+        #   body: body
+        # )
     end
   end
 end
