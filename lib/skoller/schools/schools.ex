@@ -107,14 +107,15 @@ defmodule Skoller.Schools do
           {Map.put(t_schools, school_id, elem), Map.put(t_occs, school_id, 1)}
         end
       end)
+      occs[640]
+      |> IO.inspect
+      schools[640]
+      |> IO.inspect
 
     occs
     |> Map.keys()
-    |> IO.inspect
     |> Enum.sort_by(&occs[&1])
-    |> IO.inspect
     |> Enum.reverse()
-    |> IO.inspect
     |> Enum.take(50)
     |> Enum.map(&schools[&1])
     |> IO.inspect
