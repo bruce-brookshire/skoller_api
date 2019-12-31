@@ -24,6 +24,8 @@ defmodule Skoller.Schools.School do
     field :is_chat_enabled, :boolean, default: true
     field :is_assignment_posts_enabled, :boolean, default: true
     field :is_university, :boolean, default: true
+    field :is_syllabus_overload, :boolean, default: false
+
     has_many :class_periods, ClassPeriod
     has_many :classes, through: [:class_periods, :classes]
     has_many :email_domains, EmailDomain
@@ -31,10 +33,28 @@ defmodule Skoller.Schools.School do
     timestamps()
   end
 
-  @req_fields [:name, :adr_locality, :adr_region, :is_chat_enabled, :is_assignment_posts_enabled, :is_university, :adr_country]
-  @opt_fields [:adr_line_1, :adr_line_2, :adr_zip, :is_readonly, :adr_line_3, :short_name, :timezone, :color]
+  @req_fields [
+    :name,
+    :adr_locality,
+    :adr_region,
+    :is_chat_enabled,
+    :is_assignment_posts_enabled,
+    :is_university,
+    :adr_country
+  ]
+  @opt_fields [
+    :adr_line_1,
+    :adr_line_2,
+    :adr_zip,
+    :is_readonly,
+    :adr_line_3,
+    :short_name,
+    :timezone,
+    :color
+  ]
   @all_fields @req_fields ++ @opt_fields
-  @upd_fields @all_fields
+
+  @admin_fields @all_fields ++ [:is_syllabus_overload]
 
   @doc false
   def changeset_insert(%School{} = school, attrs) do
@@ -46,7 +66,15 @@ defmodule Skoller.Schools.School do
 
   def changeset_update(%School{} = school, attrs) do
     school
-    |> cast(attrs, @upd_fields)
+    |> cast(attrs, @all_fields)
+    |> validate_required(@req_fields)
+    |> validate_editable()
+    |> unique_constraint(:school, name: :unique_school_index)
+  end
+
+  def admin_changeset_update(%School{} = school, attrs) do
+    school
+    |> cast(attrs, @admin_fields)
     |> validate_required(@req_fields)
     |> validate_editable()
     |> unique_constraint(:school, name: :unique_school_index)
@@ -54,6 +82,7 @@ defmodule Skoller.Schools.School do
 
   defp readonly(changeset, false), do: changeset
   defp readonly(%{changes: %{is_readonly: true}} = changeset, true), do: changeset
+
   defp readonly(changeset, true) do
     changeset
     |> add_error(:is_readonly, "School is read only.")

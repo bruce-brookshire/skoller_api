@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.ChatPosts
@@ -20,25 +20,45 @@ defmodule SkollerWeb.Api.V1.Class.Chat.PostLikeController do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
     case ChatPosts.like_post(params) do
-      {:ok, chat_post} -> 
+      {:ok, chat_post} ->
         sc = EnrolledStudents.get_enrolled_class_by_ids!(class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+
+        conn
+        |> put_view(ChatPostView)
+        |> render("show.json", %{
+          chat_post: %{chat_post: chat_post, color: sc.color},
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
   def delete(conn, %{"chat_post_id" => post_id}) do
     case ChatPosts.unlike_post(post_id, conn.assigns[:user].student_id) do
       {:ok, chat_post} ->
-        sc = EnrolledStudents.get_enrolled_class_by_ids!(chat_post.class_id, conn.assigns[:user].student_id)
-        render(conn, ChatPostView, "show.json", %{chat_post: %{chat_post: chat_post, color: sc.color}, current_student_id: conn.assigns[:user].student_id})
+        sc =
+          EnrolledStudents.get_enrolled_class_by_ids!(
+            chat_post.class_id,
+            conn.assigns[:user].student_id
+          )
+
+        conn
+        |> put_view(ChatPostView)
+        |> render("show.json", %{
+          chat_post: %{chat_post: chat_post, color: sc.color},
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

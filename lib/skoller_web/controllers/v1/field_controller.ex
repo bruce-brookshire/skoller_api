@@ -20,14 +20,21 @@ defmodule SkollerWeb.Api.V1.FieldController do
             )))
         |> Enum.uniq_by(& &1.id)
 
-      render(conn, FieldOfStudyView, "index.json", fields: fields)
+      conn
+      |> put_view(FieldOfStudyView)
+      |> render("index.json", fields: fields)
     else
-      render(conn, FieldOfStudyView, "index.json", fields: fields)
+      conn
+      |> put_view(FieldOfStudyView)
+      |> render("index.json", fields: fields)
     end
   end
 
   def index(conn, params) do
     fields = FieldsOfStudy.get_fields_of_study_with_filter(params)
-    render(conn, FieldOfStudyView, "index.json", fields: fields)
+
+    conn
+    |> put_view(FieldOfStudyView)
+    |> render("index.json", fields: fields)
   end
 end

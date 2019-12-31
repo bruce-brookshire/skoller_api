@@ -42,33 +42,32 @@ defmodule Skoller.Periods do
 
   def get_classes_by_period_id(period_id, params \\ %{})
 
-  def get_classes_by_period_id(period_id, %{"class_name" => name}) do
-    {classes, occs} =
-      name
-      |> String.split(" ", trim: true)
-      |> Enum.map(&search_classes_by_period_id(period_id, %{"class_name" => &1}))
-      |> Enum.concat()
-      |> Enum.reduce({%{}, %{}}, fn elem, {t_classes, t_occs} ->
-        class_id = elem.class.id
+  # def get_classes_by_period_id(period_id, %{"class_name" => name}) do
+  #   {classes, occs} =
+  #     name
+  #     |> String.split(" ", trim: true)
+  #     |> Enum.map(&search_classes_by_period_id(period_id, %{"class_name" => &1}))
+  #     |> Enum.concat()
+  #     |> Enum.reduce({%{}, %{}}, fn elem, {t_classes, t_occs} ->
+  #       class_id = elem.class.id
 
-        if Map.has_key?(t_occs, class_id) do
-          {t_classes, %{t_occs | class_id => t_occs[class_id] + 1}}
-        else
-          {Map.put(t_classes, class_id, elem), Map.put(t_occs, class_id, 1)}
-        end
-      end)
-      |> IO.inspect()
+  #       if Map.has_key?(t_occs, class_id) do
+  #         {t_classes, %{t_occs | class_id => t_occs[class_id] + 1}}
+  #       else
+  #         {Map.put(t_classes, class_id, elem), Map.put(t_occs, class_id, 1)}
+  #       end
+  #     end)
 
-    occs
-    |> Map.keys()
-    |> Enum.sort_by(&{classes[&1].enrollment, occs[&1]})
-    |> Enum.reverse()
-    |> Enum.take(50)
-    |> Enum.map(&classes[&1])
-  end
+  #   occs
+  #   |> Map.keys()
+  #   |> Enum.sort_by(&{classes[&1].enrollment, occs[&1]})
+  #   |> Enum.reverse()
+  #   |> Enum.take(50)
+  #   |> Enum.map(&classes[&1])
+  # end
 
   def get_classes_by_period_id(period_id, params),
-    do: search_classes_by_period_id(period_id, params) |> Enum.take(50)
+    do: search_classes_by_period_id(period_id, params)
 
   defp search_classes_by_period_id(period_id, filters),
     do:
@@ -82,6 +81,7 @@ defmodule Skoller.Periods do
       |> where([class, period, prof], ^class_filter(filters))
       |> select([class, period, prof], %{class: class, professor: prof, class_period: period})
       |> order_by([class], desc: class.inserted_at)
+      |> limit(50)
       |> Repo.all()
       |> Enum.map(fn class ->
         Map.put(class, :enrollment, EnrolledStudents.get_enrollment_by_class_id(class.class.id))
@@ -191,8 +191,7 @@ defmodule Skoller.Periods do
     |> Enum.map(&adjust_period_to_new_year(&1, year))
     |> Enum.filter(&(&1 != nil && &1.valid?))
     |> Enum.map(&Repo.insert/1)
-    |> Enum.filter(& Kernel.elem(&1, 0) != :ok)
-    |> IO.inspect
+    |> Enum.filter(&(Kernel.elem(&1, 0) != :ok))
   end
 
   defp adjust_period_to_new_year(

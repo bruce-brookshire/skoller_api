@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1dc72ee8-1050-4232-b1f2-3c1c023b3396",
-		"name": "ClassNavApi",
+		"name": "SkollerAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -86,7 +86,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"phone\":\"9032452355\", \"verification_code\": \"76405\"}"
+							"raw": "{\"phone\":\"9032452355\", \"verification_code\": \"41386\"}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/students/login",
@@ -6724,6 +6724,265 @@
 			]
 		},
 		{
+			"name": "Skoller Jobs",
+			"item": [
+				{
+					"name": "Career Activities",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities?type_id=200",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"4",
+								"activities"
+							],
+							"query": [
+								{
+									"key": "type_id",
+									"value": "200"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Jobs Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Jobs Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/3",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Job Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"degree_type_id\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Job Profile Copy",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n    \"alt_email\": \"leixe@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Jobs Types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/types/activities",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"types",
+								"activities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Career Activity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"start_date\": \"2019-11-18\",\n        \"organization_name\": \"skoller 2\",\n        \"name\": \"name 2\",\n        \"end_date\": \"2019-11-18\",\n        \"description\": \"description 2\",\n        \"career_activity_type_id\": 200\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"4",
+								"activities"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
 			"name": "School",
 			"item": [
 				{
@@ -11945,6 +12204,33 @@
 								"api",
 								"v1",
 								"report"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Jobs Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/users/26/job-profile",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"26",
+								"job-profile"
 							]
 						}
 					},

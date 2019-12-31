@@ -3,7 +3,7 @@ defmodule Skoller.Settings do
   The context module for Admin Settings.
   """
 
-  #TODO: this can be split into a context for each kind of setting
+  # TODO: this can be split into a context for each kind of setting
 
   alias Skoller.Repo
   alias Skoller.Settings.Setting
@@ -13,7 +13,7 @@ defmodule Skoller.Settings do
 
   @auto_upd_topic "AutoUpdate"
   @min_ver_topic "MinVersions"
-  @four_door_topic "FourDoor"
+  @syllabus_overload "SyllabusOverload"
   @notification_topic "Notification"
 
   @doc """
@@ -21,42 +21,36 @@ defmodule Skoller.Settings do
 
   Returns `[Skoller.Settings.Setting]` or `[]`
   """
-  def get_auto_update_settings() do
-    from(s in Setting)
-    |> where([s], s.topic == @auto_upd_topic)
-    |> Repo.all()
-  end
+  def get_auto_update_settings(),
+    do: get_settings_by_topic(@auto_upd_topic)
 
   @doc """
   Gets the current minimum version settings from admin_settings.
 
   Returns `[Skoller.Settings.Setting]` or `[]`
   """
-  def get_min_ver_settings() do
-    from(s in Setting)
-    |> where([s], s.topic == @min_ver_topic)
-    |> Repo.all()
-  end
+  def get_min_ver_settings(),
+    do: get_settings_by_topic(@min_ver_topic)
 
   @doc """
-  Gets the current four door settings from admin_settings.
+  Gets the current syllabus overload settings from admin_settings.
 
-  Returns `[Skoller.Settings.Setting]` or `[]`
+  Returns `Skoller.Settings.Setting` or `nil`
   """
-  def get_four_door_settings() do
-    from(s in Setting)
-    |> where([s], s.topic == @four_door_topic)
-    |> Repo.all()
-  end
+  def get_syllabus_overload_setting(),
+    do: get_settings_by_topic(@syllabus_overload) |> List.first
 
   @doc """
   Gets the current notification settings from admin_settings.
 
   Returns `[Skoller.Settings.Setting]` or `[]`
   """
-  def get_notification_settings() do
+  def get_notification_settings(),
+    do: get_settings_by_topic(@notification_topic)
+
+  defp get_settings_by_topic(topic) do
     from(s in Setting)
-    |> where([s], s.topic == @notification_topic)
+    |> where([s], s.topic == ^topic)
     |> Repo.all()
   end
 
@@ -79,18 +73,18 @@ defmodule Skoller.Settings do
   """
   def update_settings(settings) do
     Ecto.Multi.new()
-    |> Ecto.Multi.run(:settings, fn (_, changes) -> multi_update_settings(settings, changes) end)
+    |> Ecto.Multi.run(:settings, fn _, changes -> multi_update_settings(settings, changes) end)
     |> Repo.transaction()
   end
 
-  defp multi_update_settings(settings, _) do
-    status = settings |> Enum.map(&process_multi_update_setting(&1))
-    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
-  end
-
-  defp process_multi_update_setting(%{"name" => name, "value" => value}) do
+  def update_setting(%{"name" => name, "value" => value}) do
     get_setting_by_name!(name)
     |> Setting.changeset_update(%{value: value |> to_string()})
     |> Repo.update()
+  end
+
+  defp multi_update_settings(settings, _) do
+    status = settings |> Enum.map(&update_setting/1)
+    status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 end

@@ -7,13 +7,15 @@ defmodule SkollerWeb.Api.V1.NonMemberClassController do
   alias Skoller.Classes
 
   import SkollerWeb.Plugs.Auth
-  
+
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
   @change_req_role 400
-  
-  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]}
+
+  plug :verify_role, %{
+    roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]
+  }
 
   @doc """
    Shows a single class.
@@ -26,7 +28,9 @@ defmodule SkollerWeb.Api.V1.NonMemberClassController do
   """
   def show(conn, %{"id" => id}) do
     class = Classes.get_class_by_id!(id)
-    render(conn, ClassView, "show.json", class: class)
-  end
 
+    conn
+    |> put_view(ClassView)
+    |> render("show.json", class: class)
+  end
 end

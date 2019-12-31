@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias SkollerWeb.Class.ChatCommentView
@@ -19,12 +19,19 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
     case ChatComments.create_comment(params, conn.assigns[:user].student_id) do
-      {:ok, comment} -> 
-        render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
+      {:ok, comment} ->
+        conn
+        |> put_view(ChatCommentView)
+        |> render("show.json", %{
+          chat_comment: comment,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
@@ -33,11 +40,18 @@ defmodule SkollerWeb.Api.V1.Class.ChatCommentController do
 
     case ChatComments.update(comment_old, params) do
       {:ok, comment} ->
-        render(conn, ChatCommentView, "show.json", %{chat_comment: comment, current_student_id: conn.assigns[:user].student_id})
+        conn
+        |> put_view(ChatCommentView)
+        |> render("show.json", %{
+          chat_comment: comment,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

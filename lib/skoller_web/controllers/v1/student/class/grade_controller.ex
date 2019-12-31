@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.StudentAssignments
@@ -8,9 +8,9 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
   alias Skoller.StudentAssignments.StudentClasses
 
   import SkollerWeb.Plugs.Auth
-  
+
   @student_role 100
-  
+
   plug :verify_role, %{role: @student_role}
   plug :verify_member, %{of: :student_assignment, using: :assignment_id}
 
@@ -19,11 +19,15 @@ defmodule SkollerWeb.Api.V1.Student.Class.GradeController do
 
     case StudentAssignments.update_assignment_grade(assign_old, params) do
       {:ok, student_assignment} ->
-        render(conn, StudentAssignmentView, "show.json", student_assignment: student_assignment)
+        conn
+        |> put_view(StudentAssignmentView)
+        |> render("show.json", student_assignment: student_assignment)
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

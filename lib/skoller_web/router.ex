@@ -43,10 +43,6 @@ defmodule SkollerWeb.Router do
 
       post "/schools/csv", CSVController, :school
 
-      get "/four-door/overrides", Admin.School.FourDoorController, :index
-      get "/four-door", Admin.FourDoorController, :index
-      put "/four-door", Admin.FourDoorController, :update
-
       get "/chat-sort-algorithms", Chat.SortAlgorithmController, :index
 
       post "/enrollment-link/:token", Student.ClassController, :link
@@ -60,6 +56,8 @@ defmodule SkollerWeb.Router do
       resources "/auto-updates", Admin.AutoUpdateController, only: [:index]
       put "/auto-updates", Admin.AutoUpdateController, :update
       get "/auto-updates/forecast", Admin.AutoUpdateController, :forecast
+
+      resources "/admin-settings", Admin.SettingsController, only: [:show, :update], param: "name"
 
       # Min Ver Routes
       put "/min-version", Admin.MinVerController, :update
@@ -93,9 +91,6 @@ defmodule SkollerWeb.Router do
       resources "/schools", SchoolController, only: [:create]
 
       resources "/schools", Admin.SchoolController, only: [:update, :show, :index] do
-        post "/four-door", Admin.School.FourDoorController, :school
-        delete "/four-door", Admin.School.FourDoorController, :delete
-
         # School Professor routes
         resources "/professors", ProfessorController, only: [:create, :index]
 
@@ -281,6 +276,23 @@ defmodule SkollerWeb.Router do
       delete "/users/:user_id", UserController, :delete
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
+      get "/users/:user_id/job-profile", SkollerJobs.JobController, :get_by_user
+
+      # Skoller Jobs
+      scope "/skoller-jobs", SkollerJobs do
+        resources "/profiles", JobController,
+          only: [:create, :show, :update, :delete],
+          param: "id",
+          name: "profile" do
+          put "/documents/:type", DocController, :upload
+
+          resources "/activities", CareerActivityController,
+            only: [:create, :index, :show, :update, :delete],
+            param: "activity_id"
+        end
+
+        get "/types/:type", JobProfileTypeController, :show
+      end
     end
   end
 

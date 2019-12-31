@@ -60,14 +60,21 @@ defmodule Skoller.ClassStatuses.Classes do
   @doc """
   Takes an old class and a new class, and if the status has just changed to complete, send class complete notification.
   """
-  def evaluate_class_completion(old_class, %Class{class_status_id: @class_complete_status} = class) do
+  def evaluate_class_completion(
+        old_class,
+        %Class{class_status_id: @class_complete_status} = class
+      ) do
     old_class = old_class |> Repo.preload(:class_status)
+
     case old_class do
       %{class_status: %{is_complete: false}} ->
         Task.start(Notifications, :send_class_complete_notification, [class])
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
+
   def evaluate_class_completion(_old_class, _class), do: nil
 
   @doc """
@@ -80,28 +87,33 @@ defmodule Skoller.ClassStatuses.Classes do
   `[%{id: Skoller.ClassStatuses.Status.id, name: Skoller.ClassStatuses.Status.name, classes: Integer}]` or `nil`
   """
   def get_class_status_counts() do
-    statuses = from(status in Status)
-    |> join(:left, [status], class in subquery(Syllabi.get_servable_classes_subquery()), on: status.id == class.class_status_id)
-    |> where([status], status.id == @syllabus_submitted_status)
-    |> group_by([status], [status.id, status.name])
-    |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
-    |> Repo.all()
+    statuses =
+      from(status in Status)
+      |> join(:left, [status], class in Class, on: status.id == class.class_status_id)
+      |> where([status], status.id == @syllabus_submitted_status)
+      |> group_by([status], [status.id, status.name])
+      |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
+      |> Repo.all()
 
-    admin_status = from(status in Status)
-    |> join(:left, [status], class in Class, on: status.id == class.class_status_id)
-    |> where([status], status.id  == @class_issue_status)
-    |> group_by([status], [status.id, status.name])
-    |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
-    |> Repo.all()
+    admin_status =
+      from(status in Status)
+      |> join(:left, [status], class in Class, on: status.id == class.class_status_id)
+      |> where([status], status.id == @class_issue_status)
+      |> group_by([status], [status.id, status.name])
+      |> select([status, class], %{id: status.id, name: status.name, classes: count(class.id)})
+      |> Repo.all()
 
-    maint = from(class in Class)
-    |> where([class], class.is_editable == false)
-    |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
-    |> Repo.all()
+    maint =
+      from(class in Class)
+      |> where([class], class.is_editable == false)
+      |> select([class], %{id: @maint_status, name: @maint_name, classes: count(class.id)})
+      |> Repo.all()
 
     workable = Syllabi.syllabi_class_count()
-    
-    statuses ++ admin_status ++ maint ++ [%{id: @workable_syllabi_status, name: @workable_syllabi_name, classes: workable}]
+
+    statuses ++
+      admin_status ++
+      maint ++ [%{id: @workable_syllabi_status, name: @workable_syllabi_name, classes: workable}]
   end
 
   @doc """
@@ -122,6 +134,7 @@ defmodule Skoller.ClassStatuses.Classes do
     class = class |> Repo.preload(:class_status)
     get_status(class)
   end
+
   def get_class_status(%Status{} = class_status) do
     get_status(%{class_status: class_status})
   end
@@ -148,15 +161,17 @@ defmodule Skoller.ClassStatuses.Classes do
   `{:ok, Skoller.Classes.Class}` or `{:ok, nil}` or `{:error, map}` or `{:error, Ecto.Changeset}`
 
   """
-  #TODO: Internalize class status updates (remove from SkollerWeb).
-  #TODO: Standardize return objects
+  # TODO: Internalize class status updates (remove from SkollerWeb).
+  # TODO: Standardize return objects
   # A new class has been added, and it is a class that will never have a syllabus.
   def check_status(class, params) do
     Logger.info("Checking status for class: " <> to_string(class.id))
     class = class |> Repo.preload(:class_status)
+
     case match_params(class, params) do
       :ok ->
         cl_check_status(class, params)
+
       :error ->
         Logger.error("Class id and parameters did not match.")
         {:error, "Class id and parameters did not match."}
@@ -164,45 +179,99 @@ defmodule Skoller.ClassStatuses.Classes do
   end
 
   defp match_params(%Class{id: id}, %{doc: %{class_id: class_id}}) when id != class_id, do: :error
-  defp match_params(%Class{id: id}, %{change_request: %{class_id: class_id}}) when id != class_id, do: :error
-  defp match_params(%Class{id: id}, %{student_request: %{class_id: class_id}}) when id != class_id, do: :error
-  defp match_params(%Class{id: id}, %{help_request: %{class_id: class_id}}) when id != class_id, do: :error
-  defp match_params(%Class{id: id}, %{student_class: %{class_id: class_id}}) when id != class_id, do: :error
+
+  defp match_params(%Class{id: id}, %{change_request: %{class_id: class_id}}) when id != class_id,
+    do: :error
+
+  defp match_params(%Class{id: id}, %{student_request: %{class_id: class_id}})
+       when id != class_id,
+       do: :error
+
+  defp match_params(%Class{id: id}, %{help_request: %{class_id: class_id}}) when id != class_id,
+    do: :error
+
+  defp match_params(%Class{id: id}, %{student_class: %{class_id: class_id}}) when id != class_id,
+    do: :error
+
   defp match_params(_class, _params), do: :ok
 
-  defp cl_check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params), do: class |> set_status(@needs_student_input_status)
-  defp cl_check_status(%Class{class_status: %{is_complete: false}, is_syllabus: false} = class, _params), do: class |> set_status(@needs_student_input_status)
+  defp cl_check_status(%Class{class_status_id: nil, is_syllabus: false} = class, _params),
+    do: class |> set_status(@needs_student_input_status)
+
+  defp cl_check_status(
+         %Class{class_status: %{is_complete: false}, is_syllabus: false} = class,
+         _params
+       ),
+       do: class |> set_status(@needs_student_input_status)
+
   # A new class has been added.
-  defp cl_check_status(%Class{class_status_id: nil} = class, _params), do: class |> set_status(@needs_setup_status)
+  defp cl_check_status(%Class{class_status_id: nil} = class, _params),
+    do: class |> set_status(@needs_setup_status)
+
   # A syllabus has been added to a class that needs a syllabus.
-  defp cl_check_status(%Class{class_status_id: @needs_setup_status} = class, %{doc: %{is_syllabus: true}}), do: class |> set_status(@syllabus_submitted_status)
+  defp cl_check_status(%Class{class_status_id: status_id} = class, %{doc: %{is_syllabus: true}})
+       when status_id < @class_complete_status,
+       do: class |> set_status(@syllabus_submitted_status)
+
   # A class in the change status has a change request completed.
-  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{change_request: _}), do: check_req_status(class)
+  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{change_request: _}),
+    do: check_req_status(class)
+
   # A class in the change status has a student request completed.
-  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{student_request: %{is_completed: true}}), do: check_req_status(class)
+  defp cl_check_status(%Class{class_status_id: @class_issue_status} = class, %{
+         student_request: %{is_completed: true}
+       }),
+       do: check_req_status(class)
+
   # A class has a change request created.
-  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{change_request: _}), do: set_status(class, @class_issue_status)
+  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{change_request: _}),
+    do: set_status(class, @class_issue_status)
+
   # A class has a help request created.
-  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{class_help_type_id: type_id}}) when type_id in [@bad_file_type, @wrong_syllabus_type], do: class |> set_status(@needs_setup_status)
-  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{help_request: %{class_help_type_id: @no_weights_or_assign_type}}), do: class |> set_status(@needs_student_input_status)
+  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{
+         help_request: %{class_help_type_id: type_id}
+       })
+       when type_id in [@bad_file_type, @wrong_syllabus_type],
+       do: class |> set_status(@needs_setup_status)
+
+  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{
+         help_request: %{class_help_type_id: @no_weights_or_assign_type}
+       }),
+       do: class |> set_status(@needs_student_input_status)
+
   # A class has been fully unlocked. Get the highest lock
-  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{unlock: unlock}) when is_list(unlock) do
-    max_lock = unlock
-    |> Enum.filter(&elem(&1, 1).class_id == class.id)
-    |> Enum.reduce(0, &case elem(&1, 1).class_lock_section_id > &2 do
-        true -> elem(&1, 1).class_lock_section_id
-        false -> &2
-      end)
+  defp cl_check_status(%Class{class_status: %{is_complete: false}} = class, %{unlock: unlock})
+       when is_list(unlock) do
+    max_lock =
+      unlock
+      |> Enum.filter(&(elem(&1, 1).class_id == class.id))
+      |> Enum.reduce(
+        0,
+        &case elem(&1, 1).class_lock_section_id > &2 do
+          true -> elem(&1, 1).class_lock_section_id
+          false -> &2
+        end
+      )
+
     case max_lock do
       @assignment_lock ->
         check_assignments_exist_for_class(class)
-      _ -> {:ok, nil}
+
+      _ ->
+        {:ok, nil}
     end
   end
+
   # A student enrolled into a ghost class.
-  defp cl_check_status(%Class{is_ghost: true} = class, %{student_class: _sc}), do: class |> remove_ghost()
+  defp cl_check_status(%Class{is_ghost: true} = class, %{student_class: _sc}),
+    do: class |> remove_ghost()
+
   # A student created a student request.
-  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{student_request: %{is_completed: false}}), do: class |> set_status(@class_issue_status)
+  defp cl_check_status(%Class{class_status: %{is_complete: true}} = class, %{
+         student_request: %{is_completed: false}
+       }),
+       do: class |> set_status(@class_issue_status)
+
   defp cl_check_status(_class, _params), do: {:ok, nil}
 
   defp set_status(class, status) do
@@ -210,24 +279,26 @@ defmodule Skoller.ClassStatuses.Classes do
     |> Repo.update()
   end
 
-  #Check to see if there are other incomplete change requests.
+  # Check to see if there are other incomplete change requests.
   defp check_req_status(%Class{id: class_id} = class) do
+    cr_exists =
+      ChangeRequest
+      |> join(:inner, [c], m in ChangeRequestMember, on: c.id == m.class_change_request_id)
+      |> where([c, m], c.class_id == ^class_id and not m.is_completed)
+      |> Repo.exists?()
 
-    cr_exists = ChangeRequest 
-    |> join(:inner, [c], m in ChangeRequestMember, on: c.id == m.class_change_request_id)
-    |> where([c, m], c.class_id == ^class_id and not(m.is_completed))
-    |> Repo.exists?()
-
-    sr_exists = from(sr in StudentRequest)
-    |> where([sr], sr.class_id == ^class.id and sr.is_completed == false)
-    |> Repo.exists?()
+    sr_exists =
+      from(sr in StudentRequest)
+      |> where([sr], sr.class_id == ^class.id and sr.is_completed == false)
+      |> Repo.exists?()
 
     results = cr_exists or sr_exists
 
     case results do
-      false -> 
+      false ->
         class |> set_status(@class_complete_status)
-      true -> 
+
+      true ->
         {:ok, nil}
     end
   end
@@ -245,6 +316,7 @@ defmodule Skoller.ClassStatuses.Classes do
     case ClassAssignments.get_assignments_by_class(class.id) do
       [] ->
         class |> set_status(@needs_student_input_status)
+
       _assignments ->
         class |> set_status(@class_complete_status)
     end

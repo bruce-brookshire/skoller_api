@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.MinVerController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
 
   alias Skoller.Settings
@@ -8,6 +8,9 @@ defmodule SkollerWeb.Api.V1.MinVerController do
 
   def index(conn, _params) do
     settings = Settings.get_min_ver_settings()
-    render(conn, SettingView, "index.json", settings: settings)
+
+    conn
+    |> put_view(SettingView)
+    |> render("index.json", settings: settings)
   end
 end

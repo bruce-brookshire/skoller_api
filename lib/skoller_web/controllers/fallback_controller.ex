@@ -9,12 +9,14 @@ defmodule SkollerWeb.FallbackController do
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+    |> put_view(SkollerWeb.ChangesetView)
+    |> render("error.json", changeset: changeset)
   end
 
   def call(conn, {:error, :not_found}) do
     conn
     |> put_status(:not_found)
-    |> render(SkollerWeb.ErrorView, :"404")
+    |> put_view(SkollerWeb.ErrorView)
+    |> render(:"404")
   end
 end

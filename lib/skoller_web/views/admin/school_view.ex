@@ -11,7 +11,7 @@ defmodule SkollerWeb.Admin.SchoolView do
   end
 
   def render("show.json", %{school: school}) do
-    render_one(school, SchoolView, "school-detail.json")
+    render_one(school, SchoolView, "school.json")
   end
 
   def render("school.json", %{school: %{school: school, students: students, classes: classes}}) do
@@ -22,24 +22,12 @@ defmodule SkollerWeb.Admin.SchoolView do
   end
 
   def render("school.json", %{school: school}) do
-    school
-    |> base_school_view()
-  end
-
-  def render("school-detail.json", %{school: school}) do
-    school
-    |> render_one(SchoolView, "school.json")
-    |> Map.merge(
-      %{
-        is_diy_enabled: school.is_diy_enabled,
-        is_diy_preferred: school.is_diy_preferred,
-        is_auto_syllabus: school.is_auto_syllabus
-      }
-    )
+    base_school_view(school)
   end
 
   defp base_school_view(school) do
     school = school |> Repo.preload(:class_periods)
+
     %{
       id: school.id,
       name: school.name,
@@ -57,7 +45,8 @@ defmodule SkollerWeb.Admin.SchoolView do
       class_periods: render_many(school.class_periods, PeriodView, "period.json"),
       is_chat_enabled: school.is_chat_enabled,
       is_assignment_posts_enabled: school.is_assignment_posts_enabled,
-      color: school.color
+      color: school.color,
+      is_syllabus_overload: school.is_syllabus_overload
     }
   end
 

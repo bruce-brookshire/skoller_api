@@ -10,6 +10,7 @@ defmodule Skoller.Students.Student do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Schools.School
   alias Skoller.Organizations.Organization
+  alias Skoller.SkollerJobs.DegreeType
   alias Skoller.Periods.ClassPeriod
   alias Skoller.Repo
   import Ecto.Query
@@ -41,14 +42,21 @@ defmodule Skoller.Students.Student do
     field :primary_school_id, :id
     field :primary_period_id, :id
     field :primary_organization_id, :id
-    has_many :users, User
+    field :todo_days_past, :integer
+    field :todo_days_future, :integer
+    field :degree_type_id, :id
+
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
+
+    has_many :users, User
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
     has_many :schools, through: [:classes, :school]
+
     belongs_to :primary_school, School, define_field: false
     belongs_to :primary_period, ClassPeriod, define_field: false
+    belongs_to :degree_type, DegreeType, define_field: false
     belongs_to :primary_organization, Organization, define_field: false
 
     timestamps()
@@ -75,7 +83,10 @@ defmodule Skoller.Students.Student do
     :grad_year,
     :primary_school_id,
     :primary_period_id,
-    :primary_organization_id
+    :primary_organization_id,
+    :todo_days_past,
+    :todo_days_future,
+    :degree_type_id
   ]
   @all_fields @req_fields ++ @opt_fields
 

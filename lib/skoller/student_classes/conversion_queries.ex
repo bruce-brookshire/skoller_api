@@ -18,7 +18,7 @@ defmodule Skoller.StudentClasses.ConversionQueries do
 
   @days_of_week ["M", "T", "W", "R", "F", "S", "U"]
 
-  @party_size 4
+  @party_size 5
 
   @needs_setup_status_id 1100
   @class_setup_status_id 1400

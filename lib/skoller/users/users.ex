@@ -19,6 +19,8 @@ defmodule Skoller.Users do
   alias Skoller.Users.Emails
   alias Skoller.Students.Organizations
   alias Skoller.Devices.Device
+  alias Skoller.SkollerJobs.JobProfiles
+  alias Skoller.SkollerJobs.AirtableJobs
 
   import Ecto.Query
 
@@ -74,8 +76,6 @@ defmodule Skoller.Users do
   `{:ok, Skoller.Users.User}` or `{:error, changeset}`
   """
   def create_user(params, opts \\ []) do
-    IO.inspect(params)
-
     result =
       %User{}
       |> User.changeset_insert(params)
@@ -131,8 +131,41 @@ defmodule Skoller.Users do
     |> Ecto.Multi.run(:roles, fn _, changes -> add_roles(changes, params, opts) end)
     |> Ecto.Multi.run(:fields_of_study, fn _, changes -> add_fields_of_study(changes, params) end)
     |> Ecto.Multi.run(:link, fn _, changes -> get_link(changes.user) end)
+    |> Ecto.Multi.run(:airtable_sync, fn _, changes ->
+      {:ok, check_airtable_sync_job(changeset, changes, user_old.id)}
+    end)
     |> Repo.transaction()
   end
+
+  defp check_airtable_sync_job(
+         %Ecto.Changeset{valid?: true, changes: changes},
+         %{fields_of_study: field_changes},
+         user_id
+       ) do
+    keys = Map.keys(changes)
+
+    student_changes? =
+      Enum.any?(keys, &(&1 == :student)) and (changes.student.valid? || false) and
+        Enum.any?(
+          Map.keys(changes.student.changes),
+          &(&1 in [:primary_school_id, :phone, :grad_year, :name_last, :name_first])
+        )
+
+    user_changes? = Enum.any?(keys, &(&1 in [:pic_path, :email]))
+    field_changes? = field_changes != nil
+
+    should_update? = user_changes? or student_changes? or field_changes?
+
+    if should_update? do
+      user_id
+      |> JobProfiles.get_by_user()
+      |> AirtableJobs.on_profile_update()
+    else
+      :noop
+    end
+  end
+
+  defp check_airtable_sync_job(_, _, _), do: :noop
 
   def delete_user(user_id) do
     user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)

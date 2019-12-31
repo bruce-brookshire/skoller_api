@@ -1,8 +1,8 @@
 defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
-  
+
   alias SkollerWeb.Class.ChatReplyView
   alias Skoller.ChatReplies
 
@@ -19,23 +19,37 @@ defmodule SkollerWeb.Api.V1.Class.Chat.ReplyLikeController do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
 
     case ChatReplies.like_reply(params) do
-      {:ok, chat_reply} -> 
-        render(conn, ChatReplyView, "show.json", %{chat_reply: chat_reply, current_student_id: conn.assigns[:user].student_id})
+      {:ok, chat_reply} ->
+        conn
+        |> put_view(ChatReplyView)
+        |> render("show.json", %{
+          chat_reply: chat_reply,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
   def delete(conn, %{"chat_reply_id" => reply_id}) do
     case ChatReplies.unlike_reply(reply_id, conn.assigns[:user].student_id) do
       {:ok, chat_reply} ->
-        render(conn, ChatReplyView, "show.json", %{chat_reply: chat_reply, current_student_id: conn.assigns[:user].student_id})
+        conn
+        |> put_view(ChatReplyView)
+        |> render("show.json", %{
+          chat_reply: chat_reply,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

@@ -2,8 +2,8 @@ defmodule Skoller.ClassDocs do
   @moduledoc """
   Context module for class docs.
   """
-  
-  alias Skoller.DocUpload
+
+  alias Skoller.FileUploaders.ClassDocs
   alias Ecto.UUID
   alias Skoller.Repo
   alias Skoller.ClassDocs.Doc
@@ -50,9 +50,11 @@ defmodule Skoller.ClassDocs do
   def delete_doc(%Doc{} = doc) do
     Repo.delete(doc)
   end
+
   def delete_docs(ids) when is_list(ids) do
     from(d in Doc, where: d.id in ^ids) |> Repo.delete_all()
   end
+
   def delete_docs(params) do
     from(d in Doc, where: ^params) |> Repo.delete_all()
   end
@@ -84,28 +86,34 @@ defmodule Skoller.ClassDocs do
     location = file |> upload_class_doc()
 
     if Keyword.get(opts, :sammi, false) do
-      Task.start(Sammi, :sammi, [%{"is_syllabus" => is_syllabus, "class_id" => class_id}, location])
+      Task.start(Sammi, :sammi, [
+        %{"is_syllabus" => is_syllabus, "class_id" => class_id},
+        location
+      ])
     end
-  
-    params = Map.new() 
-    |> Map.put("path", location)
-    |> Map.put("name", file.filename)
-    |> Map.put("user_id", user_id)
-    |> Map.put("is_syllabus", is_syllabus)
-    |> Map.put("class_id", class_id)
+
+    params =
+      Map.new()
+      |> Map.put("path", location)
+      |> Map.put("name", file.filename)
+      |> Map.put("user_id", user_id)
+      |> Map.put("is_syllabus", is_syllabus)
+      |> Map.put("class_id", class_id)
 
     changeset = Doc.changeset(%Doc{}, params)
 
     class = Classes.get_class_by_id!(class_id)
 
-    result = Ecto.Multi.new
-    |> Ecto.Multi.insert(:doc, changeset)
-    |> Ecto.Multi.run(:status, fn (_, changes) -> ClassStatuses.check_status(class, changes) end)
-    |> Repo.transaction()
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:doc, changeset)
+      |> Ecto.Multi.run(:status, fn _, changes -> ClassStatuses.check_status(class, changes) |> IO.inspect end)
+      |> Repo.transaction()
 
     case result do
       {:ok, doc} ->
         {:ok, doc}
+
       {:error, _, changeset, _} ->
         {:error, changeset}
     end
@@ -127,22 +135,33 @@ defmodule Skoller.ClassDocs do
     classes = Periods.get_class_from_hash(class_hash, period_id)
     location = file |> upload_class_doc()
 
-    classes |> Enum.each(&Task.start(Sammi, :sammi, [%{"is_syllabus" => "true", "class_id" => &1.id}, location]))
+    classes
+    |> Enum.each(
+      &Task.start(Sammi, :sammi, [%{"is_syllabus" => "true", "class_id" => &1.id}, location])
+    )
 
-    params = Map.new() 
-    |> Map.put("path", location)
-    |> Map.put("name", file.filename)
-    |> Map.put("is_syllabus", true)
-    |> Map.put("user_id", user_id)
+    params =
+      Map.new()
+      |> Map.put("path", location)
+      |> Map.put("name", file.filename)
+      |> Map.put("is_syllabus", true)
+      |> Map.put("user_id", user_id)
 
-    Ecto.Multi.new
-    |> Ecto.Multi.run(:doc, fn (_, changes) -> insert_class_doc(classes, params, changes) end)
-    |> Ecto.Multi.run(:status, fn (_, changes) -> check_statuses(classes, changes.doc) end)
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:doc, fn _, changes -> insert_class_doc(classes, params, changes) end)
+    |> Ecto.Multi.run(:status, fn _, changes -> check_statuses(classes, changes.doc) end)
     |> Repo.transaction()
   end
 
   defp check_statuses(classes, docs) do
-    status = classes |> Enum.map(&ClassStatuses.check_status(&1, %{doc: elem(docs |> Enum.find(fn(x) -> elem(x, 1).class_id == &1.id end), 1)}))
+    status =
+      classes
+      |> Enum.map(
+        &ClassStatuses.check_status(&1, %{
+          doc: elem(docs |> Enum.find(fn x -> elem(x, 1).class_id == &1.id end), 1)
+        })
+      )
+
     status |> Enum.find({:ok, status}, &MapErrors.check_tuple(&1))
   end
 
@@ -152,7 +171,7 @@ defmodule Skoller.ClassDocs do
   end
 
   defp insert_doc(class, params) do
-    params 
+    params
     |> Map.put("class_id", class.id)
     |> insert()
   end
@@ -165,12 +184,14 @@ defmodule Skoller.ClassDocs do
 
   # ## Returns
   # The document location as a `String`
-  
+
   defp upload_class_doc(file) do
     scope = %{"id" => UUID.generate()}
-    case DocUpload.store({file, scope}) do
+
+    case ClassDocs.store({file, scope}) do
       {:ok, inserted} ->
-        DocUpload.url({inserted, scope})
+        ClassDocs.url({inserted, scope})
+
       {:error, error} ->
         Logger.info(inspect(error))
         nil

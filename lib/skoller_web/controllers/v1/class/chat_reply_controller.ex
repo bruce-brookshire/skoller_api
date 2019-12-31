@@ -1,8 +1,8 @@
 defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
   @moduledoc false
-  
+
   use SkollerWeb, :controller
-  
+
   alias SkollerWeb.Class.ChatReplyView
   alias Skoller.ChatReplies
 
@@ -17,27 +17,41 @@ defmodule SkollerWeb.Api.V1.Class.ChatReplyController do
 
   def create(conn, params) do
     params = params |> Map.put("student_id", conn.assigns[:user].student_id)
-    
+
     case ChatReplies.create_reply(params, conn.assigns[:user].student_id) do
-      {:ok, reply} -> 
-        render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
+      {:ok, reply} ->
+        conn
+        |> put_view(ChatReplyView)
+        |> render("show.json", %{
+          chat_reply: reply,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 
   def update(conn, %{"id" => id} = params) do
     reply_old = ChatReplies.get_reply_by_student_and_id!(conn.assigns[:user].student_id, id)
-    
+
     case ChatReplies.update(reply_old, params) do
-      {:ok, reply} -> 
-        render(conn, ChatReplyView, "show.json", %{chat_reply: reply, current_student_id: conn.assigns[:user].student_id})
+      {:ok, reply} ->
+        conn
+        |> put_view(ChatReplyView)
+        |> render("show.json", %{
+          chat_reply: reply,
+          current_student_id: conn.assigns[:user].student_id
+        })
+
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(SkollerWeb.ChangesetView, "error.json", changeset: changeset)
+        |> put_view(SkollerWeb.ChangesetView)
+        |> render("error.json", changeset: changeset)
     end
   end
 end

@@ -54,29 +54,29 @@ defmodule Skoller.Professors do
   `[Skoller.Professors.Professor]` or `[]`
   """
   def get_professors(school_id, params \\ %{})
-  def get_professors(school_id, %{"professor_name" => name}) do
-    {profs, occs} =
-      name
-      |> String.split(" ", trim: true)
-      |> Enum.map(&search_professors(school_id, %{"professor_name" => &1}))
-      |> Enum.concat()
-      |> Enum.reduce({%{}, %{}}, fn elem, {t_profs, t_occs} ->
-        prof_id = elem.id
+  # def get_professors(school_id, %{"professor_name" => name}) do
+  #   {profs, occs} =
+  #     name
+  #     |> String.split(" ", trim: true)
+  #     |> Enum.map(&search_professors(school_id, %{"professor_name" => &1}))
+  #     |> Enum.concat()
+  #     |> Enum.reduce({%{}, %{}}, fn elem, {t_profs, t_occs} ->
+  #       prof_id = elem.id
 
-        if Map.has_key?(t_occs, prof_id) do
-          {t_profs, %{t_occs | prof_id => t_occs[prof_id] + 1}}
-        else
-          {Map.put(t_profs, prof_id, elem), Map.put(t_occs, prof_id, 1)}
-        end
-      end)
+  #       if Map.has_key?(t_occs, prof_id) do
+  #         {t_profs, %{t_occs | prof_id => t_occs[prof_id] + 1}}
+  #       else
+  #         {Map.put(t_profs, prof_id, elem), Map.put(t_occs, prof_id, 1)}
+  #       end
+  #     end)
 
-    occs
-    |> Map.keys()
-    |> Enum.sort_by(&occs[&1])
-    |> Enum.reverse()
-    |> Enum.take(50)
-    |> Enum.map(&profs[&1])
-  end
+  #   occs
+  #   |> Map.keys()
+  #   |> Enum.sort_by(&occs[&1])
+  #   |> Enum.reverse()
+  #   |> Enum.take(50)
+  #   |> Enum.map(&profs[&1])
+  # end
 
   def get_professors(school_id, params), do: search_professors(school_id, params) |> Enum.take(50)
 

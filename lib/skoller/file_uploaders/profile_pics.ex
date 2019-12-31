@@ -1,4 +1,4 @@
-defmodule Skoller.PicUpload do
+defmodule Skoller.FileUploaders.ProfilePics do
   @moduledoc false
   # Provides doc upload utilities.
   # Defines valid extensions, filename, and storage path.
@@ -6,7 +6,6 @@ defmodule Skoller.PicUpload do
   # S3 buckets are defined in env vars.
 
   use Arc.Definition
-  use Arc.Ecto.Definition
 
   @versions [:thumb] # to keep original images as well, add :original to this list.
   @extensions ~w(.jpg .png .jpeg .gif)

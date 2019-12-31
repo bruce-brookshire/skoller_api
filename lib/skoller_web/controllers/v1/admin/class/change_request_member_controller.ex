@@ -15,7 +15,9 @@ defmodule SkollerWeb.Api.V1.Admin.Class.ChangeRequestMemberController do
   def complete(conn, %{"id" => id}) do
     case ChangeRequestMembers.set_completed(id) do
       {:ok, %{change_request_member_update: member}} ->
-        render(conn, ChangeRequestView, "show.json", change_request_member: member)
+        conn
+        |> put_view(ChangeRequestView)
+        |> render("show.json", change_request_member: member)
 
       {:error, _, failed_value, _} ->
         conn
