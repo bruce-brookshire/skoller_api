@@ -51,7 +51,9 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       %DegreeType{id: 200, name: "Masters"},
       %DegreeType{id: 300, name: "Ph. D."},
       %DegreeType{id: 400, name: "MBA"},
-      %DegreeType{id: 500, name: "JD"}
+      %DegreeType{id: 500, name: "JD"},
+      %DegreeType{id: 600, name: "Associates"},
+      %DegreeType{id: 700, name: "H.S. Diploma"}
     ]
     |> Enum.each(&Repo.insert/1)
 
