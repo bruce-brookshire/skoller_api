@@ -110,10 +110,14 @@ defmodule Skoller.Schools do
 
     occs
     |> Map.keys()
+    |> IO.inspect
     |> Enum.sort_by(&occs[&1])
+    |> IO.inspect
     |> Enum.reverse()
+    |> IO.inspect
     |> Enum.take(50)
     |> Enum.map(&schools[&1])
+    |> IO.inspect
   end
 
   def get_schools(params), do: search_schools(params) |> Enum.take(50)

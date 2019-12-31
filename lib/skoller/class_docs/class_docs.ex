@@ -107,7 +107,7 @@ defmodule Skoller.ClassDocs do
     result =
       Ecto.Multi.new()
       |> Ecto.Multi.insert(:doc, changeset)
-      |> Ecto.Multi.run(:status, fn _, changes -> ClassStatuses.check_status(class, changes) end)
+      |> Ecto.Multi.run(:status, fn _, changes -> ClassStatuses.check_status(class, changes) |> IO.inspect end)
       |> Repo.transaction()
 
     case result do
