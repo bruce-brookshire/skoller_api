@@ -92,34 +92,34 @@ defmodule Skoller.Schools do
   """
   def get_schools(params \\ %{})
 
-  def get_schools(%{"name" => name}) do
-    {schools, occs} =
-      name
-      |> String.split(" ", trim: true)
-      |> Enum.map(&search_schools(%{"name" => &1}))
-      |> Enum.concat()
-      |> Enum.reduce({%{}, %{}}, fn elem, {t_schools, t_occs} ->
-        school_id = elem.id
+  # def get_schools(%{"name" => name}) do
+  #   {schools, occs} =
+  #     name
+  #     |> String.split(" ", trim: true)
+  #     |> Enum.map(&search_schools(%{"name" => &1}))
+  #     |> Enum.concat()
+  #     |> Enum.reduce({%{}, %{}}, fn elem, {t_schools, t_occs} ->
+  #       school_id = elem.id
 
-        if Map.has_key?(t_occs, school_id) do
-          {t_schools, %{t_occs | school_id => t_occs[school_id] + 1}}
-        else
-          {Map.put(t_schools, school_id, elem), Map.put(t_occs, school_id, 1)}
-        end
-      end)
-      occs[640]
-      |> IO.inspect
-      schools[640]
-      |> IO.inspect
+  #       if Map.has_key?(t_occs, school_id) do
+  #         {t_schools, %{t_occs | school_id => t_occs[school_id] + 1}}
+  #       else
+  #         {Map.put(t_schools, school_id, elem), Map.put(t_occs, school_id, 1)}
+  #       end
+  #     end)
+  #     occs[640]
+  #     |> IO.inspect
+  #     schools[640]
+  #     |> IO.inspect
 
-    occs
-    |> Map.keys()
-    |> Enum.sort_by(&occs[&1])
-    |> Enum.reverse()
-    |> Enum.take(50)
-    |> Enum.map(&schools[&1])
-    |> IO.inspect
-  end
+  #   occs
+  #   |> Map.keys()
+  #   |> Enum.sort_by(&occs[&1])
+  #   |> Enum.reverse()
+  #   |> Enum.take(50)
+  #   |> Enum.map(&schools[&1])
+  #   |> IO.inspect
+  # end
 
   def get_schools(params), do: search_schools(params) |> Enum.take(50)
 
