@@ -20,12 +20,24 @@ defmodule Skoller.Schools do
   def create_school(params) do
     {:ok, timezone} = get_timezone(params)
 
-    %School{}
-    |> School.changeset_insert(params)
-    |> Ecto.Changeset.change(%{timezone: timezone})
-    |> Repo.insert!()
-    |> add_default_overload_settings()
-    |> add_future_periods()
+    result =
+      %School{}
+      |> School.changeset_insert(params)
+      |> Ecto.Changeset.change(%{timezone: timezone})
+      |> Repo.insert()
+
+    case result do
+      {:ok, school} ->
+        detailed_school =
+          school
+          |> add_default_overload_settings()
+          |> add_future_periods()
+
+        {:ok, detailed_school}
+
+      _ ->
+        result
+    end
   end
 
   @doc """
