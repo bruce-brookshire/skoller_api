@@ -34,9 +34,8 @@ defmodule Skoller.Analytics.Jobs do
         |> Enum.to_list()
         |> add_headers(job_id)
         |> to_string
-        |> IO.inspect
-        # |> upload_document(file_path, scope)
-        # |> store_document(scope)
+        |> upload_document(file_path, scope)
+        |> store_document(scope)
 
       nil ->
         Logger.info("Unknown analytics job")
