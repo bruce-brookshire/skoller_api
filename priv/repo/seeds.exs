@@ -210,14 +210,6 @@ Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
 })
 
 Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
-  id: 400,
-  name: "Class Start Airdrop",
-  category: "Class.Start",
-  is_active_email: nil,
-  is_active_notification: true
-})
-
-Skoller.Repo.insert!(%Skoller.EmailTypes.EmailType{
   id: 500,
   name: "Grow Community Email",
   category: "Class.Community",

@@ -24,11 +24,12 @@ defmodule Skoller.Services.Sms do
           body: body
         )
       _ -> 
-        Message.create(
-          to: "+1" <> phone,
-          from: @test_phone,
-          body: body
-        )
+        :ok
+        # Message.create(
+        #   to: "+1" <> phone,
+        #   from: @test_phone,
+        #   body: body
+        # )
     end
   end
 end
