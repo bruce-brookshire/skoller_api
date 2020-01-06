@@ -67,17 +67,9 @@ defmodule Skoller.Analytics.Jobs do
   end
 
   # Retrieve analytics per the job_id
-  defp get_analytics(@school_job_id) do
-    SchoolAnalytics.get_analytics()
-  end
-
-  defp get_analytics(@class_job_id) do
-    ClassAnalytics.get_analytics()
-  end
-
-  defp get_analytics(@user_job_id) do
-    StudentAnalytics.get_analytics()
-  end
+  defp get_analytics(@school_job_id), do: SchoolAnalytics.get_analytics()
+  defp get_analytics(@class_job_id), do: ClassAnalytics.get_analytics()
+  defp get_analytics(@user_job_id), do: StudentAnalytics.get_analytics()
 
   defp add_headers(list, @school_job_id) do
     [
@@ -90,12 +82,17 @@ defmodule Skoller.Analytics.Jobs do
 
   defp add_headers(list, @class_job_id) do
     [
-      "Created on," <>
-        "Student Created," <>
+      "Class Creation Date," <>
+        "Class Name," <>
+        "Class Status," <>
+        "School," <>
         "Term Name," <>
         "Term Status," <>
-        "Class Name," <>
-        "Class Status," <> "Active Count," <> "Inactive Count," <> "School Name\r\n"
+        "Active Count," <>
+        "Inactive Count," <>
+        "Sign ups with enroll link," <>
+        "Assignments," <>
+        "Mods Created," <> "Mod Responses," <> "Grades Added (total)," <> "Class ID\r\n"
       | list
     ]
   end

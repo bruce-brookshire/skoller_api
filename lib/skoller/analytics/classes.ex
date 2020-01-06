@@ -5,11 +5,7 @@ defmodule Skoller.Analytics.Classes do
 
   alias Skoller.Classes.Class
   alias Skoller.Classes.Schools
-  alias Skoller.Schools.School
   alias Skoller.Repo
-  alias Skoller.Periods.ClassPeriod
-  alias Skoller.ClassStatuses
-  alias Skoller.Periods.Status
   alias Skoller.StudentClasses.StudentClass
 
   import Ecto.Query
@@ -40,48 +36,10 @@ defmodule Skoller.Analytics.Classes do
     |> Repo.aggregate(:count, :id)
   end
 
-
-  def get_community_classes() do
-    from(p in ClassPeriod)
-    |> join(:inner, [p], ps in Status, on: p.class_period_status_id == ps.id)
-    |> join(:inner, [p, ps], c in Class, on: c.class_period_id == p.id)
-    |> join(:inner, [p, ps, c], cs in ClassStatuses.Status, on: c.class_status_id == cs.id)
-    |> join(:inner, [p, ps, c, cs], s in School, on: p.school_id == s.id)
-    |> join(:left, [p, ps, c, cs, s], sc_a in subquery(get_student_classes_active_subquery()),
-      on: c.id == sc_a.class_id
-    )
-    |> join(
-      :left,
-      [p, ps, c, cs, s, sc_a],
-      sc_i in subquery(get_student_classes_inactive_subquery()),
-      on: c.id == sc_i.class_id
-    )
-    |> where([p, ps, c, cs, s, sc_a, sc_i], not (is_nil(sc_a.active) and is_nil(sc_i.inactive)))
-    |> select([p, ps, c, cs, s, sc_a, sc_i], %{
-      created_on: c.inserted_at,
-      is_student_created: c.is_student_created,
-      term_name: p.name,
-      term_status: ps.name,
-      class_name: c.name,
-      class_status: cs.name,
-      active: sc_a.active,
-      inactive: sc_i.inactive,
-      school_name: s.name
-    })
-    |> Repo.all()
-  end
-
   def get_student_classes_active_subquery() do
     from(s in StudentClass)
     |> where([s], s.is_dropped == false)
     |> group_by([s], s.class_id)
     |> select([s], %{class_id: s.class_id, active: count(s.class_id)})
-  end
-
-  defp get_student_classes_inactive_subquery() do
-    from(s in StudentClass)
-    |> where([s], s.is_dropped == true)
-    |> group_by([s], s.class_id)
-    |> select([s], %{class_id: s.class_id, inactive: count(s.class_id)})
   end
 end

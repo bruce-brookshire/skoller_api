@@ -103,6 +103,7 @@ defmodule Skoller.Students.StudentAnalytics do
       on: i_m_a_c.student_id == s.id
     )
     |> join(:left, [u, s], f in subquery(aggregated_majors_subquery()), on: f.student_id == s.id)
+    |> order_by([u, s], desc: u.inserted_at)
     |> select(
       [
         u,
