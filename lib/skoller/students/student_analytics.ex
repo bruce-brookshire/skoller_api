@@ -99,7 +99,7 @@ defmodule Skoller.Students.StudentAnalytics do
     |> join(
       :left,
       [u, s],
-      i_m_a_c in subquery(modification_actions_count_subquery(active_sc_subq)),
+      i_m_a_c in subquery(modification_actions_count_subquery(inactive_sc_subq)),
       on: i_m_a_c.student_id == s.id
     )
     |> join(:left, [u, s], f in subquery(aggregated_majors_subquery()), on: f.student_id == s.id)
