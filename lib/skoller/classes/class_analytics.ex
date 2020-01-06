@@ -32,7 +32,7 @@ defmodule Skoller.Classes.ClassAnalytics do
     |> join(:left, [c], l_e in subquery(enrolled_through_link()), on: l_e.class_id == c.id)
     |> order_by([c], desc: c.inserted_at)
     |> select([c, p, s, a_c, a_g, m_c, m_a, c_a, c_i, l_e], [
-      c.inserted_at,
+      fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", c.inserted_at),
       c.name,
       c.class_status_id,
       s.name,

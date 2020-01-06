@@ -75,7 +75,14 @@ defmodule Skoller.Analytics.Jobs do
     [
       "School Creation Date," <>
         "School Name," <>
-        "City," <> "State," <> "Timezone," <> "Email Domains," <> "Color," <> "# of Accounts\r\n"
+        "School City," <>
+        "School State," <>
+        "Timezone," <>
+        "Email Domain," <>
+        "Color," <>
+        "Accounts in Active Term," <>
+        "Accounts in Inactive Term," <>
+        "Sign ups with Custom Links," <> "Sign ups with Enroll Links," <> "Total Accounts\r\n"
       | list
     ]
   end

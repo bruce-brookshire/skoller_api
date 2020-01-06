@@ -188,13 +188,6 @@ defmodule Skoller.Students do
     end
   end
 
-  @doc """
-  Gets a list of `Skoller.Students.Student` who have school as their main school.
-  """
-  def get_main_school_students(school) do
-    from(student in Student, where: student.primary_school_id == ^school.id) |> Repo.all()
-  end
-
   @student_point_signup_type 2
 
   def get_org_raise_effort_for_student(%Student{id: student_id}) do
