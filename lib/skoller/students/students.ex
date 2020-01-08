@@ -190,39 +190,71 @@ defmodule Skoller.Students do
 
   @student_point_signup_type 2
 
-  def get_org_raise_effort_for_student(%Student{id: student_id}) do
-    org =
-      from(s in Signup)
-      |> join(:inner, [s], o in Organization,
-        on: o.custom_signup_link_id == s.custom_signup_link_id
-      )
-      |> where([s, o], s.student_id == ^student_id)
-      |> select([s, o], o)
-      |> Repo.one()
+  def get_org_raise_effort_for_student(%Student{id: student_id, primary_school_id: school_id}) do
+    from(s in Signup)
+    |> join(:inner, [s], o in Organization, on: o.custom_signup_link_id == s.custom_signup_link_id)
+    |> join(:left, [s, o], cr_d in subquery(raise_direct_subquery(school_id)),
+      on: cr_d.custom_signup_link_id == o.custom_signup_link_id
+    )
+    |> join(:left, [s, o], cr_i in subquery(raise_indirect_subquery(school_id)),
+      on: cr_i.custom_signup_link_id == o.custom_signup_link_id
+    )
+    |> join(:left, [s, o], or_d in subquery(raise_direct_subquery(nil)),
+      on: or_d.custom_signup_link_id == o.custom_signup_link_id
+    )
+    |> join(:left, [s, o], or_i in subquery(raise_indirect_subquery(nil)),
+      on: or_i.custom_signup_link_id == o.custom_signup_link_id
+    )
+    |> join(:left, [s, o], ps in subquery(personal_signups()), on: ps.student_id == s.id)
+    |> where([s, o], s.student_id == ^student_id)
+    |> select([s, o, cr_d, cr_i, or_d, or_i, ps], %{
+      org_signups:
+        fragment("COALESCE(?, 0)", or_d.count) + fragment("COALESCE(?, 0)", or_i.count),
+      chapter_signups:
+        fragment("COALESCE(?, 0)", cr_i.count) + fragment("COALESCE(?, 0)", cr_d.count),
+      personal_signups: fragment("COALESCE(?, 0)", ps.count),
+      org_id: o.id,
+      org_name: o.name
+    })
+    |> Repo.one()
+  end
 
-    case org do
-      %Organization{name: org_name, id: org_id, custom_signup_link_id: link_id} ->
-        org_signups = Skoller.CustomSignups.get_link_signups_by_id(link_id)
+  defp raise_direct_subquery(primary_school_id) do
+    from(s in Student)
+    |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
+    |> filter_chapter(primary_school_id)
+    |> group_by([s, cs], cs.custom_signup_link_id)
+    |> select([s, cs], %{
+      custom_signup_link_id: cs.custom_signup_link_id,
+      count: count(cs.custom_signup_link_id)
+    })
+  end
 
-        personal_signups =
-          from(s in StudentPoint)
-          |> where(
-            [s],
-            s.student_id == ^student_id and s.student_point_type_id == @student_point_signup_type
-          )
-          |> group_by([s], s.student_id)
-          |> select([s], count(s.student_id))
-          |> Repo.one()
+  defp raise_indirect_subquery(primary_school_id) do
+    from(s in Student)
+    |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
+    |> join(:inner, [s, cs], p in StudentPoint, on: p.student_id == s.id)
+    |> where([s, cs, p], p.student_point_type_id == @student_point_signup_type)
+    |> filter_chapter(primary_school_id)
+    |> group_by([s, cs, p], cs.custom_signup_link_id)
+    |> select([s, cs], %{
+      custom_signup_link_id: cs.custom_signup_link_id,
+      count: count(cs.custom_signup_link_id)
+    })
+  end
 
-        %{
-          org_signups: org_signups,
-          personal_signups: personal_signups || 0,
-          org_id: org_id,
-          org_name: org_name
-        }
+  defp filter_chapter(query, nil), do: query
 
-      nil ->
-        nil
-    end
+  defp filter_chapter(query, school_id),
+    do: where(query, [s], s.primary_school_id == ^school_id)
+
+  defp personal_signups() do
+    from(s in StudentPoint)
+    |> where([s], s.student_point_type_id == @student_point_signup_type)
+    |> group_by([s], s.student_id)
+    |> select([s], %{
+      student_id: s.student_id,
+      count: count(s.student_id)
+    })
   end
 end
