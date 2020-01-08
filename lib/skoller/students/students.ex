@@ -191,23 +191,24 @@ defmodule Skoller.Students do
   @student_point_signup_type 2
 
   def get_org_raise_effort_for_student(%Student{id: student_id, primary_school_id: school_id}) do
-    from(s in Signup)
-    |> join(:inner, [s], o in Organization, on: o.custom_signup_link_id == s.custom_signup_link_id)
-    |> join(:left, [s, o], cr_d in subquery(raise_direct_subquery(school_id)),
+    from(st in Student)
+    |> join(:left, [st], s in Signup, on: st.id == s.student_id)
+    |> join(:left, [st, s], o in Organization, on: o.custom_signup_link_id == s.custom_signup_link_id)
+    |> join(:left, [st, s, o], cr_d in subquery(raise_direct_subquery(school_id)),
       on: cr_d.custom_signup_link_id == o.custom_signup_link_id
     )
-    |> join(:left, [s, o], cr_i in subquery(raise_indirect_subquery(school_id)),
+    |> join(:left, [st, s, o], cr_i in subquery(raise_indirect_subquery(school_id)),
       on: cr_i.custom_signup_link_id == o.custom_signup_link_id
     )
-    |> join(:left, [s, o], or_d in subquery(raise_direct_subquery(nil)),
+    |> join(:left, [st, s, o], or_d in subquery(raise_direct_subquery(nil)),
       on: or_d.custom_signup_link_id == o.custom_signup_link_id
     )
-    |> join(:left, [s, o], or_i in subquery(raise_indirect_subquery(nil)),
+    |> join(:left, [st, s, o], or_i in subquery(raise_indirect_subquery(nil)),
       on: or_i.custom_signup_link_id == o.custom_signup_link_id
     )
-    |> join(:left, [s, o], ps in subquery(personal_signups()), on: ps.student_id == s.id)
-    |> where([s, o], s.student_id == ^student_id)
-    |> select([s, o, cr_d, cr_i, or_d, or_i, ps], %{
+    |> join(:left, [st, s, o], ps in subquery(personal_signups()), on: ps.student_id == st.id)
+    |> where([st, s, o], st.id == ^student_id)
+    |> select([st, s, o, cr_d, cr_i, or_d, or_i, ps], %{
       org_signups:
         fragment("COALESCE(?, 0)", or_d.count) + fragment("COALESCE(?, 0)", or_i.count),
       chapter_signups:
