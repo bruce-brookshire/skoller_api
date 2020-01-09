@@ -84,7 +84,6 @@ defmodule Skoller.AirtableSyncJob do
     |> build_base()
     |> add_body(%{"records" => body, "typecast" => true})
     |> send_request()
-    |> IO.inspect()
   end
 
   defp perform_operation(jobs, @delete_type_id) do
@@ -125,16 +124,23 @@ defmodule Skoller.AirtableSyncJob do
                    name_last: name_last,
                    degree_type: %{name: degree}
                  } = student
-             } = user
+             } = user,
+           job_search_type: job_search_type
          } = profile
        ) do
     career_interests = (profile.career_interests || "") |> String.split("|", trim: true)
     regions = (profile.regions || "") |> String.split("|", trim: true)
     majors = fields_of_study |> Enum.map(& &1.field)
+    
+    job_type_name = case job_search_type do
+      %{name: job_type_name} -> job_type_name
+      _ -> nil
+    end
 
     %{
       "Names" => "#{name_first} #{name_last}",
-      "Graduation Year" => student.grad_year,
+      "Graduation Date" => profile.graduation_date |> format_date(),
+      "Job Search Type" => job_type_name,
       "Major" => majors,
       "Home State?" => translate_state_code(profile.state_code),
       "Career interests (up to 5):" => career_interests,
@@ -162,6 +168,21 @@ defmodule Skoller.AirtableSyncJob do
         {"Content-Type", "application/json"},
         {"Authorization", "Bearer " <> @airtable_api_token}
       ])
+
+  @month_code_translator %{
+    1 => "Jan.",
+    2 => "Feb.",
+    3 => "Mar.",
+    4 => "Apr.",
+    5 => "May",
+    6 => "Jun.",
+    7 => "Jul.",
+    8 => "Aug.",
+    9 => "Sep.",
+    10 => "Oct.",
+    11 => "Nov.",
+    12 => "Dec."
+  }
 
   @state_code_translator %{
     "AL" => "Alabama",
@@ -216,6 +237,16 @@ defmodule Skoller.AirtableSyncJob do
     "WI" => "Wisconsin",
     "WY" => "Wyoming"
   }
+
+  defp format_date(nil), do: nil
+
+  defp format_date(date) do
+    month = @month_code_translator[date.month]
+    year = date.year
+
+    "#{month} #{year}"
+  end
+
   defp translate_state_code(code),
     do: @state_code_translator[code]
 

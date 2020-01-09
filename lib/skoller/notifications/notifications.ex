@@ -168,7 +168,6 @@ defmodule Skoller.Notifications do
       count: count(sa.id)
     })
     |> Repo.all()
-    |> IO.inspect()
   end
 
   @doc """
