@@ -85,6 +85,7 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
         user: [
           student: [:primary_school, :fields_of_study, :degree_type]
         ],
+        job_search_type: [],
         ethnicity_type: []
       ]
     )
