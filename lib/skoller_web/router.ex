@@ -67,13 +67,6 @@ defmodule SkollerWeb.Router do
 
       # Analytics routes
       get "/analytics/csv/:type", Admin.AnalyticsController, :get_csv
-      # scope "/analytics" do
-      #   scope "/csv" do
-      #     get "/schools", Admin.AnalyticsController, :schools_csv
-      #     get "/classes", Admin.AnalyticsController, :classes_csv
-      #     get "/users", Admin.AnalyticsController, :users_csv
-      #   end
-      # end
 
       # User routes
       post "/users/create", Admin.UserController, :create
