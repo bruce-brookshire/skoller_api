@@ -87,14 +87,11 @@ defmodule Skoller.CustomSignups do
   `{:ok, Skoller.CustomSignups.Signup}` or `{:error, Ecto.Changeset}`
   """
   def track_signup(student_id, link_id) do
-    link =
-      get_link_by_id!(link_id)
-      |> IO.inspect()
+    link = get_link_by_id!(link_id)
 
     case link |> is_active do
       true ->
         Repo.insert(%Signup{custom_signup_link_id: link_id, student_id: student_id})
-        |> IO.inspect()
 
       false ->
         {:ok, nil}

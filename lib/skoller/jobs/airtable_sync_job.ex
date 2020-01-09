@@ -84,7 +84,6 @@ defmodule Skoller.AirtableSyncJob do
     |> build_base()
     |> add_body(%{"records" => body, "typecast" => true})
     |> send_request()
-    |> IO.inspect()
   end
 
   defp perform_operation(jobs, @delete_type_id) do
@@ -126,12 +125,17 @@ defmodule Skoller.AirtableSyncJob do
                    degree_type: %{name: degree}
                  } = student
              } = user,
-           job_search_type: %{name: job_type_name}
+           job_search_type: job_search_type
          } = profile
        ) do
     career_interests = (profile.career_interests || "") |> String.split("|", trim: true)
     regions = (profile.regions || "") |> String.split("|", trim: true)
     majors = fields_of_study |> Enum.map(& &1.field)
+    
+    job_type_name = case job_search_type do
+      %{name: job_type_name} -> job_type_name
+      _ -> nil
+    end
 
     %{
       "Names" => "#{name_first} #{name_last}",
@@ -154,7 +158,6 @@ defmodule Skoller.AirtableSyncJob do
       "Skoller Account?" => "Yes",
       "job_profile_id" => profile.id
     }
-    |> IO.inspect()
   end
 
   defp build_base(request),
@@ -234,11 +237,10 @@ defmodule Skoller.AirtableSyncJob do
     "WI" => "Wisconsin",
     "WY" => "Wyoming"
   }
-  
+
   defp format_date(nil), do: nil
 
   defp format_date(date) do
-    date.month |> IO.inspect()
     month = @month_code_translator[date.month]
     year = date.year
 

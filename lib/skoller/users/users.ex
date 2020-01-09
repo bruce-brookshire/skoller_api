@@ -103,7 +103,6 @@ defmodule Skoller.Users do
 
       {:error, _, failed_val, _} ->
         IO.puts("ATTENTION SIGNUP 404:")
-        IO.inspect(failed_val)
         {:error, failed_val}
     end
   end
