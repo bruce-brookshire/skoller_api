@@ -28,7 +28,6 @@ defmodule Skoller.StudentClasses.Notifications do
   def send_no_classes_notification(
         %{
           devices: devices,
-          org_name: org_name,
           opts: %{org_name: org_name}
         },
         email_type
