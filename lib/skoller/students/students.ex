@@ -193,7 +193,9 @@ defmodule Skoller.Students do
   def get_org_raise_effort_for_student(%Student{id: student_id, primary_school_id: school_id}) do
     from(st in Student)
     |> join(:left, [st], s in Signup, on: st.id == s.student_id)
-    |> join(:left, [st, s], o in Organization, on: o.custom_signup_link_id == s.custom_signup_link_id)
+    |> join(:left, [st, s], o in Organization,
+      on: o.custom_signup_link_id == s.custom_signup_link_id
+    )
     |> join(:left, [st, s, o], cr_d in subquery(raise_direct_subquery(school_id)),
       on: cr_d.custom_signup_link_id == o.custom_signup_link_id
     )
@@ -224,6 +226,7 @@ defmodule Skoller.Students do
     from(s in Student)
     |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
     |> filter_chapter(primary_school_id)
+    |> where([s, cs], fragment("? > '2019-05-31'", cs.inserted_at))
     |> group_by([s, cs], cs.custom_signup_link_id)
     |> select([s, cs], %{
       custom_signup_link_id: cs.custom_signup_link_id,
@@ -235,7 +238,11 @@ defmodule Skoller.Students do
     from(s in Student)
     |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
     |> join(:inner, [s, cs], p in StudentPoint, on: p.student_id == s.id)
-    |> where([s, cs, p], p.student_point_type_id == @student_point_signup_type)
+    |> where(
+      [s, cs, p],
+      p.student_point_type_id == @student_point_signup_type and
+        fragment("? > '2019-05-31'", p.inserted_at)
+    )
     |> filter_chapter(primary_school_id)
     |> group_by([s, cs, p], cs.custom_signup_link_id)
     |> select([s, cs], %{
@@ -251,7 +258,11 @@ defmodule Skoller.Students do
 
   defp personal_signups() do
     from(s in StudentPoint)
-    |> where([s], s.student_point_type_id == @student_point_signup_type)
+    |> where(
+      [s],
+      s.student_point_type_id == @student_point_signup_type and
+        fragment("? > '2019-05-31'", s.inserted_at)
+    )
     |> group_by([s], s.student_id)
     |> select([s], %{
       student_id: s.student_id,
