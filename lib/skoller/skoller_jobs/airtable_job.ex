@@ -21,7 +21,6 @@ defmodule Skoller.SkollerJobs.AirtableJobs.AirtableJob do
     field :airtable_object_id, :string
     field :airtable_job_type_id, :id
     field :job_profile_id, :id
-    # airtable_jobs_airtable_object_id_index
 
     timestamps()
 

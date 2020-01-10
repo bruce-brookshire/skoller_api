@@ -167,11 +167,20 @@ defmodule Skoller.Users do
   defp check_airtable_sync_job(_, _, _), do: :noop
 
   def delete_user(user_id) do
-    user = Repo.get(User, user_id) |> Repo.preload([:student], force: false)
+    user = Repo.get(User, user_id) |> Repo.preload([:student, :job_profile], force: false)
 
     if user == nil do
       {:error, 404}
     else
+      case user.job_profile do
+        %JobProfiles.JobProfile{airtable_object_id: object_id} = profile
+        when not is_nil(object_id) ->
+          AirtableJobs.on_profile_delete(profile)
+
+        _ ->
+          nil
+      end
+
       user_device_query =
         from(d in Device)
         |> where([d], d.user_id == ^user_id)

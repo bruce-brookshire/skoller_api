@@ -9,6 +9,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Roles.Role
   alias Skoller.UserReports.Report
   alias Skoller.Services.Authentication
+  alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
   schema "users" do
     field :email, :string
@@ -21,6 +22,8 @@ defmodule Skoller.Users.User do
     belongs_to :student, Student
     many_to_many :roles, Role, join_through: "user_roles"
     has_many :reports, Report
+
+    has_one :job_profile, JobProfile
 
     timestamps()
   end

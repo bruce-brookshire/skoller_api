@@ -114,4 +114,44 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
     |> where([a], a.job_profile_id == ^profile_id)
     |> Repo.exists?()
   end
+
+  @doc """
+  Force Airtable re-sync for profiles
+  """
+  def force_airtable_resync() do
+    alias Ecto.Multi
+
+    current_timestamp =
+      NaiveDateTime.utc_now()
+      |> NaiveDateTime.truncate(:second)
+
+    Multi.new()
+    |> Multi.run(:get_profiles, fn _, _ ->
+      results =
+        from(p in JobProfile)
+        |> join(:left, [p], j in AirtableJob, on: j.job_profile_id == p.id)
+        |> where([p, j], is_nil(j.id) and not is_nil(p.airtable_object_id))
+        |> select([p, j], %{profile_id: p.id, airtable_object_id: p.airtable_object_id})
+        |> Repo.all()
+
+      {:ok, results}
+    end)
+    |> Multi.run(:insert_profile_jobs, fn _, %{get_profiles: profiles} ->
+      jobs =
+        profiles
+        |> Enum.map(
+          &%{
+            airtable_job_type_id: @update_type_id,
+            is_running: false,
+            airtable_object_id: &1.airtable_object_id,
+            job_profile_id: &1.profile_id,
+            inserted_at: current_timestamp,
+            updated_at: current_timestamp
+          }
+        )
+
+      {:ok, Repo.insert_all(AirtableJob, jobs)}
+    end)
+    |> Repo.transaction()
+  end
 end

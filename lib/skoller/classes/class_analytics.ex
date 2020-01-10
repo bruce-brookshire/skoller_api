@@ -7,6 +7,7 @@ defmodule Skoller.Classes.ClassAnalytics do
   alias Skoller.Schools.School
   alias Skoller.Assignments.Assignment
   alias Skoller.StudentAssignments.StudentAssignment
+  alias Skoller.ClassStatuses.Status
   alias Skoller.Mods.Action
   alias Skoller.Mods.Mod
   alias Skoller.Repo
@@ -30,14 +31,15 @@ defmodule Skoller.Classes.ClassAnalytics do
     |> join(:left, [c], c_a in subquery(student_class_subquery(true)), on: c_a.class_id == c.id)
     |> join(:left, [c], c_i in subquery(student_class_subquery(false)), on: c_i.class_id == c.id)
     |> join(:left, [c], l_e in subquery(enrolled_through_link()), on: l_e.class_id == c.id)
+    |> join(:left, [c], st in Status, on: c.class_status_id == st.id)
     |> order_by([c], desc: c.inserted_at)
-    |> select([c, p, s, a_c, a_g, m_c, m_a, c_a, c_i, l_e], [
+    |> select([c, p, s, a_c, a_g, m_c, m_a, c_a, c_i, l_e, st], [
       fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", c.inserted_at),
       c.name,
-      c.class_status_id,
+      st.name,
       s.name,
       p.name,
-      p.class_period_status_id,
+      p.name,
       c_a.count,
       c_i.count,
       l_e.count,
@@ -52,7 +54,7 @@ defmodule Skoller.Classes.ClassAnalytics do
 
   defp student_class_subquery(is_active) do
     from(sc in StudentClass)
-    |> where([sc], sc.is_dropped == ^is_active)
+    |> where([sc], sc.is_dropped == not (^is_active))
     |> group_by([sc], sc.class_id)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.class_id)})
   end
