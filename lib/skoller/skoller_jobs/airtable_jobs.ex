@@ -150,9 +150,7 @@ defmodule Skoller.SkollerJobs.AirtableJobs do
           }
         )
 
-      result = Repo.insert_all(AirtableJob, jobs) |> IO.inspect()
-
-      {:ok, result}
+      {:ok, Repo.insert_all(AirtableJob, jobs)}
     end)
     |> Repo.transaction()
   end
