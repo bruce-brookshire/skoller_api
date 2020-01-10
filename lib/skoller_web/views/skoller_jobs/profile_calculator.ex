@@ -39,7 +39,7 @@ defmodule SkollerWeb.SkollerJobs.ProfileCalculator do
 
   defp work_preferences(total), do: total
 
-  defp profile_pic({profile, %{avatar: avatar} = user, value}) when not is_nil(avatar),
+  defp profile_pic({profile, %{pic_path: avatar} = user, value}) when not is_nil(avatar),
     do: {profile, user, value + 0.1}
 
   defp profile_pic(total), do: total
