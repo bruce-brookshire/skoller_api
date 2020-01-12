@@ -82,7 +82,7 @@ defmodule Skoller.StudentClasses.Emails do
       |> Map.put(:unsub_path, unsub_url(user.id))
 
     %{
-      is_org: Map.get(opts, "org_name") != nil,
+      is_org: Map.get(opts, "org_name") in [@aopi_name, @asa_name],
       template_data: %{to: user.email, form: template_data}
     }
   end
