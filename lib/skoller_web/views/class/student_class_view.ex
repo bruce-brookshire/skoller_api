@@ -7,6 +7,7 @@ defmodule SkollerWeb.Class.StudentClassView do
   alias SkollerWeb.Class.WeightView
   alias Skoller.Repo
   alias SkollerWeb.Class.StudentAssignmentView
+  alias SkollerWeb.Class.ChangeRequestView
   alias SkollerWeb.Assignment.ModView
   alias Skoller.StudentAssignments
   alias SkollerWeb.StudentView
@@ -21,7 +22,17 @@ defmodule SkollerWeb.Class.StudentClassView do
     render_one(student_class, StudentClassView, "student_class-detail.json")
   end
 
-  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students, documents: documents} = student_class}) do
+  def render("student_class-detail.json", %{
+        student_class:
+          %{
+            grade: grade,
+            completion: completion,
+            enrollment: enrollment,
+            new_assignments: new_assignments,
+            students: students,
+            documents: documents
+          } = student_class
+      }) do
     student_class
     |> base_detail_student_class()
     |> Map.merge(%{
@@ -34,7 +45,15 @@ defmodule SkollerWeb.Class.StudentClassView do
     })
   end
 
-  def render("student_class-detail.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do
+  def render("student_class-detail.json", %{
+        student_class:
+          %{
+            grade: grade,
+            completion: completion,
+            enrollment: enrollment,
+            new_assignments: new_assignments
+          } = student_class
+      }) do
     student_class
     |> base_detail_student_class()
     |> Map.merge(%{
@@ -49,7 +68,16 @@ defmodule SkollerWeb.Class.StudentClassView do
     base_detail_student_class(student_class)
   end
 
-  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments, students: students} = student_class}) do
+  def render("student_class.json", %{
+        student_class:
+          %{
+            grade: grade,
+            completion: completion,
+            enrollment: enrollment,
+            new_assignments: new_assignments,
+            students: students
+          } = student_class
+      }) do
     student_class
     |> base_student_class()
     |> Map.merge(%{
@@ -61,7 +89,15 @@ defmodule SkollerWeb.Class.StudentClassView do
     })
   end
 
-  def render("student_class.json", %{student_class: %{grade: grade, completion: completion, enrollment: enrollment, new_assignments: new_assignments} = student_class}) do
+  def render("student_class.json", %{
+        student_class:
+          %{
+            grade: grade,
+            completion: completion,
+            enrollment: enrollment,
+            new_assignments: new_assignments
+          } = student_class
+      }) do
     student_class
     |> base_student_class()
     |> Map.merge(%{
@@ -78,29 +114,51 @@ defmodule SkollerWeb.Class.StudentClassView do
 
   defp base_detail_student_class(student_class) do
     student_class = student_class |> Repo.preload([:class, :student_assignments])
-    class = student_class.class |> Repo.preload(:weights)
+
+    class =
+      student_class.class
+      |> Repo.preload([
+        :weights,
+        change_requests: :class_change_request_members
+      ])
+      |> IO.inspect
+
     %{
       student_id: student_class.student_id,
       color: student_class.color,
       is_notifications: student_class.is_notifications,
-      assignments: render_many(get_ordered_assignments(student_class), StudentAssignmentView, "student_assignment.json"),
+      change_requests: render_many(class.change_requests, ChangeRequestView, "change_request.json") |> IO.inspect,
+      assignments:
+        render_many(
+          get_ordered_assignments(student_class),
+          StudentAssignmentView,
+          "student_assignment.json"
+        ),
       weights: render_many(class.weights, WeightView, "weight.json"),
-      enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
-    } 
+      enrollment_link:
+        System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
+    }
     |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
   end
 
   defp base_student_class(student_class) do
     student_class = student_class |> Repo.preload([:class, :student_assignments])
     class = student_class.class |> Repo.preload(:weights)
+
     %{
       student_id: student_class.student_id,
       color: student_class.color,
       is_notifications: student_class.is_notifications,
-      assignments: render_many(get_ordered_assignments(student_class), StudentAssignmentView, "student_assignment-short.json"),
+      assignments:
+        render_many(
+          get_ordered_assignments(student_class),
+          StudentAssignmentView,
+          "student_assignment-short.json"
+        ),
       weights: render_many(class.weights, WeightView, "weight.json"),
-      enrollment_link: System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
-    } 
+      enrollment_link:
+        System.get_env("WEB_URL") <> @enrollment_path <> student_class.enrollment_link
+    }
     |> Map.merge(render_one(student_class.class, ClassView, "class.json"))
   end
 
@@ -110,14 +168,15 @@ defmodule SkollerWeb.Class.StudentClassView do
   end
 
   defp order(enumerable) do
-    null_due = enumerable
-    |> Enum.filter(&is_nil(&1.due))
+    null_due =
+      enumerable
+      |> Enum.filter(&is_nil(&1.due))
 
-    sorted = enumerable
-    |> Enum.filter(&not(is_nil(&1.due)))
-    |> Enum.sort(&DateTime.compare(&1.due, &2.due) in [:lt, :eq])
+    sorted =
+      enumerable
+      |> Enum.filter(&(not is_nil(&1.due)))
+      |> Enum.sort(&(DateTime.compare(&1.due, &2.due) in [:lt, :eq]))
 
     null_due ++ sorted
   end
 end
-  
