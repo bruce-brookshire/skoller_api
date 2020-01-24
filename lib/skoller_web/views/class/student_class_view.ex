@@ -121,7 +121,6 @@ defmodule SkollerWeb.Class.StudentClassView do
         :weights,
         change_requests: :class_change_request_members
       ])
-      |> IO.inspect
 
     %{
       student_id: student_class.student_id,

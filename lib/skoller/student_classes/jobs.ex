@@ -90,10 +90,17 @@ defmodule Skoller.StudentClasses.Jobs do
 
   defp check_sending_time(datetime, email_type) do
     converted_datetime = datetime |> Timex.Timezone.convert("America/Chicago")
-    {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
 
-    email_time = email_type.send_time |> Time.from_iso8601!()
+    case DateTime.to_date(converted_datetime) |> Date.day_of_week() do
+      num when num == 1 or num == 3  ->
+        {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
 
-    Time.compare(time, email_time)
+        email_time = email_type.send_time |> Time.from_iso8601!()
+
+        Time.compare(time, email_time)
+      _ ->
+        :ne # Not equal (Not a real comparison value, 
+            # but the use case of this function is private and definitively known)
+    end
   end
 end
