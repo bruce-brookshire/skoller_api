@@ -2,7 +2,6 @@ defmodule Mix.Tasks.Seed.Dev do
   @moduledoc false
 
   use Mix.Task
-  import Mix.EctoSQL
 
   alias Skoller.Repo
   alias Skoller.Users.User
@@ -22,12 +21,14 @@ defmodule Mix.Tasks.Seed.Dev do
   alias Skoller.Services.Authentication
 
   def run(_) do
-    ensure_started(Repo, [])
+    Application.ensure_started(Repo)
  
     {:ok, date1, _offset2} = DateTime.from_iso8601("2018-10-12T00:00:00Z")
     {:ok, date2, _offset2} = DateTime.from_iso8601("2019-10-12T00:00:00Z")
     
 
+    IO.inspect "HEllo"
+    
     pass = Authentication.hash_password("password")
     
     {:ok, time_pre} = Time.new(13, 0, 0, 0)
