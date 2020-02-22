@@ -1,0 +1,44 @@
+
+<Jobs>
+    <Job Action="Post">
+        <AdvertiserName>123 Recruitment</AdvertiserName>
+        <AdvertiserType ValueID="15890">Agency</AdvertiserType>
+        <SenderReference>Example123/11514</SenderReference>
+        <DisplayReference>Example123</DisplayReference>
+        <Classification ValueID="6215">I.T. &amp; Communications</Classification>
+        <SubClassification>Other</SubClassification>
+        <Position><![CDATA[Software Developer]]></Position>
+        <Description><![CDATA[Experienced software developer required for exciting
+            new startup company. Must have at least 2 years commercial experience in
+            C#, ASP.Net and SQL, and be use to working in a team
+            environment.]]></Description>
+        <Country ValueID="246">United Kingdom</Country>
+        <Location ValueID="12037">Essex</Location>
+        <Area ValueID="94722">Colchester</Area>
+        <PostalCode>CO1 8PD</PostalCode>
+        <ApplicationURL>http://www.jobg8.com/Application.aspx?ABC123</ApplicationURL>
+        <DescriptionURL>http://www.jobg8.com/Application.aspx?ABC123</DescriptionURL>
+        <Language ValueID="120036">2057</Language>
+        <ContactName>Joe Bloggs</ContactName>
+        <EmploymentType ValueID="2164">Contract</EmploymentType>
+        <StartDate>As soon as possible</StartDate>
+        <Duration>6 Months</Duration>
+        <WorkHours ValueID="2190">Full Time</WorkHours>
+        <SalaryCurrency ValueID="1078">British Pound . GBP</SalaryCurrency>
+        <SalaryMinimum>2000</SalaryMinimum>
+        <SalaryMaximum>2000</SalaryMaximum>
+        <SalaryPeriod ValueID="2177">Monthly</SalaryPeriod>
+        <SalaryAdditional>Pension and Health Care</SalaryAdditional>
+        <JobSource>Job Source ABC</JobSource>
+        <JobSourceURL>http://www.JobSourceABC.com</JobSourceURL>
+        <VideoLinkURL></VideoLinkURL>
+        <AdditionalClassification1 ValueID="6208">Education</AdditionalClassification1>
+        <AdditionalClassification2></AdditionalClassification2>
+        <AdditionalClassification3></AdditionalClassification3>
+        <AdditionalClassification4></AdditionalClassification4>
+        <LogoURL>http://www.jobg8.com/1.png</LogoURL>
+        <JobType>APPLICATION</JobType>
+        <SellPrice>0.20</SellPrice>
+        <RevenueType>CPA</RevenueType>
+    </Job>
+</Jobs>

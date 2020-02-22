@@ -320,6 +320,7 @@ defmodule SkollerWeb.Router do
       get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
+      get "/job-listings", JobListingController, :show
     end
   end
 end
