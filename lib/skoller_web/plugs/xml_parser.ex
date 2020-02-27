@@ -1,5 +1,5 @@
 defmodule Plug.Parsers.XML do
-  @behavior Plug.Parsers
+  @behaviour Plug.Parsers
 
   import Plug.Conn
 
