@@ -1,9 +1,87 @@
-
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Jobs>
-    <Job Action="Delete"><AdvertiserName>Jobg8 Test Advertiserqwersd</AdvertiserName><AdvertiserType ValueID="15890">Agency</AdvertiserType><SenderReference>830907970_TESTJOB</SenderReference><DisplayReference>0VOH5fzLey8hiKRjtKEl1Db0SPaK7R_TESTJOB</DisplayReference><Classification ValueID="6219">Primary Industry</Classification><SubClassification></SubClassification><Position><![CDATA[Lead Cook]]></Position><Description><![CDATA[ LEAD COOK (Milwaukie) <p><strong>Compensation: $15-$16 per hour</strong><br /><strong>Full Time Position</strong><br /><strong>Job Location: 13121 SE McLoughlin Blvd near Park</strong></p> <p><strong>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</strong></p> <p><strong>Job Duties include:</strong><br />Oversee day-to-day culinary operations<br />Coordinate food and kitchenware orders<br />Check freshness and quality of ingredients<br />Assist in the development of menu items<br />Work with management to create a memorable experience for guests</p> <p><strong>Qualifications for this position include:</strong><br />Five years cooking experience in restaurant<br />Two years banquet experience<br />Knowledge of safety and health compliance standards<br />Written and verbal communication skills<br />Food handlers certification<br />Must pass background check & drug test</p> <p>- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</p><br> recblid 6ri0aqhwn3l6hay3bhiifuyq6ot346 <br><img src="https://www.jobg8.com/TESTTRACKING.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw" width="0" height="0" />]]></Description><Country ValueID="247">United States</Country><Location ValueID="15358">Oregon</Location><Area ValueID="15683">Portland</Area><PostalCode>97269</PostalCode><ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</ApplicationURL><DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</DescriptionURL><Language ValueID="120036">2057</Language><ContactName></ContactName><EmploymentType ValueID="2163">Permanent</EmploymentType><StartDate>Mon, 20 Jan 2020 19:58:26 UTC</StartDate><Duration></Duration><WorkHours ValueID="2188">Not Specified</WorkHours><SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency><SalaryMinimum></SalaryMinimum><SalaryMaximum></SalaryMaximum><SalaryPeriod ValueID="2178">Annual</SalaryPeriod><SalaryAdditional></SalaryAdditional><JobSource></JobSource><JobSourceURL></JobSourceURL><VideoLinkURL></VideoLinkURL><AdditionalClassification1 /><AdditionalClassification2 /><AdditionalClassification3 /><AdditionalClassification4 /><LogoURL></LogoURL><JobType>TRAFFIC</JobType><SellPrice>0.16</SellPrice><RevenueType>CPC</RevenueType>
+    <Job Action="Delete">
+        <AdvertiserName>Jobg8 Test Advertiserqwersd</AdvertiserName>
+        <AdvertiserType ValueID="15890">Agency</AdvertiserType>
+        <SenderReference>830907970_TESTJOB</SenderReference>
+        <DisplayReference>0VOH5fzLey8hiKRjtKEl1Db0SPaK7R_TESTJOB</DisplayReference>
+        <Classification ValueID="6219">Primary Industry</Classification>
+        <SubClassification></SubClassification>
+        <Position>
+            <![CDATA[Lead Cook]]>
+        </Position>
+        <Description>
+            not to much
+        </Description>
+        <Country ValueID="247">United States</Country>
+        <Location ValueID="15358">Oregon</Location>
+        <Area ValueID="15683">Portland</Area>
+        <PostalCode>97269</PostalCode>
+        <ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</ApplicationURL>
+        <DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</DescriptionURL>
+        <Language ValueID="120036">2057</Language>
+        <ContactName></ContactName>
+        <EmploymentType ValueID="2163">Permanent</EmploymentType>
+        <StartDate>Mon, 20 Jan 2020 19:58:26 UTC</StartDate>
+        <Duration></Duration>
+        <WorkHours ValueID="2188">Not Specified</WorkHours>
+        <SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency>
+        <SalaryMinimum></SalaryMinimum>
+        <SalaryMaximum></SalaryMaximum>
+        <SalaryPeriod ValueID="2178">Annual</SalaryPeriod>
+        <SalaryAdditional></SalaryAdditional>
+        <JobSource></JobSource>
+        <JobSourceURL></JobSourceURL>
+        <VideoLinkURL></VideoLinkURL>
+        <AdditionalClassification1 >Real Estate</AdditionalClassification1 >
+        <AdditionalClassification2 >Economics</AdditionalClassification2 >
+        <AdditionalClassification3 >Real Estate</AdditionalClassification3 >
+        <AdditionalClassification4 >Mathematics</AdditionalClassification4 >
+        <LogoURL></LogoURL>
+        <JobType>TRAFFIC</JobType>
+        <SellPrice>0.16</SellPrice>
+        <RevenueType>CPC</RevenueType>
     </Job>
-    <Job Action="Delete"><AdvertiserName>Jobg8 Test Advertiserz</AdvertiserName><AdvertiserType ValueID="15890">Agency</AdvertiserType><SenderReference>830907998_TESTJOB</SenderReference><DisplayReference>DfRAcmV6ooXoNX2cdnU7aRF36ODeh4_TESTJOB</DisplayReference><Classification ValueID="6209">Engineering</Classification><SubClassification></SubClassification><Position><![CDATA[Senior Engineer - MN]]></Position><Description><![CDATA[<p>Target Enterprise, Inc. is seeking a full-time Senior Engineer at our offices in Minneapolis, MN. The Senior Engineer will be responsible for driving industry-leading software development technologies in support of every angle of the business, and help ensure that Target operates smoothly, securely and reliably.</p> <p>This position requires a Bachelor's degree or equivalent in Computer Science, Computer Engineering, or a related field and 5 years related (progressive, post-baccalaureate) experience. Must also have 12 months of demonstrated ability (which may have been gained concurrently) with each of the following: (1) leading and conducting code review, design review, testing, and debugging activities at the application level; (2) writing code to build functional user interfaces by using software development practices and enterprise coding standards; (3) configuring continuous integration and deployment workflow to automate the test, build and deployment cycle; (4) developing tools and scripts to automate repetitive tasks in the development workflow; and (5) utilizing the following technologies: Java Springboot, Microsoft .Net, AngularJS, MongoDB, Kubernetes, Docker, Jenkins, Drone, Github, PostgresDB, Microsoft SQL Server, Microsoft Infopath. </p><br> recblid c43i1ie77js7tbyztd9a9rang7dx70 <br><img src="https://www.jobg8.com/TESTTRACKING.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy" width="0" height="0" />]]></Description><Country ValueID="247">United States</Country><Location ValueID="15344">Minnesota</Location><Area ValueID="32935">Minneapolis </Area><PostalCode>55401</PostalCode><ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</ApplicationURL><DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</DescriptionURL><Language ValueID="120036">2057</Language><ContactName></ContactName><EmploymentType ValueID="2163">Permanent</EmploymentType><StartDate>Mon, 20 Jan 2020 16:36:28 UTC</StartDate><Duration></Duration><WorkHours ValueID="2188">Not Specified</WorkHours><SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency><SalaryMinimum></SalaryMinimum><SalaryMaximum></SalaryMaximum><SalaryPeriod ValueID="2178">Annual</SalaryPeriod><SalaryAdditional></SalaryAdditional><JobSource></JobSource><JobSourceURL></JobSourceURL><VideoLinkURL></VideoLinkURL><AdditionalClassification1 /><AdditionalClassification2 /><AdditionalClassification3 /><AdditionalClassification4 /><LogoURL></LogoURL><JobType>ATS</JobType><SellPrice>0.23</SellPrice><RevenueType>CPC</RevenueType>
+    <Job Action="Delete">
+        <AdvertiserName>Jobg8 Test Advertiserz</AdvertiserName>
+        <AdvertiserType ValueID="15890">Agency</AdvertiserType>
+        <SenderReference>830907998_TESTJOB</SenderReference>
+        <DisplayReference>DfRAcmV6ooXoNX2cdnU7aRF36ODeh4_TESTJOB</DisplayReference>
+        <Classification ValueID="6209">Primary Engineering</Classification>
+        <SubClassification></SubClassification>
+        <Position>
+            <![CDATA[Senior Engineer - MN]]>
+        </Position>
+        <Description>
+            Target Enterprise, Inc. is seeking
+        </Description>
+        <Country ValueID="247">United States</Country>
+        <Location ValueID="15344">Minnesota</Location>
+        <Area ValueID="32935">Minneapolis </Area>
+        <PostalCode>55401</PostalCode>
+        <ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</ApplicationURL>
+        <DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</DescriptionURL>
+        <Language ValueID="120036">2057</Language>
+        <ContactName></ContactName>
+        <EmploymentType ValueID="2163">Permanent</EmploymentType>
+        <StartDate>Mon, 20 Jan 2020 16:36:28 UTC</StartDate>
+        <Duration></Duration>
+        <WorkHours ValueID="2188">Not Specified</WorkHours>
+        <SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency>
+        <SalaryMinimum></SalaryMinimum>
+        <SalaryMaximum></SalaryMaximum>
+        <SalaryPeriod ValueID="2178">Annual</SalaryPeriod>
+        <SalaryAdditional></SalaryAdditional>
+        <JobSource></JobSource>
+        <JobSourceURL></JobSourceURL>
+        <VideoLinkURL></VideoLinkURL>
+        <AdditionalClassification1 >Real Estate</AdditionalClassification1 >
+        <AdditionalClassification2 >Library</AdditionalClassification2 >
+        <AdditionalClassification3 >Canucks</AdditionalClassification3 >
+        <AdditionalClassification4 >Sleepy</AdditionalClassification4 >
+        <LogoURL></LogoURL>
+        <JobType>ATS</JobType>
+        <SellPrice>0.23</SellPrice>
+        <RevenueType>CPC</RevenueType>
     </Job>
 </Jobs>
-

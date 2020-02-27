@@ -38,8 +38,8 @@ defmodule Skoller.Repo.Migrations.JobListings do
       add(:work_hours, :string, size: 70, null: false) # Full time, part time, etc
       add(:employment_type, :string, size: 70, null: false) # Contract, Temp, permanent, etc.
 
-      add(:start_date, :string, size: 70) # No clue what format this will be
-      add(:description_html, :string, size: 10000, null: false) # HTML description of the job
+      add(:start_date, :string, size: 70) # String
+      add(:description_html, :string, size: 10_000, null: false) # HTML description of the job
 
       # Resources
       add(:job_source_url, :string, size: 255) # URL of company offering job
@@ -62,14 +62,14 @@ defmodule Skoller.Repo.Migrations.JobListings do
 
     # Table of classification names
     create table(:job_gate_classifications) do
-      add(:classification, :string, size: 100, null: false)
+      add(:name, :string, size: 100, null: false)
     end
 
-    create(unique_index(:job_gate_classifications, [:classification]))
+    create(unique_index(:job_gate_classifications, [:name]))
 
     # Join table for job type classifications
     create table(:job_gate_classification_joiner) do
-      add(:job_gate_listing_id, references(:job_gate_listings, column: :sender_reference, type: :string, on_delete: :delete_all))
+      add(:job_gate_sender_reference, references(:job_gate_listings, column: :sender_reference, type: :string, on_delete: :delete_all))
       add(:job_gate_classification_id, references(:job_gate_classifications, on_delete: :delete_all))
       add(:is_primary, :boolean, default: false)
     end

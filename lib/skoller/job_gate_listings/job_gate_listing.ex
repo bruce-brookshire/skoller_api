@@ -2,8 +2,10 @@ defmodule Skoller.JobGateListings.JobGateListing do
   use Ecto.Schema
 
   import Ecto.Changeset
-  
+
   alias Skoller.JobGateListings.JobGateListing
+  alias Skoller.JobGateListings.JobGateClassification
+  alias Skoller.JobGateListings.JobGateClassificationJoiner
 
   @primary_key {:sender_reference, :string, autogenerate: false}
   schema "job_gate_listings" do
@@ -63,6 +65,10 @@ defmodule Skoller.JobGateListings.JobGateListing do
     # Type of the advertiser
     field :advertiser_type, :string
 
+    many_to_many :classifications, JobGateClassification,
+      join_through: JobGateClassificationJoiner,
+      join_keys: [job_gate_sender_reference: :sender_reference, job_gate_classification_id: :id]
+
     timestamps()
   end
 
@@ -98,16 +104,21 @@ defmodule Skoller.JobGateListings.JobGateListing do
 
   @all_fields @req_fields ++ @opt_fields
 
-  def insert_changeset(%{} = attrs) do
-    %JobGateListing{}
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-    |> unique_constraint(:sender_reference, name: :job_gate_listings_pkey)
-  end
+  def insert_changeset(%{} = attrs),
+    do:
+      base_changeset(%JobGateListing{}, attrs)
+      |> unique_constraint(:sender_reference, name: :job_gate_listings_pkey)
 
-  def update_changeset(%JobGateListing{} = listing, %{} = attrs) do
-    listing
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
-  end
+  def update_changeset(%JobGateListing{} = listing, %{} = attrs),
+    do: base_changeset(listing, attrs)
+
+  defp base_changeset(listing, attrs),
+    do:
+      listing
+      |> cast(attrs, @all_fields)
+      |> validate_required(@req_fields)
+      |> validate_length(:description_html,
+        max: 10_000,
+        message: "Description longer than 10,000 characters"
+      )
 end
