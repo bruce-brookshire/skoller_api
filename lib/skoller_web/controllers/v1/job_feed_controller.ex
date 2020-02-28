@@ -2,6 +2,7 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
   use SkollerWeb, :controller
 
   alias Skoller.JobGateListings
+  alias Skoller.FileUploaders.JobG8Docs
   alias Skoller.JobGateListings.Classification
   alias Skoller.JobGateListings.ClassificationJoiner
 
@@ -35,7 +36,9 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
     "WorkHours" => :work_hours
   }
 
-  def create(conn, params) do
+  def create(%{unparsed_body_params: body} = conn, params) do
+    start_cache_body_task(body)
+
     conn
     |> put_resp_content_type("text/xml")
     |> put_resp_header(
@@ -62,6 +65,21 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
     |> Enum.map(&generate_listing_result/1)
     |> Enum.join()
     |> aggregate_body
+  end
+
+  def start_cache_body_task(body) do
+    Task.start(SkollerWeb.Api.V1.JobFeedController, :cache_body, [body])
+    body
+  end
+
+  def cache_body(body) do
+    current_time = DateTime.utc_now() |> DateTime.truncate(:second)
+    file_name = "#{current_time}_listing_post"
+    file_path = "./" <> file_name
+
+    File.write(file_path, body)
+    JobG8Docs.store({file_path, %{id: file_name}})
+    File.rm(file_path)
   end
 
   defp preprocess_job_listing(%{} = listing),

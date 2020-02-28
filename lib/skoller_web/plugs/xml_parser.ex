@@ -11,7 +11,7 @@ defmodule Plug.Parsers.XML do
   def parse(conn, _, _, _, _), do: {:next, conn}
 
   defp decode({:ok, body, conn}) do
-    {:ok, XmlToMap.naive_map(body), conn}
+    {:ok, XmlToMap.naive_map(body), Map.put(conn, :unparsed_body_params, body)}
   end
 
   defp decode({:more, _, conn}) do
