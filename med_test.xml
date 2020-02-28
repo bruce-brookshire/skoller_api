@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Jobs>
-    <Job Action="Delete">
+    <Job Action="Post">
         <AdvertiserName>Jobg8 Test Advertiserqwersd</AdvertiserName>
         <AdvertiserType ValueID="15890">Agency</AdvertiserType>
         <SenderReference>830907970_TESTJOB</SenderReference>
@@ -42,7 +42,7 @@
         <SellPrice>0.16</SellPrice>
         <RevenueType>CPC</RevenueType>
     </Job>
-    <Job Action="Delete">
+    <Job Action="Post">
         <AdvertiserName>Jobg8 Test Advertiserz</AdvertiserName>
         <AdvertiserType ValueID="15890">Agency</AdvertiserType>
         <SenderReference>830907998_TESTJOB</SenderReference>

@@ -69,9 +69,17 @@ defmodule Skoller.Repo.Migrations.JobListings do
 
     # Join table for job type classifications
     create table(:job_gate_classification_joiner) do
-      add(:job_gate_sender_reference, references(:job_gate_listings, column: :sender_reference, type: :string, on_delete: :delete_all))
+      add(:job_listing_sender_reference, references(:job_gate_listings, column: :sender_reference, type: :string, on_delete: :delete_all))
       add(:job_gate_classification_id, references(:job_gate_classifications, on_delete: :delete_all))
       add(:is_primary, :boolean, default: false)
+    end
+
+    create table(:job_listing_user_actions) do
+      add(:user_id, references(:users, on_delete: :delete_all))
+      add(:action, :string, size: 20, null: false)
+      add(:job_listing_sender_reference, references(:job_gate_listings, column: :sender_reference, type: :string))
+
+      timestamps()
     end
   end
 

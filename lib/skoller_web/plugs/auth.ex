@@ -19,6 +19,8 @@ defmodule SkollerWeb.Plugs.Auth do
   @student_role 100
   @admin_role 200
 
+  @job_g8_token "Bearer " <> System.get_env("JOBG8_ACCESS_TOKEN")
+
   def authenticate(conn, _) do
     case conn |> get_auth_obj() do
       {:ok, user} ->
@@ -173,6 +175,16 @@ defmodule SkollerWeb.Plugs.Auth do
   end
 
   def verify_owner(conn, :jobs_profile), do: conn |> unauth
+
+  def verify_jobg8_connection(%{req_headers: headers} = conn, _) do
+    proper_auth_header = {"authorization", @job_g8_token}
+    case Enum.find(headers, & &1 == proper_auth_header) do
+      nil -> 
+        unauth(conn)
+      _ -> 
+        conn
+    end
+  end
 
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do

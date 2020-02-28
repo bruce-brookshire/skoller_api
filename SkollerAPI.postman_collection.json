@@ -10,6 +10,20 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c01b33f0-abb8-4ad3-94e4-ba6518cb8d6b",
+								"exec": [
+									"",
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"token\",  jsonData[\"token\"]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -40,6 +54,18 @@
 				},
 				{
 					"name": "Token Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "16d31e9e-15f1-4003-965c-cc92f09647e1",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -74,6 +100,22 @@
 				},
 				{
 					"name": "Student Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b5baaf42-50d1-40b6-9a6d-831f7ebb81b5",
+								"exec": [
+									"",
+									"if (pm.response.code == 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"token\",  jsonData[\"token\"]);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -86,7 +128,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"phone\":\"9032452355\", \"verification_code\": \"41386\"}"
+							"raw": "{\"phone\":\"9032452355\", \"verification_code\": \"69301\"}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/students/login",
@@ -6761,6 +6803,50 @@
 					"response": []
 				},
 				{
+					"name": "Update Career Activity",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"name 3\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities/3",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"4",
+								"activities",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Jobs Profile",
 					"request": {
 						"method": "GET",
@@ -6795,6 +6881,39 @@
 				},
 				{
 					"name": "Jobs Profile",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/3",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"profiles",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Jobs Profile Copy",
 					"request": {
 						"method": "DELETE",
 						"header": [
@@ -6886,7 +7005,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \n    \"alt_email\": \"leixe@gmail.com\"\n}",
+							"raw": "{\n    \"resume_url\": \"https://via.placeholder.com/150 \"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -6894,7 +7013,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/1",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/2",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -6903,7 +7022,7 @@
 								"v1",
 								"skoller-jobs",
 								"profiles",
-								"1"
+								"2"
 							]
 						}
 					},
@@ -6921,7 +7040,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/types/activities",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/types/job_search",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -6930,7 +7049,7 @@
 								"v1",
 								"skoller-jobs",
 								"types",
-								"activities"
+								"job_search"
 							]
 						}
 					},
@@ -6974,6 +7093,43 @@
 								"profiles",
 								"4",
 								"activities"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Job Listings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/job-listings?offset=160",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"skoller-jobs",
+								"job-listings"
+							],
+							"query": [
+								{
+									"key": "offset",
+									"value": "160"
+								}
 							]
 						}
 					},
@@ -11842,10 +11998,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"tyler@hku.edu\",\n\"password\": \"test\",\n\"student\": {\n\t\"id\": 1,\n  \"name_first\": \"David\",\n  \"name_last\": \"Chapelletteville\",\n  \"major\": \"Business\",\n  \"phone\": \"6158675309\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\",\n  \"future_reminder_notification_time\": \"12:00:00\"\n  }\n}"
+							"raw": "{\n    \n    \"email\": \"bruc@gmail.com\"\n}"
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/users/7",
+							"raw": "{{BaseUrl}}/api/v1/users/14",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -11853,7 +12009,7 @@
 								"api",
 								"v1",
 								"users",
-								"7"
+								"14"
 							]
 						},
 						"description": "Updates a user and the associated student object\n\n## Header Params\n* user id\n\n## Body Params\n* password (opt)\n* file (opt)\n* student obj (opt)\n  * id (req if student exists for user)\n  * name_first (opt)\n  * name_last (opt)\n  * school_id (opt)\n  * phone (opt)\n  * birthday (opt)\n  * gender (opt)\n  * is_notifications (opt)\n  * is_mod_notifications (opt)\n  * is_reminder_notifications (opt)\n  * is_chat_notifications (opt)\n  * notification_time (opt)\n  * notification_days_notice (opt)\n  * bio (opt)\n  * organization (opt)"
@@ -12298,6 +12454,120 @@
 					]
 				},
 				"description": "This updates the minimum app versions supported. Used to trigger forced updates."
+			},
+			"response": []
+		},
+		{
+			"name": "Airtable get SkollerJobs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "98f6dafe-4e4b-4547-a472-c064c5bc0833",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer keyDFOG7IeBmx88eG",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "api.airtable.com/v0/appapHxCyvnzwPPV4/Candidates",
+					"host": [
+						"api",
+						"airtable",
+						"com"
+					],
+					"path": [
+						"v0",
+						"appapHxCyvnzwPPV4",
+						"Candidates"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Airtable get SkollerJobs Copy",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer keyDFOG7IeBmx88eG",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "api.airtable.com/v0/appqBDfKHPa9g5DQa/Candidates?records[]=rec6BmLAXyxuu59ga&records[]=reccs1q5Hp4jOmdfW",
+					"host": [
+						"api",
+						"airtable",
+						"com"
+					],
+					"path": [
+						"v0",
+						"appqBDfKHPa9g5DQa",
+						"Candidates"
+					],
+					"query": [
+						{
+							"key": "records[]",
+							"value": "rec6BmLAXyxuu59ga"
+						},
+						{
+							"key": "records[]",
+							"value": "reccs1q5Hp4jOmdfW"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JobG8 Feed Endpoint",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer P3bbjkUQYymZ74AP7yK5",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/Users/brucebrookshire/Desktop/Skoller/classnav_api/med_test.xml"
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/v1/job-listing-feed",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"job-listing-feed"
+					]
+				}
 			},
 			"response": []
 		}

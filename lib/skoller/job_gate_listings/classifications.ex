@@ -1,19 +1,19 @@
-defmodule Skoller.JobGateListings.JobGateClassification do
+defmodule Skoller.JobGateListings.Classification do
   use Ecto.Schema
 
   import Ecto.Query
 
   alias Skoller.Repo
-  alias Skoller.JobGateListings.JobGateClassification
+  alias Skoller.JobGateListings.Classification
 
   schema "job_gate_classifications" do
     field :name, :string
   end
 
   def get_or_insert(classification) when is_binary(classification) do
-    case Repo.get_by(JobGateClassification, name: classification) do
+    case Repo.get_by(Classification, name: classification) do
       nil ->
-        Repo.insert!(%JobGateClassification{name: classification})
+        Repo.insert!(%Classification{name: classification})
 
       result ->
         result
@@ -21,25 +21,25 @@ defmodule Skoller.JobGateListings.JobGateClassification do
   end
 end
 
-defmodule Skoller.JobGateListings.JobGateClassificationJoiner do
+defmodule Skoller.JobGateListings.ClassificationJoiner do
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias Skoller.JobGateListings.JobGateListing
-  alias Skoller.JobGateListings.JobGateClassification
-  alias Skoller.JobGateListings.JobGateClassificationJoiner
+  alias Skoller.JobGateListings.Listing
+  alias Skoller.JobGateListings.Classification
+  alias Skoller.JobGateListings.ClassificationJoiner
 
   schema "job_gate_classification_joiner" do
-    field :job_gate_sender_reference, :string
+    field :job_listing_sender_reference, :string
     field :job_gate_classification_id, :integer
     field :is_primary, :boolean, default: false
 
-    belongs_to :job_gate_classification, JobGateClassification, define_field: false
+    belongs_to :job_gate_classification, Classification, define_field: false
 
-    belongs_to :job_gate_listing, JobGateListing,
+    belongs_to :job_gate_listing, Listing,
       define_field: false,
-      foreign_key: :job_gate_sender_reference,
+      foreign_key: :job_listing_sender_reference,
       references: :sender_reference
   end
 
@@ -48,7 +48,7 @@ defmodule Skoller.JobGateListings.JobGateClassificationJoiner do
   @all_fields @req_fields ++ @opt_fields
 
   def insert_changeset(params) do
-    %JobGateClassificationJoiner{}
+    %ClassificationJoiner{}
     |> cast(params, @all_fields)
     |> validate_required(@req_fields)
   end

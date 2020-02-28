@@ -1,7 +1,7 @@
 defmodule Skoller.JobGateListings do
   import Ecto.Query
 
-  alias Skoller.JobGateListings.JobGateListing
+  alias Skoller.JobGateListings.Listing
   alias Skoller.Repo
 
   @post_action "Post"
@@ -17,7 +17,7 @@ defmodule Skoller.JobGateListings do
       ) do
     try do
       listing
-      |> JobGateListing.insert_changeset()
+      |> Listing.insert_changeset()
       |> Repo.insert()
     catch
       :error, _error ->
@@ -38,9 +38,9 @@ defmodule Skoller.JobGateListings do
         } = listing
       ) do
     try do
-      JobGateListing
+      Listing
       |> Repo.get(sender_reference)
-      |> JobGateListing.update_changeset(listing)
+      |> Listing.update_changeset(listing)
       |> Repo.update()
     catch
       :error, _error ->
@@ -52,7 +52,7 @@ defmodule Skoller.JobGateListings do
 
   def perform_job_action(%{action: @delete_action, sender_reference: sender_reference}) do
     try do
-      JobGateListing
+      Listing
       |> Repo.get(sender_reference)
       |> Repo.delete()
     catch
@@ -64,8 +64,16 @@ defmodule Skoller.JobGateListings do
 
   def perform_job_action(_), do: nil
 
+  def exists?(sender_reference) when is_binary(sender_reference) do
+    from(l in Listing)
+    |> where([l], l.sender_reference == ^sender_reference)
+    |> Repo.exists?()
+  end
+
+  def exists?(_), do: false
+
   def get_listings(with_offset: offset) do
-    JobGateListing
+    Listing
     |> order_by(asc: :sender_reference)
     |> offset(^offset)
     |> limit(20)
@@ -95,7 +103,7 @@ defmodule Skoller.JobGateListings do
     classifications
     |> Enum.each(fn elem ->
       elem
-      |> Map.put(:job_gate_sender_reference, sender_reference)
+      |> Map.put(:job_listing_sender_reference, sender_reference)
       |> Repo.insert()
     end)
 

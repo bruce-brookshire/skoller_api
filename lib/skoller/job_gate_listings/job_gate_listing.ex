@@ -1,11 +1,11 @@
-defmodule Skoller.JobGateListings.JobGateListing do
+defmodule Skoller.JobGateListings.Listing do
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias Skoller.JobGateListings.JobGateListing
-  alias Skoller.JobGateListings.JobGateClassification
-  alias Skoller.JobGateListings.JobGateClassificationJoiner
+  alias Skoller.JobGateListings.Listing
+  alias Skoller.JobGateListings.Classification
+  alias Skoller.JobGateListings.ClassificationJoiner
 
   @primary_key {:sender_reference, :string, autogenerate: false}
   schema "job_gate_listings" do
@@ -65,9 +65,9 @@ defmodule Skoller.JobGateListings.JobGateListing do
     # Type of the advertiser
     field :advertiser_type, :string
 
-    many_to_many :classifications, JobGateClassification,
-      join_through: JobGateClassificationJoiner,
-      join_keys: [job_gate_sender_reference: :sender_reference, job_gate_classification_id: :id]
+    many_to_many :classifications, Classification,
+      join_through: ClassificationJoiner,
+      join_keys: [job_listing_sender_reference: :sender_reference, job_gate_classification_id: :id]
 
     timestamps()
   end
@@ -106,10 +106,10 @@ defmodule Skoller.JobGateListings.JobGateListing do
 
   def insert_changeset(%{} = attrs),
     do:
-      base_changeset(%JobGateListing{}, attrs)
+      base_changeset(%Listing{}, attrs)
       |> unique_constraint(:sender_reference, name: :job_gate_listings_pkey)
 
-  def update_changeset(%JobGateListing{} = listing, %{} = attrs),
+  def update_changeset(%Listing{} = listing, %{} = attrs),
     do: base_changeset(listing, attrs)
 
   defp base_changeset(listing, attrs),

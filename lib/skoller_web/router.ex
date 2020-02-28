@@ -29,6 +29,7 @@ defmodule SkollerWeb.Router do
 
   pipeline :job_g8_feed do
     plug :accepts, ["xml"]
+    plug :verify_jobg8_connection
   end
 
   # Other scopes may use custom stacks.
@@ -300,7 +301,13 @@ defmodule SkollerWeb.Router do
 
         get "/types/:type", JobProfileTypeController, :show
 
-        get "/job-listings", JobListingsController, :index
+        resources "/job-listings", JobListingsController,
+          only: [:index],
+          param: "sender_reference",
+          name: "job_listing" do
+            
+          post "/action", JobListingActionController, :create
+        end
       end
     end
   end
@@ -333,7 +340,7 @@ defmodule SkollerWeb.Router do
     pipe_through :job_g8_feed
 
     scope "/v1", V1, as: :v1 do
-      post "/job-listings", JobFeedController, :create
+      post "/job-listing-feed", JobFeedController, :create
     end
   end
 end

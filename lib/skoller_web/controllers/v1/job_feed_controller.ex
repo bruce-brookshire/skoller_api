@@ -2,8 +2,8 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
   use SkollerWeb, :controller
 
   alias Skoller.JobGateListings
-  alias Skoller.JobGateListings.JobGateClassification
-  alias Skoller.JobGateListings.JobGateClassificationJoiner
+  alias Skoller.JobGateListings.Classification
+  alias Skoller.JobGateListings.ClassificationJoiner
 
   require Logger
 
@@ -108,15 +108,15 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
         case acc[elem] do
           id when is_integer(id) ->
             {
-              %JobGateClassificationJoiner{job_gate_classification_id: id, is_primary: prim},
+              %ClassificationJoiner{job_gate_classification_id: id, is_primary: prim},
               acc
             }
 
           nil ->
-            %{id: id} = JobGateClassification.get_or_insert(elem)
+            %{id: id} = Classification.get_or_insert(elem)
 
             {
-              %JobGateClassificationJoiner{job_gate_classification_id: id, is_primary: prim},
+              %ClassificationJoiner{job_gate_classification_id: id, is_primary: prim},
               Map.put(acc, elem, id)
             }
         end
