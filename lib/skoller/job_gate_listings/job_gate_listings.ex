@@ -64,6 +64,11 @@ defmodule Skoller.JobGateListings do
 
   def perform_job_action(_), do: nil
 
+  def get(sender_reference) when is_binary(sender_reference),
+    do: Repo.get(Listing, sender_reference) |> Repo.preload([:classifications])
+
+  def get(sender_reference) when is_binary(sender_reference), do: nil
+
   def exists?(sender_reference) when is_binary(sender_reference) do
     from(l in Listing)
     |> where([l], l.sender_reference == ^sender_reference)

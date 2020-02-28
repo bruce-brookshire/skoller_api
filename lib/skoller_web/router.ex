@@ -302,10 +302,10 @@ defmodule SkollerWeb.Router do
         get "/types/:type", JobProfileTypeController, :show
 
         resources "/job-listings", JobListingsController,
-          only: [:index],
+          only: [:index, :show],
           param: "sender_reference",
           name: "job_listing" do
-            
+
           post "/action", JobListingActionController, :create
         end
       end
