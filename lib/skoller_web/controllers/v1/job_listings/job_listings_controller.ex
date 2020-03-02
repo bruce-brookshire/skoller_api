@@ -17,12 +17,16 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingsController do
   def show(conn, _params), do: send_resp(conn, 422, "sender_reference not found")
 
   def index(conn, params) do
-    offset = params["offset"] || 20
-
-    listings = Listings.get_listings(with_offset: offset)
-
-    conn
-    |> put_view(JobListingView)
-    |> render("index.json", listings: listings)
+    with offset <- params["offset"] || 20,
+         listings <- Listings.get_listings(with_offset: offset),
+         template_suffix <- if(params["min_view"] == "true", do: "-min", else: ""),
+         template_name <- "index#{template_suffix}.json" do
+      conn
+      |> put_view(JobListingView)
+      |> render(template_name, listings: listings)
+    else
+      _ ->
+        send_resp(conn, 422, "")
+    end
   end
 end
