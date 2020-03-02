@@ -163,7 +163,7 @@ defmodule SkollerWeb.Plugs.Auth do
       _ -> conn |> unauth
     end
   end
-  
+
   def verify_owner(
         %{params: %{"id" => id}, assigns: %{user: %{id: user_id}}} = conn,
         :jobs_profile
@@ -176,13 +176,22 @@ defmodule SkollerWeb.Plugs.Auth do
 
   def verify_owner(conn, :jobs_profile), do: conn |> unauth
 
+  def verify_owner(%{assigns: %{user: user}} = conn, :with_jobs_profile) do
+    case Repo.preload(user, [:job_profile]) do
+      %{job_profile: profile} = new_user when not is_nil(profile) ->
+        conn |> assign(:user, new_user)
+
+      _ ->
+        unauth(conn)
+    end
+  end
+
   def verify_jobg8_connection(%{req_headers: headers} = conn, _) do
     proper_auth_header = {"authorization", @job_g8_token}
-    case Enum.find(headers, & &1 == proper_auth_header) do
-      nil -> 
-        unauth(conn)
-      _ -> 
-        conn
+
+    case Enum.find(headers, &(&1 == proper_auth_header)) do
+      nil -> unauth(conn)
+      _ -> conn
     end
   end
 

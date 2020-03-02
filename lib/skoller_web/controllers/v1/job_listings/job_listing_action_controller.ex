@@ -1,8 +1,12 @@
 defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
   use SkollerWeb, :controller
 
+  import SkollerWeb.Plugs.Auth
+
   alias Skoller.JobGateListings.Actions
   alias Skoller.JobGateListings, as: Listings
+
+  plug :verify_owner, :with_jobs_profile
 
   @actions ["viewed_job", "clicked_application"]
 
