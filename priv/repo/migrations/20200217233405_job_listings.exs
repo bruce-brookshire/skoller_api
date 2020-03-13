@@ -143,14 +143,14 @@ defmodule Skoller.Repo.Migrations.JobListings do
   end
 
   def down() do
-    drop(table(:job_listing_user_actions))
-    drop(table(:job_gate_classification_joiner))
-    drop(table(:job_gate_classifications))
-    drop(table(:job_gate_listings))
-    drop(table(:job_gate_naming_transforms))
-    drop(table(:job_gate_column_types))
+    drop_if_exists(table(:job_listing_user_actions))
+    drop_if_exists(table(:job_gate_classification_joiner))
+    drop_if_exists(table(:job_gate_classifications))
+    drop_if_exists(table(:job_gate_listings))
+    drop_if_exists(table(:job_gate_naming_transforms))
+    drop_if_exists(table(:job_gate_column_types))
 
-    drop(table(:state_regions))
+    drop_if_exists(table(:state_regions))
 
     from(ur in UserRole)
     |> where([ur], ur.role_id == 600)
