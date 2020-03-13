@@ -21,7 +21,6 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingsController do
   def show(conn, _params), do: send_resp(conn, 422, "sender_reference not found")
 
   def index(conn, params) do
-    IO.inspect params
     with offset <- params["offset"] || 20,
          listings <- Listings.get_listings(with_offset: offset),
          template_suffix <- if(params["min_view"] == "true", do: "-min", else: ""),

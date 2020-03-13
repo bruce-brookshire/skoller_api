@@ -46,9 +46,6 @@ defmodule SkollerWeb.SkollerJobs.JobListingView do
         )
       )
 
-  def render("show.json", %{listing: %{classifications: classifications} = listing} = params),
-    do: params |> IO.inspect() |> Map.get(:listing)
-
   def render("show-min.json", %{listing: listing}), do: Map.take(listing, @min_fields)
 
   def render("index.json", %{listings: listings, user: user}),
@@ -58,11 +55,6 @@ defmodule SkollerWeb.SkollerJobs.JobListingView do
     do: render_many(listings, JobListingView, "show-min.json", as: :listing)
 
   defp generate_application_url(listing, %{student: student, job_profile: job_profile} = user) do
-    url = listing.application_url
-    IO.inspect is_map(student)
-
-    require IEx; IEx.pry
-
     params =
       %{
         "FirstName" => student.name_first,
@@ -74,9 +66,7 @@ defmodule SkollerWeb.SkollerJobs.JobListingView do
       |> Enum.map(&"&#{elem(&1, 0)}=#{elem(&1, 1)}")
       |> Enum.join("")
 
-    new_url = url <> params
-
-    Map.put(listing, :application_url, new_url)
+    Map.put(listing, :application_url, listing.application_url <> params)
   end
 
   defp generate_application_url(listing, _), do: listing

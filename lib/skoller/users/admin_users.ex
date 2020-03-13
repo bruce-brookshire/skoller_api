@@ -38,7 +38,7 @@ defmodule Skoller.Admin.Users do
   """
   def get_users(params \\ %{}) do
     from(user in User)
-    |> join(:inner, [user], role in UserRole, on: role.user_id == user.id)
+    |> join(:left, [user], role in UserRole, on: role.user_id == user.id)
     |> join(:left, [user, role], student in Student, on: student.id == user.student_id)
     |> join(:left, [user, role, student], ss in subquery(EnrolledSchools.get_student_schools_subquery()), on: ss.student_id == student.id)
     |> where([user, role, student, ss], ^filters(params))

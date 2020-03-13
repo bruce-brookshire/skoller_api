@@ -6,7 +6,11 @@ defmodule SkollerWeb.Api.V1.JobFeedController do
   alias Skoller.JobGateListings.Classification
   alias Skoller.JobGateListings.ClassificationJoiner
 
-  require Logger
+  import SkollerWeb.Plugs.Auth
+
+  @job_feed_role 600
+
+  plug :verify_role, %{role: @job_feed_role}
 
   @job_gate_param_map %{
     "Action" => :action,

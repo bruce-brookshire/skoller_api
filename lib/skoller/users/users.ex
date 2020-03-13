@@ -407,7 +407,7 @@ defmodule Skoller.Users do
   end
 
   defp add_roles_preloaded(user, %{"roles" => roles}, opts) do
-    case Keyword.get(opts, :admin, false) do
+    case Keyword.get(opts, :admin_update, false) do
       true ->
         # Admin can add roles
         UserRoles.delete_roles_for_user(user.id)

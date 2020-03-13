@@ -29,7 +29,14 @@ defmodule SkollerWeb.Router do
 
   pipeline :job_g8_feed do
     plug :accepts, ["xml"]
-    plug :verify_jobg8_connection
+    plug Guardian.Plug.Pipeline,
+      module: Skoller.Auth,
+      error_handler: Skoller.AuthErrorHandler
+
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+    plug :authenticate
   end
 
   # Other scopes may use custom stacks.

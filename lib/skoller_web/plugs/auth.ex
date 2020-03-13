@@ -186,15 +186,6 @@ defmodule SkollerWeb.Plugs.Auth do
     end
   end
 
-  def verify_jobg8_connection(%{req_headers: headers} = conn, _) do
-    proper_auth_header = {"authorization", @job_g8_token}
-
-    case Enum.find(headers, &(&1 == proper_auth_header)) do
-      nil -> unauth(conn)
-      _ -> conn
-    end
-  end
-
   defp not_in_role(conn, role) do
     case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
       true -> conn |> unauth
