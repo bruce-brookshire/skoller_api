@@ -19,8 +19,6 @@ defmodule SkollerWeb.Plugs.Auth do
   @student_role 100
   @admin_role 200
 
-  @job_g8_token "Bearer " <> System.get_env("JOBG8_ACCESS_TOKEN")
-
   def authenticate(conn, _) do
     case conn |> get_auth_obj() do
       {:ok, user} ->

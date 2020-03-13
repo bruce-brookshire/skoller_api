@@ -156,7 +156,10 @@ defmodule Skoller.Repo.Migrations.JobListings do
     |> where([ur], ur.role_id == 600)
     |> Repo.delete_all()
 
-    Repo.get(Role, 600) |> Repo.delete()
+    case Repo.get(Role, 600) do  
+      nil -> nil
+      role -> Repo.delete(role)
+    end
   end
 
   defp generate_states(),
