@@ -20,7 +20,7 @@ defmodule Skoller.Mixfile do
   def application do
     [
       mod: {Skoller.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :elixir_xml_to_map],
     ]
   end
 
@@ -40,6 +40,7 @@ defmodule Skoller.Mixfile do
       {:phoenix_pubsub, "~> 1.0"},
       {:ecto, "~> 3.0"},
       {:ecto_sql, "~> 3.0"},
+      {:elixir_xml_to_map, "~> 0.1"},
       {:phoenix_ecto, "~> 4.0"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},

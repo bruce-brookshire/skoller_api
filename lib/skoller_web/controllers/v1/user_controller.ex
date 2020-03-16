@@ -34,7 +34,7 @@ defmodule SkollerWeb.Api.V1.UserController do
 
     case Users.update_user(user_old, params, admin_update: is_admin) do
       {:ok, %{user: user}} ->
-        user = user |> Repo.preload(:student, force: true)
+        user = user |> Repo.preload([:student, :roles], force: true)
 
         conn
         |> put_view(UserView)

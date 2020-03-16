@@ -23,9 +23,9 @@ defmodule Skoller.JobHelper do
 
   # Gets the difference in time in milliseconds between now and the scheduled time
   defp get_time_diff({:ok, ~T[23:59:59.000000] = next_time}),
-    do: Time.diff(next_time, Time.utc_now(), :milliseconds) + 1000
+    do: Time.diff(next_time, Time.utc_now(), :millisecond) + 1000
 
-  defp get_time_diff({:ok, next_time}), do: Time.diff(next_time, Time.utc_now(), :milliseconds)
+  defp get_time_diff({:ok, next_time}), do: Time.diff(next_time, Time.utc_now(), :millisecond)
 
   defp get_time_diff({:error, _}),
     do: raise("converting time from " <> Time.utc_now() <> " failed.")

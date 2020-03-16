@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Jobs>
+    <Job Action="Post">
+        <AdvertiserName>Jobg8 Test Advertiserqwersd</AdvertiserName>
+        <AdvertiserType ValueID="15890">Agency</AdvertiserType>
+        <SenderReference>830907970_TESTJOB</SenderReference>
+        <DisplayReference>0VOH5fzLey8hiKRjtKEl1Db0SPaK7R_TESTJOB</DisplayReference>
+        <Classification ValueID="6219">Primary Industry</Classification>
+        <SubClassification></SubClassification>
+        <Position>
+            <![CDATA[Lead Cook]]>
+        </Position>
+        <Description>
+            not to much
+        </Description>
+        <Country ValueID="247">United States</Country>
+        <Location ValueID="15358">Oregon</Location>
+        <Area ValueID="15683">Portland</Area>
+        <PostalCode>97269</PostalCode>
+        <ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</ApplicationURL>
+        <DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?RsYh8sPwV0N8Kr4u%2fp52kgw</DescriptionURL>
+        <Language ValueID="120036">2057</Language>
+        <ContactName></ContactName>
+        <EmploymentType ValueID="2163">Permanent</EmploymentType>
+        <StartDate>Mon, 20 Jan 2020 19:58:26 UTC</StartDate>
+        <Duration></Duration>
+        <WorkHours ValueID="2188">Not Specified</WorkHours>
+        <SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency>
+        <SalaryMinimum></SalaryMinimum>
+        <SalaryMaximum></SalaryMaximum>
+        <SalaryPeriod ValueID="2178">Annual</SalaryPeriod>
+        <SalaryAdditional></SalaryAdditional>
+        <JobSource></JobSource>
+        <JobSourceURL></JobSourceURL>
+        <VideoLinkURL></VideoLinkURL>
+        <AdditionalClassification1 >Real Estate</AdditionalClassification1 >
+        <AdditionalClassification2 >Economics</AdditionalClassification2 >
+        <AdditionalClassification3 >Real Estate</AdditionalClassification3 >
+        <AdditionalClassification4 >Mathematics</AdditionalClassification4 >
+        <LogoURL></LogoURL>
+        <JobType>TRAFFIC</JobType>
+        <SellPrice>0.16</SellPrice>
+        <RevenueType>CPC</RevenueType>
+    </Job>
+    <Job Action="Post">
+        <AdvertiserName>Jobg8 Test Advertiserz</AdvertiserName>
+        <AdvertiserType ValueID="15890">Agency</AdvertiserType>
+        <SenderReference>830907998_TESTJOB</SenderReference>
+        <DisplayReference>DfRAcmV6ooXoNX2cdnU7aRF36ODeh4_TESTJOB</DisplayReference>
+        <Classification ValueID="6209">Primary Engineering</Classification>
+        <SubClassification></SubClassification>
+        <Position>
+            <![CDATA[Senior Engineer - MN]]>
+        </Position>
+        <Description>
+            Target Enterprise, Inc. is seeking
+        </Description>
+        <Country ValueID="247">United States</Country>
+        <Location ValueID="15344">Minnesota</Location>
+        <Area ValueID="32935">Minneapolis </Area>
+        <PostalCode>55401</PostalCode>
+        <ApplicationURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</ApplicationURL>
+        <DescriptionURL>https://www.jobg8.com/TESTJOB.aspx?GQsDNkFH9Zn8Q5cjBOmMiQy</DescriptionURL>
+        <Language ValueID="120036">2057</Language>
+        <ContactName></ContactName>
+        <EmploymentType ValueID="2163">Permanent</EmploymentType>
+        <StartDate>Mon, 20 Jan 2020 16:36:28 UTC</StartDate>
+        <Duration></Duration>
+        <WorkHours ValueID="2188">Not Specified</WorkHours>
+        <SalaryCurrency ValueID="1228">US Dollar . USD</SalaryCurrency>
+        <SalaryMinimum></SalaryMinimum>
+        <SalaryMaximum></SalaryMaximum>
+        <SalaryPeriod ValueID="2178">Annual</SalaryPeriod>
+        <SalaryAdditional></SalaryAdditional>
+        <JobSource></JobSource>
+        <JobSourceURL></JobSourceURL>
+        <VideoLinkURL></VideoLinkURL>
+        <AdditionalClassification1 >Real Estate</AdditionalClassification1 >
+        <AdditionalClassification2 >Library</AdditionalClassification2 >
+        <AdditionalClassification3 >Canucks</AdditionalClassification3 >
+        <AdditionalClassification4 >Sleepy</AdditionalClassification4 >
+        <LogoURL></LogoURL>
+        <JobType>ATS</JobType>
+        <SellPrice>0.23</SellPrice>
+        <RevenueType>CPC</RevenueType>
+    </Job>
+</Jobs>

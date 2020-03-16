@@ -27,6 +27,18 @@ defmodule SkollerWeb.Router do
     plug :authenticate
   end
 
+  pipeline :job_g8_feed do
+    plug :accepts, ["xml"]
+    plug Guardian.Plug.Pipeline,
+      module: Skoller.Auth,
+      error_handler: Skoller.AuthErrorHandler
+
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource
+    plug :authenticate
+  end
+
   # Other scopes may use custom stacks.
   scope "/api", SkollerWeb.Api do
     pipe_through :api_auth
@@ -295,6 +307,14 @@ defmodule SkollerWeb.Router do
         end
 
         get "/types/:type", JobProfileTypeController, :show
+
+        resources "/job-listings", JobListingsController,
+          only: [:index, :show],
+          param: "sender_reference",
+          name: "job_listing" do
+
+          post "/action", JobListingActionController, :create
+        end
       end
     end
   end
@@ -320,6 +340,14 @@ defmodule SkollerWeb.Router do
       get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
+    end
+  end
+
+  scope "/api", SkollerWeb.Api do
+    pipe_through :job_g8_feed
+
+    scope "/v1", V1, as: :v1 do
+      post "/job-listing-feed", JobFeedController, :create
     end
   end
 end
