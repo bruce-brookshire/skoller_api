@@ -185,14 +185,14 @@ defmodule Skoller.Repo.Migrations.SkollerJobs do
       remove(:degree_type_id)
     end
 
-    drop_if_exists(table(:career_activities))
-    drop_if_exists(table(:career_activity_types))
-    drop_if_exists(table(:airtable_jobs))
-    drop_if_exists(table(:airtable_job_types))
-    drop_if_exists(table(:job_profiles))
-    drop_if_exists(table(:ethnicity_types))
-    drop_if_exists(table(:job_profile_statuses))
-    drop_if_exists(table(:degree_types))
-    drop_if_exists(table(:job_search_types))
+    drop(table(:career_activities))
+    drop(table(:career_activity_types))
+    drop(table(:airtable_jobs))
+    drop(table(:airtable_job_types))
+    drop(table(:job_profiles))
+    drop(table(:ethnicity_types))
+    drop(table(:job_profile_statuses))
+    drop(table(:degree_types))
+    drop(table(:job_search_types))
   end
 end
