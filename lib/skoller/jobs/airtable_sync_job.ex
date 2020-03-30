@@ -156,7 +156,9 @@ defmodule Skoller.AirtableSyncJob do
       "SAT Score" => profile.sat_score,
       "ACT Score" => profile.act_score,
       "Skoller Account?" => "Yes",
-      "job_profile_id" => profile.id
+      "job_profile_id" => profile.id,
+      "School City" => school.adr_locality,
+      "School State" => school.adr_region
     }
   end
 
