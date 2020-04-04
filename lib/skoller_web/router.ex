@@ -336,6 +336,22 @@ defmodule SkollerWeb.Router do
       get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
+
+      resources "/organizationsi", OrganizationController, only: [:create, :index, :show, :update] do
+        # Org resources
+        resources "/owners", OrgGroupOwnerController, only: [:create, :index, :show, :update] do
+          resources "/watchlist", OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
+        end
+        resources "/students", OrgGroupStudentController, only: [:create, :index, :show, :update]
+
+        # Group resources
+        resources "/org_groups", OrgGroupController, only: [:create, :index, :show, :update] do
+          resources "/owners", OrgGroupOwnerController, only: [:create, :index, :show, :update] do
+            resources "/watchlist", OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
+          end
+          resources "/students", OrgGroupStudentController, only: [:create, :index, :show, :update]
+        end
+      end
     end
   end
 
