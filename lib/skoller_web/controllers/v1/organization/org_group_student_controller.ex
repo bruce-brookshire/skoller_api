@@ -7,9 +7,9 @@ defmodule SkollerWeb.Api.V1.Organizations.OrgGroupStudentController do
     conn
   end
   
-  def index(conn, params) do
-    conn
-  end
+  # def index(conn, params) do
+  #   conn
+  # end
 
   def create(conn, params) do
     conn
