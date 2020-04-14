@@ -1,10 +1,5 @@
 defmodule SkollerWeb.Organization.OrgGroupView do
-  use SkollerWeb, :view
+  alias Skoller.Organizations.OrgGroups.OrgGroup
 
-  alias SkollerWeb.Organization.OrgGroupView
-
-  def render("index.json", %{org_groups: groups}), do: render_many(groups, OrgGroupView, "show.json")
-
-  def render("show.json", %{org_group: group}), do: 
-    group |> Map.take([:name, :organization_id])
+  use SkollerWeb.View, model: OrgGroup, single_atom: :org_group, plural_atom: :org_groups
 end

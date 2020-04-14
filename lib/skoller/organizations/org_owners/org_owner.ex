@@ -13,17 +13,5 @@ defmodule Skoller.Organizations.OrgOwners.OrgOwner do
     belongs_to :user, User
   end
 
-  @all_fields ~w[organization_id user_id]a
-
-  def insert_changeset(params) do
-    %OrgOwner{}
-    |> cast(params, @all_fields)
-    |> validate_required(params, @all_fields)
-  end
-
-  def update_changeset(%OrgOwner{} = struct, params) do
-    struct
-    |> cast(params, @all_fields)
-    |> validate_required(params, @all_fields)
-  end
+  use Skoller.Changeset, req_fields: ~w[organization_id user_id]a
 end

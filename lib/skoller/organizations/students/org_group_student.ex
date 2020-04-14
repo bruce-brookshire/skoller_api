@@ -18,10 +18,6 @@ defmodule Skoller.Organizations.OrgGroupStudents.OrgGroupStudent do
     has_one :student, through: [:org_student, :student_id]
   end
 
-  @all_fields ~w[org_student_id org_group_id]a
-
-  def insert_changset(params), do: changeset(%OrgGroupStudent{}, params)
-
-  def changeset(%OrgGroupStudent{} = student, params),
-    do: student |> cast(params, @all_fields) |> validate_required(@all_fields)
+  use Skoller.Changeset, req_fields: ~w[org_student_id org_group_id]a
+  
 end

@@ -1,4 +1,4 @@
-defmodule SkollerWeb.Api.V1.Organizations.OrgOwnerController do
+defmodule SkollerWeb.Api.V1.Organization.OrgOwnerController do
   use SkollerWeb, :controller
 
   alias Skoller.Organizations.OrgOwners

@@ -1,22 +1,6 @@
-defmodule SkollerWeb.Api.V1.Organizations.OrgGroupOwnerController do
-  use SkollerWeb, :controller
+defmodule SkollerWeb.Api.V1.Organization.OrgGroupOwnerController do
+  alias Skoller.Organizations.OrgGroupOwners
+  alias SkollerWeb.Organization.OrgOwnerView
 
-  alias Skoller.Organizations
-
-  def show(conn, params) do
-    conn
-  end
-  
-  def index(conn, params) do
-    conn
-  end
-
-  def create(conn, params) do
-    conn
-  end
-
-  def update(conn, params) do
-    conn
-  end
-
+  use SkollerWeb.Controller, adapter: OrgGroupOwners, view: OrgOwnerView
 end

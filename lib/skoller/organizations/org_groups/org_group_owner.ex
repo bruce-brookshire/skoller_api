@@ -15,13 +15,5 @@ defmodule Skoller.Organizations.OrgGroupOwners.OrgGroupOwner do
     has_many :watchlist_items, OrgGroupOwnerWatchlistItems
   end
 
-  @all_fields ~w[org_group_id user_id]a
-
-  def insert_changeset(params), do: %OrgGroupOwner{} |> update_changeset(params)
-
-  def update_changeset(%OrgGroupOwner{} = owner, params) do
-    owner
-    |> cast(params, @all_fields)
-    |> validate_required(@all_fields)
-  end
+  use Skoller.Changeset, req_fields: ~w[org_group_id user_id]a
 end
