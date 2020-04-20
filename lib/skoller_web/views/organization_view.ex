@@ -3,7 +3,6 @@ defmodule SkollerWeb.OrganizationView do
 
   alias SkollerWeb.LinkView
   alias SkollerWeb.SchoolView
-  alias Skoller.Schools.School
   alias SkollerWeb.OrganizationView
 
   def render("index-admin.json", %{organizations: organizations}) do

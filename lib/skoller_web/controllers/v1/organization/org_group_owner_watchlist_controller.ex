@@ -1,6 +1,6 @@
 defmodule SkollerWeb.Api.V1.Organization.OrgGroupOwnerWatchlistController do
-  use SkollerWeb, :controller
+    alias Skoller.Organizations.OrgGroupOwnerWatchlistItems
+    alias SkollerWeb.Organization.OrgGroupOwnerWatchlistView
 
-  alias Skoller.Organizations
-  
+    use SkollerWeb.Controller, adapter: OrgGroupOwnerWatchlistItems, view: OrgGroupOwnerWatchlistView
 end

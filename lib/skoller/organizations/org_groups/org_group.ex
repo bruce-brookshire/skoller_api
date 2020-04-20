@@ -4,7 +4,6 @@ defmodule Skoller.Organizations.OrgGroups.OrgGroup do
   import Ecto.Changeset
 
   alias Skoller.Organizations.Organization
-  alias Skoller.Organizations.OrgGroups.OrgGroup
   alias Skoller.Organizations.OrgGroupOwners.OrgGroupOwner
 
   schema "org_groups" do

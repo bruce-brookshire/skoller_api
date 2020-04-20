@@ -1,5 +1,5 @@
 defmodule Skoller.Organizations.OrgGroups do
-  alias Skoller.Organizations.OrgGroups.OrgGroup
+  alias __MODULE__.OrgGroup
 
   use Skoller.Adapter, model: OrgGroup
 end

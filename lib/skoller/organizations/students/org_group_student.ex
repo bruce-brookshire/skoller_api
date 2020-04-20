@@ -5,11 +5,8 @@ defmodule Skoller.Organizations.OrgGroupStudents.OrgGroupStudent do
 
   alias Skoller.Organizations.{
     OrgStudents.OrgStudent,
-    OrgGroups.OrgGroup,
-    OrgGroupStudents.OrgGroupStudent
+    OrgGroups.OrgGroup
   }
-
-  alias Skoller.Students.Student
 
   schema "org_group_students" do
     belongs_to :org_student, OrgStudent

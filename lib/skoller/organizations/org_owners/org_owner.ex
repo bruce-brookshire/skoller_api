@@ -4,9 +4,7 @@ defmodule Skoller.Organizations.OrgOwners.OrgOwner do
   import Ecto.Changeset
 
   alias Skoller.Users.User
-  alias Skoller.Organizations
-  alias Organizations.Organization
-  alias Organizations.OrgOwners.OrgOwner
+  alias Skoller.Organizations.Organization
 
   schema "org_owners" do
     belongs_to :organization, Organization

@@ -1,7 +1,9 @@
 defmodule SkollerWeb.Organization.OrgOwnerView do
-  use SkollerWeb, :view
+
 
   alias SkollerWeb.Organization.OrgOwnerView
+  alias Skoller.Organizations.OrgOwners.OrgOwner
+  use SkollerWeb.View, model: OrgOwner, single_atom: :org_owner, plural_atom: :org_owners
 
   def render("index.json", %{org_owners: owners}),
     do: owners |> render_many(owners, OrgOwnerView, "show.json")

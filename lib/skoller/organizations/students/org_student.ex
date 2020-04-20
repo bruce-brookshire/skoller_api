@@ -1,4 +1,4 @@
-defmodule Skoller.Organization.OrgStudents.OrgStudent do
+defmodule Skoller.Organizations.OrgStudents.OrgStudent do
   use Ecto.Schema
   alias Skoller.Students.Student
   alias Skoller.Organizations.Organization

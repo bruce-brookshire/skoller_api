@@ -1,5 +1,5 @@
 defmodule Skoller.Organizations.OrgOwners do
-  alias Skoller.Organizations.OrgOwners.OrgOwner
+  alias __MODULE__.OrgOwner
 
   use Skoller.Adapter, model: OrgOwner
 end

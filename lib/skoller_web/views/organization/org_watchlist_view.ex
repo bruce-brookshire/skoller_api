@@ -1,19 +1,9 @@
-defmodule SkollerWeb.Organization.WatchlistView do
-  use SkollerWeb, :view
+defmodule SkollerWeb.Organization.OrgOwnerWatchlistView do
+  alias Skoller.Organizations.OrgOwnerWatchlistItems.OrgOwnerWatchlistItem
+  use SkollerWeb.View, model: OrgOwnerWatchlistItem, single_atom: :item, plural_atom: :items
+end
 
-  alias SkollerWeb.Organization.WatchlistView
-  alias Skoller.Organizations.Watchlists.OrgOwnerWatchlistItems
-  alias Skoller.Organizations.Watchlists.OrgGroupOwnerWatchlistItems
-
-  def render("index.json", %{watchlists: watchlists}),
-    do: render_many(watchlists, WatchlistView, "show.json")
-
-  def render("show.json", %{watchlist: %OrgOwnerWatchlistItems{} = watchlist}), do: %{
-    # student: watchlist.
-    hello: :hi
-  }
-
-  def render("show.json", %{watchlist: %OrgGroupOwnerWatchlistItems{} = watchlist}), do: %{
-    # student: watchlist.org_group_
-  }
+defmodule SkollerWeb.Organization.OrgGroupOwnerWatchlistView do
+  alias Skoller.Organizations.OrgGroupOwnerWatchlistItems.OrgGroupOwnerWatchlistItem
+  use SkollerWeb.View, model: OrgGroupOwnerWatchlistItem, single_atom: :item, plural_atom: :items
 end
