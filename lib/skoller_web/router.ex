@@ -339,15 +339,15 @@ defmodule SkollerWeb.Router do
 
       resources "/organizations", OrganizationController, only: [:index] do
         # Org resources
-        resources "/owners", Organization.OrgGroupOwnerController, only: [:create, :index, :show, :update] do
-          resources "/watchlist", Organization.OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
+        resources "/owners", Organization.OrgOwnerController, only: [:create, :index, :show, :update] do
+          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
         end
-        resources "/students", Organization.OrgGroupStudentController, only: [:create, :index, :show, :update]
+        resources "/students", Organization.OrgStudentController, only: [:create, :index, :show, :update]
 
         # Group resources
-        resources "/org_groups", Organization.OrgGroupController, only: [:create, :index, :show, :update] do
+        resources "/org-groups", Organization.OrgGroupController, only: [:create, :index, :show, :update] do
           resources "/owners", Organization.OrgGroupOwnerController, only: [:create, :index, :show, :update] do
-            resources "/watchlist", Organization.OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
+            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
           end
           resources "/students", Organization.OrgGroupStudentController, only: [:create, :index, :show, :update]
         end

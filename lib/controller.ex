@@ -35,7 +35,7 @@ defmodule SkollerWeb.Controller do
       end
 
       def create(conn, params) do
-        case Adapter.create(params) do
+        case Adapter.create(params) |> IO.inspect do
           {:ok, %{} = object} ->
             conn
             |> put_view(View)

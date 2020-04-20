@@ -23,7 +23,7 @@ defmodule Skoller.Organizations.OrgGroupOwnerWatchlistItems.OrgGroupOwnerWatchli
   alias Skoller.Organizations.OrgGroupOwners.OrgGroupOwner
 
   schema "org_group_owner_watchlist_items" do
-    belongs_to :group_student, OrgGroupStudent
+    belongs_to :org_group_student, OrgGroupStudent
     belongs_to :org_group_owner, OrgGroupOwner
   end
 
