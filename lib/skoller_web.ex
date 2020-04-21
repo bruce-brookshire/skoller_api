@@ -22,7 +22,6 @@ defmodule SkollerWeb do
       use Phoenix.Controller, namespace: SkollerWeb
       import Plug.Conn
       alias AppWeb.Router.Helpers, as: Routes
-      import SkollerWeb.Gettext
     end
   end
 
@@ -36,7 +35,6 @@ defmodule SkollerWeb do
 
       alias AppWeb.Router.Helpers, as: Routes
       import SkollerWeb.ErrorHelpers
-      import SkollerWeb.Gettext
     end
   end
 
@@ -51,7 +49,6 @@ defmodule SkollerWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import SkollerWeb.Gettext
     end
   end
 

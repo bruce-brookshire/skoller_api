@@ -1,12 +1,17 @@
 defmodule SkollerWeb.Controller do
   defmacro __using__(params) do
-    %{adapter: adapter, view: view} = Map.new(params)
+    %{adapter: adapter, view: view} = mapped_params = Map.new(params)
+    plug_block = Map.get(mapped_params, :plugs)
 
     quote do
-      use SkollerWeb, :controller
-
+      use Phoenix.Controller, namespace: SkollerWeb
+      import Plug.Conn
+      alias AppWeb.Router.Helpers, as: Routes
+      
       alias unquote(adapter), as: Adapter
       alias unquote(view), as: View
+
+      unquote(plug_block)
 
       def show(conn, %{"id" => id}) do
         case Adapter.get_by_id(id) do
@@ -35,7 +40,7 @@ defmodule SkollerWeb.Controller do
       end
 
       def create(conn, params) do
-        case Adapter.create(params) |> IO.inspect do
+        case Adapter.create(params) do
           {:ok, %{} = object} ->
             conn
             |> put_view(View)
@@ -46,7 +51,7 @@ defmodule SkollerWeb.Controller do
         end
       end
 
-      defoverridable [show: 2, update: 2, create: 2]
+      defoverridable show: 2, update: 2, create: 2
     end
   end
 end

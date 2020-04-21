@@ -19,8 +19,11 @@ defmodule Skoller.Users.User do
     field :is_active, :boolean, default: true
     field :is_unsubscribed, :boolean, default: false
     field :last_login, :utc_datetime
+    
     belongs_to :student, Student
+    
     many_to_many :roles, Role, join_through: "user_roles"
+    
     has_many :reports, Report
 
     has_one :job_profile, JobProfile

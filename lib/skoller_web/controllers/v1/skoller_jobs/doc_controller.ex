@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.DocController do
   alias SkollerWeb.SkollerJobs.JobView
   alias Skoller.SkollerJobs.JobProfiles
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.{Auth, JobsAuth}
 
   @student_role 100
   @accepted_types ["resume", "transcript"]
