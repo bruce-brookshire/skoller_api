@@ -42,6 +42,22 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       # resources "/organizations", OrganizationController, only: [:index]
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
+      
+      resources "/organizations", OrganizationController, only: [:index] do
+        # Org resources
+        resources "/owners", Organization.OrgOwnerController, only: [:create, :index, :show, :update] do
+          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
+        end
+        resources "/students", Organization.OrgStudentController, only: [:create, :index, :show, :update]
+
+        # Group resources
+        resources "/org-groups", Organization.OrgGroupController, only: [:create, :index, :show, :update] do
+          resources "/owners", Organization.OrgGroupOwnerController, only: [:create, :index, :show, :update] do
+            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
+          end
+          resources "/students", Organization.OrgGroupStudentController, only: [:create, :index, :show, :update]
+        end
+      end
 
       get "/email_domains/:email_domain/check", School.EmailDomainController, :show
       resources "/email-types", Admin.EmailTypeController, only: [:index, :update]
@@ -337,21 +353,7 @@ defmodule SkollerWeb.Router do
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
 
-      resources "/organizations", OrganizationController, only: [:index] do
-        # Org resources
-        resources "/owners", Organization.OrgOwnerController, only: [:create, :index, :show, :update] do
-          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
-        end
-        resources "/students", Organization.OrgStudentController, only: [:create, :index, :show, :update]
-
-        # Group resources
-        resources "/org-groups", Organization.OrgGroupController, only: [:create, :index, :show, :update] do
-          resources "/owners", Organization.OrgGroupOwnerController, only: [:create, :index, :show, :update] do
-            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
-          end
-          resources "/students", Organization.OrgGroupStudentController, only: [:create, :index, :show, :update]
-        end
-      end
+      
     end
   end
 
