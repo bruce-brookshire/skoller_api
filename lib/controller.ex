@@ -25,7 +25,16 @@ defmodule SkollerWeb.Controller do
         end
       end
 
-      # def index()
+      def index(conn, params) do
+        case Adapter.get_by_params(params) do
+          models when is_list(models) -> 
+            conn
+            |> put_view(View)
+            |> render("index.json",  [{View.plural_atom(), models}])
+
+          _ -> send_resp(conn, 404, "Params not found")
+        end
+      end
 
       def update(conn, %{"id" => id} = params) do
         case Adapter.update(id, params) do
