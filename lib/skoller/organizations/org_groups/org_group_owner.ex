@@ -17,5 +17,5 @@ defmodule Skoller.Organizations.OrgGroupOwners.OrgGroupOwner do
     has_many :watchlist_items, OrgGroupOwnerWatchlistItem
   end
 
-  use Skoller.Changeset, req_fields: ~w[org_group_id user_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[org_group_id user_id]a
 end

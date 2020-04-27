@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupController do
 
   import SkollerWeb.Plugs.InsightsAuth
 
-  use SkollerWeb.Controller,
+  use ExMvc.Controller,
     adapter: OrgGroups,
     view: OrgGroupView,
     plugs: plug(:verify_owner, :org_group)

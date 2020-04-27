@@ -13,5 +13,5 @@ defmodule Skoller.Organizations.OrgGroups.OrgGroup do
     has_many :owners, OrgGroupOwner
   end
 
-  use Skoller.Changeset, req_fields: ~w[name organization_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[name organization_id]a
 end

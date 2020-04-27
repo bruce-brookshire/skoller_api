@@ -11,5 +11,5 @@ defmodule Skoller.Organizations.OrgOwners.OrgOwner do
     belongs_to :user, User
   end
 
-  use Skoller.Changeset, req_fields: ~w[organization_id user_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[organization_id user_id]a
 end

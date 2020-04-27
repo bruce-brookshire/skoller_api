@@ -9,11 +9,11 @@ defmodule Skoller.Organizations.OrgOwnerWatchlistItems.OrgOwnerWatchlistItem do
     belongs_to :org_owner, OrgOwner
   end
 
-  use Skoller.Changeset, req_fields: ~w[org_student_id org_owner_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[org_student_id org_owner_id]a
 end
 
 defmodule Skoller.Organizations.OrgOwnerWatchlistItems do
-  use Skoller.Adapter, model: __MODULE__.OrgOwnerWatchlistItem
+  use ExMvc.Adapter, model: __MODULE__.OrgOwnerWatchlistItem
 end
 
 defmodule Skoller.Organizations.OrgGroupOwnerWatchlistItems.OrgGroupOwnerWatchlistItem do
@@ -27,9 +27,9 @@ defmodule Skoller.Organizations.OrgGroupOwnerWatchlistItems.OrgGroupOwnerWatchli
     belongs_to :org_group_owner, OrgGroupOwner
   end
 
-  use Skoller.Changeset, req_fields: ~w[org_group_student_id org_group_owner_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[org_group_student_id org_group_owner_id]a
 end
 
 defmodule Skoller.Organizations.OrgGroupOwnerWatchlistItems do
-  use Skoller.Adapter, model: __MODULE__.OrgGroupOwnerWatchlistItem
+  use ExMvc.Adapter, model: __MODULE__.OrgGroupOwnerWatchlistItem
 end

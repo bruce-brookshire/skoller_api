@@ -15,6 +15,6 @@ defmodule Skoller.Organizations.OrgGroupStudents.OrgGroupStudent do
     has_one :student, through: [:org_student, :student_id]
   end
 
-  use Skoller.Changeset, req_fields: ~w[org_student_id org_group_id]a
+  use ExMvc.ModelChangeset, req_fields: ~w[org_student_id org_group_id]a
   
 end
