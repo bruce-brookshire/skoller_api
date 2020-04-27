@@ -6,6 +6,8 @@ defmodule SkollerWeb.Router do
 
   import SkollerWeb.Plugs.Auth
 
+  @default_rest_methods [:show, :index, :create, :update, :delete]
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -45,17 +47,17 @@ defmodule SkollerWeb.Router do
       
       resources "/organizations", OrganizationController, only: [:index] do
         # Org resources
-        resources "/owners", Organization.OrgOwnerController, only: [:create, :index, :show, :update] do
-          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: [:create, :index, :show, :update]
+        resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
+          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: @default_rest_methods
         end
-        resources "/students", Organization.OrgStudentController, only: [:create, :index, :show, :update]
+        resources "/students", Organization.OrgStudentController, only: @default_rest_methods
 
         # Group resources
-        resources "/org-groups", Organization.OrgGroupController, only: [:create, :index, :show, :update] do
-          resources "/owners", Organization.OrgGroupOwnerController, only: [:create, :index, :show, :update] do
-            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: [:create, :index, :show, :update]
+        resources "/org-groups", Organization.OrgGroupController, only: @default_rest_methods do
+          resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
+            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: @default_rest_methods
           end
-          resources "/students", Organization.OrgGroupStudentController, only: [:create, :index, :show, :update]
+          resources "/students", Organization.OrgGroupStudentController, only: @default_rest_methods
         end
       end
 
