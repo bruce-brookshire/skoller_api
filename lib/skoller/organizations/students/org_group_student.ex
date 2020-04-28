@@ -12,7 +12,7 @@ defmodule Skoller.Organizations.OrgGroupStudents.OrgGroupStudent do
     belongs_to :org_student, OrgStudent
     belongs_to :org_group, OrgGroup
 
-    has_one :student, through: [:org_student, :student_id]
+    has_one :student, through: [:org_student, :student]
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[org_student_id org_group_id]a
