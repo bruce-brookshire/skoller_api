@@ -47,6 +47,7 @@ defmodule SkollerWeb.Router do
       
       resources "/organizations", OrganizationController, only: [:index] do
         # Org resources
+        get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
         resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
           resources "/watchlists", Organization.OrgOwnerWatchlistController, only: @default_rest_methods
         end
