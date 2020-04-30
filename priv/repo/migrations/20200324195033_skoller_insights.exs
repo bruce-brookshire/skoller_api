@@ -44,23 +44,29 @@ defmodule Skoller.Repo.Migrations.SkollerInsights do
       add(:org_owner_id, references(:org_owners, on_delete: :delete_all))
       add(:org_student_id, references(:org_students, on_delete: :delete_all))
     end
-    
+
     create table(:org_group_owner_watchlist_items) do
       add(:org_group_owner_id, references(:org_group_owners, on_delete: :delete_all))
       add(:org_group_student_id, references(:org_group_students, on_delete: :delete_all))
     end
+
+    create(unique_index(:org_owners, [:user_id, :organization_id]))
+    create(unique_index(:org_group_owners, [:user_id, :org_group_id]))
   end
 
-
   def down do
+    alter table(:organizations) do
+      remove(:color)
+      remove(:logo_url)
+    end
+
     drop(table(:org_schools))
-    drop(table(:organizations))
-    drop(table(:org_groups))
-    drop(table(:org_owners))
-    drop(table(:org_group_owners))
-    drop(table(:org_students))
-    drop(table(:org_group_students))
     drop(table(:org_owner_watchlist_items))
     drop(table(:org_group_owner_watchlist_items))
+    drop(table(:org_group_students))
+    drop(table(:org_students))
+    drop(table(:org_group_owners))
+    drop(table(:org_owners))
+    drop(table(:org_groups))
   end
 end

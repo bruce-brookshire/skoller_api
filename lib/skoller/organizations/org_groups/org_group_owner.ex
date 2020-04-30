@@ -18,4 +18,9 @@ defmodule Skoller.Organizations.OrgGroupOwners.OrgGroupOwner do
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[org_group_id user_id]a
+
+  def changeset(%__MODULE__{} = struct, params) do
+    super(struct, params)
+    |> unique_constraint(:user_id, name: :org_group_owners_user_id_org_group_id_index)
+  end
 end

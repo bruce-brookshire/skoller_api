@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupOwnerController do
 
   use ExMvc.Controller, adapter: OrgGroupOwners, view: OrgOwnerView
 
-  def group_owners_for_org(conn, %{"organization_id" => org_id} = params) do
+  def group_owners_for_org(conn, %{"organization_id" => _} = params) do
     OrgGroupOwners.get_by_params(params)
     |> case do
       owners when is_list(owners) ->
