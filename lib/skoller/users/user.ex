@@ -10,6 +10,8 @@ defmodule Skoller.Users.User do
   alias Skoller.UserReports.Report
   alias Skoller.Services.Authentication
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
+  alias Skoller.Organizations.OrgOwners.OrgOwner
+  alias Skoller.Organizations.OrgGroupOwners.OrgGroupOwner
 
   schema "users" do
     field :email, :string
@@ -27,6 +29,9 @@ defmodule Skoller.Users.User do
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
+
+    has_many :org_owners, OrgOwner
+    has_many :org_group_owners, OrgGroupOwner
 
     timestamps()
   end
