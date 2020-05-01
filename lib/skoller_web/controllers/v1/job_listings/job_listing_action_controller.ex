@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
   use SkollerWeb, :controller
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.JobsAuth
 
   alias Skoller.JobGateListings.Actions
   alias Skoller.JobGateListings, as: Listings
@@ -25,7 +25,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
         {204, ""}
       else
         false -> {422, "Job does not exist"}
-        {:error, error} -> {422, "Issue inserting"}
+        {:error, _} -> {422, "Issue inserting"}
       end
 
     send_resp(conn, status, message)

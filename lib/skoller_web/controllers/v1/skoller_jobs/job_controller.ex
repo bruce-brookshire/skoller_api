@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobController do
   alias Skoller.SkollerJobs.JobProfiles
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.{Auth, JobsAuth}
 
   @student_role 100
 

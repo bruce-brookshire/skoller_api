@@ -6,6 +6,8 @@ defmodule SkollerWeb.Router do
 
   import SkollerWeb.Plugs.Auth
 
+  @default_rest_methods [:show, :index, :create, :update, :delete]
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -40,8 +42,25 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
-      resources "/organizations", OrganizationController, only: [:index]
+      # resources "/organizations", OrganizationController, only: [:index]
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
+      
+      resources "/organizations", OrganizationController, only: [:index] do
+        # Org resources
+        get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
+        resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
+          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: @default_rest_methods
+        end
+        resources "/students", Organization.OrgStudentController, only: @default_rest_methods
+
+        # Group resources
+        resources "/org-groups", Organization.OrgGroupController, only: @default_rest_methods do
+          resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
+            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: @default_rest_methods
+          end
+          resources "/students", Organization.OrgGroupStudentController, only: @default_rest_methods
+        end
+      end
 
       get "/email_domains/:email_domain/check", School.EmailDomainController, :show
       resources "/email-types", Admin.EmailTypeController, only: [:index, :update]
@@ -336,6 +355,8 @@ defmodule SkollerWeb.Router do
       get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
+
+      
     end
   end
 

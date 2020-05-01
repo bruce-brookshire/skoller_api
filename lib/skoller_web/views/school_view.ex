@@ -28,4 +28,6 @@ defmodule SkollerWeb.SchoolView do
       is_syllabus_overload: school.is_syllabus_overload
     }
   end
+
+  def render("school-min.json", %{school: school}), do: school |> Map.take([:id, :name])
 end

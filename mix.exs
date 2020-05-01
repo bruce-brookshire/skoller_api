@@ -47,6 +47,7 @@ defmodule Skoller.Mixfile do
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_ses, "~> 2.1.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:ex_mvc, "~> 0.2.0", github: "flyrboy96/ex_mvc"},
       {:ex_twilio, "~> 0.7.0"},
       {:gettext, "~> 0.11"},
       {:faker, "~> 0.11"},
