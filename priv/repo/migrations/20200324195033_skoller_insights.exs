@@ -18,6 +18,11 @@ defmodule Skoller.Repo.Migrations.SkollerInsights do
     end
 
     # Owners
+    create table(:org_members) do
+      add(:user_id, references(:users, on_delete: :delete_all))
+      add(:organization_id, references(:organizations, on_delete: :delete_all))
+    end
+    
     create table(:org_owners) do
       add(:organization_id, references(:organizations))
       add(:user_id, references(:users, on_delete: :delete_all))
@@ -25,7 +30,7 @@ defmodule Skoller.Repo.Migrations.SkollerInsights do
 
     create table(:org_group_owners) do
       add(:org_group_id, references(:org_groups, on_delete: :delete_all))
-      add(:user_id, references(:users, on_delete: :delete_all))
+      add(:member_id, references(:org_members, on_delete: :delete_all))
     end
 
     # Students
@@ -50,8 +55,13 @@ defmodule Skoller.Repo.Migrations.SkollerInsights do
       add(:org_group_student_id, references(:org_group_students, on_delete: :delete_all))
     end
 
+    create table(:student_invitations) do
+      add(:student_id, references(:students))
+      add(:organization_id, references(:organizations))
+    end
+
     create(unique_index(:org_owners, [:user_id, :organization_id]))
-    create(unique_index(:org_group_owners, [:user_id, :org_group_id]))
+    create(unique_index(:org_group_owners, [:member_id, :org_group_id]))
   end
 
   def down do
