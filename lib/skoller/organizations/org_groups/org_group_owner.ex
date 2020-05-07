@@ -20,6 +20,6 @@ defmodule Skoller.Organizations.OrgGroupOwners.OrgGroupOwner do
 
   def changeset(%__MODULE__{} = struct, params) do
     super(struct, params)
-    |> unique_constraint(:user_id, name: :org_group_owners_member_id_org_group_id_index)
+    |> unique_constraint(:user_id, name: :org_group_owners_org_member_id_org_group_id_index)
   end
 end
