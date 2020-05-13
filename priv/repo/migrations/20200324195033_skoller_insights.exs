@@ -1,6 +1,12 @@
 defmodule Skoller.Repo.Migrations.SkollerInsights do
   use Ecto.Migration
 
+  import Ecto.Query
+
+  alias Skoller.Repo
+  alias Skoller.Roles.Role
+  alias Skoller.UserRoles.UserRole
+
   def up do
     create table(:org_schools) do
       add(:organization_id, references(:organizations))
@@ -62,12 +68,29 @@ defmodule Skoller.Repo.Migrations.SkollerInsights do
 
     create(unique_index(:org_owners, [:user_id, :organization_id]))
     create(unique_index(:org_group_owners, [:org_member_id, :org_group_id]))
+    create(unique_index(:org_students, [:organization_id, :student_id]))
+    create(unique_index(:org_group_students, [:org_student_id, :org_group_id]))
+
+    %Role{
+      id: 700,
+      name: "Insights User"
+    }
+    |> Repo.insert()
   end
 
   def down do
     alter table(:organizations) do
       remove(:color)
       remove(:logo_url)
+    end
+
+    from(ur in UserRole)
+    |> where([ur], ur.role_id == 600)
+    |> Repo.delete_all()
+
+    case Repo.get(Role, 600) do  
+      nil -> nil
+      role -> Repo.delete(role)
     end
 
     drop(table(:org_schools))

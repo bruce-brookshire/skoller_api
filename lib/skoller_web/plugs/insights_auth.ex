@@ -5,6 +5,7 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
   @insights_user_role_id 700
 
   import Plug.Conn
+  import Ecto.Query
 
   def verify_owner(
         %{
@@ -22,7 +23,9 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
 
       # User is an owner, check ownership
       verify_role(user, @insights_user_role_id) ->
-        case user_owns_org?(user, organization_id) do
+        alias Skoller.Organizations.OrgOwners.OrgOwner
+
+        case resource_exists?(OrgOwner, user_id: user.id, organization_id: organization_id) |> IO.inspect do
           true -> conn
           false -> conn |> unauth
         end
@@ -30,6 +33,24 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       # Unauthorized
       true ->
         conn |> unauth
+    end
+  end
+
+  def verify_owner(
+        %{
+          assigns: %{user: user},
+          params: %{"id" => org_owner_id}
+        } = conn,
+        :org_owner
+      ) do
+    alias Skoller.Organizations.OrgOwners.OrgOwner
+    org_owner_id = String.to_integer(org_owner_id)
+    IO.inspect org_owner_id
+    IO.inspect user.id
+
+    cond do
+      resource_exists?(OrgOwner, org_owner_id, user_id: user.id) -> conn
+      true -> unauth(conn)
     end
   end
 
@@ -63,6 +84,17 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
     Enum.any?(roles, fn %{id: role_id} ->
       role_id in allowable
     end)
+  end
+
+  defp resource_exists?(model, params) when is_list(params),
+    do: from(m in model, where: ^params)
+    |> Repo.exists?()
+
+  defp resource_exists?(model, id, params) when is_list(params) do
+    case Repo.get_by(model, params) do
+      %{id: object_id} when object_id == id -> true
+      _ -> false
+    end
   end
 
   defp user_owns_org?(%{id: id}, organization_id) do
