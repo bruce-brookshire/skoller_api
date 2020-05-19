@@ -48,17 +48,26 @@ defmodule SkollerWeb.Router do
       resources "/organizations", OrganizationController, only: [:index] do
         # Org resources
         get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
+        resources "/members", Organization.OrgMemberController, only: @default_rest_methods
+        resources "/students", Organization.OrgStudentController, only: @default_rest_methods do
+          resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
+            resources "/assignment", Organization.OrgStudent.Class.AssignmentsController, only: [:index]
+          end
+        end
         resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
           resources "/watchlists", Organization.OrgOwnerWatchlistController, only: @default_rest_methods
         end
-        resources "/students", Organization.OrgStudentController, only: @default_rest_methods
 
         # Group resources
         resources "/org-groups", Organization.OrgGroupController, only: @default_rest_methods do
           resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
             resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: @default_rest_methods
           end
-          resources "/students", Organization.OrgGroupStudentController, only: @default_rest_methods
+          resources "/students", Organization.OrgGroupStudentController, only: @default_rest_methods do
+            resources "/classes", Organization.OrgGroupStudent.ClassesController, only: [:index] do
+              resources "/assignment", Organization.OrgGroupStudent.Class.AssignmentsController, only: [:index]
+            end
+          end
         end
       end
 

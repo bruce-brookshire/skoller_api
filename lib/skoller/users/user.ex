@@ -11,7 +11,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Services.Authentication
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.Organizations.OrgOwners.OrgOwner
-  alias Skoller.Organizations.OrgGroupOwners.OrgGroupOwner
+  alias Skoller.Organizations.OrgMembers.OrgMember
 
   schema "users" do
     field :email, :string
@@ -31,7 +31,7 @@ defmodule Skoller.Users.User do
     has_one :job_profile, JobProfile
 
     has_many :org_owners, OrgOwner
-    has_many :org_group_owners, OrgGroupOwner
+    has_many :org_members, OrgMember
 
     timestamps()
   end

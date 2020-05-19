@@ -18,10 +18,10 @@ defmodule SkollerWeb.UserView do
     do:
       Map.take(user, [:id, :email, :pic_path, :is_active])
       |> Map.put(:org_owners, View.render_association(user.org_owners))
-      |> Map.put(:org_group_owners, View.render_association(user.org_group_owners))
+      |> Map.put(:org_group_owners, View.render_association(user.org_members))
 
   def render("user_detail.json", %{user: user}) do
-    user = user |> Repo.preload([:student, :roles, :org_owners, :org_group_owners])
+    user = user |> Repo.preload([:student, :roles, :org_owners, :org_members])
 
     user
     |> render_one(UserView, "user.json")
