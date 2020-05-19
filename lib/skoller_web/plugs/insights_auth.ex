@@ -45,8 +45,6 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       ) do
     alias Skoller.Organizations.OrgOwners.OrgOwner
     org_owner_id = String.to_integer(org_owner_id)
-    IO.inspect org_owner_id
-    IO.inspect user.id
 
     cond do
       resource_exists?(OrgOwner, org_owner_id, user_id: user.id) -> conn

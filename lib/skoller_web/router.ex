@@ -44,28 +44,40 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1, as: :v1 do
       # resources "/organizations", OrganizationController, only: [:index]
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
-      
+
       resources "/organizations", OrganizationController, only: [:index] do
+        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: @default_rest_methods do
+          post "/respond", Organization.StudentOrgInvitationController, :respond
+        end
+
         # Org resources
         get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
         resources "/members", Organization.OrgMemberController, only: @default_rest_methods
+
         resources "/students", Organization.OrgStudentController, only: @default_rest_methods do
           resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
-            resources "/assignment", Organization.OrgStudent.Class.AssignmentsController, only: [:index]
+            resources "/assignment", Organization.OrgStudent.Class.AssignmentController,
+              only: [:index]
           end
         end
+
         resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
-          resources "/watchlists", Organization.OrgOwnerWatchlistController, only: @default_rest_methods
+          resources "/watchlists", Organization.OrgOwnerWatchlistController,
+            only: @default_rest_methods
         end
 
         # Group resources
         resources "/org-groups", Organization.OrgGroupController, only: @default_rest_methods do
           resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
-            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController, only: @default_rest_methods
+            resources "/watchlists", Organization.OrgGroupOwnerWatchlistController,
+              only: @default_rest_methods
           end
-          resources "/students", Organization.OrgGroupStudentController, only: @default_rest_methods do
+
+          resources "/students", Organization.OrgGroupStudentController,
+            only: @default_rest_methods do
             resources "/classes", Organization.OrgGroupStudent.ClassesController, only: [:index] do
-              resources "/assignment", Organization.OrgGroupStudent.Class.AssignmentsController, only: [:index]
+              resources "/assignment", Organization.OrgGroupStudent.Class.AssignmentController,
+                only: [:index]
             end
           end
         end
@@ -336,7 +348,6 @@ defmodule SkollerWeb.Router do
           only: [:index, :show],
           param: "sender_reference",
           name: "job_listing" do
-
           post "/action", JobListingActionController, :create
         end
       end
@@ -364,8 +375,6 @@ defmodule SkollerWeb.Router do
       get "/student-link/:token", StudentController, :show
       get "/enrollment-link/:token", Student.Class.LinkController, :show
       get "/email-types/list", EmailTypeController, :index
-
-      
     end
   end
 
