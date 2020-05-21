@@ -75,6 +75,11 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
     end
   end
 
+  def verify_owner(conn, :student_org_invites) do 
+    IO.puts "processing correctly"
+    conn
+  end
+
   defp verify_role(%{roles: roles}, allowable) when is_integer(allowable),
     do: Enum.any?(roles, &(&1.id == allowable))
 

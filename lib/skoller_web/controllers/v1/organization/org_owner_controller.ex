@@ -4,11 +4,8 @@ defmodule SkollerWeb.Api.V1.Organization.OrgOwnerController do
 
   import SkollerWeb.Plugs.InsightsAuth
 
-  use ExMvc.Controller,
-    adapter: OrgOwners,
-    view: OrgOwnerView,
-    plugs: (
-      plug(:verify_owner, :organization when action == :create)
-      plug(:verify_owner, :org_owner when action == :get)
-    )
+  use ExMvc.Controller, adapter: OrgOwners, view: OrgOwnerView
+
+  plug(:verify_owner, :organization when action in [:create, :index])
+  plug(:verify_owner, :org_owner when action == :get)
 end

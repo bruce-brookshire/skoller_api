@@ -2,5 +2,4 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupStudent.Class.AssignmentControl
   use SkollerWeb, :controller
 
   alias Skoller.StudentAssignments
-  
 end
