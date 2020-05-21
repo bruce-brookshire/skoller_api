@@ -101,8 +101,11 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
   end
 
   defp user_owns_group?(%{id: id}, group_id) do
-    alias Skoller.Organizations.OrgGroupOwners
-    OrgGroupOwners.exists?(user_id: id, group_id: group_id)
+    alias Skoller.Organizations.{ OrgMembers.OrgMember, OrgGroupOwners.OrgGroupOwner}
+    from(m in OrgMember)
+    |> join(:inner, [m], o in OrgGroupOwner, on: o.org_member_id == m.id)
+    |> where([m, o], m.user_id == ^id and o.org_group_id == ^group_id)
+    |> Repo.exists?()
   end
 
   defp unauth(conn), do: conn |> send_resp(401, "Unauthorized") |> halt()
