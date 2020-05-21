@@ -7,6 +7,8 @@ defmodule SkollerWeb.Router do
   import SkollerWeb.Plugs.Auth
 
   @default_rest_methods [:show, :index, :create, :update, :delete]
+  @access_existing [:show, :index, :update, :delete]
+  @view_only [:show, :index]
 
   pipeline :api do
     plug :accepts, ["json"]
@@ -46,7 +48,7 @@ defmodule SkollerWeb.Router do
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
 
       resources "/organizations", OrganizationController, only: [:index] do
-        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: @default_rest_methods do
+        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create] do
           post "/respond", Organization.StudentOrgInvitationController, :respond
         end
 
@@ -54,7 +56,7 @@ defmodule SkollerWeb.Router do
         get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
         resources "/members", Organization.OrgMemberController, only: @default_rest_methods
 
-        resources "/students", Organization.OrgStudentController, only: @default_rest_methods do
+        resources "/students", Organization.OrgStudentController, only: @access_existing do
           resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
             resources "/assignment", Organization.OrgStudent.Class.AssignmentController,
               only: [:index]
@@ -123,7 +125,7 @@ defmodule SkollerWeb.Router do
 
       post "/sessions", SessionController, :create
 
-      resources "/users", Admin.UserController, only: [:show, :index] do
+      resources "/users", Admin.UserController, only: @view_only do
         # User Role routes
         post "/roles/:id", Admin.User.RoleController, :create
         resources "/roles/", Admin.User.RoleController, only: [:index, :delete]
@@ -134,7 +136,7 @@ defmodule SkollerWeb.Router do
       get "/report", Admin.ReportUserController, :index
 
       # Role routes
-      resources "/roles", RoleController, only: [:show, :index]
+      resources "/roles", RoleController, only: @view_only
 
       # School routes
       get "/schools/hub", Admin.SchoolController, :hub
