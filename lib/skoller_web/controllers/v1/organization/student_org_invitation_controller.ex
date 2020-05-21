@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   use ExMvc.Controller,
     adapter: StudentOrgInvitations,
     view: StudentOrgInvitationView,
-    only: [:show, :index, :update, :create]
+    only: [:show, :update, :create]
 
   plug(:verify_owner, :student_org_invites when action in [:index, :get, :update]) 
 
