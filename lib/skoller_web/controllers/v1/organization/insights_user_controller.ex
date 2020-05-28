@@ -26,9 +26,9 @@ defmodule SkollerWeb.Api.V1.Organization.InsightsUserController do
     Logger.info("User password: " <> password)
 
     user_params = %{
-      roles: [@insights_role],
-      email: email,
-      password: password
+      "roles" => [@insights_role],
+      "email" => email,
+      "password" => password
     }
 
     case Users.create_user(user_params, admin: true) do
