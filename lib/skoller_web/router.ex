@@ -53,9 +53,7 @@ defmodule SkollerWeb.Router do
         end
 
         # Org resources
-        get "/org-group-owners", Organization.OrgGroupOwnerController, :group_owners_for_org
         resources "/members", Organization.OrgMemberController, only: @default_rest_methods
-
         resources "/students", Organization.OrgStudentController, only: @access_existing do
           resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
             resources "/assignment", Organization.OrgStudent.Class.AssignmentController,
@@ -122,6 +120,7 @@ defmodule SkollerWeb.Router do
       post "/users/create", Admin.UserController, :create
       put "/users/:user_id/update", Admin.UserController, :update
       get "/users/points", Admin.UserController, :points
+      resources "/insights/users", Organization.InsightsUserController, only: [:create, :index]
 
       post "/sessions", SessionController, :create
 
