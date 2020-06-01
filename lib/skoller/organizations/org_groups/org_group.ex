@@ -11,6 +11,8 @@ defmodule Skoller.Organizations.OrgGroups.OrgGroup do
 
     belongs_to :organization, Organization
     has_many :owners, OrgGroupOwner
+
+    timestamps()
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[name organization_id]a

@@ -9,6 +9,8 @@ defmodule Skoller.Organizations.OrgOwners.OrgOwner do
   schema "org_owners" do
     belongs_to :organization, Organization
     belongs_to :user, User
+
+    timestamps()
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[organization_id user_id]a
@@ -16,5 +18,6 @@ defmodule Skoller.Organizations.OrgOwners.OrgOwner do
   def changeset(%__MODULE__{} = struct, params) do
     super(struct, params)
     |> unique_constraint(:user_id, name: :org_owners_user_id_organization_id_index)
+    |> foreign_key_constraint(:organization_id, name: :org_owners_organization_id_fkey)
   end
 end
