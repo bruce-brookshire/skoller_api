@@ -1,0 +1,140 @@
+<html>
+<style>
+    div {
+        text-align: center;
+        font-family: 'Arial';
+        align-items: center;
+    }
+
+    img {
+        padding: 16px;
+    }
+
+    p {
+        text-align: left;
+        padding-left: 10vw;
+    }
+
+    th,
+    td {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    a.link {
+        color: #57B9E4;
+    }
+
+    div.button {
+        flex-direction: row;
+        border-radius: 5px;
+        box-shadow: 2px 3px 3px #A6A6A6;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 16px;
+    }
+
+    .blue-background {
+        background-color: #57B9E4;
+    }
+
+    .white-background {
+        background-color: white;
+    }
+
+    .white-color {
+        color: white;
+    }
+
+    .header {
+        text-align: center;
+        font-size: 24px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .password-table {
+        flex-direction: row;
+        padding: 2px;
+        border: 1px solid #4A4A4A;
+        border-collapse: separate;
+        border-radius: 5px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .video-style {
+        padding-top: 0px;
+    }
+
+    .footer {
+        text-align: center;
+        font-size: 12px;
+        padding: 2em;
+    }
+</style>
+
+<body>
+    <div>
+        <a target='_blank' href='https://www.skoller.co'><img
+                src='https://classnav-email-images.s3.amazonaws.com/skoller_header.png' /></a>
+        <div class='header blue-background'>
+            <b><span class='white-color'>Welcome to Skoller Insights!</span></b>
+        </div>
+        <p>
+        <div style='text-align: center;'>
+            <b>You have been invited to Skoller Insights by <a class='link'
+                    href='mailto:{{invited_by}}'>{{invited_by}}</a></b>
+        </div>
+        <br />
+        <table class='password-table'>
+            <tr>
+                <th class='blue-background white-color'>Email:</th>
+                <td class='white-background'>{{email}}
+            </tr>
+            <tr>
+                <th class='blue-background white-color'>Password:</th>
+                <td class='white-background'>{{password}}
+            </tr>
+        </table>
+        <div class='white-color' style='display: flex; text-align: center; justify-content: center; padding-top: 16px;'>
+
+            <a style='text-decoration: none; padding-right: 12px' href='https://skoller.co'>
+                <div class='button blue-background white-color'>
+                    <strong>Sign in</strong>
+                </div>
+            </a>
+            <a style='text-decoration: none;' href='https://skoller.co'>
+                <div class='button blue-background white-color'>
+                    <strong>Change Password</strong>
+                </div>
+            </a>
+        </div>
+        <div>
+            <br />
+            <br />
+            <strong style='font-size: 18px; padding-top: 56px;'>What is Skoller?</strong>
+            <br />
+            <a href='https://youtu.be/4qXVfl6cUe4' target='_blank' class='video-style'> <img
+                    src='https://classnav-email-images.s3.amazonaws.com/general_assets/skoller_video_thumbnail.png'
+                    style='text-align: center; max-width: 50vw; border-radius: 0%;'> </a>
+            <br />
+        </div>
+        </p>
+        <div class='footer blue-background'>
+            <b><span class='white-color'>
+                    Skoller, Inc.<br />701 Murfreesboro Pike Suite 200<br />Nashville TN, 37210
+                </span></b>
+            <br />
+            <br />
+            <span class='white-color'>
+                This email was sent from a no-reply address.
+
+                Please send any questions to <a href='mailto:support@skoller.co'
+                    style='color: #4A4A4A;'>support@skoller.co</a>
+            </span>
+        </div>
+    </div>
+</body>
+
+</html>

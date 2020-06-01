@@ -4,7 +4,10 @@ defmodule SkollerWeb.Organization.OrgStudentView do
   use ExMvc.View, model: OrgStudent
 
   def render("show.json", %{model: org_student}) do
-    student = org_student.student |> Map.take([:name_first, :name_last, :id])
+    %{users: users} = student = org_student.student |> Map.take([:name_first, :name_last, :phone, :id, :users])
+    users = Enum.map(users, & render_association(&1))
+
+    student = %{student | users: users}
 
     %{
       org_group_students: render_association(org_student.org_group_students),

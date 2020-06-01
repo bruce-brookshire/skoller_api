@@ -45,8 +45,6 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       ) do
     alias Skoller.Organizations.OrgOwners.OrgOwner
     org_owner_id = String.to_integer(org_owner_id)
-    IO.inspect org_owner_id
-    IO.inspect user.id
 
     cond do
       resource_exists?(OrgOwner, org_owner_id, user_id: user.id) -> conn
@@ -77,6 +75,11 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
     end
   end
 
+  def verify_owner(conn, :student_org_invites) do 
+    IO.puts "processing correctly"
+    conn
+  end
+
   defp verify_role(%{roles: roles}, allowable) when is_integer(allowable),
     do: Enum.any?(roles, &(&1.id == allowable))
 
@@ -103,8 +106,11 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
   end
 
   defp user_owns_group?(%{id: id}, group_id) do
-    alias Skoller.Organizations.OrgGroupOwners
-    OrgGroupOwners.exists?(user_id: id, group_id: group_id)
+    alias Skoller.Organizations.{ OrgMembers.OrgMember, OrgGroupOwners.OrgGroupOwner}
+    from(m in OrgMember)
+    |> join(:inner, [m], o in OrgGroupOwner, on: o.org_member_id == m.id)
+    |> where([m, o], m.user_id == ^id and o.org_group_id == ^group_id)
+    |> Repo.exists?()
   end
 
   defp unauth(conn), do: conn |> send_resp(401, "Unauthorized") |> halt()
