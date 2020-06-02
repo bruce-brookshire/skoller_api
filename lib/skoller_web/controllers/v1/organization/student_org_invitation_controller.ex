@@ -13,9 +13,9 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   use ExMvc.Controller,
     adapter: StudentOrgInvitations,
     view: StudentOrgInvitationView,
-    only: [:show, :update, :create]
+    only: [:show, :update, :create, :delete]
 
-  plug(:verify_owner, :student_org_invites when action in [:index, :get, :update, :csv_create])
+  plug(:verify_owner, :student_org_invites when action in [:index, :get, :update, :csv_create, :delete])
 
   def index(%{assigns: %{user: user}} = conn, %{"organization_id" => organization_id}) do
     case user do

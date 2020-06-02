@@ -49,7 +49,7 @@ defmodule SkollerWeb.Router do
 
       resources "/organizations", OrganizationController, only: [:index] do
         post "/student-org-invitations/csv", Organization.StudentOrgInvitationController, :csv_create
-        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create] do
+        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create, :delete] do
           post "/respond", Organization.StudentOrgInvitationController, :respond
         end
 
