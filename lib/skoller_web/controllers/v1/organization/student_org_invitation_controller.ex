@@ -3,6 +3,8 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   alias SkollerWeb.Organization.StudentOrgInvitationView
   alias Skoller.Organizations.OrgStudents
   alias Skoller.Organizations.OrgGroups
+  alias Skoller.Organizations.OrgGroupStudents
+  alias Skoller.StudentClasses
   alias Skoller.Students
   alias SkollerWeb.CSVView
   alias Skoller.CSVUploads
@@ -15,7 +17,21 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     view: StudentOrgInvitationView,
     only: [:show, :update, :create, :delete]
 
-  plug(:verify_owner, :student_org_invites when action in [:index, :get, :update, :csv_create, :delete])
+  plug(
+    :verify_owner,
+    :student_org_invites when action in [:index, :get, :update, :csv_create, :delete]
+  )
+
+  @colors [
+    "ae77bdff",
+    "e882acff",
+    "3484e3ff",
+    "61d8a0ff",
+    "19a394ff",
+    "f1aa39ff",
+    "e2762dff",
+    "d73f76ff"
+  ]
 
   def index(%{assigns: %{user: user}} = conn, %{"organization_id" => organization_id}) do
     case user do
@@ -44,14 +60,28 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   def respond(conn, %{"student_org_invitation_id" => invite_id, "accepts" => accepts}) do
     case StudentOrgInvitations.get_by_id(invite_id) do
       nil ->
-        conn |> send_resp(401, "Not found")
+        conn |> send_resp(404, "Not found")
 
-      %{student_id: _, organization_id: _} = invite ->
-        if accepts,
-          do: Map.take(invite, [:student_id, :organization_id]) |> OrgStudents.create()
+      %{student_id: student_id, organization_id: _, class_ids: classes, group_ids: groups} =
+          invite ->
+        if accepts do
+          {:ok, %{id: org_student_id}} =
+            Map.take(invite, [:student_id, :organization_id]) |> OrgStudents.create()
+
+          classes
+          |> Enum.each(
+            &StudentClasses.enroll_in_class(student_id, &1, %{"color" => Enum.random(@colors), "class_id" => &1, "student_id" => student_id})
+          )
+
+          groups
+          |> Enum.each(&(OrgGroupStudents.create(%{org_student_id: org_student_id, org_group_id: &1})))
+        end
 
         StudentOrgInvitations.delete(invite)
         send_resp(conn, 204, "")
+
+      _ ->
+        send_resp(conn, 401, "Student profile does not exist")
     end
   end
 
