@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Organization.OrgGroupStudentView do
-  alias Skoller.Organizations.OrgGroupStudents.OrgGroupStudent
-
-  use ExMvc.View, model: OrgGroupStudent
+  import ExMvc.View
+  use SkollerWeb, :view
 
   def render("show.json", %{model: org_group_student}) do
     student = org_group_student.student |> Map.take([:name_first, :name_last, :id])
@@ -14,5 +13,5 @@ defmodule SkollerWeb.Organization.OrgGroupStudentView do
     }
   end
 
-  def render(name, content), do: super(name, content)
+  def render("index.json", %{models: models}), do: render_many(models, __MODULE__, "show.json")
 end
