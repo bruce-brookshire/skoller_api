@@ -15,12 +15,14 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   use ExMvc.Controller,
     adapter: StudentOrgInvitations,
     view: StudentOrgInvitationView,
-    only: [:show, :update, :create, :delete]
+    only: [:show, :update, :delete]
 
   plug(
     :verify_owner,
-    :student_org_invites when action in [:index, :get, :update, :csv_create, :delete]
+    :student_org_invites when action in [:index, :get, :delete, :respond]
   )
+
+  plug :verify_owner, :organization when action in [:csv_create, :update]
 
   @colors [
     "ae77bdff",
@@ -70,11 +72,17 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
           classes
           |> Enum.each(
-            &StudentClasses.enroll_in_class(student_id, &1, %{"color" => Enum.random(@colors), "class_id" => &1, "student_id" => student_id})
+            &StudentClasses.enroll_in_class(student_id, &1, %{
+              "color" => Enum.random(@colors),
+              "class_id" => &1,
+              "student_id" => student_id
+            })
           )
 
           groups
-          |> Enum.each(&(OrgGroupStudents.create(%{org_student_id: org_student_id, org_group_id: &1})))
+          |> Enum.each(
+            &OrgGroupStudents.create(%{org_student_id: org_student_id, org_group_id: &1})
+          )
         end
 
         StudentOrgInvitations.delete(invite)
@@ -82,6 +90,20 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
       _ ->
         send_resp(conn, 401, "Student profile does not exist")
+    end
+  end
+
+  def create(conn, params) do
+    case invite_student(params) do
+      {:ok, invite} ->
+        put_view(conn, StudentOrgInvitationView) |> render("show.json", model: invite)
+
+      {:error, %{errors: errors}} ->
+        body = ExMvc.Controller.stringify_changeset_errors(errors)
+        send_resp(conn, 422, body)
+
+      _ ->
+        send_resp(conn, 422, "Unprocessable Entity")
     end
   end
 
@@ -110,21 +132,24 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
   defp process_student(error, _org_id), do: error
 
-  defp invite_student(%{"phone" => phone} = params, %{org_id: org_id} = opts) do
+  defp invite_student(%{"phone" => phone} = params) do
+    case Students.get_student_by_phone(phone) do
+      %{id: student_id} -> Map.put(params, "student_id", student_id)
+      nil -> params
+    end
+    |> StudentOrgInvitations.create()
+  end
+
+  defp invite_student(params, %{org_id: org_id} = opts) do
     group_ids =
       case Map.has_key?(opts, :group_id) and not is_nil(opts.group_id) do
         true -> [opts.group_id]
         false -> []
       end
 
-    case Students.get_student_by_phone(phone) do
-      %{id: student_id} ->
-        %{"student_id" => student_id, "organization_id" => org_id, "group_ids" => group_ids}
-
-      nil ->
-        Map.merge(params, %{"organization_id" => org_id, "group_ids" => group_ids})
-    end
-    |> StudentOrgInvitations.create()
+    params
+    |> Map.merge(%{"organization_id" => org_id, "group_ids" => group_ids})
+    |> invite_student()
   end
 
   defp invite_student(_params, _opts), do: nil
