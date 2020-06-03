@@ -7,22 +7,20 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   alias Skoller.StudentClasses
   alias Skoller.Students
   alias SkollerWeb.CSVView
-  alias Skoller.CSVUploads
-  alias Skoller.Repo
 
   import SkollerWeb.Plugs.InsightsAuth
+  import SkollerWeb.Plugs.Auth
 
   use ExMvc.Controller,
     adapter: StudentOrgInvitations,
     view: StudentOrgInvitationView,
     only: [:show, :update, :delete]
 
-  plug(
-    :verify_owner,
-    :student_org_invites when action in [:index, :get, :delete, :respond]
-  )
+  @student_role 100
 
-  plug :verify_owner, :organization when action in [:csv_create, :update]
+  plug :verify_role, %{role: @student_role} when action == :respond
+  plug :verify_owner, :student_org_invites when action in [:index, :show, :respond]
+  plug :verify_owner, :organization when action in [:csv_create, :create, :update, :delete]
 
   @colors [
     "ae77bdff",
@@ -35,28 +33,25 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     "d73f76ff"
   ]
 
-  def index(%{assigns: %{user: user}} = conn, %{"organization_id" => organization_id}) do
-    case user do
-      %{student: %{id: id}} ->
-        invites =
-          StudentOrgInvitations.get_by_params(student_id: id, organization_id: organization_id)
+  def index(%{assigns: %{user: %{student_id: student_id}}} = conn, %{
+        "organization_id" => organization_id
+      })
+      when not is_nil(student_id) do
+    invites =
+      StudentOrgInvitations.get_by_params(
+        student_id: student_id,
+        organization_id: organization_id
+      )
 
-        put_view(conn, StudentOrgInvitationView)
-        |> render("index.json", models: invites)
+    put_view(conn, StudentOrgInvitationView)
+    |> render("index.json", models: invites)
+  end
 
-      %{roles: roles} ->
-        case Enum.any?(roles, &(&1.id == 700 || &1.id == 200)) do
-          true ->
-            invites = StudentOrgInvitations.get_by_params(organization_id: organization_id)
+  def index(conn, %{"organization_id" => organization_id}) do
+    invites = StudentOrgInvitations.get_by_params(organization_id: organization_id)
 
-            put_view(conn, StudentOrgInvitationView)
-            |> render("index.json", models: invites)
-
-          false ->
-            conn
-            |> send_resp(401, "unauthorized")
-        end
-    end
+    put_view(conn, StudentOrgInvitationView)
+    |> render("index.json", models: invites)
   end
 
   def respond(conn, %{"student_org_invitation_id" => invite_id, "accepts" => accepts}) do
