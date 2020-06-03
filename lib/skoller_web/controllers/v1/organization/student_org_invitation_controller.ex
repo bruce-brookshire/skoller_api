@@ -1,12 +1,13 @@
 defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
-  alias Skoller.Organizations.StudentOrgInvitations
   alias SkollerWeb.Organization.StudentOrgInvitationView
+  alias Skoller.Organizations.StudentOrgInvitations
+  alias Skoller.Organizations.OrgGroupStudents
   alias Skoller.Organizations.OrgStudents
   alias Skoller.Organizations.OrgGroups
-  alias Skoller.Organizations.OrgGroupStudents
+  alias Skoller.Services.SesMailer
   alias Skoller.StudentClasses
-  alias Skoller.Students
   alias SkollerWeb.CSVView
+  alias Skoller.Students
 
   import SkollerWeb.Plugs.InsightsAuth
   import SkollerWeb.Plugs.Auth
@@ -18,9 +19,12 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
   @student_role 100
 
-  plug :verify_role, %{role: @student_role} when action == :respond
+  plug :verify_role, %{role: @student_role} when action in [:respond, :student_invites]
   plug :verify_owner, :student_org_invites when action in [:index, :show, :respond]
-  plug :verify_owner, :organization when action in [:csv_create, :create, :update, :delete]
+  plug :verify_owner, :student when action == :student_invites
+
+  plug :verify_owner,
+       :organization when action in [:csv_create, :create, :update, :delete, :email_reminder]
 
   @colors [
     "ae77bdff",
@@ -122,6 +126,23 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     end
   end
 
+  def email_reminder(conn, %{"organization_id" => org_id}) do
+    StudentOrgInvitations.get_by_params(organization_id: org_id)
+    |> Enum.each(fn %{email: email, organization: %{name: org_name}} ->
+      send_reminder_email(email, org_name)
+    end)
+
+    send_resp(conn, 204, "")
+  end
+
+  def student_invites(conn, %{"student_id" => student_id}) do
+    invitations = StudentOrgInvitations.get_by_params(student_id: student_id)
+
+    conn
+    |> put_view(StudentOrgInvitationView)
+    |> render("index.json", models: invitations)
+  end
+
   defp process_student({:ok, params}, opts),
     do: invite_student(params, opts)
 
@@ -148,4 +169,25 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   end
 
   defp invite_student(_params, _opts), do: nil
+
+  defp send_invite_email(email, org_name, invited_by) do
+    %{
+      to: email,
+      template_data: %{
+        organization_name: org_name,
+        invited_by: invited_by
+      }
+    }
+    |> SesMailer.send_individual_email("skoller_insights_invitation")
+  end
+
+  defp send_reminder_email(email, org_name) do
+    %{
+      to: email,
+      template_data: %{
+        organization_name: org_name
+      }
+    }
+    |> SesMailer.send_individual_email("skoller_insights_reminder")
+  end
 end

@@ -62,7 +62,7 @@ defmodule Skoller.AirtableSyncJob do
         true
       end
 
-    if airtable_job_enabled |> IO.inspect do
+    if airtable_job_enabled do
       next_job_type_id = rem(curr_job_type_id, 300) + 100
 
       Process.send_after(

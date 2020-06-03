@@ -101,6 +101,20 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
     end
   end
 
+  def verify_owner(
+        %{
+          assigns: %{user: %{student_id: student_id}},
+          params: %{"student_id" => accessing_student_id}
+        } = conn,
+        :student
+      ) do
+    if String.to_integer(accessing_student_id) == student_id do
+      conn
+    else
+      conn |> unauth
+    end
+  end
+
   defp verify_role(%{roles: roles}, allowable) when is_integer(allowable),
     do: Enum.any?(roles, &(&1.id == allowable))
 
