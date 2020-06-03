@@ -1,5 +1,6 @@
 defmodule SkollerWeb.Organization.OrgStudentView do
   import ExMvc.View
+
   use SkollerWeb, :view
 
   def render("show.json", %{model: org_student}) do
@@ -18,4 +19,12 @@ defmodule SkollerWeb.Organization.OrgStudentView do
   end
 
   def render("index.json", %{models: models}), do: render_many(models, __MODULE__, "show.json")
+
+
+  def render(name, body) do
+    require Logger
+    Logger.info(name)
+    Logger.info(inspect(body))
+    "Hello"
+  end
 end
