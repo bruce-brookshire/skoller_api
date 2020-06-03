@@ -2,15 +2,17 @@ defmodule SkollerWeb.CSVView do
   @moduledoc false
   use SkollerWeb, :view
 
-  alias SkollerWeb.CSVView
-  alias SkollerWeb.ChangesetView
-  alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation
   alias SkollerWeb.School.FieldOfStudyView
-  alias Skoller.Classes.Class
-  alias SkollerWeb.ClassView
+  alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias SkollerWeb.Organization.StudentOrgInvitationView
+  alias SkollerWeb.ChangesetView
   alias Skoller.Schools.School
   alias SkollerWeb.SchoolView
-
+  alias Skoller.Classes.Class
+  alias SkollerWeb.ClassView
+  alias SkollerWeb.CSVView
+  
   def render("index.json", %{csv: csv}) do
     render_many(csv, CSVView, "csv.json")
   end
@@ -25,6 +27,10 @@ defmodule SkollerWeb.CSVView do
 
   def render("csv.json", %{csv: {:ok, %School{} = school}}) do
     render_one(school, SchoolView, "show.json")
+  end
+  
+  def render("csv.json", %{csv: {:ok, %StudentOrgInvitation{} = invite}}) do
+    render_one(invite, StudentOrgInvitationView, "show.json", as: :model)
   end
 
   def render("csv.json", %{csv: {:error, %Ecto.Changeset{} = changeset}}) do

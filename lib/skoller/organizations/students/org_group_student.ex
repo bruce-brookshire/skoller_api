@@ -13,6 +13,8 @@ defmodule Skoller.Organizations.OrgGroupStudents.OrgGroupStudent do
     belongs_to :org_group, OrgGroup
 
     has_one :student, through: [:org_student, :student]
+
+    timestamps()
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[org_student_id org_group_id]a

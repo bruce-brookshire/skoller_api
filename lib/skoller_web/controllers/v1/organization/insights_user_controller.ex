@@ -75,7 +75,7 @@ defmodule SkollerWeb.Api.V1.Organization.InsightsUserController do
 
   defp generate_password(), do: for(_i <- 1..12, do: Enum.random(@chars)) |> Enum.join()
 
-  defp send_insights_email(%{email: email, password: password}, invited_by) do
+  defp send_insights_email(%{"email" => email, "password" => password}, invited_by) do
     SesMailer.send_individual_email(
       %{to: email, form: %{email: email, password: password, invited_by: invited_by}},
       "new_insights_account"
