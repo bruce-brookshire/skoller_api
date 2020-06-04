@@ -1,12 +1,15 @@
 defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
+  alias Skoller.Organizations.{
+    StudentOrgInvitations,
+    OrgGroupStudents,
+    OrgStudents,
+    OrgGroups,
+    OrgStudents.OrgStudent
+  }
+
   alias SkollerWeb.Organization.StudentOrgInvitationView
-  alias Skoller.Organizations.StudentOrgInvitations
-  alias Skoller.Organizations.OrgGroupStudents
-  alias Skoller.Organizations.OrgStudents
-  alias Skoller.Organizations.OrgGroups
   alias Skoller.Services.SesMailer
   alias Skoller.StudentClasses
-  alias SkollerWeb.CSVView
   alias Skoller.Students
 
   import SkollerWeb.Plugs.InsightsAuth
@@ -98,7 +101,12 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     else
       case invite_student(params, %{org_id: org_id, group_id: params["org_group_id"]}) do
         {:ok, invite} ->
-          put_view(conn, StudentOrgInvitationView) |> render("show.json", model: invite)
+          conn |> put_view(StudentOrgInvitationView) |> render("invite.json", invite: invite)
+
+        %OrgStudent{} = org_student ->
+          conn
+          |> put_view(StudentOrgInvitationView)
+          |> render("invite.json", org_student: org_student)
 
         {:error, %{errors: errors}} ->
           body = ExMvc.Controller.stringify_changeset_errors(errors)
@@ -123,8 +131,8 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
           |> Enum.map(&process_student(&1, %{org_id: org_id, group_id: params["org_group_id"]}))
 
         conn
-        |> put_view(CSVView)
-        |> render("index.json", csv: invitations)
+        |> put_view(StudentOrgInvitationView)
+        |> render("invites.json", invites: invitations)
     end
   end
 
@@ -151,7 +159,12 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   defp process_student(error, _org_id), do: error
 
   defp invite_student(params, %{org_id: org_id} = opts) do
-    group_ids = if(opts[:group_id], do: [opts.group_id], else: [])
+    group_ids =
+      case opts[:group_id] do
+        nil -> []
+        id when is_integer(id) -> [id]
+        id when is_binary(id) -> [String.to_integer(id)]
+      end
 
     params
     |> Map.merge(%{"organization_id" => org_id, "group_ids" => group_ids})
