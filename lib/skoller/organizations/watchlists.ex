@@ -7,6 +7,8 @@ defmodule Skoller.Organizations.OrgOwnerWatchlistItems.OrgOwnerWatchlistItem do
   schema "org_owner_watchlist_items" do
     belongs_to :org_student, OrgStudent
     belongs_to :org_owner, OrgOwner
+
+    timestamps()
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[org_student_id org_owner_id]a
@@ -25,6 +27,8 @@ defmodule Skoller.Organizations.OrgGroupOwnerWatchlistItems.OrgGroupOwnerWatchli
   schema "org_group_owner_watchlist_items" do
     belongs_to :org_group_student, OrgGroupStudent
     belongs_to :org_group_owner, OrgGroupOwner
+    
+    timestamps()
   end
 
   use ExMvc.ModelChangeset, req_fields: ~w[org_group_student_id org_group_owner_id]a
