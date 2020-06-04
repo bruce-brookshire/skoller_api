@@ -92,21 +92,25 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     end
   end
 
-  def create(conn, params) do
-    case invite_student(params) do
-      {:ok, invite} ->
-        put_view(conn, StudentOrgInvitationView) |> render("show.json", model: invite)
+  def create(conn, %{"organization_id" => org_id} = params) do
+    if Map.has_key?(params, "org_group_id") and not OrgGroups.exists?(id: params["org_group_id"]) do
+      send_resp(conn, 422, "Group does not exist")
+    else
+      case invite_student(params, %{org_id: org_id, group_id: params["org_group_id"]}) do
+        {:ok, invite} ->
+          put_view(conn, StudentOrgInvitationView) |> render("show.json", model: invite)
 
-      {:error, %{errors: errors}} ->
-        body = ExMvc.Controller.stringify_changeset_errors(errors)
-        send_resp(conn, 422, body)
+        {:error, %{errors: errors}} ->
+          body = ExMvc.Controller.stringify_changeset_errors(errors)
+          send_resp(conn, 422, body)
 
-      _ ->
-        send_resp(conn, 422, "Unprocessable Entity")
+        _ ->
+          send_resp(conn, 422, "Unprocessable Entity")
+      end
     end
   end
 
-  def csv_create(conn, %{"file" => file, "organization_id" => organization_id} = params) do
+  def csv_create(conn, %{"file" => file, "organization_id" => org_id} = params) do
     cond do
       Map.has_key?(params, "org_group_id") and not OrgGroups.exists?(id: params["org_group_id"]) ->
         send_resp(conn, 422, "Group does not exist")
@@ -116,9 +120,7 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
           file.path
           |> File.stream!()
           |> CSV.decode(headers: true)
-          |> Enum.map(
-            &process_student(&1, %{org_id: organization_id, group_id: params["org_group_id"]})
-          )
+          |> Enum.map(&process_student(&1, %{org_id: org_id, group_id: params["org_group_id"]}))
 
         conn
         |> put_view(CSVView)
@@ -148,20 +150,8 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
   defp process_student(error, _org_id), do: error
 
-  defp invite_student(%{"phone" => phone} = params) do
-    case Students.get_student_by_phone(phone) do
-      %{id: student_id} -> Map.put(params, "student_id", student_id)
-      nil -> params
-    end
-    |> StudentOrgInvitations.create()
-  end
-
   defp invite_student(params, %{org_id: org_id} = opts) do
-    group_ids =
-      case Map.has_key?(opts, :group_id) and not is_nil(opts.group_id) do
-        true -> [opts.group_id]
-        false -> []
-      end
+    group_ids = if(opts[:group_id], do: [opts.group_id], else: [])
 
     params
     |> Map.merge(%{"organization_id" => org_id, "group_ids" => group_ids})
@@ -169,6 +159,56 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   end
 
   defp invite_student(_params, _opts), do: nil
+
+  defp invite_student(%{"phone" => phone, "organization_id" => org_id} = params) do
+    student = Students.get_student_by_phone(phone)
+
+    cond do
+      invitation = invitation_by_params(phone, org_id) ->
+        org_group_ids =
+          (invitation.group_ids ++ (params["group_ids"] || []))
+          |> Enum.uniq()
+
+        invitation |> StudentOrgInvitations.update(%{group_ids: org_group_ids})
+
+      org_student = org_student_by_params(student, org_id) ->
+        org_student |> add_org_group_students(params)
+
+      true ->
+        student
+        |> case do
+          nil -> params
+          %{id: student_id} -> Map.put(params, "student_id", student_id)
+        end
+        |> StudentOrgInvitations.create()
+    end
+  end
+
+  defp org_student_by_params(nil, _org_id), do: nil
+
+  defp org_student_by_params(%{phone: phone}, org_id) do
+    student_id = Map.get(Students.get_student_by_phone(phone) || %{}, :id, 0)
+
+    OrgStudents.get_by_params(student_id: student_id, organization_id: org_id)
+    |> List.first()
+  end
+
+  defp invitation_by_params(phone, org_id),
+    do:
+      StudentOrgInvitations.get_by_params(phone: phone, organization_id: org_id)
+      |> List.first()
+
+  defp add_org_group_students(%{org_groups: groups, id: org_student_id}, params) do
+    existing_groups = groups |> Enum.map(& &1.id)
+
+    (groups ++ (params["group_ids"] || []))
+    |> Enum.uniq()
+    |> Enum.reject(&(&1 in existing_groups))
+    |> Enum.map(&%{org_group_id: &1, org_student_id: org_student_id})
+    |> Enum.each(&OrgGroupStudents.create/1)
+
+    OrgStudents.get_by_id(org_student_id)
+  end
 
   defp send_invite_email(email, org_name, invited_by) do
     %{
