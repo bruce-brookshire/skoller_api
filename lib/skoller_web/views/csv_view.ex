@@ -29,10 +29,6 @@ defmodule SkollerWeb.CSVView do
     render_one(school, SchoolView, "show.json")
   end
   
-  def render("csv.json", %{csv: {:ok, %StudentOrgInvitation{} = invite}}) do
-    render_one(invite, StudentOrgInvitationView, "show.json", as: :model)
-  end
-
   def render("csv.json", %{csv: {:error, %Ecto.Changeset{} = changeset}}) do
     changeset.changes |> Map.merge(
       render_one(changeset, ChangesetView, "error.json")

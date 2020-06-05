@@ -6,6 +6,6 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupOwnerController do
   
   use ExMvc.Controller, adapter: OrgGroupOwners, view: OrgOwnerView
 
-  plug :verify_owner, :org_group when action in [:index, :show]
-  plug :verify_owner, :organization when action in [:create, :update, :delete]
+  plug :verify_owner, :org_group when action in [:index, :update, :show]
+  plug :verify_owner, :organization when action in [:create, :delete]
 end

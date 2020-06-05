@@ -23,7 +23,7 @@ defmodule Skoller.Organizations.OrgGroupOwners.OrgGroupOwner do
   def changeset(%__MODULE__{} = struct, params) do
     super(struct, params)
     |> unique_constraint(:org_member_id, name: :org_group_owners_org_member_id_org_group_id_index)
-    |> foreign_key_constraint(:org_member_id, :org_group_owners_org_member_id_fkey)
-    |> foreign_key_constraint(:org_group_id, :org_group_owners_org_group_id_fkey)
+    |> foreign_key_constraint(:org_member_id, name: :org_group_owners_org_member_id_fkey)
+    |> foreign_key_constraint(:org_group_id, name: :org_group_owners_org_group_id_fkey)
   end
 end

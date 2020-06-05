@@ -55,13 +55,22 @@ defmodule Skoller.AirtableSyncJob do
 
   # This creates a :work event to be processed after get_time_diff_minute/1 milliseconds.
   defp schedule_work(curr_job_type_id) do
-    next_job_type_id = rem(curr_job_type_id, 300) + 100
+    airtable_job_enabled =
+      if System.get_env("AIRTABLE_JOB_ENABLED") == "false" do
+        false
+      else
+        true
+      end
 
-    Process.send_after(
-      self(),
-      {:work, next_job_type_id},
-      20000
-    )
+    if airtable_job_enabled do
+      next_job_type_id = rem(curr_job_type_id, 300) + 100
+
+      Process.send_after(
+        self(),
+        {:work, next_job_type_id},
+        20000
+      )
+    end
   end
 
   # Performs a job based on the job id passed
@@ -131,11 +140,12 @@ defmodule Skoller.AirtableSyncJob do
     career_interests = (profile.career_interests || "") |> String.split("|", trim: true)
     regions = (profile.regions || "") |> String.split("|", trim: true)
     majors = fields_of_study |> Enum.map(& &1.field)
-    
-    job_type_name = case job_search_type do
-      %{name: job_type_name} -> job_type_name
-      _ -> nil
-    end
+
+    job_type_name =
+      case job_search_type do
+        %{name: job_type_name} -> job_type_name
+        _ -> nil
+      end
 
     %{
       "Names" => "#{name_first} #{name_last}",

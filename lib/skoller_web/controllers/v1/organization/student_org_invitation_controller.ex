@@ -1,28 +1,33 @@
 defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
-  alias Skoller.Organizations.StudentOrgInvitations
+  alias Skoller.Organizations.{
+    StudentOrgInvitations,
+    OrgGroupStudents,
+    OrgStudents,
+    OrgGroups,
+    OrgStudents.OrgStudent
+  }
+
   alias SkollerWeb.Organization.StudentOrgInvitationView
-  alias Skoller.Organizations.OrgStudents
-  alias Skoller.Organizations.OrgGroups
-  alias Skoller.Organizations.OrgGroupStudents
+  alias Skoller.Services.SesMailer
   alias Skoller.StudentClasses
   alias Skoller.Students
-  alias SkollerWeb.CSVView
-  alias Skoller.CSVUploads
-  alias Skoller.Repo
 
   import SkollerWeb.Plugs.InsightsAuth
+  import SkollerWeb.Plugs.Auth
 
   use ExMvc.Controller,
     adapter: StudentOrgInvitations,
     view: StudentOrgInvitationView,
     only: [:show, :update, :delete]
 
-  plug(
-    :verify_owner,
-    :student_org_invites when action in [:index, :get, :delete, :respond]
-  )
+  @student_role 100
 
-  plug :verify_owner, :organization when action in [:csv_create, :update]
+  plug :verify_role, %{role: @student_role} when action in [:respond, :student_invites]
+  plug :verify_owner, :student_org_invites when action in [:index, :show, :respond]
+  plug :verify_owner, :student when action == :student_invites
+
+  plug :verify_owner,
+       :organization when action in [:csv_create, :create, :update, :delete, :email_reminder]
 
   @colors [
     "ae77bdff",
@@ -35,28 +40,25 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     "d73f76ff"
   ]
 
-  def index(%{assigns: %{user: user}} = conn, %{"organization_id" => organization_id}) do
-    case user do
-      %{student: %{id: id}} ->
-        invites =
-          StudentOrgInvitations.get_by_params(student_id: id, organization_id: organization_id)
+  def index(%{assigns: %{user: %{student_id: student_id}}} = conn, %{
+        "organization_id" => organization_id
+      })
+      when not is_nil(student_id) do
+    invites =
+      StudentOrgInvitations.get_by_params(
+        student_id: student_id,
+        organization_id: organization_id
+      )
 
-        put_view(conn, StudentOrgInvitationView)
-        |> render("index.json", models: invites)
+    put_view(conn, StudentOrgInvitationView)
+    |> render("index.json", models: invites)
+  end
 
-      %{roles: roles} ->
-        case Enum.any?(roles, &(&1.id == 700 || &1.id == 200)) do
-          true ->
-            invites = StudentOrgInvitations.get_by_params(organization_id: organization_id)
+  def index(conn, %{"organization_id" => organization_id}) do
+    invites = StudentOrgInvitations.get_by_params(organization_id: organization_id)
 
-            put_view(conn, StudentOrgInvitationView)
-            |> render("index.json", models: invites)
-
-          false ->
-            conn
-            |> send_resp(401, "unauthorized")
-        end
-    end
+    put_view(conn, StudentOrgInvitationView)
+    |> render("index.json", models: invites)
   end
 
   def respond(conn, %{"student_org_invitation_id" => invite_id, "accepts" => accepts}) do
@@ -93,21 +95,30 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     end
   end
 
-  def create(conn, params) do
-    case invite_student(params) do
-      {:ok, invite} ->
-        put_view(conn, StudentOrgInvitationView) |> render("show.json", model: invite)
+  def create(conn, %{"organization_id" => org_id} = params) do
+    if Map.has_key?(params, "org_group_id") and not OrgGroups.exists?(id: params["org_group_id"]) do
+      send_resp(conn, 422, "Group does not exist")
+    else
+      case invite_student(params, %{org_id: org_id, group_id: params["org_group_id"]}) do
+        {:ok, invite} ->
+          conn |> put_view(StudentOrgInvitationView) |> render("invite.json", invite: invite)
 
-      {:error, %{errors: errors}} ->
-        body = ExMvc.Controller.stringify_changeset_errors(errors)
-        send_resp(conn, 422, body)
+        %OrgStudent{} = org_student ->
+          conn
+          |> put_view(StudentOrgInvitationView)
+          |> render("invite.json", org_student: org_student)
 
-      _ ->
-        send_resp(conn, 422, "Unprocessable Entity")
+        {:error, %{errors: errors}} ->
+          body = ExMvc.Controller.stringify_changeset_errors(errors)
+          send_resp(conn, 422, body)
+
+        _ ->
+          send_resp(conn, 422, "Unprocessable Entity")
+      end
     end
   end
 
-  def csv_create(conn, %{"file" => file, "organization_id" => organization_id} = params) do
+  def csv_create(conn, %{"file" => file, "organization_id" => org_id} = params) do
     cond do
       Map.has_key?(params, "org_group_id") and not OrgGroups.exists?(id: params["org_group_id"]) ->
         send_resp(conn, 422, "Group does not exist")
@@ -117,14 +128,29 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
           file.path
           |> File.stream!()
           |> CSV.decode(headers: true)
-          |> Enum.map(
-            &process_student(&1, %{org_id: organization_id, group_id: params["org_group_id"]})
-          )
+          |> Enum.map(&process_student(&1, %{org_id: org_id, group_id: params["org_group_id"]}))
 
         conn
-        |> put_view(CSVView)
-        |> render("index.json", csv: invitations)
+        |> put_view(StudentOrgInvitationView)
+        |> render("invites.json", invites: invitations)
     end
+  end
+
+  def email_reminder(conn, %{"organization_id" => org_id}) do
+    StudentOrgInvitations.get_by_params(organization_id: org_id)
+    |> Enum.each(fn %{email: email, organization: %{name: org_name}} ->
+      send_reminder_email(email, org_name)
+    end)
+
+    send_resp(conn, 204, "")
+  end
+
+  def student_invites(conn, %{"student_id" => student_id}) do
+    invitations = StudentOrgInvitations.get_by_params(student_id: student_id)
+
+    conn
+    |> put_view(StudentOrgInvitationView)
+    |> render("index.json", models: invitations)
   end
 
   defp process_student({:ok, params}, opts),
@@ -132,19 +158,12 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
 
   defp process_student(error, _org_id), do: error
 
-  defp invite_student(%{"phone" => phone} = params) do
-    case Students.get_student_by_phone(phone) do
-      %{id: student_id} -> Map.put(params, "student_id", student_id)
-      nil -> params
-    end
-    |> StudentOrgInvitations.create()
-  end
-
   defp invite_student(params, %{org_id: org_id} = opts) do
     group_ids =
-      case Map.has_key?(opts, :group_id) and not is_nil(opts.group_id) do
-        true -> [opts.group_id]
-        false -> []
+      case opts[:group_id] do
+        nil -> []
+        id when is_integer(id) -> [id]
+        id when is_binary(id) -> [String.to_integer(id)]
       end
 
     params
@@ -153,4 +172,75 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
   end
 
   defp invite_student(_params, _opts), do: nil
+
+  defp invite_student(%{"phone" => phone, "organization_id" => org_id} = params) do
+    student = Students.get_student_by_phone(phone)
+
+    cond do
+      invitation = invitation_by_params(phone, org_id) ->
+        org_group_ids =
+          (invitation.group_ids ++ (params["group_ids"] || []))
+          |> Enum.uniq()
+
+        invitation |> StudentOrgInvitations.update(%{group_ids: org_group_ids})
+
+      org_student = org_student_by_params(student, org_id) ->
+        org_student |> add_org_group_students(params)
+
+      true ->
+        student
+        |> case do
+          nil -> params
+          %{id: student_id} -> Map.put(params, "student_id", student_id)
+        end
+        |> StudentOrgInvitations.create()
+    end
+  end
+
+  defp org_student_by_params(nil, _org_id), do: nil
+
+  defp org_student_by_params(%{phone: phone}, org_id) do
+    student_id = Map.get(Students.get_student_by_phone(phone) || %{}, :id, 0)
+
+    OrgStudents.get_by_params(student_id: student_id, organization_id: org_id)
+    |> List.first()
+  end
+
+  defp invitation_by_params(phone, org_id),
+    do:
+      StudentOrgInvitations.get_by_params(phone: phone, organization_id: org_id)
+      |> List.first()
+
+  defp add_org_group_students(%{org_groups: groups, id: org_student_id}, params) do
+    existing_groups = groups |> Enum.map(& &1.id)
+
+    (groups ++ (params["group_ids"] || []))
+    |> Enum.uniq()
+    |> Enum.reject(&(&1 in existing_groups))
+    |> Enum.map(&%{org_group_id: &1, org_student_id: org_student_id})
+    |> Enum.each(&OrgGroupStudents.create/1)
+
+    OrgStudents.get_by_id(org_student_id)
+  end
+
+  defp send_invite_email(email, org_name, invited_by) do
+    %{
+      to: email,
+      template_data: %{
+        organization_name: org_name,
+        invited_by: invited_by
+      }
+    }
+    |> SesMailer.send_individual_email("skoller_insights_invitation")
+  end
+
+  defp send_reminder_email(email, org_name) do
+    %{
+      to: email,
+      template_data: %{
+        organization_name: org_name
+      }
+    }
+    |> SesMailer.send_individual_email("skoller_insights_reminder")
+  end
 end

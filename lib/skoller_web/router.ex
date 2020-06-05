@@ -49,6 +49,7 @@ defmodule SkollerWeb.Router do
 
       resources "/organizations", OrganizationController, only: [:index] do
         post "/student-org-invitations/csv", Organization.StudentOrgInvitationController, :csv_create
+        post "/student-org-invitations/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
         resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create, :delete] do
           post "/respond", Organization.StudentOrgInvitationController, :respond
         end
@@ -279,6 +280,8 @@ defmodule SkollerWeb.Router do
         get "/school", Student.SchoolController, :show
 
         get "/signup-organization", Student.EnrolledByController, :signup_organization
+
+        get "/student-org-invitations", Organization.StudentOrgInvitationController, :student_invites
       end
 
       # Assignment routes
