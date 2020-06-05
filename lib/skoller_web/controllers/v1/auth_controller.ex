@@ -61,7 +61,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def student_login(conn, %{"phone" => phone}) do
-    case Students.get_student_by_phone(phone) do
+    case Students.get_student_by_phone(phone) |> IO.inspect do
       %Student{} = student ->
         case Students.create_login_attempt(student) do
           {:ok, _} ->
