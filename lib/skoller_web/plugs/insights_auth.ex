@@ -26,11 +26,7 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       verify_role(user, @insights_user_role_id) ->
         alias Skoller.Organizations.OrgOwners.OrgOwner
 
-        IO.inspect user.id
-        IO.inspect organization_id
-
-        case resource_exists?(OrgOwner, user_id: user.id, organization_id: organization_id)
-             |> IO.inspect() do
+        case resource_exists?(OrgOwner, user_id: user.id, organization_id: organization_id) do
           true -> conn
           false -> conn |> unauth
         end
