@@ -5,7 +5,7 @@ defmodule SkollerWeb.Organization.OrgGroupStudentView do
   def render("show.json", %{model: org_group_student}) do
     student = org_group_student.student |> Map.take([:name_first, :name_last, :id])
 
-    student |> Map.put(users, org_group_student.users)
+    student |> Map.put(:users, org_group_student.users)
 
     %{
       org_student: render_association(org_group_student.org_student),
