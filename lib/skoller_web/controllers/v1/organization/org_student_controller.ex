@@ -1,8 +1,7 @@
 defmodule SkollerWeb.Api.V1.Organization.OrgStudentController do
-  alias Skoller.{Organizations.OrgStudents, FileUploaders.ProfilePics, Users, Repo}
+  alias Skoller.{Organizations.OrgStudents, FileUploaders.ProfilePics, Users}
   alias SkollerWeb.Organization.OrgStudentView
   alias SkollerWeb.Responses.MultiError
-  alias SkollerWeb.UserView
   alias Ecto.UUID
 
   use ExMvc.Controller,
@@ -17,13 +16,13 @@ defmodule SkollerWeb.Api.V1.Organization.OrgStudentController do
          %Users.User{} = user_old <- List.first(users),
          {:ok, inserted} <- ProfilePics.store({file, scope}),
          location <- ProfilePics.url({inserted, scope}, :thumb),
-         {:ok, %{user: user}} <-
+         {:ok, %{user: _user}} <-
            Users.update_user(user_old, %{"pic_path" => location}, admin_update: true) do
-      user = user |> Repo.preload([:student, :roles], force: true)
+      org_student = OrgStudents.get_by_id(org_student_id)
 
       conn
-      |> put_view(UserView)
-      |> render("show.json", user: user)
+      |> put_view(OrgStudentView)
+      |> render("show.json", model: org_student)
     else
       {:error, _, failed_value, _} ->
         conn
