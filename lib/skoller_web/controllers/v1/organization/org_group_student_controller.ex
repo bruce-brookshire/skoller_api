@@ -2,6 +2,7 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupStudentController do
   alias Skoller.{Organizations.OrgGroupStudents, FileUploaders.ProfilePics, Users, Repo}
   alias SkollerWeb.Organization.OrgGroupStudentView
   alias SkollerWeb.Responses.MultiError
+  alias SkollerWeb.UserView
   alias Ecto.UUID
 
   use ExMvc.Controller, adapter: OrgGroupStudents, view: OrgGroupStudentView
