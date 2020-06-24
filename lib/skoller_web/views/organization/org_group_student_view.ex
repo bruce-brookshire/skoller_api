@@ -3,9 +3,10 @@ defmodule SkollerWeb.Organization.OrgGroupStudentView do
   use SkollerWeb, :view
 
   def render("show.json", %{model: org_group_student}) do
-    student = org_group_student.student |> Map.take([:name_first, :name_last, :id])
-
-    student |> Map.put(:users, org_group_student.users |> IO.inspect())
+    student =
+      org_group_student.student
+      |> Map.take([:name_first, :name_last, :id])
+      |> Map.put(:users, org_group_student.users |> IO.inspect())
 
     %{
       org_student: render_association(org_group_student.org_student),
@@ -15,5 +16,6 @@ defmodule SkollerWeb.Organization.OrgGroupStudentView do
     }
   end
 
-  def render("index.json", %{models: models}), do: render_many(models, __MODULE__, "show.json", as: :model)
+  def render("index.json", %{models: models}),
+    do: render_many(models, __MODULE__, "show.json", as: :model)
 end
