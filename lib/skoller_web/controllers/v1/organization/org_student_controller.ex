@@ -9,11 +9,6 @@ defmodule SkollerWeb.Api.V1.Organization.OrgStudentController do
     view: OrgStudentView,
     only: [:show, :index, :update, :delete]
 
-    def upload_avatar(conn, params) do
-      IO.inspect(params)
-      conn |> send_resp(401, "")
-    end
-
   def upload_avatar(conn, %{"file" => file, "org_student_id" => org_student_id}) do
     scope = %{"id" => UUID.generate()}
 

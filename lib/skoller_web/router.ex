@@ -57,7 +57,7 @@ defmodule SkollerWeb.Router do
         # Org resources
         resources "/members", Organization.OrgMemberController, only: @default_rest_methods
         resources "/students", Organization.OrgStudentController, only: @access_existing do
-          put "/upload_avatar", Organization.OrgGroupStudentController, :upload_avatar
+          put "/upload_avatar", Organization.OrgStudentController, :upload_avatar
           resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
             resources "/assignment", Organization.OrgStudent.Class.AssignmentController,
               only: [:index]
