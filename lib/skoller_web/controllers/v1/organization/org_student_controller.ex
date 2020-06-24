@@ -1,5 +1,5 @@
 defmodule SkollerWeb.Api.V1.Organization.OrgStudentController do
-  alias Skoller.Organizations.{OrgStudents, FileUploaders.ProfilePics, Users, Repo}
+  alias Skoller.{Organizations.OrgStudents, FileUploaders.ProfilePics, Users, Repo}
   alias SkollerWeb.Organization.OrgStudentView
   alias SkollerWeb.Responses.MultiError
   alias SkollerWeb.UserView
