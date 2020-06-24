@@ -6,7 +6,7 @@ defmodule SkollerWeb.Organization.OrgGroupStudentView do
     student =
       org_group_student.student
       |> Map.take([:name_first, :name_last, :id])
-      |> Map.put(:user, org_group_student.users |> List.first |> render_association() |> IO.inspect())
+      |> Map.put(:user, org_group_student.users |> List.first |> render_association())
 
     %{
       org_student: render_association(org_group_student.org_student),
