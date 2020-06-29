@@ -12,13 +12,16 @@ defmodule SkollerWeb.Api.V1.Student.ClassController do
   alias Skoller.Mods.Assignments
   alias Skoller.ClassDocs
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.Auth, only: [verify_role: 2, verify_member: 2, verify_class_is_editable: 2]
+  import SkollerWeb.Plugs.InsightsAuth, only: [verify_access: 2]
 
   @student_role 100
+  @insights_role 700
 
-  plug :verify_role, %{role: @student_role}
+  plug :verify_role, %{roles: [@student_role, @insights_role]}
   plug :verify_member, :student
   plug :verify_class_is_editable, :class_id
+  plug :verify_access, :student_id when action in [:create, :delete]
 
   def create(conn, %{"student_id" => student_id, "class_id" => class_id} = params) do
     case StudentClasses.enroll_in_class(student_id, class_id, params) do

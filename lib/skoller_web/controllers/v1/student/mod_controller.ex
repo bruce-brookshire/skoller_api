@@ -8,12 +8,15 @@ defmodule SkollerWeb.Api.V1.Student.ModController do
   alias Skoller.Mods
   alias Skoller.Mods.Students
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.Auth, only: [verify_role: 2, verify_member: 2]
+  import SkollerWeb.Plugs.InsightsAuth, only: [verify_access: 2]
 
   @student_role 100
+  @insights_role 700
 
-  plug :verify_role, %{role: @student_role}
+  plug :verify_role, %{roles: [@student_role, @insights_role]}
   plug :verify_member, :student
+  plug :verify_access, :assignment_modification
 
   def create(conn, %{"student_id" => student_id, "id" => id, "is_accepted" => true}) do
     case Mods.manual_accept_mod_for_student(id, student_id) do

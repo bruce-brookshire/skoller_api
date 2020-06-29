@@ -114,6 +114,33 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
     end
   end
 
+  def verify_access(
+        %{
+          assigns: %{user: %{roles: roles} = user},
+          params: params
+        } = conn,
+       resource_type
+      ) do
+
+    roles
+    |> Enum.any?(& &1.id == 700)
+    |> if do
+      user_preloaded = Repo.preload(user, [:org_owners, :org_members])
+
+      (Enum.map(user_preloaded.org_owners, & &1.organization_id) ++
+        Enum.map(user_preloaded.org_members, & &1.organization_id))
+      |> Enum.uniq()
+      |> resource_query(params, resource_type)
+      |> Skoller.Repo.exists?()
+      |> case do
+        true -> conn
+        false -> conn |> unauth()
+      end
+    else
+      conn
+    end
+  end
+
   defp verify_role(%{roles: roles}, allowable) when is_integer(allowable),
     do: Enum.any?(roles, &(&1.id == allowable))
 
@@ -133,6 +160,39 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       %{id: object_id} when object_id == id -> true
       _ -> false
     end
+  end
+
+  defp resource_query(org_ids, %{"assignment_id" => assignment_id}, :assignment_id) do
+    alias Skoller.Organizations.OrgStudents.OrgStudent
+    alias Skoller.{      
+      StudentAssignments.StudentAssignment,
+      StudentClasses.StudentClass
+    }
+
+    OrgStudent
+    |> join(:inner, [o], sc in StudentClass, on: sc.student_id == o.student_id)
+    |> join(:inner, [o, sc], sa in StudentAssignment, on: sc.id == sa.student_class_id)
+    |> where([o, sc, sa], o.organization_id in ^org_ids and sa.id == ^assignment_id)
+  end
+
+  defp resource_query(org_ids, %{"id" => mod_id}, :assignment_modification) do
+    alias Skoller.{ 
+      Organizations.OrgStudents.OrgStudent,
+      Mods.Action, 
+      StudentClasses.StudentClass
+    }
+
+    OrgStudent
+    |> join(:inner, [o], sc in StudentClass, on: sc.student_id == o.student_id)
+    |> join(:inner, [o, sc], a in Action, on: a.student_class_id == sc.id)
+    |> where([o, sc, a], o.organization_id in ^org_ids and a.assignment_modification_id == ^mod_id)
+  end
+  
+  defp resource_query(org_ids, %{"student_id" => student_id}, :student_id) do
+    alias Skoller.Organizations.OrgStudents.OrgStudent
+
+    OrgStudent
+    |> where([o], o.organization_id in ^org_ids and o.student_id == ^student_id)
   end
 
   defp user_owns_org?(%{id: id}, organization_id) do

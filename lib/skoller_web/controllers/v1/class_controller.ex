@@ -16,9 +16,10 @@ defmodule SkollerWeb.Api.V1.ClassController do
   @admin_role 200
   @syllabus_worker_role 300
   @change_req_role 400
+  @insights_role 700
 
   plug :verify_role, %{
-    roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role]
+    roles: [@student_role, @admin_role, @syllabus_worker_role, @change_req_role, @insights_role]
   }
 
   plug :verify_member, :class
