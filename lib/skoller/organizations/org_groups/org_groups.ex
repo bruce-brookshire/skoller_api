@@ -38,7 +38,7 @@ defmodule Skoller.Organizations.OrgGroups do
       StudentOrgInvitation
       |> where(
         [i],
-        ^org_group_id in i.group_ids and fragment("array_length(?, 1)", i.class_ids) == 0
+        ^org_group_id in i.group_ids and is_nil(fragment("array_length(?, 1)", i.class_ids))
       )
       |> Repo.aggregate(:count)
 
