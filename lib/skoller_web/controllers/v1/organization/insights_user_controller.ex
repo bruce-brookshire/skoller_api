@@ -5,7 +5,6 @@ defmodule SkollerWeb.Api.V1.Organization.InsightsUserController do
   alias SkollerWeb.UserView
   alias Skoller.UserRoles.UserRole
   alias Skoller.Services.SesMailer
-  alias Skoller.Organizations.OrgOwners
   alias SkollerWeb.Responses.MultiError
 
   import Ecto.Query
