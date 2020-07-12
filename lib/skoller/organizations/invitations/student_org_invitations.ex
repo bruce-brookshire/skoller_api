@@ -11,4 +11,10 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
       %{} = invitation -> __MODULE__.update(invitation, %{student_id: student_id})
     end
   end
+
+  def get_invitations_by_org_group(org_group_id) do
+    StudentOrgInvitation
+    |> where([i], ^org_group_id in i.group_ids)
+    |> Repo.all()
+  end
 end

@@ -4,11 +4,11 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     OrgGroupStudents,
     OrgStudents,
     OrgGroups,
-    OrgStudents.OrgStudent
+    OrgStudents.OrgStudent,
+    StudentOrgInvitations.InvitationEmails
   }
 
   alias SkollerWeb.Organization.StudentOrgInvitationView
-  alias Skoller.Services.SesMailer
   alias Skoller.StudentClasses
   alias Skoller.Students
 
@@ -136,11 +136,44 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     end
   end
 
+  def email_reminder(conn, %{"org_group_id" => org_group_id}) do
+    InvitationEmails.send_reminder_email(org_group_id: org_group_id)
+
+    send_resp(conn, 204, "")
+  end
+
+  def email_reminder(conn, %{"student_org_invitation_id" => org_invitation_id}) do
+    InvitationEmails.send_reminder_email(id: org_invitation_id)
+
+    send_resp(conn, 204, "")
+  end
+
   def email_reminder(conn, %{"organization_id" => org_id}) do
-    StudentOrgInvitations.get_by_params(organization_id: org_id)
-    |> Enum.each(fn %{email: email, organization: %{name: org_name}} ->
-      send_reminder_email(email, org_name)
-    end)
+    InvitationEmails.send_reminder_email(organization_id: org_id)
+
+    send_resp(conn, 204, "")
+  end
+
+  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
+        "org_group_id" => org_group_id
+      }) do
+    InvitationEmails.send_invite_email(invited_by, org_group_id: org_group_id)
+
+    send_resp(conn, 204, "")
+  end
+
+  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
+        "student_org_invitation_id" => org_invitation_id
+      }) do
+    InvitationEmails.send_invite_email(invited_by, id: org_invitation_id)
+
+    send_resp(conn, 204, "")
+  end
+
+  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
+        "organization_id" => org_id
+      }) do
+    InvitationEmails.send_invite_email(invited_by, organization_id: org_id)
 
     send_resp(conn, 204, "")
   end
@@ -221,26 +254,5 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     |> Enum.each(&OrgGroupStudents.create/1)
 
     OrgStudents.get_by_id(org_student_id)
-  end
-
-  defp send_invite_email(email, org_name, invited_by) do
-    %{
-      to: email,
-      template_data: %{
-        organization_name: org_name,
-        invited_by: invited_by
-      }
-    }
-    |> SesMailer.send_individual_email("skoller_insights_invitation")
-  end
-
-  defp send_reminder_email(email, org_name) do
-    %{
-      to: email,
-      template_data: %{
-        organization_name: org_name
-      }
-    }
-    |> SesMailer.send_individual_email("skoller_insights_reminder")
   end
 end
