@@ -11,11 +11,11 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
   def verify_owner(
         %{
           assigns: %{user: user},
-          params: %{"organization_id" => org_id}
+          params: params
         } = conn,
         :organization
       ) do
-    organization_id = org_id |> String.to_integer()
+    organization_id = (params["organization_id"] || params["id"]) |> String.to_integer()
 
     cond do
       # User is admin
