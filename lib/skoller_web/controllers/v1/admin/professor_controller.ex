@@ -11,8 +11,9 @@ defmodule SkollerWeb.Api.V1.Admin.ProfessorController do
   @student_role 100
   @admin_role 200
   @change_req_role 400
+  @insights_role 700 
 
-  plug :verify_role, %{roles: [@student_role, @admin_role, @change_req_role]}
+  plug :verify_role, %{roles: [@student_role, @admin_role, @change_req_role, @insights_role]}
 
   def update(%{assigns: %{user: user}} = conn, %{"id" => id} = params) do
     professor_old = Professors.get_professor_by_id!(id)

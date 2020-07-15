@@ -10,8 +10,9 @@ defmodule SkollerWeb.Api.V1.ProfessorController do
 
   @student_role 100
   @admin_role 200
+  @insights_role 700
 
-  plug :verify_role, %{roles: [@admin_role, @student_role]}
+  plug :verify_role, %{roles: [@admin_role, @student_role, @insights_role]}
 
   def create(conn, params) do
     case Professors.create_professor(params) do
