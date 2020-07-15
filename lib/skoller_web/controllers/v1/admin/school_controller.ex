@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Admin.SchoolController do
   @insights_role 700
 
   plug :verify_role, %{role: @admin_role} when action in [:index, :hub, :update]
-  plug :verify_role, {roles: [@admin_role, @insights_role]} when action == :show
+  plug :verify_role, %{roles: [@admin_role, @insights_role]} when action == :show
 
   def index(conn, params) do
     schools = Schools.get_schools(params)
