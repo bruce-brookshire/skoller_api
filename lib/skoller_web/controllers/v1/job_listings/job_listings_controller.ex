@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingsController do
   use SkollerWeb, :controller
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.JobsAuth
 
   alias Skoller.JobGateListings, as: Listings
   alias SkollerWeb.SkollerJobs.JobListingView

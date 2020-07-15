@@ -9,7 +9,7 @@ defmodule Skoller.Changeset do
   Deletes all tuples in `keyword` from the changeset.
   """
   def delete_changes(changeset, keyword) do
-    keyword |> Enum.reduce(changeset, & &2 |> delete_change(elem(&1, 0)))
+    keyword |> Enum.reduce(changeset, &(&2 |> delete_change(elem(&1, 0))))
   end
 
   @doc """
@@ -23,7 +23,7 @@ defmodule Skoller.Changeset do
   end
 
   defp convert_keyword_to_map(keyword) do
-    keyword |> Enum.reduce(%{}, & &2 |> Map.put(elem(&1, 0), elem(&1, 1)))
+    keyword |> Enum.reduce(%{}, &(&2 |> Map.put(elem(&1, 0), elem(&1, 1))))
   end
 
   defp old_field_not_set(tuple, original) do

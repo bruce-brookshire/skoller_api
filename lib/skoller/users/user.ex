@@ -10,6 +10,8 @@ defmodule Skoller.Users.User do
   alias Skoller.UserReports.Report
   alias Skoller.Services.Authentication
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
+  alias Skoller.Organizations.OrgOwners.OrgOwner
+  alias Skoller.Organizations.OrgMembers.OrgMember
 
   schema "users" do
     field :email, :string
@@ -19,11 +21,17 @@ defmodule Skoller.Users.User do
     field :is_active, :boolean, default: true
     field :is_unsubscribed, :boolean, default: false
     field :last_login, :utc_datetime
+    
     belongs_to :student, Student
+    
     many_to_many :roles, Role, join_through: "user_roles"
+    
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
+
+    has_many :org_owners, OrgOwner
+    has_many :org_members, OrgMember
 
     timestamps()
   end

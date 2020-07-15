@@ -5,7 +5,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.CareerActivityController do
   alias Skoller.SkollerJobs.CareerActivities
   alias SkollerWeb.SkollerJobs.CareerActivityView
 
-  import SkollerWeb.Plugs.Auth
+  import SkollerWeb.Plugs.{Auth, JobsAuth}
 
   @student_role 100
 
