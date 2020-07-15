@@ -74,8 +74,9 @@ defmodule Skoller.StudentAssignments.StudentAssignment do
     |> complete_assignment()
   end
 
-  defp complete_assignment(%Ecto.Changeset{changes: %{grade: _grade}, valid?: true} = changeset) do
+  defp complete_assignment(%Ecto.Changeset{changes: %{grade: _grade}, valid?: true} = changeset), do:
     changeset |> change(%{is_completed: true})
-  end
+
+  defp complete_assignment(changeset), do: changeset
 end
   

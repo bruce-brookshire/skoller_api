@@ -20,7 +20,7 @@ defmodule Skoller.Organizations do
   """
   def list_organizations do
     from(o in Organization)
-    |> preload([o], [:custom_signup_link])
+    |> preload([o], [:custom_signup_link, :schools])
     |> Repo.all()
   end
 
@@ -73,6 +73,7 @@ defmodule Skoller.Organizations do
   """
   def update_organization(%Organization{} = organization, attrs) do
     organization
+    |> Repo.preload(:org_schools)
     |> Organization.update_changeset(attrs)
     |> Repo.update()
     |> preload_org()
@@ -126,6 +127,6 @@ defmodule Skoller.Organizations do
   defp preload_org(result), do: result
 
   defp run_preloads(org) do
-    Repo.preload(org, :custom_signup_link)
+    Repo.preload(org, [:custom_signup_link, :schools], force: true)
   end
 end

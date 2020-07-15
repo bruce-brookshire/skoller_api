@@ -8,9 +8,10 @@ defmodule SkollerWeb.Api.V1.OrganizationController do
 
   @student_role 100
   @admin_role 200
+  @insights_role 700
 
   action_fallback SkollerWeb.FallbackController
-  plug :verify_role, %{roles: [@admin_role, @student_role]}
+  plug :verify_role, %{roles: [@admin_role, @student_role, @insights_role]}
 
   def index(%{assigns: %{user: user}} = conn, _params) do
     is_admin = user.roles |> Enum.any?(&(&1.id == @admin_role))

@@ -34,7 +34,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"dev_admin@skoller.co\", \"password\": \"IGxs1Px9BY1x\"}"
+							"raw": "{\n\t\"email\": \"dev_admin@skoller.co\",\n\t\"password\": \"IGxs1Px9BY1x\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users/login",
@@ -363,7 +366,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Analytics",
@@ -402,7 +406,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Auto Update",
@@ -582,7 +587,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Assignment",
@@ -698,6 +704,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -828,6 +835,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -860,6 +868,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -1343,7 +1352,8 @@
 						}
 					]
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Chat",
@@ -1372,7 +1382,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Classes",
@@ -1682,6 +1693,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -1862,6 +1874,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2120,6 +2133,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -2466,6 +2480,7 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -2647,9 +2662,11 @@
 									"response": []
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -2698,6 +2715,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3019,6 +3037,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3312,6 +3331,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3582,6 +3602,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -3623,6 +3644,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4111,6 +4133,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4263,6 +4286,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4662,6 +4686,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -4898,7 +4923,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Custom Links",
@@ -5021,7 +5047,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Email Types",
@@ -5108,7 +5135,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Fields of Study",
@@ -5153,6 +5181,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -5553,7 +5582,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Four Door",
@@ -5703,7 +5733,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Locations",
@@ -5734,7 +5765,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Notifications",
@@ -5829,11 +5861,605 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Organizations",
 			"item": [
+				{
+					"name": "Owners",
+					"item": [
+						{
+							"name": "Get",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/owners",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"owners"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Org Owner",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"user_id\": 32\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/owners/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"owners",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Groups",
+					"item": [
+						{
+							"name": "Owners",
+							"item": [
+								{
+									"name": "Create Group Owners",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"org_member_id\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/organizations/1/org-groups/2/",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"1",
+												"org-groups",
+												"2",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Org Group Owner",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"org_member_id\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/organizations/1/org-groups/2/",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"1",
+												"org-groups",
+												"2",
+												""
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Students",
+							"item": [
+								{
+									"name": "Create student",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"org_student_id\": 1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/organizations/1/org-groups/1/students",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"1",
+												"org-groups",
+												"1",
+												"students"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create student Copy",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer {{token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{BaseUrl}}/api/v1/organizations/1/org-groups/1/students/2/classes",
+											"host": [
+												"{{BaseUrl}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"1",
+												"org-groups",
+												"1",
+												"students",
+												"2",
+												"classes"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Create group",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Mens Basketball\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/org-groups",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"org-groups"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Students",
+					"item": [
+						{
+							"name": "Classes",
+							"item": [
+								{
+									"name": "Get student classes",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": ""
+										}
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Get Org Students",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/students/",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"students",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Student Invitations",
+					"item": [
+						{
+							"name": "Create Org Invite",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\": \"\"\n\t\"phone\": \"5555555555\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/student-org-invitations",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"student-org-invitations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Org Invite",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"group_ids\": [2],\n\t\"class_ids\": [1, 2, 5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/student-org-invitations/13",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"student-org-invitations",
+										"13"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Index Student Org Invites",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/student-org-invitations",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"student-org-invitations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Respond Student Org Invitation",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"accepts\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/student-org-invitations/13/respond",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"student-org-invitations",
+										"13",
+										"respond"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Student Invite CSV upload",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/Users/brucebrookshire/Desktop/upload.csv"
+										},
+										{
+											"key": "org_group_id",
+											"value": "2",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/student-org-invitations/csv",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"student-org-invitations",
+										"csv"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Members",
+					"item": [
+						{
+							"name": "Create Org Member",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"user_id\": 33\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/members",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"members"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Org Member",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"user_id\": 33\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BaseUrl}}/api/v1/organizations/1/members",
+									"host": [
+										"{{BaseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"1",
+										"members"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
 				{
 					"name": "Get Organizations",
 					"request": {
@@ -5849,14 +6475,15 @@
 							}
 						],
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/organizations",
+							"raw": "{{BaseUrl}}/api/v1/organizations/",
 							"host": [
 								"{{BaseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"organizations"
+								"organizations",
+								""
 							]
 						}
 					},
@@ -5878,7 +6505,45 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"custom_signup_link_id\": 1,\n\t\"name\": \"AOII\"\n}"
+							"raw": "{\n\t\"custom_signup_link_id\": 1,\n\t\"name\": \"AOII\",\n\t\"org_schools\": [\n\t\t{\n\t\t\t\"school_id\": 1\n\t\t}\n\t]\n}",
+							"options": {
+								"raw": {}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/organizations",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Organization Copy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"custom_signup_link_id\": 1,\n\t\"name\": \"AOII\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/organizations",
@@ -5910,10 +6575,13 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"custom_signup_link_id\": 2,\n\t\"name\": \"AOI1I\"\n}"
+							"raw": "{\n\t\"name\": \"AOI1I\",\n\t\"org_schools\": [\n\t\t{\"school_id\": 1\t},\n\t\t{\"school_id\": 2\t}\n\t]\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/organizations/1",
+							"raw": "{{BaseUrl}}/api/v1/organizations/3",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -5921,7 +6589,7 @@
 								"api",
 								"v1",
 								"organizations",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -5959,8 +6627,73 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create Insights User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/insights/users?email=bruce@skoller.co",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"insights",
+								"users"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "bruce@skoller.co"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Index Insights Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/insights/users?email=bruce@skoller.co",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"insights",
+								"users"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "bruce@skoller.co"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Period",
@@ -6211,7 +6944,8 @@
 						}
 					]
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Professors",
@@ -6462,7 +7196,8 @@
 						}
 					]
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Roles",
@@ -6709,7 +7444,8 @@
 						}
 					]
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Sammi",
@@ -6763,7 +7499,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Skoller Jobs",
@@ -6821,12 +7558,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"name\": \"name 3\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\"name\": \"name 3\"}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities/3",
@@ -6964,12 +7696,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"degree_type_id\": 100\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n    \"degree_type_id\": 100\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles",
@@ -7005,12 +7732,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"resume_url\": \"https://via.placeholder.com/150 \"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n    \"resume_url\": \"https://via.placeholder.com/150 \"\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/2",
@@ -7074,12 +7796,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n        \"start_date\": \"2019-11-18\",\n        \"organization_name\": \"skoller 2\",\n        \"name\": \"name 2\",\n        \"end_date\": \"2019-11-18\",\n        \"description\": \"description 2\",\n        \"career_activity_type_id\": 200\n    }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"raw": "{\n        \"start_date\": \"2019-11-18\",\n        \"organization_name\": \"skoller 2\",\n        \"name\": \"name 2\",\n        \"end_date\": \"2019-11-18\",\n        \"description\": \"description 2\",\n        \"career_activity_type_id\": 200\n    }"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/profiles/4/activities",
@@ -7115,7 +7832,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/job-listings?offset=160",
+							"raw": "{{BaseUrl}}/api/v1/skoller-jobs/job-listings?offset=30&min_view=true",
 							"host": [
 								"{{BaseUrl}}"
 							],
@@ -7128,7 +7845,11 @@
 							"query": [
 								{
 									"key": "offset",
-									"value": "160"
+									"value": "30"
+								},
+								{
+									"key": "min_view",
+									"value": "true"
 								}
 							]
 						}
@@ -7397,6 +8118,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -7747,6 +8469,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -7875,6 +8598,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -8326,7 +9050,10 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\":\"Hard Knocks Utopia\",\n  \"timezone\": \"CST\",\n  \"adr_zip\": \"37202\",\n  \"adr_region\": \"TN\",\n  \"adr_line_1\": \"530 Church St\",\n  \"adr_locality\": \"Nashville\",\n  \"email_domain_prof\": \"\",\n  \"is_active\":true,\n  \"is_editable\":true\n}"
+							"raw": "{\n  \"is_syllabus_overload\": false,\n  \"name\": \"Other HKU\"\n}",
+							"options": {
+								"raw": {}
+							}
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/schools/1",
@@ -8869,7 +9596,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Students",
@@ -9737,6 +10465,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -9963,6 +10692,7 @@
 									]
 								}
 							],
+							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
 						{
@@ -10464,6 +11194,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -10708,6 +11439,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -10907,6 +11639,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -10973,6 +11706,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -11288,8 +12022,36 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Student Org Invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BaseUrl}}/api/v1/students/5/student-org-invitations",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"students",
+								"5",
+								"student-org-invitations"
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "SW",
@@ -11327,7 +12089,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Users",
@@ -11705,6 +12468,7 @@
 							]
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -11765,6 +12529,7 @@
 							"response": []
 						}
 					],
+					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
 				{
@@ -11779,7 +12544,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"email\":\"test@skoller.co\",\n\"password\": \"password\",\n\"student\": {\n  \"name_first\": \"Dave\",\n  \"name_last\": \"Chapelle\",\n  \"fields_of_study\": [1],\n  \"phone\": \"2067189446\",\n  \"birthday\": \"2017-10-12T16:00:26Z\",\n  \"gender\": \"Male\",\n  \"notification_time\": \"18:00:00\",\n  \"future_reminder_notification_time\": \"18:00:00\"\n  }\n}"
+							"raw": "{\"email\":\"test_admin@skoller.co\",\n\"password\": \"password\"\n}"
 						},
 						"url": {
 							"raw": "{{BaseUrl}}/api/v1/users",
@@ -12392,7 +13157,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "Get Minimum App Versions",
@@ -12451,6 +13217,47 @@
 						"api",
 						"v1",
 						"min-version"
+					]
+				},
+				"description": "This updates the minimum app versions supported. Used to trigger forced updates."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Admin Settings",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"settings\": [\n\t\t{\n\t\t\t\"name\": \"is_syllabus_overload\",\n\t\t\t\"value\": \"true\"\n\t\t}\n\t]\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/v1/admin-settings",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"admin-settings"
 					]
 				},
 				"description": "This updates the minimum app versions supported. Used to trigger forced updates."
@@ -12537,6 +13344,21 @@
 		{
 			"name": "JobG8 Feed Endpoint",
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "X5cPgUnmZS9sFQYz",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin@jobg8.com",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -12544,17 +13366,15 @@
 						"name": "Content-Type",
 						"value": "text/xml",
 						"type": "text"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer P3bbjkUQYymZ74AP7yK5",
-						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "file",
 					"file": {
 						"src": "/Users/brucebrookshire/Desktop/Skoller/classnav_api/med_test.xml"
+					},
+					"options": {
+						"file": {}
 					}
 				},
 				"url": {
@@ -12570,6 +13390,42 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Org Owner",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"user_id\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/v1/organizations/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"organizations",
+						"1"
+					]
+				}
+			},
+			"response": []
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

@@ -1,7 +1,7 @@
 defmodule SkollerWeb.Plugs.Lock do
-  
+
   @moduledoc """
-  
+
   Handles lock auth.
 
   """
@@ -16,6 +16,7 @@ defmodule SkollerWeb.Plugs.Lock do
   @admin_role 200
   @change_req_role 400
   @help_req_role 500
+  @insights_role 700
 
   @weight_lock 100
   @assignment_lock 200
@@ -85,7 +86,7 @@ defmodule SkollerWeb.Plugs.Lock do
 
   defp check_maintenance(conn, class_id) do
     case Enum.any?(conn.assigns[:user].roles, & &1.id in[@change_req_role, @help_req_role]) do
-      true -> 
+      true ->
         case Classes.class_in_request?(class_id) do
           true -> conn
           false -> conn |> unauth()
@@ -103,7 +104,7 @@ defmodule SkollerWeb.Plugs.Lock do
   defp check_using(_params, _, _), do: false
 
   defp is_admin(conn) do
-    Enum.any?(conn.assigns[:user].roles, & &1.id == @admin_role)
+    Enum.any?(conn.assigns[:user].roles, & &1.id == @admin_role or &1.id == @insights_role)
   end
 
   defp unauth(conn) do

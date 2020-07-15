@@ -14,9 +14,10 @@ defmodule SkollerWeb.Api.V1.Admin.Class.WeightController do
   @syllabus_worker_role 300
   @change_req_role 400
   @help_req_role 500
+  @insights_role 700
 
   plug :verify_role, %{
-    roles: [@admin_role, @change_req_role, @student_role, @syllabus_worker_role, @help_req_role]
+    roles: [@admin_role, @change_req_role, @student_role, @syllabus_worker_role, @help_req_role, @insights_role]
   }
 
   plug :check_lock, %{type: :weight, using: :id}

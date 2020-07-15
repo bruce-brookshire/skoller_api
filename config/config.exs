@@ -27,6 +27,11 @@ config :arc,
   storage: Arc.Storage.S3,
   bucket: {:system, "AWS_S3_BUCKET"}
 
+# Configuration for simplified MVC+S module declarations
+config :ex_mvc, 
+  repo: Skoller.Repo,
+  web_namespace: SkollerWeb
+
 #this is for AWS access
 config :ex_aws,
   access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],

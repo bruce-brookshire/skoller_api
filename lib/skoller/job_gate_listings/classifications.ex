@@ -1,8 +1,6 @@
 defmodule Skoller.JobGateListings.Classification do
   use Ecto.Schema
 
-  import Ecto.Query
-
   alias Skoller.Repo
   alias Skoller.JobGateListings.Classification
 

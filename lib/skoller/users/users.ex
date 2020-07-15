@@ -21,6 +21,7 @@ defmodule Skoller.Users do
   alias Skoller.Devices.Device
   alias Skoller.SkollerJobs.JobProfiles
   alias Skoller.SkollerJobs.AirtableJobs
+  alias Skoller.Organizations.StudentOrgInvitations
 
   import Ecto.Query
 
@@ -87,6 +88,7 @@ defmodule Skoller.Users do
       end)
       |> Ecto.Multi.run(:link, fn _, changes -> get_link(changes.user) end)
       |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.user) end)
+      |> Ecto.Multi.run(:org_invites, fn _, changes -> convert_org_invite(changes.user) end)
       |> Repo.transaction()
       |> send_link_used_notification()
       |> send_verification_text()
@@ -407,7 +409,7 @@ defmodule Skoller.Users do
   end
 
   defp add_roles_preloaded(user, %{"roles" => roles}, opts) do
-    case Keyword.get(opts, :admin_update, false) do
+    case Keyword.get(opts, :admin_update, false) || Keyword.get(opts, :admin, false) do
       true ->
         # Admin can add roles
         UserRoles.delete_roles_for_user(user.id)
@@ -438,4 +440,9 @@ defmodule Skoller.Users do
   def preload_student(user, student_preloads \\ [], opts \\ []) do
     user |> Repo.preload([{:student, student_preloads}], opts)
   end
+
+  defp convert_org_invite(%{student: %{id: id, phone: phone}}),
+    do: StudentOrgInvitations.convert_invite_to_student(id, phone)
+
+  defp convert_org_invite(_params), do: {:ok, "User is not student"}
 end

@@ -18,8 +18,9 @@ defmodule SkollerWeb.Api.V1.Class.LockController do
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
+  @insights_role 700
 
-  plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role]}
+  plug :verify_role, %{roles: [@student_role, @syllabus_worker_role, @admin_role, @insights_role]}
   plug :verify_member, :class
 
   @doc """

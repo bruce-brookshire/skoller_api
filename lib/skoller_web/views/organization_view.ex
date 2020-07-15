@@ -1,7 +1,9 @@
 defmodule SkollerWeb.OrganizationView do
   use SkollerWeb, :view
-  alias SkollerWeb.OrganizationView
+
   alias SkollerWeb.LinkView
+  alias SkollerWeb.SchoolView
+  alias SkollerWeb.OrganizationView
 
   def render("index-admin.json", %{organizations: organizations}) do
     render_many(organizations, OrganizationView, "organization.json")
@@ -16,9 +18,12 @@ defmodule SkollerWeb.OrganizationView do
   end
 
   def render("organization-base.json", %{organization: organization}) do
+    organization |> Map.take([:id, :name])
+
     %{
       id: organization.id,
-      name: organization.name
+      name: organization.name,
+      schools: organization.schools |> school_view()
     }
   end
 
@@ -32,5 +37,12 @@ defmodule SkollerWeb.OrganizationView do
   defp link_view(%{custom_signup_link: custom_signup_link}) when not is_nil(custom_signup_link) do
     render_one(custom_signup_link, LinkView, "link_base.json")
   end
+
   defp link_view(_organization), do: nil
+
+  defp school_view(schools) when is_list(schools),
+    do: render_many(schools, SchoolView, "school-min.json")
+
+  defp school_view(%Ecto.Association.NotLoaded{}), do: []
+  defp school_view(_), do: nil
 end

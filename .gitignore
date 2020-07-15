@@ -20,9 +20,6 @@ erl_crash.dump
 /config/*.secret.exs
 .*env
 
-# version management asdf
-/.tool-versions
-
 **/.DS_Store
 
 /.elixir_ls
