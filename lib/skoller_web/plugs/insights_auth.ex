@@ -128,7 +128,7 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
       user_preloaded = Repo.preload(user, [:org_owners, :org_members])
 
       (Enum.map(user_preloaded.org_owners, & &1.organization_id) ++
-        Enum.map(user_preloaded.org_members, & &1.organization_id))
+         Enum.map(user_preloaded.org_members, & &1.organization_id))
       |> Enum.uniq()
       |> resource_query(params, resource_type)
       |> Skoller.Repo.exists?()
@@ -164,7 +164,8 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
 
   defp resource_query(org_ids, %{"assignment_id" => assignment_id}, :assignment_id) do
     alias Skoller.Organizations.OrgStudents.OrgStudent
-    alias Skoller.{      
+
+    alias Skoller.{
       StudentAssignments.StudentAssignment,
       StudentClasses.StudentClass
     }
@@ -176,18 +177,21 @@ defmodule SkollerWeb.Plugs.InsightsAuth do
   end
 
   defp resource_query(org_ids, %{"id" => mod_id}, :assignment_modification) do
-    alias Skoller.{ 
+    alias Skoller.{
       Organizations.OrgStudents.OrgStudent,
-      Mods.Action, 
+      Mods.Action,
       StudentClasses.StudentClass
     }
 
     OrgStudent
     |> join(:inner, [o], sc in StudentClass, on: sc.student_id == o.student_id)
     |> join(:inner, [o, sc], a in Action, on: a.student_class_id == sc.id)
-    |> where([o, sc, a], o.organization_id in ^org_ids and a.assignment_modification_id == ^mod_id)
+    |> where(
+      [o, sc, a],
+      o.organization_id in ^org_ids and a.assignment_modification_id == ^mod_id
+    )
   end
-  
+
   defp resource_query(org_ids, %{"student_id" => student_id}, :student_id) do
     alias Skoller.Organizations.OrgStudents.OrgStudent
 

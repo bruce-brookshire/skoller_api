@@ -12,8 +12,9 @@ defmodule SkollerWeb.Api.V1.Admin.OrganizationController do
   @insights_role 700
 
   action_fallback SkollerWeb.FallbackController
-  plug :verify_role, %{roles: [@admin_role, @insights_role]} when action in [:show, :create, :update, :delete]
-  plug :verify_owner, :organization
+  plug :verify_role, %{roles: [@admin_role, @insights_role]} when action in [:show, :update, :delete]
+  plug :verify_role, %{role: @admin_role}
+  plug :verify_owner, :organization when action in [:show, :update, :delete]
   
 
   def create(conn, params) do
