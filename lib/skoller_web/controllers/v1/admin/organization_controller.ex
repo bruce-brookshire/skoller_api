@@ -13,7 +13,7 @@ defmodule SkollerWeb.Api.V1.Admin.OrganizationController do
 
   action_fallback SkollerWeb.FallbackController
   plug :verify_role, %{roles: [@admin_role, @insights_role]} when action in [:show, :update, :delete]
-  plug :verify_role, %{role: @admin_role}
+  plug :verify_role, %{role: @admin_role} when action == :create
   plug :verify_owner, :organization when action in [:show, :update, :delete]
   
 
