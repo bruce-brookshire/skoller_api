@@ -12,11 +12,13 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   import SkollerWeb.Plugs.Auth
 
   @student_role 100
+  @insights_role 700
 
-  plug :verify_role, %{role: @student_role}
+  plug :verify_role, %{roles: [@student_role, @insights_role]}
   plug :verify_member, :class
   plug :verify_member, :student
   plug :verify_member, %{of: :student_assignment, using: :id}
+  # plug :verify_insights_access, :assignment_id
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do

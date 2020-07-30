@@ -18,11 +18,10 @@ defmodule SkollerWeb.OrganizationView do
   end
 
   def render("organization-base.json", %{organization: organization}) do
-    organization |> Map.take([:id, :name])
-
     %{
       id: organization.id,
       name: organization.name,
+      logo_url: organization.logo_url,
       schools: organization.schools |> school_view()
     }
   end

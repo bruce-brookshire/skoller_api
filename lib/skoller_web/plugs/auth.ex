@@ -16,6 +16,7 @@ defmodule SkollerWeb.Plugs.Auth do
 
   @student_role 100
   @admin_role 200
+  @insights_role 700
 
   def authenticate(conn, _) do
     case conn |> get_auth_obj() do
@@ -71,8 +72,8 @@ defmodule SkollerWeb.Plugs.Auth do
         conn
 
       {:ok, class_id} ->
-        case EditableClasses.get_editable_class_by_id(class_id) do
-          nil -> conn |> in_role(@admin_role)
+        case EditableClasses.get_editable_class_by_id(class_id |> IO.inspect ) do
+          nil -> conn |> enforce_roles([@admin_role, @insights_role])
           _ -> conn
         end
     end
@@ -150,15 +151,25 @@ defmodule SkollerWeb.Plugs.Auth do
 
   def verify_student_exists(conn, _), do: conn
 
+  # TODO: Force insights user access to single student
+  # def verify_insights_access(conn, :assignment_id) do
+  #   conn.assigns.user.roles
+  #   |> Enum.any?(& &1.id == @insights_role)
+  #   |> case do
+  #     true -> conn
+  #     false -> conn
+  #   end
+  # end
+
   defp not_in_role(conn, role) do
-    case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
+    case Enum.member?(conn.assigns[:user].roles, role) do
       true -> conn |> unauth
       false -> conn
     end
   end
 
-  defp in_role(conn, role) do
-    case Enum.any?(conn.assigns[:user].roles, &(&1.id == role)) do
+  defp enforce_roles(conn, roles) do
+    case Enum.any?(conn.assigns[:user].roles, &Enum.member?(roles, &1.id)) do
       false -> conn |> unauth
       true -> conn
     end
