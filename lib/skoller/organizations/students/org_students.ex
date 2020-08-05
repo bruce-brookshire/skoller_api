@@ -22,6 +22,6 @@ defmodule Skoller.Organizations.OrgStudents do
 
   defp fetch_student_assignments(%{student_id: student_id} = student) do
     # TODO: DO this. And do it right
-    
+    student
   end
 end
