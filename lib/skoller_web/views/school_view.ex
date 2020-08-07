@@ -20,6 +20,7 @@ defmodule SkollerWeb.SchoolView do
       id: school.id,
       name: school.name,
       periods: render_many(school.class_periods, PeriodView, "period.json"),
+      class_periods: render_many(school.class_periods, PeriodView, "period.json"),
       timezone: school.timezone,
       adr_region: school.adr_region,
       adr_locality: school.adr_locality,
