@@ -41,7 +41,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations.InvitationEmails do
   defp send_invite_email(email, org_name, invited_by) do
     %{
       to: email,
-      template_data: %{
+      form: %{
         organization_name: org_name,
         invited_by: invited_by
       }
@@ -52,7 +52,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations.InvitationEmails do
   defp send_reminder_email(email, org_name) do
     %{
       to: email,
-      template_data: %{
+      form: %{
         organization_name: org_name
       }
     }
