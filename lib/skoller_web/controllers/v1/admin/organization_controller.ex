@@ -70,4 +70,6 @@ defmodule SkollerWeb.Api.V1.Admin.OrganizationController do
         nil
     end
   end
+
+  defp upload_pic(params), do: params
 end
