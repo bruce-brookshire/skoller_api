@@ -44,7 +44,6 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
-      # resources "/organizations", OrganizationController, only: [:index]
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
 
       resources "/organizations", OrganizationController, only: [:index] do
