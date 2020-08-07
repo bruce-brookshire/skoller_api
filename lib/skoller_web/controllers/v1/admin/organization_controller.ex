@@ -6,6 +6,7 @@ defmodule SkollerWeb.Api.V1.Admin.OrganizationController do
   alias SkollerWeb.OrganizationView
   alias Skoller.FileUploaders.OrgPics
   alias Ecto.UUID
+  alias Skoller.Repo
 
   import SkollerWeb.Plugs.Auth, only: [verify_role: 2]
   import SkollerWeb.Plugs.InsightsAuth
