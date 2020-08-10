@@ -54,7 +54,7 @@ defmodule SkollerWeb.Api.V1.Organization.InsightsUserController do
     |> select([u, r], u)
     |> offset(^offset)
     |> limit(15)
-    |> preload([:org_owners, :org_members, :roles])
+    |> preload([:org_owners, :org_members, :org_group_owners, :roles])
     |> Repo.all()
     |> case do
       users when is_list(users) ->

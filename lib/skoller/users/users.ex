@@ -37,7 +37,7 @@ defmodule Skoller.Users do
   """
   def get_user_by_id!(id) do
     Repo.get!(User, id)
-    |> Repo.preload([:roles, :student])
+    |> Repo.preload([:roles, :student, :org_owners, :org_members, :org_group_owners])
   end
 
   @doc """
@@ -48,7 +48,7 @@ defmodule Skoller.Users do
   """
   def get_user_by_id(id) do
     Repo.get(User, id)
-    |> Repo.preload([:roles, :student])
+    |> Repo.preload([:roles, :student, :org_owners, :org_members, :org_group_owners])
   end
 
   @doc """

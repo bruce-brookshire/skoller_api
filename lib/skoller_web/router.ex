@@ -44,14 +44,17 @@ defmodule SkollerWeb.Router do
     pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
-      # resources "/organizations", OrganizationController, only: [:index]
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
 
       resources "/organizations", OrganizationController, only: [:index] do
         post "/student-org-invitations/csv", Organization.StudentOrgInvitationController, :csv_create
         post "/student-org-invitations/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
+        post "/student-org-invitations/email-invites", Organization.StudentOrgInvitationController, :email_invitation
+
         resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create, :delete] do
           post "/respond", Organization.StudentOrgInvitationController, :respond
+          post "/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
+          post "/email-invites", Organization.StudentOrgInvitationController, :email_invitation
         end
 
         # Org resources
@@ -71,6 +74,9 @@ defmodule SkollerWeb.Router do
 
         # Group resources
         resources "/org-groups", Organization.OrgGroupController, only: @default_rest_methods do
+          post "/student-org-invitations/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
+          post "/student-org-invitations/email-invites", Organization.StudentOrgInvitationController, :email_invitation
+
           resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
             resources "/watchlists", Organization.OrgGroupOwnerWatchlistController,
               only: @default_rest_methods
