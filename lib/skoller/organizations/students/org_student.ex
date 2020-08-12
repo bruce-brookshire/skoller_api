@@ -5,6 +5,8 @@ defmodule Skoller.Organizations.OrgStudents.OrgStudent do
   alias Skoller.Organizations.OrgGroupStudents.OrgGroupStudent
 
   schema "org_students" do
+    field(:intensity_score, :map, virtual: true)
+
     belongs_to :student, Student
     belongs_to :organization, Organization
 

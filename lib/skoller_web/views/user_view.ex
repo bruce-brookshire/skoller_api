@@ -16,7 +16,7 @@ defmodule SkollerWeb.UserView do
 
   def render("user.json", %{user: user}),
     do:
-      Map.take(user |> IO.inspect, [:id, :email, :pic_path, :is_active])
+      Map.take(user, [:id, :email, :pic_path, :is_active])
       |> Map.put(:org_owners, View.render_association(user.org_owners))
       |> Map.put(:org_group_owners, View.render_association(user.org_group_owners))
       |> Map.put(:org_members, View.render_association(user.org_members))

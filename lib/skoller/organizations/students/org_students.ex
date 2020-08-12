@@ -1,6 +1,8 @@
 defmodule Skoller.Organizations.OrgStudents do
   alias __MODULE__.OrgStudent
-  alias Skoller.StudentAssignments.StudentAssignment
+  alias Skoller.StudentAssignments.StudentClasses
+  alias Skoller.Schools.School
+  alias Skoller.Organizations.IntensityScore
 
   use ExMvc.Adapter, model: OrgStudent
 
@@ -20,8 +22,17 @@ defmodule Skoller.Organizations.OrgStudents do
     |> Enum.map(&fetch_student_assignments/1)
   end
 
-  defp fetch_student_assignments(%{student_id: student_id} = student) do
-    # TODO: DO this. And do it right
-    student
+  defp fetch_student_assignments(
+         %{student_id: student_id, student: %{primary_school_id: s_id}} = student
+       ) do
+    sa = StudentClasses.get_student_assignments(student_id)
+
+    tz =
+      case Repo.get(School, s_id || 0) do
+        %{timezone: tz} -> tz
+        nil -> "America/Chicago"
+      end
+
+    %{student | intensity_score: IntensityScore.create_intensity_scores(sa, tz)}
   end
 end
