@@ -70,8 +70,7 @@ defmodule Skoller.Timezone do
    * `{:error, error}` if there is an error.
   """
   def get_timezone(locality, country, region \\ nil) do
-    case request(@get_tz_url, %{by: "city", country: country, region: region, city: locality})
-         |> IO.inspect() do
+    case request(@get_tz_url, %{by: "city", country: country, region: region, city: locality}) do
       {:ok, %{"zones" => zones}} ->
         case zones |> Enum.count() do
           0 ->

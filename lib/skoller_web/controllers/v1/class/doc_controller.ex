@@ -12,8 +12,9 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
   @student_role 100
   @admin_role 200
   @syllabus_worker_role 300
+  @insights_role 700
 
-  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role]}
+  plug :verify_role, %{roles: [@student_role, @admin_role, @syllabus_worker_role, @insights_role]}
   plug :verify_member, :class
 
   def create(%{assigns: %{user: user}} = conn, %{"file" => file, "class_id" => class_id} = params) do

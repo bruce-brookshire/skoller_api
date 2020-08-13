@@ -60,7 +60,7 @@ defmodule Skoller.StudentAssignments.StudentClasses do
   ## Returns
   `[%{Skoller.StudentClasses.StudentClass}]` with assignments and is_pending_mods or `[]`
   """
-  def get_student_assignments(student_id, filters) do
+  def get_student_assignments(student_id, filters \\ %{}) do
     from(sc in subquery(EnrolledStudents.get_enrolled_classes_by_student_id_subquery(student_id)))
     |> join(:inner, [sc], class in Class, on: class.id == sc.class_id)
     |> join(:inner, [sc, class], cs in Status, on: cs.id == class.class_status_id)
