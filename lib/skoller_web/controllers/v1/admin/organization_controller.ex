@@ -44,7 +44,7 @@ defmodule SkollerWeb.Api.V1.Admin.OrganizationController do
     |> Organizations.update_organization(upload_pic(params))
     |> case do
       {:ok, %Organization{} = organization} ->
-        org = Repo.preload(organization, [school: :class_periods])
+        org = Repo.preload(organization, [schools: :class_periods])
         render(conn, "show.json", organization: org)
 
       _ ->

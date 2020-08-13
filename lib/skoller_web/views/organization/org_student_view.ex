@@ -21,9 +21,4 @@ defmodule SkollerWeb.Organization.OrgStudentView do
 
   def render("index.json", %{models: models}),
     do: render_many(models, __MODULE__, "show.json", as: :model)
-
-  def render(name, body) do
-    IO.inspect({name, body})
-    ""
-  end
 end
