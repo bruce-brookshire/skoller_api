@@ -154,26 +154,20 @@ defmodule SkollerWeb.Api.V1.Organization.StudentOrgInvitationController do
     send_resp(conn, 204, "")
   end
 
-  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
-        "org_group_id" => org_group_id
-      }) do
-    InvitationEmails.send_invite_email(invited_by, org_group_id: org_group_id)
+  def email_invitation(conn, %{"org_group_id" => org_group_id}) do
+    InvitationEmails.send_invite_email(org_group_id: org_group_id)
 
     send_resp(conn, 204, "")
   end
 
-  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
-        "student_org_invitation_id" => org_invitation_id
-      }) do
-    InvitationEmails.send_invite_email(invited_by, id: org_invitation_id)
+  def email_invitation(conn, %{"student_org_invitation_id" => org_invitation_id}) do
+    InvitationEmails.send_invite_email(id: org_invitation_id)
 
     send_resp(conn, 204, "")
   end
 
-  def email_invitation(%{assigns: %{user: %{email: invited_by}}} = conn, %{
-        "organization_id" => org_id
-      }) do
-    InvitationEmails.send_invite_email(invited_by, organization_id: org_id)
+  def email_invitation(conn, %{"organization_id" => org_id}) do
+    InvitationEmails.send_invite_email(organization_id: org_id)
 
     send_resp(conn, 204, "")
   end
