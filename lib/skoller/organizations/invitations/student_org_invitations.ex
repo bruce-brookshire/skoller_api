@@ -15,6 +15,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
   def get_invitations_by_org_group(org_group_id) do
     StudentOrgInvitation
     |> where([i], ^org_group_id in i.group_ids)
+    |> preload([:organization])
     |> Repo.all()
   end
 end
