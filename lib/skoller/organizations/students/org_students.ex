@@ -1,6 +1,7 @@
 defmodule Skoller.Organizations.OrgStudents do
   alias __MODULE__.OrgStudent
   alias Skoller.StudentAssignments.StudentClasses
+  alias Skoller.EnrolledStudents
   alias Skoller.Schools.School
   alias Skoller.Organizations.IntensityScore
 
@@ -26,6 +27,7 @@ defmodule Skoller.Organizations.OrgStudents do
          %{student_id: student_id, student: %{primary_school_id: s_id}} = student
        ) do
     sa = StudentClasses.get_student_assignments(student_id)
+    cl = EnrolledStudents.get_enrolled_classes_by_student_id(student_id)
 
     tz =
       case Repo.get(School, s_id || 0) do
@@ -33,6 +35,6 @@ defmodule Skoller.Organizations.OrgStudents do
         nil -> "America/Chicago"
       end
 
-    %{student | intensity_score: IntensityScore.create_intensity_scores(sa, tz)}
+    %{student | intensity_score: IntensityScore.create_intensity_scores(sa, tz), assignments: sa, classes: cl}
   end
 end

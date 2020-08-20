@@ -1,4 +1,7 @@
 defmodule SkollerWeb.Organization.OrgStudentView do
+  alias SkollerWeb.Class.StudentAssignmentView
+  alias SkollerWeb.Class.StudentClassView
+
   import ExMvc.View
 
   use SkollerWeb, :view
@@ -15,8 +18,11 @@ defmodule SkollerWeb.Organization.OrgStudentView do
       student: student,
       student_id: org_student.student_id,
       id: org_student.id,
-      intensity_score: org_student.intensity_score
+      intensity_score: org_student.intensity_score,
+      assignments: render_many(org_student.assignments, StudentAssignmentView, "student_assignment-short.json"),
+      classes: render_many(org_student.classes, StudentClassView, "student_class.json")
     }
+    |> IO.inspect
   end
 
   def render("index.json", %{models: models}),

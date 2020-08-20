@@ -3,9 +3,13 @@ defmodule Skoller.Organizations.OrgStudents.OrgStudent do
   alias Skoller.Students.Student
   alias Skoller.Organizations.Organization
   alias Skoller.Organizations.OrgGroupStudents.OrgGroupStudent
+  alias Skoller.StudentAssignments.StudentAssignment
+  alias Skoller.StudentClasses.StudentClass
 
   schema "org_students" do
     field(:intensity_score, :map, virtual: true)
+    field(:assignments, {:array, StudentAssignment}, virtual: true)
+    field(:classes, {:array, StudentClass}, virtual: true)
 
     belongs_to :student, Student
     belongs_to :organization, Organization
