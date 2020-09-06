@@ -9,7 +9,7 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupStudent.ClassesController do
   alias Skoller.Organizations.OrgGroupStudents
 
   def index(conn, %{"org_group_student_id" => org_student_id} = params) do
-    %{student: %{id: student_id}} = OrgGroupStudents.get_by_id(org_student_id) |> IO.inspect
+    %{student: %{id: student_id}} = OrgGroupStudents.get_by_id(org_student_id)
 
     student_classes =
       EnrolledStudents.get_enrolled_classes_by_student_id(student_id)

@@ -1,6 +1,7 @@
 defmodule Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation do
   use Ecto.Schema
 
+  alias Skoller.Classes.Class
   alias Skoller.Students.Student
   alias Skoller.Organizations.Organization
 
@@ -12,9 +13,11 @@ defmodule Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation do
     field :class_ids, {:array, :integer}, default: []
     field :group_ids, {:array, :integer}, default: []
 
+    field :classes, {:array, Class}, virtual: true
+
     belongs_to :student, Student
     belongs_to :organization, Organization
-    
+
     timestamps()
   end
 

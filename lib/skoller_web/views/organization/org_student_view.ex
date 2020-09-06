@@ -22,7 +22,6 @@ defmodule SkollerWeb.Organization.OrgStudentView do
       assignments: render_many(org_student.assignments, StudentAssignmentView, "student_assignment-short.json"),
       classes: render_many(org_student.classes, StudentClassView, "student_class.json")
     }
-    |> IO.inspect
   end
 
   def render("index.json", %{models: models}),
