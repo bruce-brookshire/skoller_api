@@ -17,9 +17,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
   def get_by_params(query_params) when is_list(query_params) do
     from(m in Model, where: ^query_params)
     |> Repo.all()
-    |> IO.inspect()
     |> Enum.map(&preload/1)
-    |> IO.inspect()
     |> Enum.map(&fetch_invite_assignments/1)
     |> IO.inspect()
   end
@@ -32,10 +30,12 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
       end)
       |> preload([:weights, :notes])
       |> Repo.all()
+      |> IO.inspect
       |> Enum.map(fn %{id: id} = class ->
         class
         |> Map.put(:assignments, Mods.get_mod_assignments_by_class(id))
         |> Map.put(:students, StudentClasses.get_studentclasses_by_class(id))
+        |> IO.inspect
       end)
 
     %{invite | classes: cl}
