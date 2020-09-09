@@ -28,7 +28,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
       |> Enum.reduce(Class, fn elem, q ->
         or_where(q, [c], c.id == ^elem)
       end)
-      |> preload([:weights, :notes])
+      |> Ecto.Query.preload([:weights, :notes])
       |> Repo.all()
       |> IO.inspect
       |> Enum.map(fn %{id: id} = class ->
