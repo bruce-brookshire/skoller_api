@@ -17,8 +17,11 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
   def get_by_params(query_params) when is_list(query_params) do
     from(m in Model, where: ^query_params)
     |> Repo.all()
+    |> IO.inspect()
     |> Enum.map(&preload/1)
+    |> IO.inspect()
     |> Enum.map(&fetch_invite_assignments/1)
+    |> IO.inspect()
   end
 
   defp fetch_invite_assignments(%{class_ids: class_ids} = invite) do
