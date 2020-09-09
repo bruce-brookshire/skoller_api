@@ -19,8 +19,9 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
     |> Repo.all()
     |> Enum.map(&preload/1)
     |> Enum.map(&fetch_invite_assignments/1)
-    |> IO.inspect()
   end
+
+  defp fetch_invite_assignments(%{class_ids: []} = invite), do: %{invite | classes: []}
 
   defp fetch_invite_assignments(%{class_ids: class_ids} = invite) do
     cl =
@@ -29,14 +30,11 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
         or_where(q, [c], c.id == ^elem)
       end)
       |> Ecto.Query.preload([:weights, :notes])
-      |> IO.inspect
       |> Repo.all()
-      |> IO.inspect
       |> Enum.map(fn %{id: id} = class ->
         class
         |> Map.put(:assignments, Mods.get_mod_assignments_by_class(id))
         |> Map.put(:students, StudentClasses.get_studentclasses_by_class(id))
-        |> IO.inspect
       end)
 
     %{invite | classes: cl}
