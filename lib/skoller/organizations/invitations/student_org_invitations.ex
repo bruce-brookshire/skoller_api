@@ -21,6 +21,14 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
     |> Enum.map(&fetch_invite_assignments/1)
   end
 
+  def get_by_id(id) when is_binary(id) or is_integer(id) do
+    Model
+    |> Repo.get(id)
+    |> preload()
+    |> fetch_invite_assignments()
+  end
+
+
   defp fetch_invite_assignments(%{class_ids: []} = invite), do: %{invite | classes: []}
 
   defp fetch_invite_assignments(%{class_ids: class_ids} = invite) do
