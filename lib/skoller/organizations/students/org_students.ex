@@ -1,6 +1,7 @@
 defmodule Skoller.Organizations.OrgStudents do
   alias __MODULE__.OrgStudent
-  alias Skoller.StudentAssignments.StudentClasses
+  alias Skoller.StudentAssignments.StudentClasses, as: SAStudentClasses
+  alias Skoller.StudentClasses
   alias Skoller.EnrolledStudents
   alias Skoller.Schools.School
   alias Skoller.Organizations.IntensityScore
@@ -26,8 +27,10 @@ defmodule Skoller.Organizations.OrgStudents do
   defp fetch_student_assignments(
          %{student_id: student_id, student: %{primary_school_id: s_id}} = student
        ) do
-    sa = StudentClasses.get_student_assignments(student_id)
-    cl = EnrolledStudents.get_enrolled_classes_by_student_id(student_id)
+    sa = SAStudentClasses.get_student_assignments(student_id)
+    cl = student_id
+    |> EnrolledStudents.get_enrolled_classes_by_student_id()
+    |> Enum.map(fn cl ->  Map.put(cl, :grade, StudentClasses.get_class_grade(cl.id)) end)
 
     tz =
       case Repo.get(School, s_id || 0) do
