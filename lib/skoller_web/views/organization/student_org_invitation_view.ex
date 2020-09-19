@@ -3,6 +3,7 @@ defmodule SkollerWeb.Organization.StudentOrgInvitationView do
 
   alias Skoller.Organizations.{StudentOrgInvitations.StudentOrgInvitation, OrgStudents.OrgStudent}
   alias SkollerWeb.Organization.OrgStudentView
+  alias SkollerWeb.OrganizationView
   alias SkollerWeb.Admin.ClassView
 
   def render("show.json", %{model: invite}) do
@@ -11,6 +12,7 @@ defmodule SkollerWeb.Organization.StudentOrgInvitationView do
     |> Map.merge(%{
       classes: invite.classes && render_many(invite.classes, ClassView, "class.json")
     })
+    |> Map.put(:organization, Map.take(invite.organization, [:id, :name]))
   end
 
   def render("index.json", %{models: models}),
