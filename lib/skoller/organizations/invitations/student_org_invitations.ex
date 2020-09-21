@@ -1,7 +1,53 @@
 defmodule Skoller.Organizations.StudentOrgInvitations do
-  alias __MODULE__.StudentOrgInvitation
+  use ExMvc.Adapter, model: __MODULE__.StudentOrgInvitation
 
-  use ExMvc.Adapter, model: StudentOrgInvitation
+  alias Skoller.StudentClasses
+  alias Skoller.Classes.Class
+  alias Skoller.Assignments.Mods
+
+  def get_by_params(query_params) when is_map(query_params) do
+    fields = Model.__schema__(:fields) |> Enum.map(&to_string/1)
+
+    query_params
+    |> Map.take(fields)
+    |> Enum.map(fn {key, val} -> {String.to_atom(key), val} end)
+    |> get_by_params()
+  end
+
+  def get_by_params(query_params) when is_list(query_params) do
+    from(m in Model, where: ^query_params)
+    |> Repo.all()
+    |> Enum.map(&preload/1)
+    |> Enum.map(&fetch_invite_assignments/1)
+  end
+
+  def get_by_id(id) when is_binary(id), do: id |> String.to_integer() |> get_by_id()
+
+  def get_by_id(id) when is_integer(id) do
+    Model
+    |> Repo.get(id)
+    |> preload()
+    |> fetch_invite_assignments()
+  end
+
+  defp fetch_invite_assignments(%{class_ids: []} = invite), do: %{invite | classes: []}
+
+  defp fetch_invite_assignments(%{class_ids: class_ids} = invite) do
+    cl =
+      class_ids
+      |> Enum.reduce(Class, fn elem, q ->
+        or_where(q, [c], c.id == ^elem)
+      end)
+      |> Ecto.Query.preload([:weights, :notes])
+      |> Repo.all()
+      |> Enum.map(fn %{id: id} = class ->
+        class
+        |> Map.put(:assignments, Mods.get_mod_assignments_by_class(id))
+        |> Map.put(:students, StudentClasses.get_studentclasses_by_class(id))
+      end)
+
+    %{invite | classes: cl}
+  end
 
   def convert_invite_to_student(student_id, phone) do
     StudentOrgInvitation

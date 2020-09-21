@@ -1,8 +1,21 @@
 defmodule SkollerWeb.Organization.StudentOrgInvitationView do
+  use SkollerWeb, :view
+
   alias Skoller.Organizations.{StudentOrgInvitations.StudentOrgInvitation, OrgStudents.OrgStudent}
   alias SkollerWeb.Organization.OrgStudentView
+  alias SkollerWeb.Admin.ClassView
 
-  use ExMvc.View, model: StudentOrgInvitation
+  def render("show.json", %{model: invite}) do
+    invite
+    |> Map.take([:id, :phone, :email, :name_first, :name_last, :class_ids, :group_ids])
+    |> Map.merge(%{
+      classes: invite.classes && render_many(invite.classes, ClassView, "class.json")
+    })
+    |> Map.put(:organization, Map.take(invite.organization, [:id, :name]))
+  end
+
+  def render("index.json", %{models: models}),
+    do: render_many(models, __MODULE__, "show.json", as: :model)
 
   def render("invite.json", %{invite: invite}),
     do: %{invite: render_one(invite, __MODULE__, "show.json", as: :model)}

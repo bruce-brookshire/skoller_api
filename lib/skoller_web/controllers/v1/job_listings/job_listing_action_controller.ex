@@ -15,7 +15,6 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
         %{"action" => action, "job_listing_sender_reference" => ref} = params
       )
       when action in @actions do
-        IO.inspect params
     {status, message} =
       with(
         true <- Listings.exists?(ref),
@@ -32,7 +31,6 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
   end
 
   def create(conn, params) do
-    IO.inspect(params)
     send_resp(conn, 422, "Invalid Action or sender reference missing")
   end
 end
