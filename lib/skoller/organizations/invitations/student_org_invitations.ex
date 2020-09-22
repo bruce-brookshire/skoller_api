@@ -50,7 +50,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations do
   end
 
   def convert_invite_to_student(student_id, phone) do
-    StudentOrgInvitation
+    __MODULE__.StudentOrgInvitation
     |> Repo.get_by(phone: phone)
     |> case do
       nil -> {:ok, "Student does not exist"}
