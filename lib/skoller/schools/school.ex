@@ -25,6 +25,7 @@ defmodule Skoller.Schools.School do
     field :is_assignment_posts_enabled, :boolean, default: true
     field :is_university, :boolean, default: true
     field :is_syllabus_overload, :boolean, default: false
+    field :admin_syllabus_overload, :boolean, virtual: true
 
     has_many :class_periods, ClassPeriod
     has_many :classes, through: [:class_periods, :classes]

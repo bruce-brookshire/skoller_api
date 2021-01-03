@@ -91,7 +91,7 @@ defmodule Skoller.Users do
       |> Ecto.Multi.run(:org_invites, fn _, changes -> convert_org_invite(changes.user) end)
       |> Repo.transaction()
       |> send_link_used_notification()
-      |> send_verification_text()
+      |> send_verification_text(opts)
 
     case result do
       {:ok, %{user: user}} ->
@@ -257,13 +257,17 @@ defmodule Skoller.Users do
 
   defp send_verification_text(
          {:ok, %{user: %{student: %{phone: phone, verification_code: verification_code}}}} =
-           result
+           result,
+         opts
        ) do
-    phone |> Sms.verify_phone(verification_code)
+    if !opts[:admin] do
+      Sms.verify_phone(phone, verification_code)
+    end
+
     result
   end
 
-  defp send_verification_text(result), do: result
+  defp send_verification_text(result, _), do: result
 
   defp add_points_to_student(%{student: %{enrolled_by: enrolled_by, id: link_consumer_student_id}})
        when not is_nil(enrolled_by) do

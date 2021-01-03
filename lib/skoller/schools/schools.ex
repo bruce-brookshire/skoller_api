@@ -321,13 +321,20 @@ defmodule Skoller.Schools do
 
   defp add_default_overload_settings({:ok, school}), do: add_default_overload_settings(school)
 
+  # Overload logic is as follows:
+
+  # when override on, school off -> overload == false
+  # when override on, school on -> overload == true
+  # when override off, school on -> overload == false
+  # when override off, school off -> overload == false
+
   defp add_default_overload_settings(%{is_syllabus_overload: school_value} = school) do
     case Settings.get_syllabus_overload_setting() do
-      %{value: "true"} when not school_value ->
-        %{school | is_syllabus_overload: true}
+      %{value: "false"} when school_value ->
+        %{school | is_syllabus_overload: false, admin_syllabus_overload: school_value}
 
       _ ->
-        school
+        %{school | admin_syllabus_overload: school_value}
     end
   end
 
