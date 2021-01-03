@@ -46,7 +46,8 @@ defmodule SkollerWeb.Admin.SchoolView do
       is_chat_enabled: school.is_chat_enabled,
       is_assignment_posts_enabled: school.is_assignment_posts_enabled,
       color: school.color,
-      is_syllabus_overload: school.is_syllabus_overload
+      is_syllabus_overload: school.is_syllabus_overload,
+      admin_syllabus_overload: admin_syllabus_overload
     }
   end
 
