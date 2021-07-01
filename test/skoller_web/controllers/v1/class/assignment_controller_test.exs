@@ -44,10 +44,7 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentControllerTest do
     conn = post(conn, Routes.v1_class_assignment_path(conn, :create, class), @invalid_attrs)
     assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
     assert %{"errors" => errors} = json_response(conn, 422)
-
-    expected_results = %{"name" => ["can't be blank"]}
-    
-    assert errors == expected_results 
+    assert errors == %{"name" => ["can't be blank"]} 
   end
 
   test "/classes/:class_id/assignments/:id updates an assignment with given valid params", %{conn: conn, assignment: assignment, class: class, weight: weight} do
@@ -59,5 +56,12 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentControllerTest do
     resp = json_response(conn, 200)
     assert resp["name"] == @update_attrs["name"]
     assert resp["weight_id"] == weight.id
+  end
+
+  test "/classes/:class_id/assignments/:id updates an assignment with given invalid params", %{conn: conn, assignment: assignment, class: class} do
+    conn = put(conn, Routes.v1_class_assignment_path(conn, :update, class, assignment), @invalid_attrs)
+    assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
+    assert %{"errors" => errors} = json_response(conn, 422)
+    assert errors == %{"name" => ["can't be blank"]} 
   end
 end
