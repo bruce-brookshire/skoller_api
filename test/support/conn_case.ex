@@ -18,21 +18,32 @@ defmodule SkollerWeb.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      use Phoenix.ConnTest
-      import SkollerWeb.Router.Helpers
+      use ExUnit.Case, async: true
+      use Skoller.DataCase
+      
+      import Plug.Conn
+      import Phoenix.ConnTest
+      
+      alias Skoller.Auth
+      alias SkollerWeb.Router.Helpers, as: Routes
 
       # The default endpoint for testing
       @endpoint SkollerWeb.Endpoint
+
+      def authenticate(conn, student) do
+        case Auth.encode_and_sign(student) do
+          {:ok, jwt, _} ->
+            conn
+            |> Plug.Conn.put_req_header("authorization", "Bearer #{jwt}")
+
+          _ ->
+            conn
+        end
+      end
     end
   end
 
-
-  setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Skoller.Repo)
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Skoller.Repo, {:shared, self()})
-    end
+  setup do
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
-
 end

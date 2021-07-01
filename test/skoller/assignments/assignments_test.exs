@@ -1,5 +1,5 @@
 defmodule Skoller.AssignmentsTest do
-  use Skoller.DataCase
+  use Skoller.DataCase, async: true
 
   alias Skoller.Assignments
 
@@ -20,7 +20,7 @@ defmodule Skoller.AssignmentsTest do
   setup do
     class = insert(:class)
     user = insert(:user)
-    assignment = insert(:assignment, class: class)
+    assignment = insert(:assignment, class_id: class.id)
 
     %{assignment: assignment, class: class, user: user}
   end

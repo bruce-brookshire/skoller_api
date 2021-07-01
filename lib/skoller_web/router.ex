@@ -229,7 +229,7 @@ defmodule SkollerWeb.Router do
         delete "/docs/:id", Admin.Class.DocController, :delete
 
         # Class Assignment routes
-        resources "/assignments", Class.AssignmentController, only: [:create, :index]
+        resources "/assignments", Class.AssignmentController, only: ~w(index create update)a
 
         # Class Weight routes
         resources "/weights", Class.WeightController, only: [:index]
@@ -281,8 +281,7 @@ defmodule SkollerWeb.Router do
         get "/classes/:class_id", Student.ClassController, :show
         get "/classes/:class_id/mods", Student.Class.ModController, :index
 
-        resources "/classes/:class_id/assignments", Student.Class.AssignmentController,
-          only: [:create]
+        post "/classes/:class_id/assignments", Student.Class.AssignmentController, :create
 
         # School routes
         get "/school", Student.SchoolController, :show

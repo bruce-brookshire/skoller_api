@@ -83,24 +83,20 @@ defmodule Skoller.Assignments do
     |> Repo.delete()
   end
 
+  ### Private Methods
+
   defp check_weight_id(changeset, %{"weight_id" => nil}) do
     changeset |> Ecto.Changeset.force_change(:weight_id, nil)
   end
+  
   defp check_weight_id(changeset, _params), do: changeset
 
-  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset, class_id) do
-    weights = Weights.get_class_weights(class_id)
-
-    case weights do
-      [] -> changeset
-      _ -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight can't be null when weights exist.")
-    end
-  end
-  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) do
+  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) when not is_nil(weight_id) do
     case Weights.get_class_weight_by_ids(class_id, weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
       _ -> changeset
     end
   end
+  
   defp validate_class_weight(changeset, _class_id), do: changeset
 end
