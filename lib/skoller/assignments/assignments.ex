@@ -37,8 +37,6 @@ defmodule Skoller.Assignments do
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
   def create_assignment(class_id, user_id, params) do
-    params = params
-    |> Map.put_new("weight_id", nil)
     changeset = %Assignment{}
       |> Assignment.changeset(params)
       |> check_weight_id(params)
@@ -60,7 +58,6 @@ defmodule Skoller.Assignments do
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
   def update_assignment(id, user_id, params) do
-    params = params |> Map.put_new("weight_id", nil)
     assign_old = get_assignment_by_id!(id)
     changeset = assign_old
       |> Assignment.changeset(params)

@@ -22,6 +22,7 @@ defmodule Skoller.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Skoller.DataCase
+      import Skoller.Factory
     end
   end
 

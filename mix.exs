@@ -65,7 +65,10 @@ defmodule Skoller.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:sweet_xml, "~> 0.6"},
       {:timex, "~> 3.1"},
-      {:tzdata, "~> 0.5.21"}
+      {:tzdata, "~> 0.5.21"},
+
+      # Test
+      {:ex_machina, "~> 2.7", only: :test}
     ]
   end
 

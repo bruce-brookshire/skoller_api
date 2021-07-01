@@ -370,42 +370,36 @@ defmodule Mix.Tasks.Seed.Dev do
     r1 = Repo.insert!(%Assignment{
       name: "RP 1",
       due: date2,
-      weight_id: rp_weight.id,
       class_id: class.id
     })
 
     r2 = Repo.insert!(%Assignment{
       name: "RP 2",
       due: date2,
-      weight_id: rp_weight.id,
       class_id: class.id
     })
 
     r3 = Repo.insert!(%Assignment{
       name: "RP 3",
       due: date2,
-      weight_id: rp_weight.id,
       class_id: class.id
     })
 
     a3 = Repo.insert!(%Assignment{
       name: "A3",
       due: date2,
-      weight_id: assign_weight.id,
       class_id: class.id
     })
 
     a4 = Repo.insert!(%Assignment{
       name: "A4",
       due: date2,
-      weight_id: assign_weight.id,
       class_id: class.id
     })
 
     t1 = Repo.insert!(%Assignment{
       name: "E1",
       due: date2,
-      weight_id: test_weight.id,
       class_id: class.id
     })
 

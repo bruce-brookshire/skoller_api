@@ -12,7 +12,6 @@ defmodule Skoller.Assignments.Assignment do
   schema "assignments" do
     field :due, :utc_datetime
     field :name, :string
-    field :weight_id, :id
     field :class_id, :id
     field :from_mod, :boolean, default: false
     field :created_by, :id
@@ -29,12 +28,11 @@ defmodule Skoller.Assignments.Assignment do
   end
 
   @req_fields [:name, :class_id]
-  @opt_fields [:due, :weight_id]
+  @opt_fields [:due]
   @all_fields @req_fields ++ @opt_fields
 
   @stu_req_fields [:name, :class_id, :due]
-  @stu_opt_fields [:weight_id]
-  @stu_fields @stu_req_fields ++ @stu_opt_fields
+  @stu_fields @stu_req_fields
 
   @doc false
   def changeset(%Assignment{} = assignment, attrs) do
