@@ -50,13 +50,13 @@ defmodule Skoller.Mixfile do
       {:ex_mvc, "~> 0.3.0", github: "flyrboy96/ex_mvc"},
       {:ex_twilio, "~> 0.7.0"},
       {:gettext, "~> 0.11"},
-      {:faker, "~> 0.11"},
-      {:guardian, "~> 1.0-beta"},
+      {:faker, "~> 0.16.0"},
+      {:guardian, "~> 2.1"},
       {:kadabra, "~> 0.4.4"},
       {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
-      {:phoenix, "~> 1.4.0"},
+      {:phoenix, "~> 1.5"},
       {:phoenix_html, "~> 2.2"},
-      {:phoenix_pubsub, "~> 1.0"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
       {:pigeon, "~> 1.3.2"},
       {:plug_cowboy, "~> 2.0"},
@@ -65,7 +65,10 @@ defmodule Skoller.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:sweet_xml, "~> 0.6"},
       {:timex, "~> 3.1"},
-      {:tzdata, "~> 0.5.21"}
+      {:tzdata, "~> 0.5.21"},
+
+      # Test
+      {:ex_machina, "~> 2.7", only: :test},
     ]
   end
 
@@ -79,7 +82,7 @@ defmodule Skoller.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate_s", "run priv/repo/seeds.exs", "seed.dev"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate_s", "test"],
+      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate_s", "test"],
       "ecto.migrate_s": ["ecto.migrate.startup", "ecto.migrate"]
     ]
   end

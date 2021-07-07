@@ -1,20 +1,28 @@
 defmodule Skoller.Auth do
-  @moduledoc """
-  Auth module used by Guardian.
-  """
-
+  @moduledoc "Auth Guardian"
   use Guardian, otp_app: :skoller
 
-  # used during Skoller.Auth.encode_and_sign/2
-  def subject_for_token(resource, _claims) do
-    {:ok, to_string(resource.id)}
+  alias Skoller.{
+    Users,
+    Users.User
+  }
+
+  def subject_for_token(%{id: id}, _claims) do
+    {:ok, to_string(id)}
   end
 
-  # used during Guardian.Plug.LoadResource
-  def resource_from_claims(%{"sub" => sub}) do
-    {:ok, sub}
+  def subject_for_token(_, _) do
+    {:error, :not_found}
   end
+
+  def resource_from_claims(%{"sub" => id}) do
+    case Users.get_user_by_id(id) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, :no_resource_found}
+    end
+  end
+
   def resource_from_claims(_claims) do
-    {:error, :reason_for_error}
+    {:error, :not_found}
   end
 end

@@ -16,6 +16,7 @@ defmodule Skoller.Application do
       supervisor(Skoller.Repo, []),
       # Start the endpoint when the application starts
       supervisor(SkollerWeb.Endpoint, []),
+      {Phoenix.PubSub, [name: Skoller.PubSub, adapter: Phoenix.PubSub.PG2]},
       # Start your own worker by calling:
       # Skoller.Worker.start_link(arg1, arg2, arg3)
       # worker(Skoller.Worker, [arg1, arg2, arg3]),

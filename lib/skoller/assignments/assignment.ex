@@ -1,20 +1,13 @@
 defmodule Skoller.Assignments.Assignment do
-  @moduledoc false
-
-  use Ecto.Schema
-  import Ecto.Changeset
-  alias Skoller.Assignments.Assignment
-  alias Skoller.Classes.Class
-  alias Skoller.StudentAssignments.StudentAssignment
-  alias Skoller.Weights.Weight
-  alias Skoller.Users.User
+  @moduledoc "Assignments Assignment Schema"
+  use Skoller.Schema
 
   schema "assignments" do
     field :due, :utc_datetime
     field :name, :string
+    field :from_mod, :boolean, default: false
     field :weight_id, :id
     field :class_id, :id
-    field :from_mod, :boolean, default: false
     field :created_by, :id
     field :updated_by, :id
     field :created_on, :string
@@ -28,24 +21,19 @@ defmodule Skoller.Assignments.Assignment do
     timestamps()
   end
 
-  @req_fields [:name, :class_id]
-  @opt_fields [:due, :weight_id]
-  @all_fields @req_fields ++ @opt_fields
-
-  @stu_req_fields [:name, :class_id, :due]
-  @stu_opt_fields [:weight_id]
-  @stu_fields @stu_req_fields ++ @stu_opt_fields
+  @required ~w(name class_id)a
+  @optional ~w(due weight_id)a
 
   @doc false
-  def changeset(%Assignment{} = assignment, attrs) do
+  def changeset(%__MODULE__{} = assignment, attrs) do
     assignment
-    |> cast(attrs, @all_fields)
-    |> validate_required(@req_fields)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required)
   end
 
-  def student_changeset(%Assignment{} = assignment, attrs) do
+  def student_changeset(%__MODULE__{} = assignment, attrs) do
     assignment
-    |> cast(attrs, @stu_fields)
-    |> validate_required(@stu_req_fields)
+    |> cast(attrs, @required ++ @optional)
+    |> validate_required(@required ++ [:due])
   end
 end
