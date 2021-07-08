@@ -2,19 +2,15 @@ defmodule Skoller.Assignments.Classes do
   @moduledoc """
   A context module for class assignments
   """
-
-  alias Skoller.Repo
-  alias Skoller.Assignments.Assignment
-
-  import Ecto.Query
+  use Skoller.Schema
 
   @doc """
   Gets non mod assignments by class.
   """
   def get_assignments_by_class(class_id) do
-    from(a in Assignment)
+    Assignment
     |> where([a], a.class_id == ^class_id)
-    |> where([assign], assign.from_mod == false)
+    |> where([a], not a.from_mod)
     |> Repo.all()
   end
 end

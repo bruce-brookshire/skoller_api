@@ -13,6 +13,8 @@ defmodule Skoller.Schema do
         Weights.Weight
       }
 
+      alias Skoller.Repo
+
       import Ecto
       import Ecto.Changeset
       import Ecto.Query, warn: false

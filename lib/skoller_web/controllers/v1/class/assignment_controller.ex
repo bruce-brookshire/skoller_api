@@ -27,6 +27,14 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
   plug :check_lock, %{type: :assignment, using: :id}
   plug :check_lock, %{type: :assignment, using: :class_id}
 
+  def index(conn, %{"class_id" => class_id}) do
+    assignments = Classes.get_assignments_by_class(class_id)
+
+    conn
+    |> put_view(AssignmentView)
+    |> render("index.json", assignments: assignments)
+  end
+
   def create(%{assigns: %{user: user}} = conn, %{"class_id" => class_id} = params) do
     case Assignments.create_assignment(class_id, user.id, params) do
       {:ok, %{assignment: assignment}} ->
@@ -38,14 +46,6 @@ defmodule SkollerWeb.Api.V1.Class.AssignmentController do
         conn
         |> MultiError.render(failed_value)
     end
-  end
-
-  def index(conn, %{"class_id" => class_id}) do
-    assignments = Classes.get_assignments_by_class(class_id)
-
-    conn
-    |> put_view(AssignmentView)
-    |> render("index.json", assignments: assignments)
   end
 
   def delete(conn, %{"id" => id}) do

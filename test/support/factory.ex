@@ -3,7 +3,12 @@ defmodule Skoller.Factory do
   use ExMachina.Ecto, repo: Skoller.Repo
   use Skoller.Schema
 
-  def assignment_factory, do: %Assignment{}
+  def assignment_factory do
+    %Assignment{
+      name: sequence("assignment"),
+
+    }
+  end
   
   def class_factory, do: %Class{}
   
