@@ -41,7 +41,7 @@ defmodule SkollerWeb.Router do
 
   # Other scopes may use custom stacks.
   scope "/api", SkollerWeb.Api do
-    pipe_through :api_auth
+    # pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
