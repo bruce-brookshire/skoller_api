@@ -9,15 +9,15 @@ defmodule SkollerWeb.Api.V1.Admin.Student.ClassController do
   alias Skoller.EnrolledStudents
   alias Skoller.Mods.Assignments
 
-  import SkollerWeb.Plugs.Auth
+  # import SkollerWeb.Plugs.Auth
 
-  @student_role 100
-  @admin_role 200
+  # @student_role 100
+  # @admin_role 200
 
-  plug :verify_role, %{roles: [@student_role, @admin_role]}
-  plug :verify_member, :student
-  plug :verify_member, %{of: :class, using: :id}
-  plug :verify_class_is_editable, :class_id
+  # plug :verify_role, %{roles: [@student_role, @admin_role]}
+  # plug :verify_member, :student
+  # plug :verify_member, %{of: :class, using: :id}
+  # plug :verify_class_is_editable, :class_id
 
   def index(conn, %{"student_id" => student_id}) do
     student_classes =
