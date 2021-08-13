@@ -41,7 +41,7 @@ defmodule SkollerWeb.Router do
 
   # Other scopes may use custom stacks.
   scope "/api", SkollerWeb.Api do
-    # pipe_through :api_auth
+    pipe_through :api_auth
 
     scope "/v1", V1, as: :v1 do
       resources "/organizations", Admin.OrganizationController, except: [:new, :edit, :index]
@@ -229,7 +229,7 @@ defmodule SkollerWeb.Router do
         delete "/docs/:id", Admin.Class.DocController, :delete
 
         # Class Assignment routes
-        resources "/assignments", Class.AssignmentController, only: ~w(index create update)a
+        resources "/assignments", Class.AssignmentController, only: [:create, :index]
 
         # Class Weight routes
         resources "/weights", Class.WeightController, only: [:index]
@@ -281,7 +281,8 @@ defmodule SkollerWeb.Router do
         get "/classes/:class_id", Student.ClassController, :show
         get "/classes/:class_id/mods", Student.Class.ModController, :index
 
-        post "/classes/:class_id/assignments", Student.Class.AssignmentController, :create
+        resources "/classes/:class_id/assignments", Student.Class.AssignmentController,
+          only: [:create]
 
         # School routes
         get "/school", Student.SchoolController, :show

@@ -40,7 +40,7 @@ defmodule SkollerWeb.Plugs.Auth do
   end
 
   def get_auth_obj(conn) do
-    case Guardian.Plug.current_resource(conn) do
+    case Users.get_user_by_id(Guardian.Plug.current_resource(conn)) do
       %{is_active: false} ->
         {:error, :inactive}
 

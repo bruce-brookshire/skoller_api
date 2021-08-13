@@ -78,9 +78,14 @@ defmodule Skoller.Classes do
     |> Repo.transaction()
   end
 
-
   @doc """
   Updates a `Skoller.Classes.Class` with changeset depending on `Skoller.Schools.School` tied to the `Skoller.Periods.ClassPeriod`
+
+  ## Examples
+
+      iex> Skoller.Classes.update_class(old_class, %{} = params)
+      {:ok, %{class: %Skoller.Classes.Class{}, class_status: %Skoller.Classes.Class{}}}
+
   """
   def update_class(class_old, params, user_id \\ nil) do
     changeset = class_old.class_period_id

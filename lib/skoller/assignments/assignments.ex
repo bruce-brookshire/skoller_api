@@ -37,6 +37,8 @@ defmodule Skoller.Assignments do
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
   def create_assignment(class_id, user_id, params) do
+    params = params
+    |> Map.put_new("weight_id", nil)
     changeset = %Assignment{}
       |> Assignment.changeset(params)
       |> check_weight_id(params)
@@ -58,6 +60,7 @@ defmodule Skoller.Assignments do
     `%{assignment: Skoller.Assignments.Assignment, student_assignments: [Skoller.StudentAssignments.StudentAssignment]}`
   """
   def update_assignment(id, user_id, params) do
+    params = params |> Map.put_new("weight_id", nil)
     assign_old = get_assignment_by_id!(id)
     changeset = assign_old
       |> Assignment.changeset(params)
@@ -83,20 +86,24 @@ defmodule Skoller.Assignments do
     |> Repo.delete()
   end
 
-  ### Private Methods
-
   defp check_weight_id(changeset, %{"weight_id" => nil}) do
     changeset |> Ecto.Changeset.force_change(:weight_id, nil)
   end
-  
   defp check_weight_id(changeset, _params), do: changeset
 
-  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) when not is_nil(weight_id) do
+  defp validate_class_weight(%Ecto.Changeset{changes: %{weight_id: nil}} = changeset, class_id) do
+    weights = Weights.get_class_weights(class_id)
+
+    case weights do
+      [] -> changeset
+      _ -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight can't be null when weights exist.")
+    end
+  end
+  defp validate_class_weight(%Ecto.Changeset{changes: %{class_id: class_id, weight_id: weight_id}, valid?: true} = changeset, _class_id) do
     case Weights.get_class_weight_by_ids(class_id, weight_id) do
       nil -> changeset |> Ecto.Changeset.add_error(:weight_id, "Weight class combination invalid")
       _ -> changeset
     end
   end
-  
   defp validate_class_weight(changeset, _class_id), do: changeset
 end

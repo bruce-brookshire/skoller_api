@@ -14,7 +14,8 @@ config :skoller, SkollerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
   render_errors: [view: SkollerWeb.ErrorView, accepts: ~w(json)],
-  pubsub_server: Skoller.PubSub
+  pubsub: [name: Skoller.PubSub,
+           adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
