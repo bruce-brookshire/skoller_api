@@ -41,7 +41,7 @@ defmodule Skoller.Mixfile do
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:csv, "~> 2.0.0"},
       {:ecto, "~> 3.0"},
-      {:ecto_sql, "~> 3.0"},
+     {:ecto_sql, "~> 3.0"},
       {:elixir_xml_to_map, "~> 0.1"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
@@ -66,6 +66,7 @@ defmodule Skoller.Mixfile do
       {:sweet_xml, "~> 0.6"},
       {:timex, "~> 3.1"},
       {:tzdata, "~> 0.5.21"},
+      {:stripity_stripe, "~> 2.0"},
 
       # Test
       {:ex_machina, "~> 2.7", only: :test},
