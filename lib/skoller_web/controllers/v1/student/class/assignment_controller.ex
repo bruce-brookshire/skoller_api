@@ -22,7 +22,6 @@ defmodule SkollerWeb.Api.V1.Student.Class.AssignmentController do
   plug :verify_class_is_editable, :class_id
 
   def create(conn, %{"class_id" => class_id, "student_id" => student_id} = params) do
-    raise student_id
     student_class = EnrolledStudents.get_enrolled_class_by_ids!(class_id, student_id)
 
     params
