@@ -22,8 +22,8 @@ defmodule SkollerWeb.Router do
     plug :accepts, ["json"]
 
     plug Guardian.Plug.Pipeline,
-      module: Skoller.Auth,
-      error_handler: Skoller.AuthErrorHandler
+         module: Skoller.Auth,
+         error_handler: Skoller.AuthErrorHandler
 
     plug Guardian.Plug.VerifyHeader, realm: "Bearer"
     plug Guardian.Plug.EnsureAuthenticated
@@ -35,8 +35,8 @@ defmodule SkollerWeb.Router do
     plug :accepts, ["xml"]
 
     plug BasicAuth,
-      callback: &Skoller.BasicAuth.authenticate/3,
-      custom_response: &Skoller.BasicAuth.on_error/1
+         callback: &Skoller.BasicAuth.authenticate/3,
+         custom_response: &Skoller.BasicAuth.on_error/1
   end
 
   # Other scopes may use custom stacks.
@@ -51,7 +51,9 @@ defmodule SkollerWeb.Router do
         post "/student-org-invitations/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
         post "/student-org-invitations/email-invites", Organization.StudentOrgInvitationController, :email_invitation
 
-        resources "/student-org-invitations", Organization.StudentOrgInvitationController, only: [:show, :index, :update, :create, :delete] do
+        resources "/student-org-invitations",
+                  Organization.StudentOrgInvitationController,
+                  only: [:show, :index, :update, :create, :delete] do
           post "/respond", Organization.StudentOrgInvitationController, :respond
           post "/email-reminders", Organization.StudentOrgInvitationController, :email_reminder
           post "/email-invites", Organization.StudentOrgInvitationController, :email_invitation
@@ -63,13 +65,13 @@ defmodule SkollerWeb.Router do
           put "/upload_avatar", Organization.OrgStudentController, :upload_avatar
           resources "/classes", Organization.OrgStudent.ClassesController, only: [:index] do
             resources "/assignment", Organization.OrgStudent.Class.AssignmentController,
-              only: [:index]
+                      only: [:index]
           end
         end
 
         resources "/owners", Organization.OrgOwnerController, only: @default_rest_methods do
           resources "/watchlists", Organization.OrgOwnerWatchlistController,
-            only: @default_rest_methods
+                    only: @default_rest_methods
         end
 
         # Group resources
@@ -79,15 +81,15 @@ defmodule SkollerWeb.Router do
 
           resources "/owners", Organization.OrgGroupOwnerController, only: @default_rest_methods do
             resources "/watchlists", Organization.OrgGroupOwnerWatchlistController,
-              only: @default_rest_methods
+                      only: @default_rest_methods
           end
 
           resources "/students", Organization.OrgGroupStudentController,
-            only: @default_rest_methods do
+                    only: @default_rest_methods do
             put "/upload_avatar", Organization.OrgGroupStudentController, :upload_avatar
             resources "/classes", Organization.OrgGroupStudent.ClassesController, only: [:index] do
               resources "/assignment", Organization.OrgGroupStudent.Class.AssignmentController,
-                only: [:index]
+                        only: [:index]
             end
           end
         end
@@ -251,7 +253,7 @@ defmodule SkollerWeb.Router do
       resources "/class-change-types", Class.Change.TypeController, only: [:index]
 
       resources "/class-student-request-types", Class.StudentRequest.TypeController,
-        only: [:index]
+                only: [:index]
 
       # Student routes
       resources "/students", StudentController, only: [] do
@@ -295,7 +297,7 @@ defmodule SkollerWeb.Router do
       resources "/class/assignments", Class.AssignmentController, only: [:delete, :update]
 
       resources "/assignments", Student.Class.AssignmentController,
-        only: [:delete, :update, :show] do
+                only: [:delete, :update, :show] do
         # Assignment Post routes
         resources "/posts", Admin.Assignment.PostController, only: [:delete]
         resources "/posts", Assignment.PostController, only: [:create, :update]
@@ -329,7 +331,7 @@ defmodule SkollerWeb.Router do
       get "/notifications", NotificationController, :index
 
       resources "/reminder-messages", Assignment.ReminderController,
-        only: [:create, :index, :delete]
+                only: [:create, :index, :delete]
 
       resources "/reminder-messages/topics", Assignment.Reminder.TopicController, only: [:index]
 
@@ -343,23 +345,26 @@ defmodule SkollerWeb.Router do
 
       # Skoller Jobs
       scope "/skoller-jobs", SkollerJobs do
-        resources "/profiles", JobController,
-          only: [:create, :show, :update, :delete],
-          param: "id",
-          name: "profile" do
+        resources "/profiles",
+                  JobController,
+                  only: [:create, :show, :update, :delete],
+                  param: "id",
+                  name: "profile" do
           put "/documents/:type", DocController, :upload
 
-          resources "/activities", CareerActivityController,
-            only: [:create, :index, :show, :update, :delete],
-            param: "activity_id"
+          resources "/activities",
+                    CareerActivityController,
+                    only: [:create, :index, :show, :update, :delete],
+                    param: "activity_id"
         end
 
         get "/types/:type", JobProfileTypeController, :show
 
-        resources "/job-listings", JobListingsController,
-          only: [:index, :show],
-          param: "sender_reference",
-          name: "job_listing" do
+        resources "/job-listings",
+                  JobListingsController,
+                  only: [:index, :show],
+                  param: "sender_reference",
+                  name: "job_listing" do
           post "/action", JobListingActionController, :create
         end
       end
@@ -395,6 +400,20 @@ defmodule SkollerWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       post "/job-listing-feed", JobFeedController, :create
+    end
+  end
+
+  scope "/api", SkollerWeb.Api do
+    scope "/v1", V1, as: :v1 do
+      pipe_through :api_auth
+      scope "/stripe", Stripe do
+        get "/my-subscriptions", SubscriptionController, :list_user_subscriptions
+        get "/all-subscriptions", SubscriptionController, :list_all_subscriptions
+        post "/save-card-and-subscription", SubscriptionController, :create_subscription
+        get "/last-and-upcoming-payments", SubscriptionController, :list_upcoming_payments
+        get "/billing-history", SubscriptionController, :list_billing_history
+        post "/webhook", WebHookController, :web_hook
+      end
     end
   end
 end
