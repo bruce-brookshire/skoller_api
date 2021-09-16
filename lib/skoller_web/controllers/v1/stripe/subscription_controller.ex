@@ -15,8 +15,8 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
 
 
   def list_all_subscriptions(conn, _params)do
-    with {:ok, %Stripe.List{data: subscriptions}} <- Stripe.Subscription.list() do
-      render(conn, "index.json", %{subscriptions: subscriptions})
+    with {:ok, %Stripe.List{data: products}} <- Stripe.Product.list() do
+      render(conn, "products.json", %{products: products})
     else
       data -> process_errors(conn, data)
     end
