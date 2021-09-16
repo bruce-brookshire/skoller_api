@@ -409,6 +409,8 @@ defmodule SkollerWeb.Router do
       scope "/stripe", Stripe do
         get "/my-subscriptions", SubscriptionController, :list_user_subscriptions
         get "/all-subscriptions", SubscriptionController, :list_all_subscriptions
+        get "/all-products", SubscriptionController, :list_all_products
+        get "/all-plans", SubscriptionController, :list_all_plans
         post "/save-card-and-subscription", SubscriptionController, :create_subscription
         get "/last-and-upcoming-payments", SubscriptionController, :list_upcoming_payments
         get "/billing-history", SubscriptionController, :list_billing_history

@@ -2,8 +2,6 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   use SkollerWeb, :controller
   alias Skoller.Payments
 
-  @plan_id "price_1JYF3sSGLvMTa3qVrsx7uADn"
-
   def list_user_subscriptions(conn, _params)do
     with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
@@ -15,10 +13,26 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-
   def list_all_subscriptions(conn, _params)do
-    with {:ok, %Stripe.List{data: subscriptions}} <- Stripe.Subscription.list() do
+    with{:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list() do
       render(conn, "index.json", %{subscriptions: subscriptions})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
+
+
+  def list_all_products(conn, _params)do
+    with {:ok, %Stripe.List{data: products}} <- Stripe.Product.list() do
+      render(conn, "products.json", %{products: products})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
+
+  def list_all_plans(conn, _params)do
+    with {:ok, %Stripe.List{data: plans}} <- Stripe.Plan.list() do
+      render(conn, "plans.json", %{plans: plans})
     else
       data -> process_errors(conn, data)
     end
@@ -28,19 +42,20 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
         conn,
         %{
           "payment_method" =>
-            %{"type" => type, "billing_details" => %{"email" => email} = billing_details} = payment_method
+            %{"type" => type, "plan_id" => plan_id,  "billing_details" => %{"email" => email} = billing_details} = payment_method
         }
       )do
+    method = payment_method |> Map.delete("plan_id")
     with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
-         {:ok, %Stripe.PaymentMethod{id: payment_method, card: card}} <- Stripe.PaymentMethod.create(payment_method),
+         {:ok, %Stripe.PaymentMethod{id: payment_method, card: card}} <- Stripe.PaymentMethod.create(method),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            email,
            payment_method,
            user_id
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
-           %{customer: customer_stripe_id, items: [%{plan: @plan_id}], payment_behavior: "allow_incomplete"}
+           %{customer: customer_stripe_id, items: [%{plan: plan_id}], payment_behavior: "allow_incomplete"}
          )do
       create_or_update_card_info(
         %{

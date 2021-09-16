@@ -4,9 +4,18 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
   alias  SkollerWeb.Api.V1.Stripe.PlanView
   alias SkollerWeb.Api.V1.Stripe.SubscriptionItemView
   alias SkollerWeb.Api.V1.Stripe.InvoiceView
+  alias SkollerWeb.Api.V1.Stripe.ProductView
 
   def render("index.json", %{subscriptions: subscriptions}) do
     %{data: render_many(subscriptions, SubscriptionView, "subscription.json")}
+  end
+
+  def render("plans.json", %{plans: plans}) do
+    %{data: render_many(plans, PlanView, "plan.json", as: :plan)}
+  end
+
+  def render("products.json", %{products: products}) do
+    %{data: render_many(products, ProductView, "product.json", as: :product)}
   end
 
   def render("invoice.json", %{invoice: invoice}) do
