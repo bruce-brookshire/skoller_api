@@ -10,6 +10,10 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
     %{data: render_many(subscriptions, SubscriptionView, "subscription.json")}
   end
 
+  def render("plans.json", %{plans: plans}) do
+    %{data: render_many(plans, PlanView, "plan.json", as: :plan)}
+  end
+
   def render("products.json", %{products: products}) do
     %{data: render_many(products, ProductView, "product.json", as: :product)}
   end
