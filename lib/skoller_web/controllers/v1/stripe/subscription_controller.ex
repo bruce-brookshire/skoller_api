@@ -38,20 +38,12 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-  def create_subscription(
-        conn,
-        %{
-          "payment_method" =>
-            %{"type" => type, "plan_id" => plan_id,  "billing_details" => %{"email" => email} = billing_details} = payment_method
-        }
-      )do
-    method = payment_method |> Map.delete("plan_id")
-    with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
+  def create_subscription(conn, %{"payment_method" => %{"plan_id" => plan_id, "token" => token} = payment_method})do
+    with {:ok, %Stripe.Token{card:  %Stripe.Card{id: card_id}}} <- Stripe.Token.retrieve(token),
+         {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
-         {:ok, %Stripe.PaymentMethod{id: payment_method, card: card}} <- Stripe.PaymentMethod.create(method),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
-           email,
-           payment_method,
+           card_id,
            user_id
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
@@ -61,9 +53,8 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
         %{
           user_id: user_id,
           customer_id: customer_stripe_id,
-          payment_method: type,
-          billing_details: billing_details,
-          card_info: card
+          payment_method: "card",
+          card_info: %{card_id: card_id}
         }
       )
       conn
