@@ -88,12 +88,11 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-  defp find_or_create_stripe_customer(email, payment_method, user_id)do
+  defp find_or_create_stripe_customer(payment_method, user_id)do
     case Payments.get_stripe_by_user_id(user_id)  do
       nil ->
         Stripe.Customer.create(
           %{
-            email: email,
             payment_method: payment_method,
             invoice_settings: %{
               default_payment_method: payment_method
@@ -101,20 +100,19 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
           }
         )
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
-        maybe_create_stripe_customer(email, payment_method, customer_id)
+        maybe_create_stripe_customer(payment_method, customer_id)
       error -> error
 
     end
   end
 
-  defp maybe_create_stripe_customer(email, payment_method, customer_id)do
+  defp maybe_create_stripe_customer(payment_method, customer_id)do
     case Stripe.Customer.retrieve(customer_id) do
       {:ok, customer} ->
         {:ok, customer}
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
         Stripe.Customer.create(
           %{
-            email: email,
             payment_method: payment_method,
             invoice_settings: %{
               default_payment_method: payment_method
