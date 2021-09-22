@@ -133,6 +133,22 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
+  def cancel_subscription(conn, %{"subscription_id" => subscription_id}) do
+    with {:ok, subscription} <- Stripe.Subscription.delete(subscription_id) do
+      render(conn, "show.json", %{subscription: subscription})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
+
+  def update_subscription(conn, %{"subscription_id" => subscription_id, "subscription_params" => subscription_params}) do
+    with {:ok, subscription} <- Stripe.Subscription.update(subscription_id, subscription_params) do
+      render(conn, "show.json", %{subscription: subscription})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
+
   defp process_errors(conn, data)do
     case data do
       {:error, %Stripe.Error{code: _code, message: message}} ->

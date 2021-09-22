@@ -414,6 +414,9 @@ defmodule SkollerWeb.Router do
         post "/save-card-and-subscription", SubscriptionController, :create_subscription
         get "/last-and-upcoming-payments", SubscriptionController, :list_upcoming_payments
         get "/billing-history", SubscriptionController, :list_billing_history
+        post "/create-checkout-session", SubscriptionController, :create_checkout_session
+        post "/cancel-subscription", SubscriptionController, :cancel_subscription
+        post "/update-subscription", SubscriptionController, :update_subscription
         post "/webhook", WebHookController, :web_hook
       end
     end
