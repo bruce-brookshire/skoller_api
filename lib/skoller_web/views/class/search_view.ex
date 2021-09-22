@@ -13,6 +13,11 @@ defmodule SkollerWeb.Class.SearchView do
   def render("class.json", %{class: %{class: class, class_period: class_period, professor: professor, school: school, class_status: class_status, enroll: enroll}}) do
     %{
       id: class.id,
+      premium: class.premium,
+      trial: class.premium,
+      expired: class.expired,
+      received: class.received,
+      days_left: class.days_left,
       meet_days: class.meet_days,
       meet_start_time: class.meet_start_time,
       name: class.name,
