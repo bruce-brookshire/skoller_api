@@ -56,6 +56,12 @@ defmodule Skoller.StudentClasses.Classes do
     |> maint_filter(params)
     |> name_filter(params)
     |> day_filter(params)
+    |> premium_filter(params)
+    |> trial_filter(params)
+    |> trial_filter(params)
+    |> expired_filter(params)
+    |> received_filter(params)
+    |> days_left_filter(params)
   end
 
   defp school_filter(dynamic, %{"school" => filter, "or" => "true"}) do
@@ -128,8 +134,66 @@ defmodule Skoller.StudentClasses.Classes do
   defp day_filter(dynamic, %{"class_meet_days" => filter, "or" => "true"}) do
     dynamic([class, period, prof], class.meet_days == ^filter or ^dynamic)
   end
+
   defp day_filter(dynamic, %{"class_meet_days" => filter}) do
     dynamic([class, period, prof], class.meet_days == ^filter and ^dynamic)
   end
+
   defp day_filter(dynamic, _), do: dynamic
+
+  defp premium_filter(dynamic, %{"premium" => filter, "or" => "true"}) do
+    premium_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.premium == ^premium_filter or ^dynamic)
+  end
+
+  defp premium_filter(dynamic, %{"premium" => filter}) do
+    premium_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.premium == ^premium_filter and ^dynamic)
+  end
+  defp premium_filter(dynamic, _), do: dynamic
+
+  defp trial_filter(dynamic, %{"trial" => filter, "or" => "true"}) do
+    trial_filter =  filter |> string_to_integer()
+    dynamic([class, period, prof], class.trial == ^trial_filter or ^dynamic)
+  end
+  defp trial_filter(dynamic, %{"trial" => filter}) do
+    trial_filter =  filter |> string_to_integer()
+    dynamic([class, period, prof], class.trial == ^trial_filter and ^dynamic)
+  end
+  defp trial_filter(dynamic, _), do: dynamic
+
+  defp expired_filter(dynamic, %{"expired" => filter, "or" => "true"}) do
+    expired_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.expired == ^expired_filter or ^dynamic)
+  end
+  defp expired_filter(dynamic, %{"expired" => filter}) do
+    expired_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.expired == ^expired_filter and ^dynamic)
+  end
+  defp expired_filter(dynamic, _), do: dynamic
+
+  defp received_filter(dynamic, %{"received" => filter, "or" => "true"}) do
+    received_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.received, ^received_filter) or ^dynamic)
+  end
+  defp received_filter(dynamic, %{"received" => filter}) do
+    received_filter = "%" <> filter <> "%"
+    dynamic([class, period, prof], ilike(class.received, ^received_filter) and ^dynamic)
+  end
+  defp received_filter(dynamic, _), do: dynamic
+
+  defp days_left_filter(dynamic, %{"days_left" => filter, "or" => "true"}) do
+    days_left_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.days_left == ^days_left_filter or ^dynamic)
+  end
+  defp days_left_filter(dynamic, %{"days_left" => filter}) do
+    days_left_filter = filter |> string_to_integer()
+    dynamic([class, period, prof], class.days_left == ^days_left_filter and ^dynamic)
+  end
+  defp days_left_filter(dynamic, _), do: dynamic
+
+  defp string_to_integer(string)do
+    {val, ""} = Integer.parse(string)
+    val
+  end
 end
