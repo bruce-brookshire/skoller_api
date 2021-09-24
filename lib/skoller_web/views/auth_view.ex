@@ -4,6 +4,7 @@ defmodule SkollerWeb.AuthView do
 
   alias SkollerWeb.AuthView
   alias SkollerWeb.UserView
+  alias SkollerWeb.Api.V1.Stripe.SubscriptionView
 
   def render("show.json", %{auth: auth}) do
     render_one(auth, AuthView, "auth.json")
@@ -30,6 +31,7 @@ defmodule SkollerWeb.AuthView do
   def render("auth.json", %{auth: %{token: token} = auth}) do
     %{token: token}
     |> Map.merge(%{
+      subscriptions:  render_many(auth.subscriptions, SubscriptionView, "subscription.json", as: :subscription),
       user: render_one(auth.user, UserView, "user_detail.json")
     })
   end
