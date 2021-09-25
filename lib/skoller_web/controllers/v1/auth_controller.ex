@@ -94,9 +94,14 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
+    user = conn.assigns[:user]
+    subscriptions = Task.async(fn  -> get_subscription_list(user.id)   end)
+    token = user
+            |> Map.merge(%{subscriptions: Task.await(subscriptions, :infinity)})
+
     conn
     |> put_view(AuthView)
-    |> render("show.json", auth: conn.assigns[:user])
+    |> render("show.json", auth: token)
   end
 
   def deregister_devices(
