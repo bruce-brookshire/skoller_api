@@ -405,8 +405,8 @@ defmodule SkollerWeb.Router do
 
   scope "/api", SkollerWeb.Api do
     scope "/v1", V1, as: :v1 do
-      pipe_through :api_auth
       scope "/stripe", Stripe do
+        pipe_through :api_auth
         get "/my-subscriptions", SubscriptionController, :list_user_subscriptions
         get "/all-subscriptions", SubscriptionController, :list_all_subscriptions
         get "/all-products", SubscriptionController, :list_all_products
@@ -415,9 +415,11 @@ defmodule SkollerWeb.Router do
         get "/last-and-upcoming-payments", SubscriptionController, :list_upcoming_payments
         get "/billing-history", SubscriptionController, :list_billing_history
         post "/create-checkout-session", SubscriptionController, :create_checkout_session
-        post "/cancel-subscription", SubscriptionController, :cancel_subscription
         post "/update-subscription", SubscriptionController, :update_subscription
+      end
+      scope "/stripe", Stripe do
         post "/webhook", WebHookController, :web_hook
+        post "/cancel-subscription", SubscriptionController, :cancel_subscription
       end
     end
   end
