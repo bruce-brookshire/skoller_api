@@ -51,7 +51,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
           {:ok, token} = Token.long_token(user.id)
           token = Map.new(%{token: token})
                   |> Map.merge(%{user: user})
-                  |> Map.merge(%{subscriptions: Task.await(subscriptions, :infinity)})
+                  |> Map.merge(%{subscriptions:  %{}})
 
           conn
           |> put_view(AuthView)
