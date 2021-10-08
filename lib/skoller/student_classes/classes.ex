@@ -40,6 +40,7 @@ defmodule Skoller.StudentClasses.Classes do
     |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), on: enroll.class_id == class.id)
     |> where([class, period, prof, school], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
+    |> sort(params)
     |> limit(500)
     |> Repo.all()
   end
@@ -209,4 +210,23 @@ defmodule Skoller.StudentClasses.Classes do
     {val, ""} = Integer.parse(string)
     val
   end
+
+  defp sort(query, %{"sort_by" => sort_by, "sort_order" => sort_order}) do
+    cond do
+      sort_order == "asc" || sort_order == "desc" ->
+        order = String.to_atom(sort_order)
+        case sort_by do
+          "classname" -> order_by(query, [class, school], [{^order, class.name}])
+          "school" -> order_by(query, [class, school], [{^order, school.name}])
+          "premium" -> order_by(query, [class, school], [{^order, class.premium}])
+          "trial" -> order_by(query, [class, school], [{^order, class.trial}])
+          "expired" -> order_by(query, [class, school], [{^order, class.expired}])
+          "received" -> order_by(query, [class, school], [{^order, class.received}])
+          "days_left" -> order_by(query, [class, school], [{^order, class.days_left}])
+          _ -> query
+        end
+      true -> query
+    end
+  end
+  defp sort(query, _), do: query
 end
