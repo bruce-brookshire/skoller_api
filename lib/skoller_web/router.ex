@@ -419,7 +419,7 @@ defmodule SkollerWeb.Router do
       end
       scope "/stripe", Stripe do
         post "/webhook", WebHookController, :web_hook
-        post "/cancel-subscription", SubscriptionController, :cancel_subscription
+        get "/cancel-subscription", SubscriptionController, :cancel_subscription
       end
     end
   end
