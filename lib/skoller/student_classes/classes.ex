@@ -38,7 +38,7 @@ defmodule Skoller.StudentClasses.Classes do
     |> join(:inner, [class, period, prof], school in School, on: school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, on: status.id == class.class_status_id)
     |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), on: enroll.class_id == class.id)
-    |> where([class, period, prof], ^filter(params))
+    |> where([class, period, prof, school], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> limit(500)
     |> Repo.all()
@@ -48,6 +48,7 @@ defmodule Skoller.StudentClasses.Classes do
     dynamic = params["or"] != "true"
 
     dynamic
+    |> search_txt_filter(params)
     |> school_filter(params)
     |> prof_filter(params)
     |> prof_id_filter(params)
@@ -64,131 +65,143 @@ defmodule Skoller.StudentClasses.Classes do
     |> days_left_filter(params)
   end
 
+  defp search_txt_filter(dynamic, %{"search_txt" => filter, "or" => "true"}) do
+    name_filter = "%" <> filter <> "%"
+    id_filter = String.match?(filter, ~r/^[0-9]*$/) && filter || "-1"
+    dynamic([class, period, prof, school], ((period.school_id == ^id_filter or class.id == ^id_filter) or ilike(class.name, ^name_filter) or ilike(school.name, ^name_filter)) or ^dynamic)
+  end
+  defp search_txt_filter(dynamic, %{"search_txt" => filter}) do
+    name_filter = "%" <> filter <> "%"
+    id_filter = String.match?(filter, ~r/^[0-9]*$/) && filter || "-1"
+    dynamic([class, period, prof, school], ((period.school_id == ^id_filter or class.id == ^id_filter) or ilike(class.name, ^name_filter) or ilike(school.name, ^name_filter)) and ^dynamic)
+  end
+  defp search_txt_filter(dynamic, _), do: dynamic
+
   defp school_filter(dynamic, %{"school" => filter, "or" => "true"}) do
-    dynamic([class, period, prof], period.school_id == ^filter or ^dynamic)
+    dynamic([class, period, prof, school], period.school_id == ^filter or ^dynamic)
   end
   defp school_filter(dynamic, %{"school" => filter}) do
-    dynamic([class, period, prof], period.school_id == ^filter and ^dynamic)
+    dynamic([class, period, prof, school], period.school_id == ^filter and ^dynamic)
   end
   defp school_filter(dynamic, _), do: dynamic
 
   defp prof_filter(dynamic, %{"professor_name" => filter, "or" => "true"}) do
     prof_filter = filter <> "%"
-    dynamic([class, period, prof], ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter) or ^dynamic)
+    dynamic([class, period, prof, school], ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter) or ^dynamic)
   end
   defp prof_filter(dynamic, %{"professor_name" => filter}) do
     prof_filter = filter <> "%"
-    dynamic([class, period, prof], (ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter)) and ^dynamic)
+    dynamic([class, period, prof, school], (ilike(prof.name_last, ^prof_filter) or ilike(prof.name_first, ^prof_filter)) and ^dynamic)
   end
   defp prof_filter(dynamic, _), do: dynamic
 
   defp prof_id_filter(dynamic, %{"professor_id" => filter, "or" => "true"}) do
-    dynamic([class, period, prof], prof.id == ^filter or ^dynamic)
+    dynamic([class, period, prof, school], prof.id == ^filter or ^dynamic)
   end
   defp prof_id_filter(dynamic, %{"professor_id" => filter}) do
-    dynamic([class, period, prof], prof.id == ^filter and ^dynamic)
+    dynamic([class, period, prof, school], prof.id == ^filter and ^dynamic)
   end
   defp prof_id_filter(dynamic, _), do: dynamic
 
   defp status_filter(dynamic, %{"class_status" => "0", "or" => "true"}) do
-    dynamic([class, period, prof], class.is_ghost == true or ^dynamic)
+    dynamic([class, period, prof, school], class.is_ghost == true or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter, "or" => "true"}) do
-    dynamic([class, period, prof], class.class_status_id == ^filter or ^dynamic)
+    dynamic([class, period, prof, school], class.class_status_id == ^filter or ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => "0"}) do
-    dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+    dynamic([class, period, prof, school], class.is_ghost == true and ^dynamic)
   end
   defp status_filter(dynamic, %{"class_status" => filter}) do
-    dynamic([class, period, prof], class.class_status_id == ^filter and ^dynamic)
+    dynamic([class, period, prof, school], class.class_status_id == ^filter and ^dynamic)
   end
   defp status_filter(dynamic, _), do: dynamic
 
   defp ghost_filter(dynamic, %{"class_status" => "0"}), do: dynamic
   defp ghost_filter(dynamic, %{"ghost" => "true"}) do
-    dynamic([class, period, prof], class.is_ghost == true and ^dynamic)
+    dynamic([class, period, prof, school], class.is_ghost == true and ^dynamic)
   end
   defp ghost_filter(dynamic, %{"ghost" => "false"}) do
-    dynamic([class, period, prof], class.is_ghost == false and ^dynamic)
+    dynamic([class, period, prof, school], class.is_ghost == false and ^dynamic)
   end
   defp ghost_filter(dynamic, _), do: dynamic
 
   defp maint_filter(dynamic, %{"class_maint" => "true"}) do
-    dynamic([class, period, prof], class.is_editable == false and ^dynamic)
+    dynamic([class, period, prof, school], class.is_editable == false and ^dynamic)
   end
   defp maint_filter(dynamic, %{"class_maint" => "false"}) do
-    dynamic([class, period, prof], class.is_editable == true and ^dynamic)
+    dynamic([class, period, prof, school], class.is_editable == true and ^dynamic)
   end
   defp maint_filter(dynamic, _), do: dynamic
 
   defp name_filter(dynamic, %{"class_name" => filter, "or" => "true"}) do
     name_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.name, ^name_filter) or ^dynamic)
+    dynamic([class, period, prof, school], ilike(class.name, ^name_filter) or ^dynamic)
   end
   defp name_filter(dynamic, %{"class_name" => filter}) do
     name_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.name, ^name_filter) and ^dynamic)
+    dynamic([class, period, prof, school], ilike(class.name, ^name_filter) and ^dynamic)
   end
   defp name_filter(dynamic, _), do: dynamic
 
   defp day_filter(dynamic, %{"class_meet_days" => filter, "or" => "true"}) do
-    dynamic([class, period, prof], class.meet_days == ^filter or ^dynamic)
+    dynamic([class, period, prof, school], class.meet_days == ^filter or ^dynamic)
   end
 
   defp day_filter(dynamic, %{"class_meet_days" => filter}) do
-    dynamic([class, period, prof], class.meet_days == ^filter and ^dynamic)
+    dynamic([class, period, prof, school], class.meet_days == ^filter and ^dynamic)
   end
 
   defp day_filter(dynamic, _), do: dynamic
 
   defp premium_filter(dynamic, %{"premium" => filter, "or" => "true"}) do
     premium_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.premium == ^premium_filter or ^dynamic)
+    dynamic([class, period, prof, school], class.premium == ^premium_filter or ^dynamic)
   end
 
   defp premium_filter(dynamic, %{"premium" => filter}) do
     premium_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.premium == ^premium_filter and ^dynamic)
+    dynamic([class, period, prof, school], class.premium == ^premium_filter and ^dynamic)
   end
   defp premium_filter(dynamic, _), do: dynamic
 
   defp trial_filter(dynamic, %{"trial" => filter, "or" => "true"}) do
     trial_filter =  filter |> string_to_integer()
-    dynamic([class, period, prof], class.trial == ^trial_filter or ^dynamic)
+    dynamic([class, period, prof, school], class.trial == ^trial_filter or ^dynamic)
   end
   defp trial_filter(dynamic, %{"trial" => filter}) do
     trial_filter =  filter |> string_to_integer()
-    dynamic([class, period, prof], class.trial == ^trial_filter and ^dynamic)
+    dynamic([class, period, prof, school], class.trial == ^trial_filter and ^dynamic)
   end
   defp trial_filter(dynamic, _), do: dynamic
 
   defp expired_filter(dynamic, %{"expired" => filter, "or" => "true"}) do
     expired_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.expired == ^expired_filter or ^dynamic)
+    dynamic([class, period, prof, school], class.expired == ^expired_filter or ^dynamic)
   end
   defp expired_filter(dynamic, %{"expired" => filter}) do
     expired_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.expired == ^expired_filter and ^dynamic)
+    dynamic([class, period, prof, school], class.expired == ^expired_filter and ^dynamic)
   end
   defp expired_filter(dynamic, _), do: dynamic
 
   defp received_filter(dynamic, %{"received" => filter, "or" => "true"}) do
     received_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.received, ^received_filter) or ^dynamic)
+    dynamic([class, period, prof, school], ilike(class.received, ^received_filter) or ^dynamic)
   end
   defp received_filter(dynamic, %{"received" => filter}) do
     received_filter = "%" <> filter <> "%"
-    dynamic([class, period, prof], ilike(class.received, ^received_filter) and ^dynamic)
+    dynamic([class, period, prof, school], ilike(class.received, ^received_filter) and ^dynamic)
   end
   defp received_filter(dynamic, _), do: dynamic
 
   defp days_left_filter(dynamic, %{"days_left" => filter, "or" => "true"}) do
     days_left_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.days_left == ^days_left_filter or ^dynamic)
+    dynamic([class, period, prof, school], class.days_left == ^days_left_filter or ^dynamic)
   end
   defp days_left_filter(dynamic, %{"days_left" => filter}) do
     days_left_filter = filter |> string_to_integer()
-    dynamic([class, period, prof], class.days_left == ^days_left_filter and ^dynamic)
+    dynamic([class, period, prof, school], class.days_left == ^days_left_filter and ^dynamic)
   end
   defp days_left_filter(dynamic, _), do: dynamic
 
