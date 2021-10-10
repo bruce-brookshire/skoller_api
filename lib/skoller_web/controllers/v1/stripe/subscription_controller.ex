@@ -47,8 +47,13 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
            user_id
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
-           %{customer: customer_stripe_id, items: [%{plan: plan_id}], payment_behavior: "allow_incomplete"}
-         )do
+           %{
+              customer: customer_stripe_id,
+              items: [%{plan: plan_id}],
+              payment_behavior: "allow_incomplete",
+              trial_end: Skoller.Users.Trial.end_date(user) |> DateTime.to_unix
+            }
+          )do
       create_or_update_card_info(
         %{
           user_id: user_id,
