@@ -21,4 +21,9 @@ defmodule Skoller.Users.Trial do
       |> DateTime.from_naive!("Etc/UTC")
       |> DateTime.add(60*60*24*30)
   end
+
+  @doc false
+  def now?(%User{} = user) do
+    end_date(user) < DateTime.now!("Etc/UTC")
+  end
 end
