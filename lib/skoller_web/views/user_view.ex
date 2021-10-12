@@ -28,7 +28,8 @@ defmodule SkollerWeb.UserView do
     |> render_one(UserView, "user.json")
     |> Map.merge(%{
       student: render_one(user.student, SkollerWeb.StudentView, "student.json"),
-      roles: render_many(user.roles, SkollerWeb.RoleView, "role.json")
+      roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
+      trial: Skoller.Users.Trial.now?(user)
     })
   end
 end
