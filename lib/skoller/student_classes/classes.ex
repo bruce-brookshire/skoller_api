@@ -60,7 +60,6 @@ defmodule Skoller.StudentClasses.Classes do
     |> day_filter(params)
     |> premium_filter(params)
     |> trial_filter(params)
-    |> trial_filter(params)
     |> expired_filter(params)
     |> received_filter(params)
     |> days_left_filter(params)
