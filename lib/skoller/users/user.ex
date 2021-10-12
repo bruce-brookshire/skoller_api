@@ -21,6 +21,8 @@ defmodule Skoller.Users.User do
     field :is_active, :boolean, default: true
     field :is_unsubscribed, :boolean, default: false
     field :last_login, :utc_datetime
+    field :trial_start, :utc_datetime
+    field :trial_end, :utc_datetime
     
     belongs_to :student, Student
     
@@ -54,6 +56,8 @@ defmodule Skoller.Users.User do
     |> validate_required(@req_fields)
     |> update_change(:email, &String.downcase(&1))
     |> update_change(:email, &String.trim(&1))
+    |> change(%{trial_start: DateTime.utc_now |> DateTime.truncate(:second)})
+    |> change(%{trial_end: DateTime.utc_now |> DateTime.add(60*60*24*30) |> DateTime.truncate(:second)})
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)

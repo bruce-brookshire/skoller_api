@@ -51,7 +51,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
               customer: customer_stripe_id,
               items: [%{plan: plan_id}],
               payment_behavior: "allow_incomplete",
-              trial_end: Skoller.Users.Trial.end_date(user) |> DateTime.to_unix
+              trial_end: user.trial_end && (user.trial_end |> DateTime.to_unix)
             }
           )do
       create_or_update_card_info(
@@ -91,6 +91,11 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     else
       data -> process_errors(conn, data)
     end
+  end
+
+  def start_trial_for_all_users(conn, _) do
+    Skoller.Users.Trial.start_trial_for_all_users()
+    json(conn, %{status: :ok, message: "Your successfully started all users' trial"})
   end
 
   defp find_or_create_stripe_customer(payment_method, user_id)do
