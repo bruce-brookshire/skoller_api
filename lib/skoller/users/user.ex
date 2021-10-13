@@ -23,6 +23,7 @@ defmodule Skoller.Users.User do
     field :last_login, :utc_datetime
     field :trial_start, :utc_datetime
     field :trial_end, :utc_datetime
+    field :trial, :boolean
     
     belongs_to :student, Student
     
