@@ -24,19 +24,17 @@ defmodule Skoller.Users.Trial do
   # @doc false
   def update_users_trial_status do
     from(u in User,
-      where: u.trial_start < datetime_add(^NaiveDateTime.utc_now, 0, "month") and
-             u.trial_end > datetime_add(^NaiveDateTime.utc_now, 0, "month"),
+      where: u.trial_end > datetime_add(^NaiveDateTime.utc_now, 0, "month") and
+             u.trial == false,
       update: [set: [trial: true]]
     )
     |> Repo.update_all([])
 
     from(u in User,
-      where: u.trial_start > datetime_add(^NaiveDateTime.utc_now, 0, "month") or
-             u.trial_end < datetime_add(^NaiveDateTime.utc_now, 0, "month"),
+      where: u.trial_end < datetime_add(^NaiveDateTime.utc_now, 0, "month") and
+             u.trial == true,
       update: [set: [trial: false]]
     )
     |> Repo.update_all([])
-
-    IO.puts("Trial statuses updated")
   end
 end

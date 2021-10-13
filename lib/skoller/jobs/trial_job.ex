@@ -6,7 +6,7 @@ defmodule Skoller.TrialJob do
 
   # This will currently run on every 5 minute interval in an hour.
   # It is NOT every 5 minutes from spin up.
-  @interval_min 1
+  @interval_min 90
 
   # This puts :jobs on the state for future calls.
   def start_link do
