@@ -5,7 +5,7 @@ defmodule Skoller.Users.Trial do
 
   # @doc false
   def now?(%User{} = user) do
-    user.trial_end > DateTime.now!("Etc/UTC")
+    user.trial_end > DateTime.utc_now
   end
 
   def start_trial_for_all_users do
