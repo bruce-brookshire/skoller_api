@@ -13,12 +13,17 @@ defmodule Skoller.Users.Trial do
 
   # @doc false
   def start_trial_for_all_users do
-    Skoller.Repo.update_all(
-      User, set: [
-        trial_start: DateTime.utc_now,
-        trial_end: DateTime.utc_now |> DateTime.add(60*60*24*30)
+    from(u in User,
+      where: is_nil(u.trial_end),
+      update: [set:
+        [
+          trial: true,
+          trial_start: datetime_add(^NaiveDateTime.utc_now, 0, "month"),
+          trial_end: datetime_add(^NaiveDateTime.utc_now, +1, "month")
+        ]
       ]
     )
+    |> Repo.update_all([])
   end
 
   # @doc false
