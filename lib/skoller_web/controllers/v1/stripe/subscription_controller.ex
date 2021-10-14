@@ -9,7 +9,12 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
          {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id, status: "all"}) do
       render(conn, "index.json", %{subscriptions: subscriptions})
     else
-      data -> process_errors(conn, data)
+      data ->
+        unless data do
+          json(conn, %{data: []})
+        else
+          process_errors(conn, data)
+        end
     end
   end
 
