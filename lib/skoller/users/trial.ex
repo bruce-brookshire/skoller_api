@@ -36,7 +36,8 @@ defmodule Skoller.Users.Trial do
     |> Repo.update_all([])
 
     from(u in User,
-      where: u.trial_end < datetime_add(^NaiveDateTime.utc_now, 0, "month") and
+      where: (u.trial_end < datetime_add(^NaiveDateTime.utc_now, 0, "month") or
+             is_nil(u.trial_end)) and
              u.trial == true,
       update: [set: [trial: false]]
     )
