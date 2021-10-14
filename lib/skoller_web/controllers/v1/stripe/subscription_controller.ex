@@ -6,7 +6,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
          %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
-         {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id}) do
+         {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id, status: "all"}) do
       render(conn, "index.json", %{subscriptions: subscriptions})
     else
       data -> process_errors(conn, data)
@@ -14,7 +14,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def list_all_subscriptions(conn, _params)do
-    with{:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list() do
+    with{:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"}) do
       render(conn, "index.json", %{subscriptions: subscriptions})
     else
       data -> process_errors(conn, data)
