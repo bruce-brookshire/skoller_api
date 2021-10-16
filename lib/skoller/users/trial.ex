@@ -8,7 +8,7 @@ defmodule Skoller.Users.Trial do
 
   # @doc false
   def now?(%User{} = user) do
-    user.trial_end > DateTime.utc_now
+    DateTime.compare(user.trial_end, DateTime.utc_now) == :gt
   end
 
   # @doc false
