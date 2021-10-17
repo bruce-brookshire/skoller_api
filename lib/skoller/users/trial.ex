@@ -8,7 +8,16 @@ defmodule Skoller.Users.Trial do
 
   # @doc false
   def now?(%User{} = user) do
-    DateTime.compare(user.trial_end, DateTime.utc_now) == :gt
+    user.trial_end != nil && DateTime.compare(user.trial_end, DateTime.utc_now) == :gt
+  end
+
+  # @doc false
+  def cancel(id) do
+    from(u in User,
+      where: u.id == ^id,
+      update: [set: [trial_end: nil]]
+    )
+    |> Repo.update_all([])
   end
 
   # @doc false

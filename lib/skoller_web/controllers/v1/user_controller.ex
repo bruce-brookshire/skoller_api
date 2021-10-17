@@ -59,6 +59,11 @@ defmodule SkollerWeb.Api.V1.UserController do
     end
   end
 
+  def end_trial(conn, %{"user_id" => id}) do
+    Skoller.Users.Trial.cancel(id)
+    conn |> send_resp(204, "")
+  end
+
   defp upload_pic(%{"file" => ""}), do: ""
 
   defp upload_pic(%{"file" => file}) do

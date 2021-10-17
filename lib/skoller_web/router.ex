@@ -339,6 +339,7 @@ defmodule SkollerWeb.Router do
 
       put "/users/:user_id", UserController, :update
       delete "/users/:user_id", UserController, :delete
+      get "/users/:user_id/end-trial", UserController, :end_trial
       post "/users/:user_id/register", DeviceController, :register
       post "/users/token-login", AuthController, :token
       get "/users/:user_id/job-profile", SkollerJobs.JobController, :get_by_user
