@@ -48,16 +48,18 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
          {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
-           card_id,
+           token,
            user_id
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
            %{
               customer: customer_stripe_id,
               items: [%{plan: plan_id}],
-              payment_behavior: "allow_incomplete",
-              trial_end: user.trial_end && (user.trial_end |> DateTime.to_unix)
+              payment_behavior: "allow_incomplete"
             }
+            |> Map.merge(
+              if user.trial_end != nil, do: %{trial_end: (user.trial |> DateTime.to_unix)}, else: %{}
+            )
           )do
       create_or_update_card_info(
         %{
@@ -103,26 +105,32 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     json(conn, %{status: :ok, message: "Your successfully started all users' trial"})
   end
 
-  defp find_or_create_stripe_customer(payment_method, user_id)do
+  defp find_or_create_stripe_customer(token, user_id)do
     case Payments.get_stripe_by_user_id(user_id)  do
       nil ->
         Stripe.Customer.create(
-          %{description: "Staging test customer"}
+          %{
+            description: "Staging test customer",
+            source: token
+          }
         )
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
-        maybe_create_stripe_customer(payment_method, customer_id)
+        maybe_create_stripe_customer(token, customer_id)
       error -> error
 
     end
   end
 
-  defp maybe_create_stripe_customer(payment_method, customer_id)do
+  defp maybe_create_stripe_customer(token, customer_id)do
     case Stripe.Customer.retrieve(customer_id) do
       {:ok, customer} ->
         {:ok, customer}
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
         Stripe.Customer.create(
-          %{description: "Staging test customer"}
+          %{
+            description: "Staging test customer",
+            source: token
+          }
         )
       error -> error
     end
