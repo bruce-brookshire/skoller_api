@@ -107,12 +107,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     case Payments.get_stripe_by_user_id(user_id)  do
       nil ->
         Stripe.Customer.create(
-          %{
-            payment_method: payment_method,
-            invoice_settings: %{
-              default_payment_method: payment_method
-            }
-          }
+          %{description: "Staging test customer"}
         )
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
         maybe_create_stripe_customer(payment_method, customer_id)
@@ -127,12 +122,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
         {:ok, customer}
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
         Stripe.Customer.create(
-          %{
-            payment_method: payment_method,
-            invoice_settings: %{
-              default_payment_method: payment_method
-            }
-          }
+          %{description: "Staging test customer"}
         )
       error -> error
     end
