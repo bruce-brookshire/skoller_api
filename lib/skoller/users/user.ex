@@ -36,6 +36,7 @@ defmodule Skoller.Users.User do
     has_many :org_owners, OrgOwner, on_delete: :nilify_all
     has_many :org_members, OrgMember, on_delete: :nilify_all
     has_many :org_group_owners, through: [:org_members, :org_group_owners]
+    has_many :customers_infos, Skoller.Payments.Stripe, on_delete: :nothing
 
     timestamps()
   end
