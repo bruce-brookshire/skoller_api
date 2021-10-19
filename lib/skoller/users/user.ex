@@ -27,16 +27,16 @@ defmodule Skoller.Users.User do
     
     belongs_to :student, Student
     
-    many_to_many :roles, Role, join_through: "user_roles", on_delete: :nothing
+    many_to_many :roles, Role, join_through: "user_roles"
     
-    has_many :reports, Report, on_delete: :nilify_all
+    has_many :reports, Report
 
-    has_one :job_profile, JobProfile, on_delete: :nilify_all
+    has_one :job_profile, JobProfile
 
-    has_many :org_owners, OrgOwner, on_delete: :nilify_all
-    has_many :org_members, OrgMember, on_delete: :nilify_all
+    has_many :org_owners, OrgOwner
+    has_many :org_members, OrgMember
     has_many :org_group_owners, through: [:org_members, :org_group_owners]
-    has_many :customers_infos, Skoller.Payments.Stripe, on_delete: :nothing
+    has_many :customers_infos, Skoller.Payments.Stripe, on_delete: :delete_all
 
     timestamps()
   end
