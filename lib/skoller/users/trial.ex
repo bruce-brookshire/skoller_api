@@ -1,17 +1,23 @@
 defmodule Skoller.Users.Trial do
-  @moduledoc false
+  @moduledoc """
+  The Users Trial context.
+  """
+
+  alias Skoller.Repo
+  alias Skoller.Users.User
 
   import Ecto.Query
 
-  alias Skoller.Users.User
-  alias Skoller.Repo
-
-  # @doc false
+  @doc """
+    Check if the user is on a trial.
+  """
   def now?(%User{} = user) do
     user.trial_end != nil && DateTime.compare(user.trial_end, DateTime.utc_now) == :gt
   end
 
-  # @doc false
+  @doc """
+    Cancel a user's trial.
+  """
   def cancel(id) do
     from(u in User,
       where: u.id == ^id,
@@ -20,7 +26,9 @@ defmodule Skoller.Users.Trial do
     |> Repo.update_all([])
   end
 
-  # @doc false
+  @doc """
+    Start trial for all users with trial_end: nil
+  """
   def start_trial_for_all_users do
     from(u in User,
       where: is_nil(u.trial_end),
@@ -28,14 +36,16 @@ defmodule Skoller.Users.Trial do
         [
           trial: true,
           trial_start: datetime_add(^NaiveDateTime.utc_now, 0, "month"),
-          trial_end: datetime_add(^NaiveDateTime.utc_now, +1, "month")
+          trial_end: datetime_add(^NaiveDateTime.utc_now, 1, "month")
         ]
       ]
     )
     |> Repo.update_all([])
   end
 
-  # @doc false
+  @doc """
+    Update users' trial status in db, used for cronjob
+  """
   def update_users_trial_status do
     from(u in User,
       where: u.trial_end > datetime_add(^NaiveDateTime.utc_now, 0, "month") and
