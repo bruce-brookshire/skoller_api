@@ -5,6 +5,7 @@ defmodule SkollerWeb.UserView do
   alias SkollerWeb.UserView
   alias Skoller.Repo
   alias ExMvc.View
+  alias Skoller.Users.Trial
 
   def render("index.json", %{users: users}) do
     render_many(users, UserView, "user.json")
@@ -29,7 +30,8 @@ defmodule SkollerWeb.UserView do
     |> Map.merge(%{
       student: render_one(user.student, SkollerWeb.StudentView, "student.json"),
       roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
-      trial: Skoller.Users.Trial.now?(user)
+      trial: Trial.now?(user),
+      trial_days_left: Trial.days_left(user)
     })
   end
 end
