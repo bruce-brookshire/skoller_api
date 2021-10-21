@@ -16,6 +16,13 @@ defmodule Skoller.Users.Trial do
   end
 
   @doc """
+    Days left for a trial end
+  """
+  def days_left(%User{} = user) do
+    user.trial_end && DateTime.diff(user.trial_end, DateTime.utc_now)/60/60/24
+  end
+
+  @doc """
     Cancel a user's trial.
   """
   def cancel(id) do
