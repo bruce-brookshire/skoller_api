@@ -43,7 +43,7 @@ defmodule Skoller.Users.Trial do
         [
           trial: true,
           trial_start: datetime_add(^NaiveDateTime.utc_now, 0, "month"),
-          trial_end: datetime_add(^NaiveDateTime.utc_now, 1, "month")
+          trial_end: datetime_add(^NaiveDateTime.utc_now, 30, "day")
         ]
       ]
     )
