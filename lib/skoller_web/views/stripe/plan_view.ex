@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Stripe.PlanView do
   def render("plan.json", %{plan: plan}) do
     %{
       active: plan.active,
+      price: plan.amount / 100,
       amount: plan.amount,
       amount_decimal: plan.amount_decimal,
       currency: plan.currency,
