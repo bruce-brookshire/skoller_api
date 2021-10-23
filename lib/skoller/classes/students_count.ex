@@ -27,7 +27,6 @@ defmodule Skoller.Classes.StudentsCount do
     end)
   end
 
-
   @doc """
     Load classes' trial premium and expired students count from db and stripe
   """
