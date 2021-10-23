@@ -14,7 +14,7 @@ defmodule SkollerWeb.Class.SearchView do
     %{
       id: class.id,
       premium: class.premium,
-      trial: class.premium,
+      trial: class.trial,
       expired: class.expired,
       received: class.received,
       days_left: class.days_left,
