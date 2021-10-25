@@ -35,6 +35,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
     %{
       id: subscription.id,
       current_period_start: subscription.current_period_start,
+      cancel_at_period_end: subscription.cancel_at_period_end,
       created: subscription.created,
       canceled_at: subscription.canceled_at,
       status: subscription.status,
