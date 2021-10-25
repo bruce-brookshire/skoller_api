@@ -147,7 +147,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def cancel_subscription(conn, %{"subscription_id" => subscription_id}) do
-    with {:ok, subscription} <- Stripe.Subscription.delete(subscription_id) do
+    with {:ok, subscription} <- Stripe.Subscription.update(subscription_id, %{cancel_at_period_end: true}) do
       render(conn, "show.json", %{subscription: subscription})
     else
       data -> process_errors(conn, data)
@@ -178,5 +178,4 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
         |> json(%{error: :error, message: "Something went wrong while processing your request"})
     end
   end
-
 end
