@@ -418,6 +418,7 @@ defmodule SkollerWeb.Router do
         post "/create-checkout-session", SubscriptionController, :create_checkout_session
         post "/update-subscription", SubscriptionController, :update_subscription
         get "/start-trial-for-all-users", SubscriptionController, :start_trial_for_all_users
+        resources "/cancellation-reasons", CancellationReasonController, only: [:create]
       end
       scope "/stripe", Stripe do
         post "/webhook", WebHookController, :web_hook
