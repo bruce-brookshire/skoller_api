@@ -1,6 +1,7 @@
 defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   use SkollerWeb, :controller
   alias Skoller.Payments
+  alias Skoller.Users.Trial
 
   def list_user_subscriptions(conn, _params)do
     with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
@@ -57,9 +58,6 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
               items: [%{plan: plan_id}],
               payment_behavior: "allow_incomplete"
             }
-            |> Map.merge(
-              if user.trial_end != nil, do: %{trial_end: (user.trial_end |> DateTime.to_unix)}, else: %{}
-            )
           )do
       create_or_update_card_info(
         %{
@@ -69,6 +67,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
           card_info: %{card_id: card_id}
         }
       )
+      Trial.expire(user)
       conn
       |> json(%{status: :ok, message: "Your subscription was successful"})
 
@@ -101,7 +100,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def start_trial_for_all_users(conn, _) do
-    Skoller.Users.Trial.start_trial_for_all_users()
+    Trial.start_trial_for_all_users()
     json(conn, %{status: :ok, message: "Your successfully started all users' trial"})
   end
 
