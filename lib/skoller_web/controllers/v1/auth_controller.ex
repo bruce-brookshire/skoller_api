@@ -120,12 +120,12 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
   def deregister_devices(conn, _params), do: conn
 
-  defp get_subscription_list(user_id)do
+  defp get_subscription_list(user_id) do
     with %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
-         {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id}) do
+         {:ok, %Stripe.List{data: subscriptions}} <- Stripe.Subscription.list(%{customer: customer_id}) do
       subscriptions
     else
-      _ -> nil
+      _ -> []
     end
   end
 end

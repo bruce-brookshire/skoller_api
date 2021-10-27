@@ -18,7 +18,7 @@ defmodule SkollerWeb.Api.V1.Stripe.PlanView do
       interval: plan.interval,
       interval_count: plan.interval_count,
       name: plan.name,
-     product: plan.product
+      product: plan.product
     }
   end
 end
