@@ -12,6 +12,7 @@ defmodule Skoller.Users.User do
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.Organizations.OrgOwners.OrgOwner
   alias Skoller.Organizations.OrgMembers.OrgMember
+  alias Skoller.CancellationReasons.CancellationReason
 
   schema "users" do
     field :email, :string
@@ -37,6 +38,7 @@ defmodule Skoller.Users.User do
     has_many :org_members, OrgMember
     has_many :org_group_owners, through: [:org_members, :org_group_owners]
     has_many :customers_infos, Skoller.Payments.Stripe, on_delete: :delete_all
+    has_many :cancellation_reasons, CancellationReason, on_delete: :nilify_all
 
     timestamps()
   end
