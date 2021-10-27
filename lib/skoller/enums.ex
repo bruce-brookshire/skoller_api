@@ -5,5 +5,5 @@ defenum(Skoller.Enum.CancellationReasonTitle, :cancellation_reason_title, [
   :product_issues,
   :using_something_else,
   :not_helpful,
-  :note_of_the_above
+  :none_of_the_above
 ])
