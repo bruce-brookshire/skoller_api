@@ -58,7 +58,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
               payment_behavior: "allow_incomplete"
             }
             |> Map.merge(
-              if user.trial_end != nil, do: %{trial_end: (user.trial |> DateTime.to_unix)}, else: %{}
+              if user.trial_end != nil, do: %{trial_end: (user.trial_end |> DateTime.to_unix)}, else: %{}
             )
           )do
       create_or_update_card_info(
