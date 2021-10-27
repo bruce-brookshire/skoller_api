@@ -34,6 +34,17 @@ defmodule Skoller.Users.Trial do
   end
 
   @doc """
+    Expire user's trial
+  """
+  def expire(%User{} = user) do
+    from(u in User,
+      where: u.id == ^user.id,
+      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now, 0, "month"), trial: false]]
+    )
+    |> Repo.update_all([])
+  end
+
+  @doc """
     Start trial for all users with trial_end: nil
   """
   def start_trial_for_all_users do
