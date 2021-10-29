@@ -30,6 +30,17 @@ defmodule Skoller.StudentClasses.Classes do
     * `Skoller.Classes.Class` :meet_days
 
   """
+
+  def classes_count do
+    from(class in Class)
+    |> join(:inner, [class], status in Status, on: status.id == class.class_status_id)
+    |> select([class, status], %{
+      in_reviews: fragment("sum(case when ? = '1100' OR ? = '1200' then 1 else 0 end)", status.id, status.id),
+      class_changes: fragment("sum(case when ? = '1300' then 1 else 0 end)", status.id)
+    })
+    |> Repo.all()
+  end
+
   def get_classes_with_enrollment(params) do
     #TODO: Filter ClassPeriod
     from(class in Class)
@@ -38,7 +49,7 @@ defmodule Skoller.StudentClasses.Classes do
     |> join(:inner, [class, period, prof], school in School, on: school.id == period.school_id)
     |> join(:inner, [class, period, prof, school], status in Status, on: status.id == class.class_status_id)
     |> join(:left, [class, period, prof, school, status], enroll in subquery(EnrolledStudents.count_subquery()), on: enroll.class_id == class.id)
-    |> where([class, period, prof, school], ^filter(params))
+    |> where([class, period, prof, school, status], ^filter(params))
     |> select([class, period, prof, school, status, enroll], %{class: class, class_period: period, professor: prof, school: school, class_status: status, enroll: enroll})
     |> sort(params)
     |> limit(500)
@@ -49,6 +60,7 @@ defmodule Skoller.StudentClasses.Classes do
     dynamic = params["or"] != "true"
 
     dynamic
+    |> for_dashboard(params)
     |> search_txt_filter(params)
     |> school_filter(params)
     |> prof_filter(params)
@@ -64,6 +76,14 @@ defmodule Skoller.StudentClasses.Classes do
     |> received_filter(params)
     |> days_left_filter(params)
   end
+
+  defp for_dashboard(dynamic, %{"dashboard" => "in_reviews"}) do
+    dynamic([class, period, prof, school, status], status.id in [1100,1200])
+  end
+  defp for_dashboard(dynamic, %{"dashboard" => "class_changes"}) do
+    dynamic([class, period, prof, school, status], status.id in [1300])
+  end
+  defp for_dashboard(dynamic, _), do: dynamic
 
   defp search_txt_filter(dynamic, %{"search_txt" => filter, "or" => "true"}) do
     name_filter = "%" <> filter <> "%"
