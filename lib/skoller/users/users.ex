@@ -239,14 +239,6 @@ defmodule Skoller.Users do
     end
   end
 
-  def set_lifetime_subscription(%User{} = user) do
-    from(u in User,
-      where: u.id == ^user.id,
-      update: [set: [lifetime_subscription: true]]
-    )
-    |> Repo.update_all([])
-  end
-
   defp change_password(user_old, password, _) do
     user_old
     |> User.changeset_update(%{"password" => password})

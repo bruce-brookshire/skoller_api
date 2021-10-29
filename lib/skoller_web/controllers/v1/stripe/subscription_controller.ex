@@ -91,7 +91,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
           card_info: %{card_id: card_id}
         }
       )
-      Skoller.Users.set_lifetime_subscription(user)
+      Skoller.Users.Subscription.set_lifetime_subscription(user)
       Trial.expire(user)
       conn
       |> json(%{status: :ok, message: "Your subscription was successful"})
