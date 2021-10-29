@@ -25,7 +25,8 @@ defmodule Skoller.Users.User do
     field :trial_start, :utc_datetime
     field :trial_end, :utc_datetime
     field :trial, :boolean, default: true
-    
+    field :lifetime_subscription, :boolean, default: false
+
     belongs_to :student, Student
     
     many_to_many :roles, Role, join_through: "user_roles"

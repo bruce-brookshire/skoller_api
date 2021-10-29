@@ -31,7 +31,8 @@ defmodule SkollerWeb.UserView do
       student: render_one(user.student, SkollerWeb.StudentView, "student.json"),
       roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
       trial: Trial.now?(user),
-      trial_days_left: Trial.days_left(user)
+      trial_days_left: Trial.days_left(user),
+      lifetime_subscription: user.lifetime_subscription
     })
   end
 end
