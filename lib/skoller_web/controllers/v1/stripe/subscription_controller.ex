@@ -44,7 +44,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-  def create_subscription(conn, %{"payment_method" => %{"plan_id" => plan_id, "token" => token} = payment_method})do
+  def create_subscription(conn, %{"payment_method" => %{"plan_id" => plan_id, "token" => token} = payment_method}) do
     with {:ok, %Stripe.Token{card:  %Stripe.Card{id: card_id}}} <- Stripe.Token.retrieve(token),
          {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
@@ -67,6 +67,31 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
           card_info: %{card_id: card_id}
         }
       )
+      Trial.expire(user)
+      conn
+      |> json(%{status: :ok, message: "Your subscription was successful"})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
+
+  def create_subscription(conn, %{"payment_method" => %{"token" => token} = payment_method}) do
+    with {:ok, %Stripe.Token{card:  %Stripe.Card{id: card_id}}} <- Stripe.Token.retrieve(token),
+         {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
+                                                           |> Map.fetch(:user),
+         {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
+           token,
+           user_id
+         ) do
+      create_or_update_card_info(
+        %{
+          user_id: user_id,
+          customer_id: customer_stripe_id,
+          payment_method: "card",
+          card_info: %{card_id: card_id}
+        }
+      )
+      Skoller.Users.Subscription.set_lifetime_subscription(user)
       Trial.expire(user)
       conn
       |> json(%{status: :ok, message: "Your subscription was successful"})
