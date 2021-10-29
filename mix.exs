@@ -37,7 +37,7 @@ defmodule Skoller.Mixfile do
       {:basic_auth, "~> 2.2.2"},
       {:bcrypt_elixir, "~> 1.0"},
       {:comeonin, "~> 4.0"},
-      {:cors_plug, "~> 1.2"},
+      {:cors_plug, "~> 2.0"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
       {:csv, "~> 2.0.0"},
       {:ecto, "~> 3.0"},
