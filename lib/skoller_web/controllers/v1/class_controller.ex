@@ -27,6 +27,18 @@ defmodule SkollerWeb.Api.V1.ClassController do
   plug :verify_class_is_editable, :class_id
   plug :verify_class_is_editable, :id
 
+  def dashboard_classes(conn, params) do
+    classes = EnrolledClasses.get_classes_with_enrollment(params)
+
+    conn
+    |> put_view(SearchView)
+    |> render("index.json", classes: classes)
+  end
+
+  def dashboard_classes_count(conn, _params) do
+    json(conn, EnrolledClasses.classes_count |> List.first)
+  end
+
   @doc """
    Creates a new class through `Skoller.Classes`
 

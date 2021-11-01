@@ -185,6 +185,8 @@ defmodule SkollerWeb.Router do
       get "/classes/:id", NonMemberClassController, :show
       get "/classes/:id/admin", Admin.ClassController, :show
 
+      get "/dashboard/classes/count", ClassController, :dashboard_classes_count
+      get "/dashboard/classes/:dashboard", ClassController, :dashboard_classes
       resources "/classes", ClassController, only: [:update, :index] do
         post "/notes", Class.NoteController, :create
 
