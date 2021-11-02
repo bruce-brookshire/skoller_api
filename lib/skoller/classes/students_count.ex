@@ -16,14 +16,16 @@ defmodule Skoller.Classes.StudentsCount do
     Update classes' trial premium and expired students count
   """
   def update_all do
-    load()
-    |> Enum.each(fn class ->
+    stream = load() |> Stream.each(fn class ->
       changes = Map.delete(class, :id) |> Map.to_list
       from(c in Class,
         where: c.id == ^class.id,
         update: [set: ^changes]
       )
       |> Repo.update_all([])
+    end)
+    Repo.transaction(fn() ->
+      stream |> Stream.run()
     end)
   end
 
@@ -34,7 +36,7 @@ defmodule Skoller.Classes.StudentsCount do
     subscriptions = subscriptions()
     inactive_customers = inactive_customers(subscriptions)
     active_customers = active_customers(subscriptions)
-    query = from(class in Class,
+    from(class in Class,
       left_join: student_class in StudentClass, on: class.id == student_class.class_id,
       left_join: student in Student, on: student.id == student_class.student_id,
       left_join: user in User, on: user.student_id == student.id,
@@ -47,12 +49,8 @@ defmodule Skoller.Classes.StudentsCount do
         expired: fragment("sum(case when ? then 0 when ? = ANY(?) then 1 else 0 end)", user.trial, payment.customer_id, ^inactive_customers)
       }
     )
+    |> Repo.stream()
 
-    stream = Repo.stream(query)
-    {:ok, result} = Repo.transaction(fn() ->
-      Enum.to_list(stream)
-    end)
-    result
   end
 
   @doc """
