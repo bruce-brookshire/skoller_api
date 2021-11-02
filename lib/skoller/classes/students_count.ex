@@ -34,7 +34,7 @@ defmodule Skoller.Classes.StudentsCount do
     subscriptions = subscriptions()
     inactive_customers = inactive_customers(subscriptions)
     active_customers = active_customers(subscriptions)
-    from(class in Class,
+    query = from(class in Class,
       left_join: student_class in StudentClass, on: class.id == student_class.class_id,
       left_join: student in Student, on: student.id == student_class.student_id,
       left_join: user in User, on: user.student_id == student.id,
@@ -47,7 +47,12 @@ defmodule Skoller.Classes.StudentsCount do
         expired: fragment("sum(case when ? then 0 when ? = ANY(?) then 1 else 0 end)", user.trial, payment.customer_id, ^inactive_customers)
       }
     )
-    |> Repo.all()
+
+    stream = Repo.stream(query)
+    {:ok, result} = Repo.transaction(fn() ->
+      Enum.to_list(stream)
+    end)
+    result
   end
 
   @doc """
