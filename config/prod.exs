@@ -73,7 +73,7 @@ config :skoller, SkollerWeb.Endpoint,
 config :skoller, Skoller.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  timeout: 200_000
+  timeout: 20_000_000
 
 # Configure Guardian Token Generation (this is for auth tokens)
 config :skoller, Skoller.Auth,
