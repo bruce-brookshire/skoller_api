@@ -26,7 +26,7 @@ defmodule Skoller.Classes.StudentsCount do
     end)
     Repo.transaction(fn() ->
       stream |> Stream.run()
-    end)
+    end, timeout: 20_000_000)
   end
 
   @doc """
@@ -50,7 +50,6 @@ defmodule Skoller.Classes.StudentsCount do
       }
     )
     |> Repo.stream()
-
   end
 
   @doc """
