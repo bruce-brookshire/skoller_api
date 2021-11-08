@@ -88,4 +88,11 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
         |> MultiError.render(failed_value)
     end
   end
+
+  def set_endless_trial(conn, %{"user_id" => user_id}) do
+    Repo.get(Skoller.Users.User, user_id)
+    |> Skoller.Users.Trial.set_endless_trial()
+
+    json(conn, [])
+  end
 end

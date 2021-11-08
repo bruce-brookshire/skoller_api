@@ -133,6 +133,7 @@ defmodule SkollerWeb.Router do
       put "/users/:user_id/update", Admin.UserController, :update
       get "/users/points", Admin.UserController, :points
       resources "/insights/users", Organization.InsightsUserController, only: [:create, :index]
+      get "users/:user_id/set_endless_trial", Admin.UserController, :set_endless_trial
 
       post "/sessions", SessionController, :create
 
