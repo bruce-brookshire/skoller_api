@@ -9,6 +9,7 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   alias Skoller.Users
   alias Skoller.Admin.Users, as: AdminUsers
   alias Skoller.Repo
+  alias Skoller.Payments
 
   import SkollerWeb.Plugs.Auth
 
@@ -40,9 +41,11 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
   def show(conn, %{"id" => id}) do
     user = AdminUsers.get_user_by_id!(id)
 
+    subscriptions = get_subscription_list(user.id)
+
     conn
     |> put_view(UserView)
-    |> render("show.json", user: user)
+    |> render("user_subscriptions.json", user: user, subscriptions: subscriptions)
   end
 
   def update(conn, %{"user_id" => user_id} = params) do
@@ -94,5 +97,16 @@ defmodule SkollerWeb.Api.V1.Admin.UserController do
     |> Skoller.Users.Trial.set_endless_trial()
 
     json(conn, [])
+  end
+
+  defp get_subscription_list(user_id) do
+    with %Skoller.Payments.Stripe{customer_id: customer_id} <-
+           Payments.get_stripe_by_user_id(user_id),
+         {:ok, %Stripe.List{data: subscriptions}} <-
+           Stripe.Subscription.list(%{customer: customer_id}) do
+      subscriptions
+    else
+      _ -> []
+    end
   end
 end
