@@ -54,6 +54,7 @@ defmodule SkollerWeb.Admin.UserView do
       reports: render_many(user.reports, ReportView, "report.json"),
       trial: Trial.now?(user),
       trial_days_left: Trial.days_left(user),
+      trial_ends: user.trial_end,
       lifetime_subscription: user.lifetime_subscription,
       subscriptions:
         render_many(subscriptions, SubscriptionView, "subscription.json", as: :subscription)
