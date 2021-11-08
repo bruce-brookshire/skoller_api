@@ -66,17 +66,36 @@ defmodule Skoller.Users.Trial do
   """
   def update_users_trial_status do
     from(u in User,
-      where: u.trial_end > datetime_add(^NaiveDateTime.utc_now, 0, "month") and
-             u.trial == false,
+      where:
+        u.trial_end > datetime_add(^NaiveDateTime.utc_now(), 0, "month") and
+          u.trial == false,
       update: [set: [trial: true]]
     )
     |> Repo.update_all([])
 
     from(u in User,
-      where: (u.trial_end < datetime_add(^NaiveDateTime.utc_now, 0, "month") or
-             is_nil(u.trial_end)) and
-             u.trial == true,
+      where:
+        (u.trial_end < datetime_add(^NaiveDateTime.utc_now(), 0, "month") or
+           is_nil(u.trial_end)) and
+          u.trial == true,
       update: [set: [trial: false]]
+    )
+    |> Repo.update_all([])
+  end
+
+  @doc """
+    start endless trial for specific user
+  """
+  def set_endless_trial(%User{} = user) do
+    from(u in User,
+      where: u.id == ^user.id,
+      update: [
+        set: [
+          trial: true,
+          trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
+          trial_end: datetime_add(^NaiveDateTime.utc_now(), 100, "year")
+        ]
+      ]
     )
     |> Repo.update_all([])
   end
