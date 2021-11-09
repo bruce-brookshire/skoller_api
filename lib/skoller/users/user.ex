@@ -26,11 +26,12 @@ defmodule Skoller.Users.User do
     field :trial_end, :utc_datetime
     field :trial, :boolean, default: true
     field :lifetime_subscription, :boolean, default: false
+    field :lifetime_trial, :boolean, default: false
 
     belongs_to :student, Student
-    
+
     many_to_many :roles, Role, join_through: "user_roles"
-    
+
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
@@ -61,8 +62,11 @@ defmodule Skoller.Users.User do
     |> validate_required(@req_fields)
     |> update_change(:email, &String.downcase(&1))
     |> update_change(:email, &String.trim(&1))
-    |> change(%{trial_start: DateTime.utc_now |> DateTime.truncate(:second)})
-    |> change(%{trial_end: DateTime.utc_now |> DateTime.add(60*60*24*30) |> DateTime.truncate(:second)})
+    |> change(%{trial_start: DateTime.utc_now() |> DateTime.truncate(:second)})
+    |> change(%{
+      trial_end:
+        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 30) |> DateTime.truncate(:second)
+    })
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
@@ -87,9 +91,9 @@ defmodule Skoller.Users.User do
     |> put_pass_hash()
   end
 
-  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
-                      %{password: password}} = changeset) do
+  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, Authentication.hash_password(password))
   end
+
   defp put_pass_hash(changeset), do: changeset
 end

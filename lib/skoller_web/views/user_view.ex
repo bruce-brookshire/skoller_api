@@ -32,7 +32,8 @@ defmodule SkollerWeb.UserView do
       roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
       trial: Trial.now?(user),
       trial_days_left: Trial.days_left(user),
-      lifetime_subscription: user.lifetime_subscription
+      lifetime_subscription: user.lifetime_subscription,
+      lifetime_trial: user.lifetime_trial
     })
   end
 end
