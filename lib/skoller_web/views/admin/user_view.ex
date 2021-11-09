@@ -56,7 +56,7 @@ defmodule SkollerWeb.Admin.UserView do
       trial_days_left: Trial.days_left(user),
       trial_ends: user.trial_end,
       lifetime_subscription: user.lifetime_subscription,
-      lifetime_trial: Trial.days_left(user) > 10000,
+      lifetime_trial: user.lifetime_trial,
       subscriptions:
         render_many(subscriptions, SubscriptionView, "subscription.json", as: :subscription)
     })

@@ -33,7 +33,7 @@ defmodule SkollerWeb.UserView do
       trial: Trial.now?(user),
       trial_days_left: Trial.days_left(user),
       lifetime_subscription: user.lifetime_subscription,
-      lifetime_trial: Trial.days_left(user) > 10000
+      lifetime_trial: user.lifetime_trial
     })
   end
 end

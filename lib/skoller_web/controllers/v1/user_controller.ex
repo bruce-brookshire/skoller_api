@@ -60,7 +60,8 @@ defmodule SkollerWeb.Api.V1.UserController do
   end
 
   def end_trial(conn, %{"user_id" => id}) do
-    Skoller.Users.Trial.cancel(id)
+    user = Repo.get(Skoller.Users.User, id)
+    Skoller.Users.Trial.cancel(user)
     conn |> send_resp(204, "")
   end
 

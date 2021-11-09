@@ -12,23 +12,23 @@ defmodule Skoller.Users.Trial do
     Check if the user is on a trial.
   """
   def now?(%User{} = user) do
-    user.trial_end != nil && DateTime.compare(user.trial_end, DateTime.utc_now) == :gt
+    user.trial_end != nil && DateTime.compare(user.trial_end, DateTime.utc_now()) == :gt
   end
 
   @doc """
     Days left for a trial end
   """
   def days_left(%User{} = user) do
-    user.trial_end && DateTime.diff(user.trial_end, DateTime.utc_now)/60/60/24
+    user.trial_end && DateTime.diff(user.trial_end, DateTime.utc_now()) / 60 / 60 / 24
   end
 
   @doc """
     Cancel a user's trial.
   """
-  def cancel(id) do
+  def cancel(%User{} = user) do
     from(u in User,
-      where: u.id == ^id,
-      update: [set: [trial_end: nil]]
+      where: u.id == ^user.id,
+      update: [set: [trial_end: nil, lifetime_trial: false]]
     )
     |> Repo.update_all([])
   end
@@ -39,7 +39,7 @@ defmodule Skoller.Users.Trial do
   def expire(%User{} = user) do
     from(u in User,
       where: u.id == ^user.id,
-      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now, 0, "month"), trial: false]]
+      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now(), 0, "month"), trial: false]]
     )
     |> Repo.update_all([])
   end
@@ -50,11 +50,11 @@ defmodule Skoller.Users.Trial do
   def start_trial_for_all_users do
     from(u in User,
       where: is_nil(u.trial_end),
-      update: [set:
-        [
+      update: [
+        set: [
           trial: true,
-          trial_start: datetime_add(^NaiveDateTime.utc_now, 0, "month"),
-          trial_end: datetime_add(^NaiveDateTime.utc_now, 30, "day")
+          trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
+          trial_end: datetime_add(^NaiveDateTime.utc_now(), 30, "day")
         ]
       ]
     )
@@ -92,6 +92,7 @@ defmodule Skoller.Users.Trial do
       update: [
         set: [
           trial: true,
+          lifetime_trial: true,
           trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
           trial_end: datetime_add(^NaiveDateTime.utc_now(), 100, "year")
         ]
