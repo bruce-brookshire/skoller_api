@@ -17,7 +17,7 @@ defmodule SkollerWeb.Class.SearchView do
       trial: class.trial,
       expired: class.expired,
       received: class.received,
-      days_left: class.days_left,
+      days_left: Skoller.Periods.days_left(class_period),
       meet_days: class.meet_days,
       meet_start_time: class.meet_start_time,
       name: class.name,
