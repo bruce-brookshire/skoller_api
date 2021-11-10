@@ -342,6 +342,12 @@ defmodule Skoller.Periods do
     end
   end
 
+  def days_left(%ClassPeriod{} = period) do
+    period.end_date &&
+      DateTime.compare(period.end_date, DateTime.utc_now()) == :gt &&
+      (DateTime.diff(period.end_date, DateTime.utc_now()) / 60 / 60 / 24) || nil
+  end
+
   defp filter(query, params) do
     query
     |> filter_name(params)
