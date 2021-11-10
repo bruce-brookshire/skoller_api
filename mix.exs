@@ -44,7 +44,7 @@ defmodule Skoller.Mixfile do
       {:ecto_sql, "~> 3.0"},
       {:ecto_enum, "~> 1.4"},
       {:elixir_xml_to_map, "~> 0.1"},
-      {:ex_aws, "~> 2.0"},
+      {:ex_aws, "~> 2.1.5"},
       {:ex_aws_s3, "~> 2.0"},
       {:ex_aws_ses, "~> 2.1.1"},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
