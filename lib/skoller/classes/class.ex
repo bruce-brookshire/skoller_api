@@ -18,9 +18,9 @@ defmodule Skoller.Classes.Class do
   alias Skoller.Users.User
 
   schema "classes" do
-    field :premium, :integer
-    field :trial, :integer
-    field :expired, :integer
+    field :premium, :integer, default: 0
+    field :trial, :integer, default: 0
+    field :expired, :integer, default: 0
     field :received, :string
     field :days_left, :integer
     field :credits, :string
