@@ -35,8 +35,8 @@ defmodule Skoller.StudentClasses.Classes do
     from(class in Class)
     |> join(:inner, [class], status in Status, on: status.id == class.class_status_id)
     |> select([class, status], %{
-      in_reviews: fragment("sum(case when ? = '1100' OR ? = '1200' then 1 else 0 end)", status.id, status.id),
-      class_changes: fragment("sum(case when ? = '1300' then 1 else 0 end)", status.id)
+      in_reviews: fragment("sum(case when ? = '1100' OR ? = '1200' OR ? = '1400' then 1 else 0 end)", status.id, status.id),
+      class_changes: fragment("sum(case when ? = '1500' then 1 else 0 end)", status.id)
     })
     |> Repo.all()
   end
@@ -81,7 +81,7 @@ defmodule Skoller.StudentClasses.Classes do
     dynamic([class, period, prof, school, status], (status.id in [1100, 1200, 1400]) and period.class_period_status_id == 200)
   end
   defp for_dashboard(dynamic, %{"dashboard" => "class_changes"}) do
-    dynamic([class, period, prof, school, status], (status.id in [1300]) and period.class_period_status_id == 200)
+    dynamic([class, period, prof, school, status], (status.id in [1500]) and period.class_period_status_id == 200)
   end
   defp for_dashboard(dynamic, _), do: dynamic
 
