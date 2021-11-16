@@ -35,7 +35,7 @@ defmodule Skoller.StudentClasses.Classes do
     from(class in Class)
     |> join(:inner, [class], status in Status, on: status.id == class.class_status_id)
     |> select([class, status], %{
-      in_reviews: fragment("sum(case when ? = '1100' OR ? = '1200' then 1 else 0 end)", status.id, status.id, status.id),
+      in_reviews: fragment("sum(case when ? = '1100' OR ? = '1200' then 1 else 0 end)", status.id, status.id),
       class_changes: fragment("sum(case when ? = '1500' then 1 else 0 end)", status.id)
     })
     |> Repo.all()
