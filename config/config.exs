@@ -51,7 +51,7 @@ config :pigeon, :apns,
 
 config :stripity_stripe,
        hackney_opts: [{:connect_timeout, 1_000_000}, {:recv_timeout, 5_000_000}],
-       api_key: "sk_test_51JV9OSSGLvMTa3qVQGL5oc6UusqzdXaERjWnAOTmcNjK44emrv8dS6WZomBR96RQxzBQQeqoXIIdzbsoNsD0jVs500EG7uso1T"
+       api_key: "sk_test_51JHvLoGtOURsTxun9zAvF8xXT9LBVHtV58UggeaE3HwoKVy4UCEEw9g8rI41LH0EKH3EizCLJwjP6rMjUicVXhlW00WnQo5cAq"
 
 config :pigeon, :fcm,
   fcm_default: %{
