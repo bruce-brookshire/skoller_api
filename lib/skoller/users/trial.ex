@@ -26,10 +26,24 @@ defmodule Skoller.Users.Trial do
     Cancel a user's trial.
   """
   def cancel(%User{} = user) do
-    from(u in User,
-      where: u.id == ^user.id,
-      update: [set: [trial_end: nil, lifetime_trial: false]]
-    )
+    if user.lifetime_trial do
+      from(u in User,
+        where: u.id == ^user.id,
+        update: [
+          set: [
+            trial: true,
+            trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
+            trial_end: datetime_add(^NaiveDateTime.utc_now(), 30, "day"),
+            lifetime_trial: false
+          ]
+        ]
+      )
+    else
+      from(u in User,
+        where: u.id == ^user.id,
+        update: [set: [trial: false, trial_end: nil]]
+      )
+    end
     |> Repo.update_all([])
   end
 
