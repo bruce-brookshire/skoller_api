@@ -37,6 +37,60 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
+  def create(conn, %{"payment_method" => %{"plan_id" => plan_id, "payment_method_id" => payment_method_id}}) do
+    with {:ok, %Stripe.PaymentMethod{billing_details: billing_details, card: card}} <- Stripe.PaymentMethod.retrieve(payment_method_id),
+         {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
+         {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
+           nil,
+           user_id
+         ),
+         {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
+           %{
+              customer: customer_stripe_id,
+              items: [%{plan: plan_id}],
+              payment_behavior: "allow_incomplete"
+            }
+          ) do
+      create_or_update_card_info(
+        %{
+          user_id: user_id,
+          customer_id: customer_stripe_id,
+          payment_method: "card",
+          billing_details: billing_details,
+          card_info: card
+        }
+      )
+      Trial.expire(user)
+      {:ok, :created}
+    else
+      data -> {:error, data}
+    end
+  end
+
+  def create(conn, %{"payment_method" => %{"payment_method_id" => payment_method_id}}) do
+    with {:ok, %Stripe.PaymentMethod{billing_details: billing_details, card: card}} <- Stripe.PaymentMethod.retrieve(payment_method_id),
+         {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
+         {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
+           nil,
+           user_id
+         ) do
+      create_or_update_card_info(
+        %{
+          user_id: user_id,
+          customer_id: customer_stripe_id,
+          payment_method: "card",
+          billing_details: billing_details,
+          card_info: card
+        }
+      )
+      set_lifetime_subscription(user)
+      Trial.expire(user)
+      {:ok, :created}
+    else
+      data -> {:error, data}
+    end
+  end
+
   def create(conn, %{"payment_method" => %{"token" => token}}) do
     with {:ok, %Stripe.Token{card:  %Stripe.Card{id: card_id}}} <- Stripe.Token.retrieve(token),
          {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
