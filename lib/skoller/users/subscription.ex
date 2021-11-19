@@ -8,39 +8,14 @@ defmodule Skoller.Users.Subscription do
 
   import Ecto.Query
 
-  def create(conn, %{"payment_method" => %{"token" => token} = payment_method}) do
-    with {:ok, %Stripe.Token{card:  %Stripe.Card{id: card_id}}} <- Stripe.Token.retrieve(token),
+  def create(conn, %{"payment_method" => payment_method}) do
+    token = payment_method["token"]
+    payment_method_id = payment_method["payment_method_id"]
+    with {:ok, %Stripe.Token{card: %Stripe.Card{} = card}} <- retrieve_token(token),
+         {:ok, %Stripe.PaymentMethod{} = stripe_payment_method} <- retrieve_payment_method(payment_method_id),
          {:ok, %User{} = user} <- conn.assigns |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            token,
-           user.id,
-           nil
-         ),
-         {:ok, %Stripe.Subscription{}} <- create_subscription(
-           customer_stripe_id,
-           payment_method["plan_id"],
-           user
-         ) do
-      create_or_update_card_info(
-        %{
-          user_id: user.id,
-          customer_id: customer_stripe_id,
-          payment_method: "card",
-          card_info: %{card_id: card_id}
-        }
-      )
-      Trial.expire(user)
-      {:ok, :created}
-    else
-      data -> {:error, data}
-    end
-  end
-
-  def create(conn, %{"payment_method" => %{"payment_method_id" => payment_method_id} = payment_method}) do
-    with {:ok, %Stripe.PaymentMethod{billing_details: billing_details, card: card}} <- Stripe.PaymentMethod.retrieve(payment_method_id),
-         {:ok, %User{} = user} <- conn.assigns |> Map.fetch(:user),
-         {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
-           nil,
            user.id,
            payment_method_id
          ),
@@ -53,15 +28,39 @@ defmodule Skoller.Users.Subscription do
         %{
           user_id: user.id,
           customer_id: customer_stripe_id,
-          payment_method: "card",
-          billing_details: billing_details,
-          card_info: card
+          payment_method: "card"
         }
+        |> Map.merge(
+          case {token, payment_method_id} do
+            {token, nil} -> %{card_info: %{card_id: card.id}}
+            {nil, payment_method_id} ->
+              %{
+                billing_details: stripe_payment_method.billing_details,
+                card_info: stripe_payment_method.card
+              }
+          end
+        )
       )
       Trial.expire(user)
       {:ok, :created}
     else
       data -> {:error, data}
+    end
+  end
+
+  defp retrieve_token(token) do
+    if token do
+      Stripe.Token.retrieve(token)
+    else
+      {:ok, %Stripe.Token{card: %Stripe.Card{}}}
+    end
+  end
+
+  defp retrieve_payment_method(id) do
+    if id do
+      Stripe.PaymentMethod.retrieve(id)
+    else
+      {:ok, %Stripe.PaymentMethod{}}
     end
   end
 
