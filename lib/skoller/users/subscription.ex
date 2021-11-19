@@ -118,21 +118,10 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  defp find_or_create_stripe_customer(token, user_id, payment_method_id)do
-    case Payments.get_stripe_by_user_id(user_id)  do
+  defp find_or_create_stripe_customer(token, user_id, payment_method_id) do
+    case Payments.get_stripe_by_user_id(user_id) do
       nil ->
-        Stripe.Customer.create(
-          %{
-            description: "Staging test customer"
-          }
-          |> Map.merge(if(token, do: %{source: token}, else: %{}))
-          |> Map.merge(if(payment_method_id, do: %{
-            invoice_settings: %{
-              default_payment_method: payment_method_id
-            },
-            payment_method: payment_method_id
-          }, else: %{}))
-        )
+        create_stripe_customer(token, payment_method_id)
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
         maybe_create_stripe_customer(token, customer_id, payment_method_id)
       error -> error
@@ -144,20 +133,28 @@ defmodule Skoller.Users.Subscription do
       {:ok, customer} ->
         {:ok, customer}
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
-        Stripe.Customer.create(
+        create_stripe_customer(token, payment_method_id)
+      error -> error
+    end
+  end
+
+  defp create_stripe_customer(token, payment_method_id) do
+    Stripe.Customer.create(
+      %{description: "Staging test customer"}
+      |> Map.merge(if(token, do: %{source: token}, else: %{}))
+      |> Map.merge(
+        if payment_method_id do
           %{
-            description: "Staging test customer"
-          }
-          |> Map.merge(if(token, do: %{source: token}, else: %{}))
-          |> Map.merge(if(payment_method_id, do: %{
             invoice_settings: %{
               default_payment_method: payment_method_id
             },
             payment_method: payment_method_id
-          }, else: %{}))
-        )
-      error -> error
-    end
+          }
+        else
+          %{}
+        end
+      )
+    )
   end
 
   defp create_or_update_card_info(%{user_id: user_id} = params)do
