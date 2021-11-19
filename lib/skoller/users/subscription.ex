@@ -141,17 +141,17 @@ defmodule Skoller.Users.Subscription do
   defp create_stripe_customer(token, payment_method_id) do
     Stripe.Customer.create(
       %{description: "Staging test customer"}
-      |> Map.merge(if(token, do: %{source: token}, else: %{}))
       |> Map.merge(
-        if payment_method_id do
-          %{
-            invoice_settings: %{
-              default_payment_method: payment_method_id
-            },
-            payment_method: payment_method_id
-          }
-        else
-          %{}
+        case {token, payment_method_id} do
+          {token, nil} ->
+            %{source: token}
+          {nil, payment_method_id} ->
+            %{
+              invoice_settings: %{
+                default_payment_method: payment_method_id
+              },
+              payment_method: payment_method_id
+            }
         end
       )
     )
