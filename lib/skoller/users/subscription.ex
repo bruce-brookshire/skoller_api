@@ -13,7 +13,8 @@ defmodule Skoller.Users.Subscription do
          {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            token,
-           user_id
+           user_id,
+           nil
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
            %{
@@ -42,7 +43,8 @@ defmodule Skoller.Users.Subscription do
          {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            nil,
-           user_id
+           user_id,
+           payment_method_id
          ),
          {:ok, %Stripe.Subscription{}} <- Stripe.Subscription.create(
            %{
@@ -72,7 +74,8 @@ defmodule Skoller.Users.Subscription do
          {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            nil,
-           user_id
+           user_id,
+           payment_method_id
          ) do
       create_or_update_card_info(
         %{
@@ -96,7 +99,8 @@ defmodule Skoller.Users.Subscription do
          {:ok, %User{id: user_id} = user} <- conn.assigns |> Map.fetch(:user),
          {:ok, %Stripe.Customer{id: customer_stripe_id}} <- find_or_create_stripe_customer(
            token,
-           user_id
+           user_id,
+           nil
          ) do
       create_or_update_card_info(
         %{
@@ -114,31 +118,43 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  defp find_or_create_stripe_customer(token, user_id)do
+  defp find_or_create_stripe_customer(token, user_id, payment_method_id)do
     case Payments.get_stripe_by_user_id(user_id)  do
       nil ->
         Stripe.Customer.create(
           %{
-            description: "Staging test customer",
-            source: token
+            description: "Staging test customer"
           }
+          |> Map.merge(if(token, do: %{source: token}, else: %{}))
+          |> Map.merge(if(payment_method_id, do: %{
+            invoice_settings: %{
+              default_payment_method: payment_method_id
+            },
+            payment_method: payment_method_id
+          }, else: %{}))
         )
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
-        maybe_create_stripe_customer(token, customer_id)
+        maybe_create_stripe_customer(token, customer_id, payment_method_id)
       error -> error
     end
   end
 
-  defp maybe_create_stripe_customer(token, customer_id)do
+  defp maybe_create_stripe_customer(token, customer_id, payment_method_id)do
     case Stripe.Customer.retrieve(customer_id) do
       {:ok, customer} ->
         {:ok, customer}
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
         Stripe.Customer.create(
           %{
-            description: "Staging test customer",
-            source: token
+            description: "Staging test customer"
           }
+          |> Map.merge(if(token, do: %{source: token}, else: %{}))
+          |> Map.merge(if(payment_method_id, do: %{
+            invoice_settings: %{
+              default_payment_method: payment_method_id
+            },
+            payment_method: payment_method_id
+          }, else: %{}))
         )
       error -> error
     end
