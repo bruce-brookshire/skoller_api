@@ -78,7 +78,7 @@ defmodule Skoller.StudentClasses.Classes do
   end
 
   defp for_dashboard(dynamic, %{"dashboard" => "in_reviews"}) do
-    dynamic([class, period, prof, school, status], (status.id in [1100, 1200]) and period.class_period_status_id == 200)
+    dynamic([class, period, prof, school, status], (status.id in [1200]) and period.class_period_status_id == 200 and period.end_date > ^DateTime.utc_now())
   end
   defp for_dashboard(dynamic, %{"dashboard" => "class_changes"}) do
     dynamic([class, period, prof, school, status], (status.id in [1500]) and period.class_period_status_id == 200)
