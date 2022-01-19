@@ -19,7 +19,7 @@ defmodule Skoller.Users.Subscription do
            user.id,
            payment_method_id
          ),
-         {:ok, %Stripe.Subscription{}} <- create_subscription(
+         {:ok, %Stripe.Subscription{} = subscription} <- create_subscription(
            customer_stripe_id,
            payment_method["plan_id"],
            user
@@ -42,7 +42,7 @@ defmodule Skoller.Users.Subscription do
         )
       )
       Trial.expire(user)
-      {:ok, :created}
+      {:ok, %{user: Repo.get!(User, user.id), subscription: subscription}}
     else
       data -> {:error, data}
     end
