@@ -416,6 +416,7 @@ defmodule SkollerWeb.Router do
         get "/all-products", SubscriptionController, :list_all_products
         get "/all-plans", SubscriptionController, :list_all_plans
         post "/save-card-and-subscription", SubscriptionController, :create_subscription
+        post "/update-apple-pay-subscription", SubscriptionController, :update_apple_pay_subscription
         get "/last-and-upcoming-payments", SubscriptionController, :list_upcoming_payments
         get "/billing-history", SubscriptionController, :list_billing_history
         post "/create-checkout-session", SubscriptionController, :create_checkout_session

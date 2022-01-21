@@ -53,6 +53,15 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
+  def update_apple_pay_subscription(conn, params) do
+    case Subscription.update(conn, params) do
+      {:ok, data} ->
+        json(conn, %{status: :ok, message: "Your subscription was updated successful"})
+      {:error, data} ->
+        process_errors(conn, data)
+    end
+  end
+
   def list_upcoming_payments(conn, _params)do
     with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
                                                            |> Map.fetch(:user),
