@@ -48,6 +48,17 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
+  def update(conn, %{"payment" => payment_method}) do
+
+    with {:ok, %User{} = user} <- conn.assigns |> Map.fetch(:user) do
+      set_lifetime_subscription(user)
+      Trial.expire(user)
+      {:ok, :updated_succesfully}
+    else
+      data -> {:error, data}
+    end
+  end
+
   defp retrieve_token(token) do
     if token do
       Stripe.Token.retrieve(token)
