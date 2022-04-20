@@ -100,36 +100,15 @@ defmodule Skoller.Students.Student do
   end
 
   defp check_phone(%Ecto.Changeset{valid?: true, changes: %{phone: phone}} = changeset) do
-    case get_check_phone() do
-      false ->
-        changeset
+    q = from s in Student, where: s.phone == ^phone
 
-      true ->
-        q =
-          from s in Student,
-            where: s.phone == ^phone
-
-        case Repo.all(q) do
-          [] -> changeset
-          _phone -> changeset |> add_error(:phone, "Phone exists.")
-        end
+    case Repo.all(q) do
+      [] -> changeset
+      _phone -> changeset |> add_error(:phone, "Phone exists.")
     end
   end
 
   defp check_phone(changeset), do: changeset
-
-  defp get_check_phone() do
-    case System.get_env("CHECK_PHONE") do
-      nil ->
-        false
-
-      val ->
-        case val |> String.downcase() do
-          "true" -> true
-          _ -> false
-        end
-    end
-  end
 
   def with_primary_school(student) do
     student |> Repo.preload(:primary_school)

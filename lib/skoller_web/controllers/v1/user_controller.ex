@@ -59,6 +59,12 @@ defmodule SkollerWeb.Api.V1.UserController do
     end
   end
 
+  def end_trial(conn, %{"user_id" => id}) do
+    user = Repo.get(Skoller.Users.User, id)
+    Skoller.Users.Trial.cancel(user)
+    conn |> send_resp(204, "")
+  end
+
   defp upload_pic(%{"file" => ""}), do: ""
 
   defp upload_pic(%{"file" => file}) do

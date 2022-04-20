@@ -12,6 +12,7 @@ defmodule Skoller.Users.User do
   alias Skoller.SkollerJobs.JobProfiles.JobProfile
   alias Skoller.Organizations.OrgOwners.OrgOwner
   alias Skoller.Organizations.OrgMembers.OrgMember
+  alias Skoller.CancellationReasons.CancellationReason
 
   schema "users" do
     field :email, :string
@@ -21,11 +22,16 @@ defmodule Skoller.Users.User do
     field :is_active, :boolean, default: true
     field :is_unsubscribed, :boolean, default: false
     field :last_login, :utc_datetime
-    
+    field :trial_start, :utc_datetime
+    field :trial_end, :utc_datetime
+    field :trial, :boolean, default: true
+    field :lifetime_subscription, :boolean, default: false
+    field :lifetime_trial, :boolean, default: false
+
     belongs_to :student, Student
-    
+
     many_to_many :roles, Role, join_through: "user_roles"
-    
+
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
@@ -33,6 +39,8 @@ defmodule Skoller.Users.User do
     has_many :org_owners, OrgOwner
     has_many :org_members, OrgMember
     has_many :org_group_owners, through: [:org_members, :org_group_owners]
+    has_many :customers_infos, Skoller.Payments.Stripe, on_delete: :delete_all
+    has_many :cancellation_reasons, CancellationReason, on_delete: :nilify_all
 
     timestamps()
   end
@@ -54,6 +62,11 @@ defmodule Skoller.Users.User do
     |> validate_required(@req_fields)
     |> update_change(:email, &String.downcase(&1))
     |> update_change(:email, &String.trim(&1))
+    |> change(%{trial_start: DateTime.utc_now() |> DateTime.truncate(:second)})
+    |> change(%{
+      trial_end:
+        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 30) |> DateTime.truncate(:second)
+    })
     |> unique_constraint(:email)
     |> cast_assoc(:student)
     |> validate_format(:email, ~r/@/)
@@ -78,9 +91,9 @@ defmodule Skoller.Users.User do
     |> put_pass_hash()
   end
 
-  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes:
-                      %{password: password}} = changeset) do
+  defp put_pass_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     change(changeset, Authentication.hash_password(password))
   end
+
   defp put_pass_hash(changeset), do: changeset
 end

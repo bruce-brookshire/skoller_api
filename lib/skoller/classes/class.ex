@@ -18,6 +18,11 @@ defmodule Skoller.Classes.Class do
   alias Skoller.Users.User
 
   schema "classes" do
+    field :premium, :integer, default: 0
+    field :trial, :integer, default: 0
+    field :expired, :integer, default: 0
+    field :received, :string
+    field :days_left, :integer
     field :credits, :string
     field :crn, :string
     field :is_chat_enabled, :boolean, default: true
@@ -66,7 +71,7 @@ defmodule Skoller.Classes.Class do
 
   @req_fields [:name, :is_editable, :class_period_id, :is_chat_enabled, :is_assignment_posts_enabled,
     :is_syllabus, :is_points, :section]
-  @opt_fields [:professor_id, :location, :meet_end_time, :meet_start_time, :class_upload_key, :grade_scale]
+  @opt_fields [:premium, :trial, :expired, :received, :days_left, :professor_id, :location, :meet_end_time, :meet_start_time, :class_upload_key, :grade_scale]
 
   @req_uni_fields @req_fields ++ [:code, :subject, :meet_days]
   @opt_uni_fields @opt_fields ++ [:crn, :credits, :class_type, :campus, :seat_count]

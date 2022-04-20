@@ -10,6 +10,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   alias SkollerWeb.AuthView
   alias Skoller.Token
   alias Skoller.Services.Authentication
+  alias Skoller.Payments
 
   import SkollerWeb.Plugs.Auth
 
@@ -19,11 +20,14 @@ defmodule SkollerWeb.Api.V1.AuthController do
     user = Users.get_user_by_email(email)
 
     if Authentication.check_password(password, user.password_hash) do
+      subscriptions = Task.async(fn  -> get_subscription_list(user.id)   end)
       {:ok, token} = Token.login(user.id)
+      token = Map.new(%{token: token})
+              |> Map.merge(%{user: user})
+              |> Map.merge(%{subscriptions: Task.await(subscriptions, :infinity)})
 
-      token = Map.new(%{token: token}) |> Map.merge(%{user: user})
-
-      user |> Users.update_user(%{last_login: DateTime.utc_now()})
+      user
+      |> Users.update_user(%{last_login: DateTime.utc_now()})
 
       conn
       |> put_view(AuthView)
@@ -40,11 +44,14 @@ defmodule SkollerWeb.Api.V1.AuthController do
       when verification_code == code ->
         if DateTime.diff(DateTime.utc_now(), last_attempt, :seconds) <= 300 do
           user = Users.get_user_by_student_id(student.id)
-
-          user |> Users.update_user(%{last_login: DateTime.utc_now()})
+          subscriptions = Task.async(fn  -> get_subscription_list(user.id) end)
+          user
+          |> Users.update_user(%{last_login: DateTime.utc_now()})
 
           {:ok, token} = Token.long_token(user.id)
-          token = Map.new(%{token: token}) |> Map.merge(%{user: user})
+          token = Map.new(%{token: token})
+                  |> Map.merge(%{user: user})
+                  |> Map.merge(%{subscriptions:  %{}})
 
           conn
           |> put_view(AuthView)
@@ -75,7 +82,8 @@ defmodule SkollerWeb.Api.V1.AuthController do
 
       value ->
         IO.inspect(value)
-        conn |> send_resp(404, "User not found")
+        conn
+        |> send_resp(404, "User not found")
     end
   end
 
@@ -86,12 +94,24 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
+    user = conn.assigns[:user]
+    subscriptions = Task.async(fn  -> get_subscription_list(user.id)   end)
+    token = user
+            |> Map.merge(%{subscriptions: Task.await(subscriptions, :infinity)})
+
     conn
     |> put_view(AuthView)
-    |> render("show.json", auth: conn.assigns[:user])
+    |> render("show.json", auth: token)
   end
 
-  def deregister_devices(%{assigns: %{user: user}} = conn, %{"udid" => udid, "type" => type}) do
+  def deregister_devices(
+        %{
+          assigns: %{
+            user: user
+          }
+        } = conn,
+        %{"udid" => udid, "type" => type}
+      ) do
     Devices.get_device_by_attributes!(udid, type, user.id)
     |> Devices.delete_device!()
 
@@ -99,4 +119,13 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def deregister_devices(conn, _params), do: conn
+
+  defp get_subscription_list(user_id) do
+    with %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
+         {:ok, %Stripe.List{data: subscriptions}} <- Stripe.Subscription.list(%{customer: customer_id}) do
+      subscriptions
+    else
+      _ -> []
+    end
+  end
 end

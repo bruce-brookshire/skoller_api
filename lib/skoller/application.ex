@@ -28,7 +28,9 @@ defmodule Skoller.Application do
       worker(Skoller.NoClassesJob, []),
       worker(Skoller.EmailManagerJob, []),
       worker(Skoller.AirtableSyncJob, []),
-      worker(Skoller.AnalyticsJob, [])
+      worker(Skoller.AnalyticsJob, []),
+      worker(Skoller.TrialJob, []),
+      worker(Skoller.StudentsCountJob, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
