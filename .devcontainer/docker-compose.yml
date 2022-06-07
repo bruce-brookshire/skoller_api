@@ -1,0 +1,57 @@
+# Version of docker-compose
+version: "3"
+
+# Containers we are going to run
+services:
+  # Our Phoenix container
+  phoenix:
+    # The build parameters for this container.
+    build:
+      # Here we define that it should build from the current directory
+      context: ../
+      dockerfile: .devcontainer/Dockerfile
+    # ports:
+    #   # Mapping the port to make the Phoenix app accessible outside of the container
+    #   - "4002:4001"
+    depends_on:
+      # The db container needs to be started before we start this container
+      - postgres
+    environment:
+      MIX_ENV: "dev"
+    ports:
+      - 4001:4000
+
+    volumes:
+      - ../:/app:cached
+      - build:/app/_build
+      - elixir-ls:/app/.elixir_ls
+      - ~/.ssh:/home/vscode/.ssh:ro
+      - elixir-mixes:/home/vscode/.mix
+      - ~/.zshrc:/home/vscode/.zshrc
+      - ~/.oh-my-zsh:/home/vscode/.oh-my-zsh
+      - ~/.oh-my-zsh-custom:/home/vscode/.oh-my-zsh-custom
+      - .zsh_history:/home/vscode/.zsh_history
+    command: /bin/sh -c "while sleep 10000; do :; done"
+  postgres:
+    # We use the predefined Postgres image
+    image: postgis/postgis:13-3.1-alpine
+    ports:
+      - "5435:5432"
+    environment:
+      # Set user/password for Postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      # Set a path where Postgres should store the data
+      PGDATA: /var/lib/postgresql/data/pgdata
+    hostname: postgres
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+# Define the volumes
+volumes:
+  pgdata:
+  elixir-mixes:
+  elastic-data:
+  remote-workspace:
+  build:
+  elixir-ls:

@@ -5,7 +5,7 @@ defmodule Skoller.Mixfile do
     [
       app: :skoller,
       version: "3.0.0",
-      elixir: "~> 1.7",
+      elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -51,7 +51,7 @@ defmodule Skoller.Mixfile do
       {:ex_mvc, "~> 0.3.0", github: "flyrboy96/ex_mvc"},
       {:ex_twilio, "~> 0.7.0"},
       {:gettext, "~> 0.11"},
-      {:faker, "~> 0.16.0"},
+      {:faker, "~> 0.17.0"},
       {:guardian, "~> 2.1"},
       {:kadabra, "~> 0.4.4"},
       {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
@@ -65,8 +65,8 @@ defmodule Skoller.Mixfile do
       {:poison, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:sweet_xml, "~> 0.6"},
-      {:timex, "~> 3.1"},
-      {:tzdata, "~> 0.5.21"},
+      {:timex, "~> 3.7.8"},
+      {:tzdata, "~> 1.1"},
       {:stripity_stripe, "~> 2.0"},
 
       # Test
