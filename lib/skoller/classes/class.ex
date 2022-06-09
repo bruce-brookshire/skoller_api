@@ -16,6 +16,7 @@ defmodule Skoller.Classes.Class do
   alias Skoller.Assignments.Assignment
   alias Skoller.Classes.Note
   alias Skoller.Users.User
+  alias Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation
 
   schema "classes" do
     field :premium, :integer, default: 0
@@ -53,6 +54,7 @@ defmodule Skoller.Classes.Class do
     field :created_on, :string
     has_many :docs, Doc
     belongs_to :professor, Professor, define_field: false
+    belongs_to :student_org_inventations, StudentOrgInventations
     belongs_to :class_period, ClassPeriod, define_field: false
     belongs_to :created_by_user, User, define_field: false, foreign_key: :created_by
     belongs_to :updated_by_user, User, define_field: false, foreign_key: :updated_by
@@ -88,14 +90,14 @@ defmodule Skoller.Classes.Class do
     |> validate_required(@req_hs_fields)
     |> mandatory_validations
   end
-  
+
   @doc false
   #TODO: Remove this temp jank code once flutter is deployed
   def university_changeset(%Class{} = class, attrs) do
 
     #This makes sure that meet_start_time being "online" doesnt fail the creation
-    {_, attrs} = Map.get_and_update(attrs, "meet_start_time", 
-      fn current_value -> 
+    {_, attrs} = Map.get_and_update(attrs, "meet_start_time",
+      fn current_value ->
         if current_value == nil do
           :pop
         else
@@ -120,4 +122,3 @@ defmodule Skoller.Classes.Class do
     |> unique_constraint(:class, name: :unique_class_index)
   end
 end
-  
