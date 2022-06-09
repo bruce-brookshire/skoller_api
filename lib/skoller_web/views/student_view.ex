@@ -48,7 +48,6 @@ defmodule SkollerWeb.StudentView do
       ])
 
     raise_effort = Skoller.Students.get_org_raise_effort_for_student(student)
-
     %{
       id: student.id,
       name_first: student.name_first,
