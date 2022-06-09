@@ -10,11 +10,11 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-Skoller.Repo.insert!(%Skoller.Roles.Role{id: 100, name: "Student"})
-Skoller.Repo.insert!(%Skoller.Roles.Role{id: 200, name: "Admin"})
-Skoller.Repo.insert!(%Skoller.Roles.Role{id: 300, name: "Syllabus Worker"})
-Skoller.Repo.insert!(%Skoller.Roles.Role{id: 400, name: "Change Requests"})
-Skoller.Repo.insert!(%Skoller.Roles.Role{id: 500, name: "Help Requests"})
+Skoller.Repo.insert!(Skoller.Roles.Role.changeset(%Skoller.Roles.Role{}, %{id: 100, name: "Student"}))
+Skoller.Repo.insert!(Skoller.Roles.Role.changeset(%Skoller.Roles.Role{}, %{id: 200, name: "Admin"}))
+Skoller.Repo.insert!(Skoller.Roles.Role.changeset(%Skoller.Roles.Role{}, %{id: 300, name: "Syllabus Worker"}))
+Skoller.Repo.insert!(Skoller.Roles.Role.changeset(%Skoller.Roles.Role{}, %{id: 400, name: "Change Requests"}))
+Skoller.Repo.insert!(Skoller.Roles.Role.changeset(%Skoller.Roles.Role{}, %{id: 500, name: "Help Requests"}))
 
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 100, name: "This is the wrong syllabus"})
 Skoller.Repo.insert!(%Skoller.HelpRequests.Type{id: 300, name: "Issues viewing the file"})

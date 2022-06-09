@@ -10,7 +10,7 @@ File Conversion setup
 API Dependencies
    * Run `mix deps.get`
    * Get API vars
-   * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
+   * Create and migrate your database with `mix ecto.create && mix ecto.migrate_s`
 
 ## Running
 
@@ -20,7 +20,7 @@ DevContainer setups allow you to skip all of the ASDF versioning, NPM NVM mumboj
 Check the `.devcontainer/docker-compose.yml`file line 39 (ports) and line 21 (ports). If you have multiple devcontainers or docker instances using these ports, update them to unused ports
 Open the command palatte and select `rebuild in container`
 Run `sudo chown -R vscode:vscode _build .elixir_ls`so the devcontainer has the access it needs to do its thing
-`mix deps.get` `mix ecto.create` `mix ecto.migrate` and if applicable run seeds.
+`mix deps.get` `mix ecto.create` `mix ecto.migrate_s` and if applicable run seeds.
 
 To start your Phoenix server:
   * `source` the env file

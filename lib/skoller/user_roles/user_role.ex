@@ -26,6 +26,6 @@ defmodule Skoller.UserRoles.UserRole do
     |> validate_required(@req_fields)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:role_id)
-    |> unique_constraint(:user_role, name: :user_roles_user_id_role_id_index)
+    |> unique_constraint(:user_role, [name: :user_roles_user_id_role_id_index, message: "User ID/User Role ID already exists"])
   end
 end

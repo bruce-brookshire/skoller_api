@@ -16,7 +16,6 @@ defmodule Skoller.Classes.Class do
   alias Skoller.Assignments.Assignment
   alias Skoller.Classes.Note
   alias Skoller.Users.User
-  alias Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation
 
   schema "classes" do
     field :premium, :integer, default: 0
@@ -54,7 +53,6 @@ defmodule Skoller.Classes.Class do
     field :created_on, :string
     has_many :docs, Doc
     belongs_to :professor, Professor, define_field: false
-    belongs_to :student_org_inventations, StudentOrgInventations
     belongs_to :class_period, ClassPeriod, define_field: false
     belongs_to :created_by_user, User, define_field: false, foreign_key: :created_by
     belongs_to :updated_by_user, User, define_field: false, foreign_key: :updated_by

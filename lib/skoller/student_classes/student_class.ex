@@ -7,7 +7,6 @@ defmodule Skoller.StudentClasses.StudentClass do
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Classes.Class
   alias Skoller.Students.Student
-  alias Skoller.Organizations.OrgStudents.OrgStudent
 
   schema "student_classes" do
     field :student_id, :id
@@ -19,7 +18,6 @@ defmodule Skoller.StudentClasses.StudentClass do
     field :enrolled_by, :id
     belongs_to :class, Class, define_field: false
     belongs_to :student, Student, define_field: false
-    belongs_to :org_student, OrgStudent
     has_many :student_assignments, StudentAssignment
 
     timestamps()

@@ -7,7 +7,6 @@ defmodule Skoller.StudentAssignments.StudentAssignment do
   alias Skoller.StudentAssignments.StudentAssignment
   alias Skoller.StudentClasses.StudentClass
   alias Skoller.Weights.Weight
-  alias Skoller.Organizations.OrgStudents.OrgStudent
 
   schema "student_assignments" do
     field :due, :utc_datetime
@@ -24,7 +23,6 @@ defmodule Skoller.StudentAssignments.StudentAssignment do
     belongs_to :student_class, StudentClass, define_field: false
     belongs_to :weight, Weight, define_field: false
     belongs_to :assignment, Assignment, define_field: false
-    belongs_to :org_students, OrgStudent
     has_many :posts, through: [:assignment, :posts]
 
     timestamps()

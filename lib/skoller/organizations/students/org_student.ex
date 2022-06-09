@@ -8,6 +8,8 @@ defmodule Skoller.Organizations.OrgStudents.OrgStudent do
 
   schema "org_students" do
     field(:intensity_score, :map, virtual: true)
+    field(:assignments, {:array, :map}, default: [], virtual: true)
+    field(:classes, {:array, :map}, default: [] virtual: true)
 
     belongs_to :student, Student
     belongs_to :organization, Organization
@@ -15,8 +17,6 @@ defmodule Skoller.Organizations.OrgStudents.OrgStudent do
     has_many :org_group_students, OrgGroupStudent
     has_many :org_groups, through: [:org_group_students, :org_group]
     has_many :users, through: [:student, :users]
-    has_many :classes, StudentClass
-    has_many :assignments, StudentAssignment
 
     timestamps()
   end

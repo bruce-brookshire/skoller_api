@@ -13,10 +13,10 @@ defmodule Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation do
     field :class_ids, {:array, :integer}, default: []
     field :group_ids, {:array, :integer}, default: []
 
+    field :classes, {:array, :map}, default: [], virtual: true
+
     belongs_to :student, Student
     belongs_to :organization, Organization
-
-    has_many :class, Class
 
     timestamps()
   end

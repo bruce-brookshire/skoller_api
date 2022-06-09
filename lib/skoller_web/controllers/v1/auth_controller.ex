@@ -39,10 +39,11 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def student_login(conn, %{"verification_code" => code, "phone" => phone}) do
+
     case Students.get_student_by_phone(phone) do
       %{verification_code: verification_code, login_attempt: last_attempt} = student
       when verification_code == code ->
-        if DateTime.diff(DateTime.utc_now(), last_attempt, :seconds) <= 300 do
+        if Timex.diff(Timex.now(), last_attempt, :seconds) <= 300 do
           user = Users.get_user_by_student_id(student.id)
           subscriptions = Task.async(fn  -> get_subscription_list(user.id) end)
           user
