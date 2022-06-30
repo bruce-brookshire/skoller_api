@@ -3,7 +3,7 @@ defmodule SkollerWeb.Student.ReferredStudentsView do
 
   use SkollerWeb, :view
 
-  def render("referred_students.json", %{stuff: nil}) do
-    %{stuff: "HI!"}
+  def render("referred_students.json", %{referred_students: referred_students}) do
+    %{referred_students: referred_students}
   end
 end

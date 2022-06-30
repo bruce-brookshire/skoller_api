@@ -222,6 +222,45 @@ defmodule Skoller.Students do
     |> Repo.one()
   end
 
+  @doc """
+    Retrieve list of students referred by another students
+  """
+  def get_referred_students_by_student_id(referring_student_id) do
+    from(student in Student,
+      join: user in Skoller.Users.User, on: user.student_id == student.id,
+      join: customers_info in Skoller.Payments.Stripe, on: customers_info.user_id == user.id,
+      where: student.enrolled_by == ^referring_student_id,
+      select: %{
+        user: user,
+        student: student,
+        customer_info: customers_info
+      }
+    )
+    |> Skoller.Repo.all()
+    |> then(fn list ->
+      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "active"})
+      Enum.reduce(list, [], fn %{user: user, student: student, customer_info: %{customer_id: customer_id}}, acc ->
+        result =
+        subscriptions
+        |> Enum.find(& &1.customer == customer_id)
+        |> Map.get(:plan, %{active: nil})
+        |> Map.get(:active, :not_available)
+
+        [%{user: %{
+          trial_start: user.trial_start,
+          trial_end: user.trial_end
+        },
+        student: %{
+          first_name: student.name_first,
+          last_name: student.name_last
+        }, premium_active?: result} | acc]
+      end)
+    end)
+  end
+
+  #      join: sr in DB.SandataRequest,
+ # on: sr.request_object_id == p.id and (sr.request_object_type == "patient" or sr.request_object_type == "staff"),
+
   defp raise_direct_subquery(primary_school_id) do
     from(s in Student)
     |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
