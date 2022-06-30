@@ -41,7 +41,7 @@ config :skoller, Skoller.Repo,
   username: "postgres",
   password: "postgres",
   database: "skoller_dev",
-  hostname: "localhost",
+  hostname: "postgres",
   pool_size: 10,
   timeout: 200_000
 

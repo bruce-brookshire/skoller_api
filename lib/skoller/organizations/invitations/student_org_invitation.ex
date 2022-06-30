@@ -13,7 +13,7 @@ defmodule Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation do
     field :class_ids, {:array, :integer}, default: []
     field :group_ids, {:array, :integer}, default: []
 
-    field :classes, {:array, Class}, virtual: true
+    field :classes, {:array, :map}, virtual: true
 
     belongs_to :student, Student
     belongs_to :organization, Organization
