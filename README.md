@@ -91,6 +91,18 @@ Alternatively
 `ssh -i <ssh rsa key> <ec2 user>@<ec2 instance> -L <local port to use>:<rds endpoint:<rds port>`
 Then connect with localhost on `<local port to use>`
 
+#### Loading local with staging data (with devcontainer)
+- Get copy of staging db dump
+- Open terminal
+- `docker ps -a` and get container id for `skoller_api_devcontainer_postgres_1`
+- Copy the dump file to the postgres container instance: `docker cp <src-path> <container>:<dest-path>`
+- Connect to the container: `docker exec -it <container id> bash`
+- Run psql: `psql -U postgres`
+- Drop the skoller_dev db (fresh start): `DROP DATABASE skoller_dev;`
+- Recreate it: `CREATE DATABASE skoller_dev;`
+- Exit psql: `\q`
+- Load the dump file: `psql -U postgres -d skoller_dev -f <source file>`
+
 ## NOTES
 - `Skoller.Periods.generate_periods_for_all_schools_for_year()` must be run from the iex console (see IEx console on server) once a year to generate periods for all school for the current year.
 - Subscription plans: month, year, premium-vip.
