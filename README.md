@@ -87,6 +87,10 @@ and then run psql (eesh)
 
 Or create an SSH tunnel using your db visualizer with your RSA key and the above information
 
+Alternatively
+`ssh -i <ssh rsa key> <ec2 user>@<ec2 instance> -L <local port to use>:<rds endpoint:<rds port>`
+Then connect with localhost on `<local port to use>`
+
 ## NOTES
 - `Skoller.Periods.generate_periods_for_all_schools_for_year()` must be run from the iex console (see IEx console on server) once a year to generate periods for all school for the current year.
 - Subscription plans: month, year, premium-vip.
