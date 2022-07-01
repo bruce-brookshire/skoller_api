@@ -38,6 +38,10 @@ To generate API Documentation, run `mix hex.docs`
 - `cd /opts/api`
 - `source ~/scripts/api_vars.sh && iex -S mix`
 ## Deployment
+- ssh into desired environment
+- `sudo su skoller`
+- `cd /home/skoller`
+- `bash /home/update_api.sh`
 ### Adding a new dev
  - Have new dev generate RSA key pair
  - Connect to staging server
@@ -78,7 +82,7 @@ To generate API Documentation, run `mix hex.docs`
 
 You can either SSH into ec2 instance for the desired environment and alias the following:
 #### Staging
-`alias stagingdb="PGPASSWORD='<classnav-dev pass' psql -U classnav -W -h <rds endpoint> -p 45734 classnavdev"`
+`alias stagingdb="PGPASSWORD='<classnav-dev pass>' psql -U classnav -W -h <rds endpoint> -p 45734 classnavdev"`
 
 #### Prod
 `alias proddb="PGPASSWORD='<classnav-prod pass>' psql -U classnav -W -h <rds endpoint -p 45734 classnav"`
