@@ -14,6 +14,5 @@ defmodule SkollerWeb.Api.V1.Student.StudentReferralsController do
     conn
     |> put_view(ReferredStudentsView)
     |> render("referred_students.json", referred_students: referred_students)
-    |> IO.inspect
   end
 end

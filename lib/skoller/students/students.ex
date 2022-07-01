@@ -14,6 +14,8 @@ defmodule Skoller.Students do
 
   import Ecto.Query
 
+  use Timex
+
   require Logger
 
   @doc """
@@ -243,23 +245,36 @@ defmodule Skoller.Students do
         result =
         subscriptions
         |> Enum.find(& &1.customer == customer_id)
-        |> Map.get(:plan, %{active: nil})
-        |> Map.get(:active, :not_available)
+        |> then(fn
+
+          nil ->
+            :inactive
+          customer ->
+
+          customer
+          |> Map.get(:plan)
+          |> Map.get(:active, :not_available)
+        end)
 
         [%{user: %{
           trial_start: user.trial_start,
-          trial_end: user.trial_end
+          trial_end: user.trial_end,
+          trial_status: getTrialStatus(user.trial_start, user.trial_end)
         },
         student: %{
-          first_name: student.name_first,
-          last_name: student.name_last
-        }, premium_active?: result} | acc]
+          name: "#{student.name_first} #{student.name_last}"
+        }, premium_active: result} | acc]
       end)
     end)
   end
 
-  #      join: sr in DB.SandataRequest,
- # on: sr.request_object_id == p.id and (sr.request_object_type == "patient" or sr.request_object_type == "staff"),
+  defp getTrialStatus(trial_start, trial_end) do
+    if Timex.between?(Date.utc_today, trial_start, trial_end) do
+      :active
+    else
+      :inactive
+    end
+  end
 
   defp raise_direct_subquery(primary_school_id) do
     from(s in Student)

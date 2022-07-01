@@ -20,7 +20,7 @@ defmodule Skoller.Mixfile do
   def application do
     [
       mod: {Skoller.Application, []},
-      extra_applications: [:logger, :runtime_tools, :elixir_xml_to_map],
+      extra_applications: [:logger, :runtime_tools, :elixir_xml_to_map, :timex],
     ]
   end
 
