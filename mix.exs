@@ -5,7 +5,7 @@ defmodule Skoller.Mixfile do
     [
       app: :skoller,
       version: "3.0.0",
-      elixir: "~> 1.13",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
