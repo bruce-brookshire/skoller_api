@@ -5,7 +5,7 @@ defmodule Skoller.Mixfile do
     [
       app: :skoller,
       version: "3.0.0",
-      elixir: "~> 1.11",
+      elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -20,7 +20,7 @@ defmodule Skoller.Mixfile do
   def application do
     [
       mod: {Skoller.Application, []},
-      extra_applications: [:logger, :runtime_tools, :elixir_xml_to_map],
+      extra_applications: [:logger, :runtime_tools, :elixir_xml_to_map, :timex],
     ]
   end
 
@@ -51,7 +51,7 @@ defmodule Skoller.Mixfile do
       {:ex_mvc, "~> 0.3.0", github: "flyrboy96/ex_mvc"},
       {:ex_twilio, "~> 0.7.0"},
       {:gettext, "~> 0.11"},
-      {:faker, "~> 0.16.0"},
+      {:faker, "~> 0.17.0"},
       {:guardian, "~> 2.1"},
       {:kadabra, "~> 0.4.4"},
       {:mail, "~> 0.2.0", git: "https://github.com/DockYard/elixir-mail.git", override: true},
