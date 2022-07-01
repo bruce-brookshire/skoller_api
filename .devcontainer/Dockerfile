@@ -6,8 +6,8 @@ ENV LANG C.UTF-8
 
 RUN wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb && sudo dpkg -i erlang-solutions_2.0_all.deb
 
-ENV ELIXIR_VERSION=1.12.2-1
-ENV ERLANG_VERSION=1:24.3.3-1
+ENV ELIXIR_VERSION=1.13.0-1
+ENV ERLANG_VERSION=1:25.0.2-1
 
 # ** [Optional] Uncomment this section to install additional packages. **
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
