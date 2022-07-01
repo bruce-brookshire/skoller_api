@@ -90,7 +90,7 @@ defmodule Skoller.Classes.ClassAnalytics do
 
   defp enrolled_through_link() do
     from(sc in StudentClass)
-    |> where([sc], not is_nil(sc.enrolled_by_id))
+    |> where([sc], not is_nil(sc.enrolled_by))
     |> group_by([sc], sc.class_id)
     |> select([sc], %{class_id: sc.class_id, count: count(sc.class_id)})
   end
