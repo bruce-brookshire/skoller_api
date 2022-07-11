@@ -13,4 +13,9 @@ defmodule SkollerWeb.Api.V1.StudentController do
     |> put_view(StudentView)
     |> render("show.json", link: student)
   end
+
+  def store_venmo_handle(conn, params) do
+    IO.inspect(params, label: "STORE VENMO")
+    conn
+  end
 end

@@ -298,6 +298,7 @@ defmodule SkollerWeb.Router do
         # Referral Route
 
         get "/referred-students", Student.StudentReferralsController, :referred_students
+        post "/store-venmo-handle", StudentController, :store_venmo_handle
       end
 
       # Assignment routes
