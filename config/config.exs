@@ -60,6 +60,28 @@ config :pigeon, :fcm,
 
 config :phoenix, :json_library, Poison
 
+config :oban, Oban,
+  repo: Skoller.Repo,
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 3600},
+    {Oban.Plugins.Cron,
+     crontab: [
+      #  {"@daily", Jobs.RefreshItems},
+      #  {"@reboot", Jobs.RefreshItems},
+      #  {"@daily", Jobs.Rewards.ConsumerConsumerReferralRewards},
+      #  {"@reboot", Jobs.Rewards.ConsumerConsumerReferralRewards},
+      #  {"@daily", Jobs.Rewards.ConsumerBusinessReferralRewards},
+      #  {"@reboot", Jobs.Rewards.ConsumerBusinessReferralRewards},
+      #  {"@daily", Jobs.TriggerBillingStatements},
+      #  {"@daily", Jobs.TriggerSijomeAccountStatements}
+     ]}
+  ],
+  queues: [
+    default: 5
+  ]
+
+
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

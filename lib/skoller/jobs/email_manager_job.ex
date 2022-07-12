@@ -4,6 +4,8 @@ defmodule Skoller.EmailManagerJob do
   # This needs to be run from a `Supervisor.Spec.worker/3` call.
   use GenServer
 
+  require Logger
+
   alias Skoller.EmailJobs.Jobs, as: EmailJobs
 
 
@@ -24,7 +26,7 @@ defmodule Skoller.EmailManagerJob do
   def handle_info(:work, state) do
     # Do the work you desire here
     schedule_work() # Reschedule once more
-    
+    Logger.info("Running Email Manager Job: " <> to_string(Time.utc_now))
     EmailJobs.run_jobs()
 
     {:noreply, state}
