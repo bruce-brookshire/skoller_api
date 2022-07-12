@@ -3,7 +3,7 @@
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
+import Config
 
 # General application configuration
 config :skoller,
@@ -27,7 +27,7 @@ config :arc,
   bucket: {:system, "AWS_S3_BUCKET"}
 
 # Configuration for simplified MVC+S module declarations
-config :ex_mvc, 
+config :ex_mvc,
   repo: Skoller.Repo,
   web_namespace: SkollerWeb
 
@@ -37,7 +37,7 @@ config :ex_aws,
   secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
 
 #this is for texting
-config :ex_twilio, 
+config :ex_twilio,
   account_sid: {:system, "TWILIO_ACCT_SID"},
   auth_token: {:system, "TWILIO_AUTH"}
 
@@ -62,4 +62,4 @@ config :phoenix, :json_library, Poison
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{config_env()}.exs"
