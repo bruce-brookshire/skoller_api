@@ -87,7 +87,8 @@ defmodule Skoller.Students.Student do
     :primary_organization_id,
     :todo_days_past,
     :todo_days_future,
-    :degree_type_id
+    :degree_type_id,
+    :venmo_handle
   ]
   @all_fields @req_fields ++ @opt_fields
 
