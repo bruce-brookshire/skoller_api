@@ -15,7 +15,7 @@ API Dependencies
 ## Running
 
 ### DevContainer Setup (optional - VSCode Only)
-DevContainer setups allow you to skip all of the ASDF versioning, NPM NVM mumbojumbo and get right into development.
+DevContainer setup allow you to skip all of the ASDF versioning, NPM NVM mumbojumbo and get right into development.
 
 Check the `.devcontainer/docker-compose.yml`file line 39 (ports) and line 21 (ports). If you have multiple devcontainers or docker instances using these ports, update them to unused ports
 Open the command palatte and select `rebuild in container`
