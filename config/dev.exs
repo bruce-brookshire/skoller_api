@@ -13,6 +13,13 @@ config :skoller, SkollerWeb.Endpoint,
   check_origin: false,
   watchers: []
 
+  config :cors_plug,
+  origin: ["*"],
+  max_age: 86_400,
+  allow_headers: ["accept", "content-type", "authorization"],
+  methods: ["GET", "DELETE", "PUT", "POST", "OPTIONS"],
+  send_preflight_response?: true
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

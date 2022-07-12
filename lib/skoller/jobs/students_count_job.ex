@@ -27,7 +27,7 @@ defmodule Skoller.StudentsCountJob do
     require Logger
     Logger.info("Running StudentsCount Job: " <> to_string(Time.utc_now))
 
-    Skoller.Classes.StudentsCount.update_all
+    # Skoller.Classes.StudentsCount.update_all
 
     {:noreply, state}
   end
