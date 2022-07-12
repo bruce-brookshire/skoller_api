@@ -19,10 +19,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     make \
     gcc \
     build-essential \
-    ruby \
-    imagemagick \
-    libreoffice 
-    
+    ruby
 
 ENV HTMLBEAUTIFIER_VERSION=1.3.1
 RUN gem install htmlbeautifier -v ${HTMLBEAUTIFIER_VERSION}
@@ -48,6 +45,3 @@ WORKDIR /app
 # # Install hex package manager
 RUN mix local.hex --force && \
     mix local.rebar --force
-
-COPY soffice_pdf.sh /usr/local/src/soffice_pdf
-COPY soffice_pdf.sh /usr/local/bin/soffice_pdf
