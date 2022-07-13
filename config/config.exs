@@ -60,24 +60,29 @@ config :pigeon, :fcm,
 
 config :phoenix, :json_library, Poison
 
+# Cron jobs
 config :oban, Oban,
   repo: Skoller.Repo,
   plugins: [
     {Oban.Plugins.Pruner, max_age: 3600},
     {Oban.Plugins.Cron,
      crontab: [
-      #  {"@daily", Jobs.RefreshItems},
-      #  {"@reboot", Jobs.RefreshItems},
-      #  {"@daily", Jobs.Rewards.ConsumerConsumerReferralRewards},
-      #  {"@reboot", Jobs.Rewards.ConsumerConsumerReferralRewards},
-      #  {"@daily", Jobs.Rewards.ConsumerBusinessReferralRewards},
-      #  {"@reboot", Jobs.Rewards.ConsumerBusinessReferralRewards},
-      #  {"@daily", Jobs.TriggerBillingStatements},
-      #  {"@daily", Jobs.TriggerSijomeAccountStatements}
+      {"@daily", Skoller.CronJobs.StudentsCountJob},
+      {"@reboot", Skoller.CronJobs.StudentsCountJob},
+      {"10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
+      {"* * * * *", Skoller.CronJobs.AssignmentCompletionJob},
+      {"10 * * * *", Skoller.CronJobs.ClassLocksJob},
+      {"5 * * * *", Skoller.CronJobs.ClassPeriodJob},
+      {"5 * * * *", Skoller.CronJobs.ClassSetupJob},
+      {"5 * * * *", Skoller.CronJobs.NoClassesJob},
+      {"10 * * * *", Skoller.CronJobs.EmailManagerJob},
+      {"5 * * * *", Skoller.CronJobs.AnalyticsJob},
+      {"10 * * * *", Skoller.CronJobs.TrialJob}
      ]}
   ],
   queues: [
-    default: 5
+    long_workers: 5,
+    short_workers: 10
   ]
 
 
