@@ -10,7 +10,7 @@ defmodule Skoller.Services.Authentication do
   Returns a boolean.
   """
   def check_password(password, hash) do
-    Comeonin.Bcrypt.checkpw(password, hash)
+    Bcrypt.verify_pass(password, hash)
   end
 
   @doc """
