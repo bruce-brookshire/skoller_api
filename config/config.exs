@@ -60,6 +60,33 @@ config :pigeon, :fcm,
 
 config :phoenix, :json_library, Poison
 
+# Cron jobs
+config :oban, Oban,
+  repo: Skoller.Repo,
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 3600},
+    {Oban.Plugins.Cron,
+     crontab: [
+      {"@daily", Skoller.CronJobs.StudentsCountJob},
+      {"@reboot", Skoller.CronJobs.StudentsCountJob},
+      {"10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
+      {"10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
+      {"10 * * * *", Skoller.CronJobs.ClassLocksJob},
+      {"5 * * * *", Skoller.CronJobs.ClassPeriodJob},
+      {"5 * * * *", Skoller.CronJobs.ClassSetupJob},
+      {"5 * * * *", Skoller.CronJobs.NoClassesJob},
+      {"10 * * * *", Skoller.CronJobs.EmailManagerJob},
+      {"5 * * * *", Skoller.CronJobs.AnalyticsJob},
+      {"10 * * * *", Skoller.CronJobs.TrialJob}
+     ]}
+  ],
+  queues: [
+    long_workers: 5,
+    short_workers: 10
+  ]
+
+
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

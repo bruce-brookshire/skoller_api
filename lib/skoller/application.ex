@@ -8,29 +8,14 @@ defmodule Skoller.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    import Supervisor.Spec
 
     # Define workers and child supervisors to be supervised
     children = [
-      # Start the Ecto repository
-      supervisor(Skoller.Repo, []),
-      # Start the endpoint when the application starts
-      supervisor(SkollerWeb.Endpoint, []),
+      Skoller.Repo,
+      {Oban, Application.fetch_env!(:oban, Oban)},
+      SkollerWeb.Endpoint,
       {Phoenix.PubSub, [name: Skoller.PubSub, adapter: Phoenix.PubSub.PG2]},
-      # Start your own worker by calling:
-      # Skoller.Worker.start_link(arg1, arg2, arg3)
-      # worker(Skoller.Worker, [arg1, arg2, arg3]),
-      worker(Skoller.AssignmentReminderJob, []),
-      # worker(Skoller.AssignmentCompletionJob, []),
-      worker(Skoller.ClassLocksJob, []),
-      worker(Skoller.ClassPeriodJob, []),
-      worker(Skoller.ClassSetupJob, []),
-      worker(Skoller.NoClassesJob, []),
-      worker(Skoller.EmailManagerJob, []),
-      worker(Skoller.AirtableSyncJob, []),
-      worker(Skoller.AnalyticsJob, []),
-      worker(Skoller.TrialJob, []),
-      worker(Skoller.StudentsCountJob, [])
+      %{id: AirtableSyncJob, start: {Skoller.AirtableSyncJob, :start_link, []}},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
