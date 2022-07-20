@@ -10,7 +10,6 @@ defmodule Skoller.Analytics.Jobs do
   @user_job_id 100
   @class_job_id 200
   @school_job_id 300
-  @student_job_id 400
 
   def run_analytics(job, curtime) do
     curtime
@@ -43,11 +42,6 @@ defmodule Skoller.Analytics.Jobs do
     end
   end
 
-  # Return the filename and directory for the job if available
-  defp get_context(@student_job_id) do
-    filename = "StudentsReferrals-" <> get_file_base()
-    {filename, }
-  end
 
   defp get_context(@school_job_id) do
     filename = "Schools-" <> get_file_base()

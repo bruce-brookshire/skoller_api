@@ -277,47 +277,6 @@ defmodule Skoller.Students do
     end
   end
 
-  def compile_referred_students_report() do
-    subscriptions = subscriptions()
-    inactive_users = inactive_users(subscriptions)
-    active_users = active_users(subscriptions)
-
-    from(referring_student in Skoller.Students.Student,
-      left_join: referring_user in Skoller.Users.User, on: referring_user.student_id == referring_student.id,
-      left_join: referred_students in Skoller.Students.Student, on: referred_students.enrolled_by_student_id == referring_student.id,
-      left_join: referred_user in Skoller.Users.User, on: referred_user.student_id == referred_students.id,
-      left_join: payment in Skoller.Payments.Stripe, on: referred_user.id == payment.user_id,
-      select: %{
-        referring_first_name: referring_student.name_first,
-        referring_last_name: referring_student.name_last,
-        referring_phone: referring_student.phone,
-        referring_email: referring_user.email,
-        trial: fragment("SUM(CASE WHEN ? AND ? = ANY(?) THEN 0 WHEN ? THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^active_users, referred_user.trial),
-        premium: fragment("SUM(CASE WHEN ? = ANY(?) THEN 1 ELSE 0 END)", payment.customer_id, ^active_users),
-        expired: fragment("SUM(CASE WHEN ? THEN 0 WHEN ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^inactive_users)
-      },
-      group_by: [referring_student.id, referring_user.id]
-    )
-    |> Skoller.Repo.all
-  end
-
-  defp subscriptions do
-    {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
-    subscriptions
-  end
-
-  defp inactive_users(subscriptions) do
-    subscriptions
-    |> Enum.reject(&(&1.status == "active"))
-    |> Enum.map(&(&1.customer))
-  end
-
-  defp active_users(subscriptions) do
-    subscriptions
-    |> Enum.reject(&(&1.status != "active"))
-    |> Enum.map(&(&1.customer))
-  end
-
   defp raise_direct_subquery(primary_school_id) do
     from(s in Student)
     |> join(:inner, [s], cs in Signup, on: cs.student_id == s.id)
