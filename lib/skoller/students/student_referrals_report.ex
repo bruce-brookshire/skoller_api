@@ -41,6 +41,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> add_headers()
     |> to_string()
     |> upload_document(file_path, scope)
+    |> IO.inspect
     |> store_document(scope)
   end
 
