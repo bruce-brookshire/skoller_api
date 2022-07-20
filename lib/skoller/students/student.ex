@@ -38,7 +38,6 @@ defmodule Skoller.Students.Student do
     field :bio, :string
     field :grad_year, :string
     field :enrollment_link, :string
-    # field :enrolled_by, :id
     field :primary_school_id, :id
     field :primary_period_id, :id
     field :primary_organization_id, :id

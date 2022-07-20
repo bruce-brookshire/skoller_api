@@ -11,6 +11,7 @@ defmodule Skoller.Students do
   alias Skoller.StudentPoints.StudentPoint
   alias Skoller.CustomSignups.Signup
   alias Skoller.Organizations.Organization
+  alias Skoller.Users.User
 
   import Ecto.Query
 
@@ -240,7 +241,7 @@ defmodule Skoller.Students do
     )
     |> Skoller.Repo.all()
     |> then(fn list ->
-      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "active"})
+      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
       Enum.reduce(list, [], fn %{user: user, student: student, customer_info: %{customer_id: customer_id}}, acc ->
         result =
         subscriptions
@@ -259,7 +260,7 @@ defmodule Skoller.Students do
         [%{user: %{
           trial_start: user.trial_start,
           trial_end: user.trial_end,
-          trial_status: getTrialStatus(user.trial_start, user.trial_end)
+          trial_status: get_trial_status(user.trial_start, user.trial_end)
         },
         student: %{
           name: "#{student.name_first} #{student.name_last}"
@@ -268,27 +269,53 @@ defmodule Skoller.Students do
     end)
   end
 
-  def compile_referred_students_report() do
-    from(student in Student,
-      join: user in Skoller.Users.User, on: user.student_id == student.id,
-      join: customer_info in Skoller.Payments.Stripe, on: customer_info.user_id == user.id,
-      join: enrolled_students in Student, on: enrolled_students.enrolled_by == student.id,
-      where: not is_nil(student.enrolled_by),
-      select: %{
-        user: user,
-        student: student,
-        customer_info: customer_info
-      }
-    )
-    |> Skoller.Repo.all()
-  end
-
-  defp getTrialStatus(trial_start, trial_end) do
+  defp get_trial_status(trial_start, trial_end) do
     if Timex.between?(Date.utc_today, trial_start, trial_end) do
       :active
     else
       :inactive
     end
+  end
+
+  def compile_referred_students_report() do
+    subscriptions = subscriptions()
+    inactive_users = inactive_users(subscriptions)
+    active_users = active_users(subscriptions)
+
+    from(referring_student in Skoller.Students.Student,
+      left_join: referring_user in Skoller.Users.User, on: referring_user.student_id == referring_student.id,
+      left_join: referred_students in Skoller.Students.Student, on: referred_students.enrolled_by_student_id == referring_student.id,
+      left_join: referred_user in Skoller.Users.User, on: referred_user.student_id == referred_students.id,
+      left_join: payment in Skoller.Payments.Stripe, on: referred_user.id == payment.user_id,
+      select: %{
+        referring_first_name: referring_student.name_first,
+        referring_last_name: referring_student.name_last,
+        referring_phone: referring_student.phone,
+        referring_email: referring_user.email,
+        trial: fragment("SUM(CASE WHEN ? AND ? = ANY(?) THEN 0 WHEN ? THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^active_users, referred_user.trial),
+        premium: fragment("SUM(CASE WHEN ? = ANY(?) THEN 1 ELSE 0 END)", payment.customer_id, ^active_users),
+        expired: fragment("SUM(CASE WHEN ? THEN 0 WHEN ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^inactive_users)
+      },
+      group_by: [referring_student.id, referring_user.id]
+    )
+    |> Skoller.Repo.all
+  end
+
+  defp subscriptions do
+    {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
+    subscriptions
+  end
+
+  defp inactive_users(subscriptions) do
+    subscriptions
+    |> Enum.reject(&(&1.status == "active"))
+    |> Enum.map(&(&1.customer))
+  end
+
+  defp active_users(subscriptions) do
+    subscriptions
+    |> Enum.reject(&(&1.status != "active"))
+    |> Enum.map(&(&1.customer))
   end
 
   defp raise_direct_subquery(primary_school_id) do

@@ -9,6 +9,7 @@ defmodule Skoller.CronJobs.StudentReferralsReportJob do
   @impl Oban.Worker
   def perform(_args) do
     Logger.info("Scheduling StudentReferralsReport Job: " <> to_string(Time.utc_now))
+    Skoller.
     Logger.info("StudentReferralsReport Job Complete: " <> to_string(Time.utc_now))
   end
 end
