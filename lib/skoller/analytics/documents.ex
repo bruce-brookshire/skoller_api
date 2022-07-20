@@ -48,6 +48,16 @@ defmodule Skoller.Analytics.Documents do
         |> Repo.insert
     end
 
+    def get_current_student_referrals_csv_path() do
+        csv = from(d in Document)
+            |> where([d], d.analytics_document_type_id == ^@student_fkey_id)
+            |> order_by([d], [desc: d.inserted_at])
+            |> limit(1)
+            |> Repo.one
+
+        csv.path
+    end
+
     def get_current_school_csv_path() do
         csv = from(d in Document)
             |> where([d], d.analytics_document_type_id == ^@school_fkey_id)
@@ -63,4 +73,5 @@ defmodule Skoller.Analytics.Documents do
           |> Document.changeset(%{path: path, analytics_document_type_id: @school_fkey_id})
           |> Repo.insert
     end
+
 end
