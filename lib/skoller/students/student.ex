@@ -38,7 +38,7 @@ defmodule Skoller.Students.Student do
     field :bio, :string
     field :grad_year, :string
     field :enrollment_link, :string
-    field :enrolled_by, :id
+    # field :enrolled_by, :id
     field :primary_school_id, :id
     field :primary_period_id, :id
     field :primary_organization_id, :id
@@ -54,7 +54,9 @@ defmodule Skoller.Students.Student do
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
     has_many :schools, through: [:classes, :school]
+    has_many :enrolled_students, Student, foreign_key: :enrolled_by_student_id
 
+    belongs_to :enrolled_by_student, Student
     belongs_to :primary_school, School, define_field: false
     belongs_to :primary_period, ClassPeriod, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false

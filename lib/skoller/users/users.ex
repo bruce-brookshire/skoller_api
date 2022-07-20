@@ -320,7 +320,7 @@ defmodule Skoller.Users do
 
       enrolled_by ->
         Ecto.Changeset.change(u_changeset, %{
-          student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.id)
+          student: Map.put(s_changeset.changes, :enrolled_by_student_id, enrolled_by.id)
         })
     end
   end
@@ -341,7 +341,7 @@ defmodule Skoller.Users do
 
       enrolled_by ->
         Ecto.Changeset.change(u_changeset, %{
-          student: Map.put(s_changeset.changes, :enrolled_by, enrolled_by.student.id)
+          student: Map.put(s_changeset.changes, :enrolled_by_student_id, enrolled_by.student.id)
         })
     end
   end
@@ -374,9 +374,9 @@ defmodule Skoller.Users do
   end
 
   # Adds student to custom link enrollment if the user referring the student is attached to an organization with a link.
-  defp custom_link_signup(%User{student: %Student{enrolled_by: enrolled_by} = student}, _params)
-       when not is_nil(enrolled_by) do
-    Organizations.attribute_signup_to_organization(student.id, enrolled_by)
+  defp custom_link_signup(%User{student: %Student{enrolled_by_student_id: enrolled_by_student_id} = student}, _params)
+       when not is_nil(enrolled_by_student_id) do
+    Organizations.attribute_signup_to_organization(student.id, enrolled_by_student_id)
   end
 
   defp custom_link_signup(_user, _params), do: {:ok, nil}

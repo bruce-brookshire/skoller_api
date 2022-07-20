@@ -10,6 +10,7 @@ defmodule Skoller.CronJobs.StudentsCountJob do
   def perform(_args) do
     Logger.info("Scheduling StudentsCount Job: " <> to_string(Time.utc_now))
     Skoller.Classes.StudentsCount.update_all
+    Logger.info("StudentsCount Job Complete: " <> to_string(Time.utc_now))
 
     :ok
   end

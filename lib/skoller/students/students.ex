@@ -231,7 +231,7 @@ defmodule Skoller.Students do
     from(student in Student,
       join: user in Skoller.Users.User, on: user.student_id == student.id,
       join: customers_info in Skoller.Payments.Stripe, on: customers_info.user_id == user.id,
-      where: student.enrolled_by == ^referring_student_id,
+      where: student.enrolled_by_student_id == ^referring_student_id,
       select: %{
         user: user,
         student: student,
@@ -266,6 +266,21 @@ defmodule Skoller.Students do
         }, premium_active: result} | acc]
       end)
     end)
+  end
+
+  def compile_referred_students_report() do
+    from(student in Student,
+      join: user in Skoller.Users.User, on: user.student_id == student.id,
+      join: customer_info in Skoller.Payments.Stripe, on: customer_info.user_id == user.id,
+      join: enrolled_students in Student, on: enrolled_students.enrolled_by == student.id,
+      where: not is_nil(student.enrolled_by),
+      select: %{
+        user: user,
+        student: student,
+        customer_info: customer_info
+      }
+    )
+    |> Skoller.Repo.all()
   end
 
   defp getTrialStatus(trial_start, trial_end) do
