@@ -68,6 +68,7 @@ config :oban, Oban,
     {Oban.Plugins.Cron,
      crontab: [
       {"@daily", Skoller.CronJobs.StudentsCountJob},
+      {"@monthly", Skoller.CronJobs.StudentReferralsReportJob},
       {"10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
       {"10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
       {"10 * * * *", Skoller.CronJobs.ClassLocksJob},

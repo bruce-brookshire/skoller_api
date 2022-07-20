@@ -11,6 +11,7 @@ defmodule Skoller.Students do
   alias Skoller.StudentPoints.StudentPoint
   alias Skoller.CustomSignups.Signup
   alias Skoller.Organizations.Organization
+  alias Skoller.Users.User
 
   import Ecto.Query
 
@@ -231,7 +232,7 @@ defmodule Skoller.Students do
     from(student in Student,
       join: user in Skoller.Users.User, on: user.student_id == student.id,
       join: customers_info in Skoller.Payments.Stripe, on: customers_info.user_id == user.id,
-      where: student.enrolled_by == ^referring_student_id,
+      where: student.enrolled_by_student_id == ^referring_student_id,
       select: %{
         user: user,
         student: student,
@@ -240,7 +241,7 @@ defmodule Skoller.Students do
     )
     |> Skoller.Repo.all()
     |> then(fn list ->
-      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "active"})
+      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
       Enum.reduce(list, [], fn %{user: user, student: student, customer_info: %{customer_id: customer_id}}, acc ->
         result =
         subscriptions
@@ -259,7 +260,7 @@ defmodule Skoller.Students do
         [%{user: %{
           trial_start: user.trial_start,
           trial_end: user.trial_end,
-          trial_status: getTrialStatus(user.trial_start, user.trial_end)
+          trial_status: get_trial_status(user.trial_start, user.trial_end)
         },
         student: %{
           name: "#{student.name_first} #{student.name_last}"
@@ -268,7 +269,7 @@ defmodule Skoller.Students do
     end)
   end
 
-  defp getTrialStatus(trial_start, trial_end) do
+  defp get_trial_status(trial_start, trial_end) do
     if Timex.between?(Date.utc_today, trial_start, trial_end) do
       :active
     else

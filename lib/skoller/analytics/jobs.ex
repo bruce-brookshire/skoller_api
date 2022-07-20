@@ -42,7 +42,7 @@ defmodule Skoller.Analytics.Jobs do
     end
   end
 
-  # Return the filename and directory for the job if available
+
   defp get_context(@school_job_id) do
     filename = "Schools-" <> get_file_base()
     {filename, "school_csv"}
@@ -67,9 +67,9 @@ defmodule Skoller.Analytics.Jobs do
   end
 
   # Retrieve analytics per the job_id
-  defp get_analytics(@school_job_id), do: SchoolAnalytics.get_analytics()
-  defp get_analytics(@class_job_id), do: ClassAnalytics.get_analytics()
-  defp get_analytics(@user_job_id), do: StudentAnalytics.get_analytics()
+  def get_analytics(@school_job_id), do: SchoolAnalytics.get_analytics()
+  def get_analytics(@class_job_id), do: ClassAnalytics.get_analytics()
+  def get_analytics(@user_job_id), do: StudentAnalytics.get_analytics()
 
   defp add_headers(list, @school_job_id) do
     [
