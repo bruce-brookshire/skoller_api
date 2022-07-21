@@ -111,12 +111,10 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   defp process_errors(conn, data)do
     case data do
       {:error, %Stripe.Error{code: _code, message: message}} ->
-        IO.inspect(data)
         conn
         |> put_status(200)
         |> json(%{error: :error, message: message})
       {:error, %{message: message}} ->
-        IO.inspect(data, label: "new case")
         conn
         |> put_status(200)
         |> json(%{error: :error, message: message})
