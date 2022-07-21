@@ -97,6 +97,14 @@ defmodule SkollerWeb.StudentView do
     }
   end
 
+  def render("venmo_handle.json", %{student: student}) do
+    %{student: student}
+  end
+
+  def render("venmo_handle.json", %{changeset: %Ecto.Changeset{} = changeset}) do
+    %{errors: changeset.errors}
+  end
+
   defp primary_organization_name(%{primary_organization: primary_organization})
        when not is_nil(primary_organization) do
     primary_organization.name

@@ -1,0 +1,50 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.163.1/containers/debian
+{
+  "name": "Elixir",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "phoenix",
+  "workspaceFolder": "/app",
+  "shutdownAction": "stopCompose",
+  // "postCreateCommand": "cd /app && mix deps.get && cd /app/apps/db && mix ecto.setup",
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "terminal.integrated.profiles.linux": {
+      "bash": {
+        "path": "bash",
+        "icon": "terminal-bash"
+      },
+      "zsh": {
+        "path": "zsh",
+        "args": [
+          "-c",
+          "source /app/.env && zsh"
+        ]
+      }
+    },
+    "terminal.integrated.defaultProfile.linux": "zsh"
+  },
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "ms-vsliveshare.vsliveshare",
+    "editorconfig.editorconfig",
+    "jakebecker.elixir-ls",
+    "royalmist.vscode-eex-format",
+    "hookyqr.beautify",
+    "phoenixframework.phoenix",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "bradlc.vscode-tailwindcss",
+    "emeraldwalk.runonsave"
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  // Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+  // "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+  // Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+  // "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+  // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "vscode",
+}

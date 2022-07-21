@@ -11,8 +11,11 @@ defmodule Skoller.Students do
   alias Skoller.StudentPoints.StudentPoint
   alias Skoller.CustomSignups.Signup
   alias Skoller.Organizations.Organization
+  alias Skoller.Users.User
 
   import Ecto.Query
+
+  use Timex
 
   require Logger
 
@@ -220,6 +223,58 @@ defmodule Skoller.Students do
       org_name: o.name
     })
     |> Repo.one()
+  end
+
+  @doc """
+    Retrieve list of students referred by another students
+  """
+  def get_referred_students_by_student_id(referring_student_id) do
+    from(student in Student,
+      join: user in Skoller.Users.User, on: user.student_id == student.id,
+      join: customers_info in Skoller.Payments.Stripe, on: customers_info.user_id == user.id,
+      where: student.enrolled_by_student_id == ^referring_student_id,
+      select: %{
+        user: user,
+        student: student,
+        customer_info: customers_info
+      }
+    )
+    |> Skoller.Repo.all()
+    |> then(fn list ->
+      {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
+      Enum.reduce(list, [], fn %{user: user, student: student, customer_info: %{customer_id: customer_id}}, acc ->
+        result =
+        subscriptions
+        |> Enum.find(& &1.customer == customer_id)
+        |> then(fn
+
+          nil ->
+            :inactive
+          customer ->
+
+          customer
+          |> Map.get(:plan)
+          |> Map.get(:active, :not_available)
+        end)
+
+        [%{user: %{
+          trial_start: user.trial_start,
+          trial_end: user.trial_end,
+          trial_status: get_trial_status(user.trial_start, user.trial_end)
+        },
+        student: %{
+          name: "#{student.name_first} #{student.name_last}"
+        }, premium_active: result} | acc]
+      end)
+    end)
+  end
+
+  defp get_trial_status(trial_start, trial_end) do
+    if Timex.between?(Date.utc_today, trial_start, trial_end) do
+      :active
+    else
+      :inactive
+    end
   end
 
   defp raise_direct_subquery(primary_school_id) do

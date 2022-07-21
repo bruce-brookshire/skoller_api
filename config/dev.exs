@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -12,6 +12,13 @@ config :skoller, SkollerWeb.Endpoint,
   code_reloader: true,
   check_origin: false,
   watchers: []
+
+  config :cors_plug,
+  origin: ["*"],
+  max_age: 86_400,
+  allow_headers: ["accept", "content-type", "authorization"],
+  methods: ["GET", "DELETE", "PUT", "POST", "OPTIONS"],
+  send_preflight_response?: true
 
 # ## SSL Support
 #
@@ -41,7 +48,7 @@ config :skoller, Skoller.Repo,
   username: "postgres",
   password: "postgres",
   database: "skoller_dev",
-  hostname: "localhost",
+  hostname: "postgres",
   pool_size: 10,
   timeout: 200_000
 

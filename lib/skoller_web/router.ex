@@ -294,6 +294,11 @@ defmodule SkollerWeb.Router do
         get "/signup-organization", Student.EnrolledByController, :signup_organization
 
         get "/student-org-invitations", Organization.StudentOrgInvitationController, :student_invites
+
+        # Referral Route
+
+        get "/referred-students", Student.StudentReferralsController, :referred_students
+        post "/store-venmo-handle", StudentController, :store_venmo_handle
       end
 
       # Assignment routes

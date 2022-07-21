@@ -26,7 +26,7 @@ defmodule SkollerWeb.Endpoint do
 
   plug SkollerWeb.Plugs.SNSHeader
 
-  
+
 
   plug Plug.Parsers,
   parsers: [:urlencoded, :multipart, :json, {:xml, length: 100_000_000}],

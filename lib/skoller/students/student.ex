@@ -38,13 +38,13 @@ defmodule Skoller.Students.Student do
     field :bio, :string
     field :grad_year, :string
     field :enrollment_link, :string
-    field :enrolled_by, :id
     field :primary_school_id, :id
     field :primary_period_id, :id
     field :primary_organization_id, :id
     field :todo_days_past, :integer
     field :todo_days_future, :integer
     field :degree_type_id, :id
+    field :venmo_handle, :string
 
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
@@ -53,7 +53,9 @@ defmodule Skoller.Students.Student do
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
     has_many :schools, through: [:classes, :school]
+    has_many :enrolled_students, Student, foreign_key: :enrolled_by_student_id
 
+    belongs_to :enrolled_by_student, Student
     belongs_to :primary_school, School, define_field: false
     belongs_to :primary_period, ClassPeriod, define_field: false
     belongs_to :degree_type, DegreeType, define_field: false
@@ -86,7 +88,8 @@ defmodule Skoller.Students.Student do
     :primary_organization_id,
     :todo_days_past,
     :todo_days_future,
-    :degree_type_id
+    :degree_type_id,
+    :venmo_handle
   ]
   @all_fields @req_fields ++ @opt_fields
 

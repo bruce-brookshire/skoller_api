@@ -8,8 +8,8 @@ defmodule Skoller.Organizations.OrgStudents.OrgStudent do
 
   schema "org_students" do
     field(:intensity_score, :map, virtual: true)
-    field(:assignments, {:array, StudentAssignment}, virtual: true)
-    field(:classes, {:array, StudentClass}, virtual: true)
+    field(:assignments, {:array, :map}, virtual: true)
+    field(:classes, {:array, :map}, virtual: true)
 
     belongs_to :student, Student
     belongs_to :organization, Organization
