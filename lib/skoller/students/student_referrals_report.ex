@@ -111,7 +111,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     result
   end
 
-  defp store_document({:ok, inserted}, %{:dir => student_referrals_csv} = scope) do
+  defp store_document({:ok, inserted}, %{:dir => "student_referrals_csv"} = scope) do
     Logger.info("Student Referrals Report stored successfully")
     path = AnalyticsDocs.url({inserted, scope})
     Documents.set_current_student_referrals_csv_path(path)
