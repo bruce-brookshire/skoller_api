@@ -51,7 +51,7 @@ config :pigeon, :apns,
 
 config :stripity_stripe,
        hackney_opts: [{:connect_timeout, 1_000_000}, {:recv_timeout, 5_000_000}],
-       api_key: "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"
+       api_key: System.get_env("STRIPE_API_TEST_SK")
 
 config :pigeon, :fcm,
   fcm_default: %{
