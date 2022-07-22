@@ -1,7 +1,6 @@
 defmodule Skoller.Organizations.StudentOrgInvitations.StudentOrgInvitation do
   use Ecto.Schema
 
-  alias Skoller.Classes.Class
   alias Skoller.Students.Student
   alias Skoller.Organizations.Organization
 

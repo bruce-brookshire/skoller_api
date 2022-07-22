@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   alias Skoller.Users.{Trial, Subscription}
 
   def list_user_subscriptions(conn, _params)do
-    with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
+    with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
                                                            |> Map.fetch(:user),
          %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
          {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id, status: "all"}) do
@@ -19,11 +19,12 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-  def list_all_subscriptions(conn, _params)do
-    with{:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"}) do
-      render(conn, "index.json", %{subscriptions: subscriptions})
-    else
-      data -> process_errors(conn, data)
+  def list_all_subscriptions(conn, _params) do
+    case Stripe.Subscription.list(%{status: "all"}) do
+      {:ok, %Stripe.List{data: subscriptions}} ->
+        render(conn, "index.json", %{subscriptions: subscriptions})
+      _ ->
+        process_errors(conn, %{message: "Unable to get subscriptions."})
     end
   end
 
@@ -55,7 +56,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
 
   def update_apple_pay_subscription(conn, params) do
     case Subscription.update(conn, params) do
-      {:ok, data} ->
+      {:ok, _data} ->
         json(conn, %{status: :ok, message: "Your subscription was updated successful"})
       {:error, data} ->
         process_errors(conn, data)
@@ -63,7 +64,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def list_upcoming_payments(conn, _params)do
-    with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
+    with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
                                                            |> Map.fetch(:user),
          %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
          {:ok, invoice} <- Stripe.Invoice.upcoming(%{customer: customer_id})do
@@ -75,7 +76,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def list_billing_history(conn, _params)do
-    with {:ok, %Skoller.Users.User{id: user_id} = user} <- conn.assigns
+    with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
                                                            |> Map.fetch(:user),
          %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
          {:ok, invoice} <- Stripe.Invoice.upcoming(%{customer: customer_id}) do

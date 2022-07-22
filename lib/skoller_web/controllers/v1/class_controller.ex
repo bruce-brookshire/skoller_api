@@ -80,26 +80,25 @@ defmodule SkollerWeb.Api.V1.ClassController do
     |> render("index.json", classes: classes)
   end
 
-  @doc """
-   Shows all classes. Can be used as a search with multiple filters.
 
-   ## Filters:
-  * school
-    * school id
-  * professor_name
-    * professor name
-  * class_status
-    * class status id
-    * For ghost classes, use 0.
-  * class_name
-  * class_number
-  * class_meet_days
+  #  Shows all classes. Can be used as a search with multiple filters.
 
-  ## Returns:
-  * 422 `SkollerWeb.ChangesetView`
-  * 401
-  * 200 `SkollerWeb.Class.SearchView`
-  """
+  #  ## Filters:
+  # * school
+  #   * school id
+  # * professor_name
+  #   * professor name
+  # * class_status
+  #   * class status id
+  #   * For ghost classes, use 0.
+  # * class_name
+  # * class_number
+  # * class_meet_days
+
+  # ## Returns:
+  # * 422 `SkollerWeb.ChangesetView`
+  # * 401
+  # * 200 `SkollerWeb.Class.SearchView`
   def index(conn, params) do
     classes = EnrolledClasses.get_classes_with_enrollment(params)
 

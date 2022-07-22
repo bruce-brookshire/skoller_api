@@ -36,10 +36,10 @@ defmodule Skoller.Users.Subscription do
         }
         |> Map.merge(
           case {token, payment_method_id} do
-            {token, nil} ->
+            {_token, nil} ->
               %{card_info: %{card_id: card.id}}
 
-            {nil, payment_method_id} ->
+            {nil, _payment_method_id} ->
               %{
                 billing_details: stripe_payment_method.billing_details,
                 card_info: stripe_payment_method.card
@@ -56,7 +56,7 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  def update(conn, %{"payment" => payment_method}) do
+  def update(conn, %{"payment" => _payment_method}) do
     with {:ok, %User{} = user} <- conn.assigns |> Map.fetch(:user) do
       set_lifetime_subscription(user)
       Trial.expire(user)
@@ -68,7 +68,7 @@ defmodule Skoller.Users.Subscription do
 
   def update(conn, %{"customer_id" => customer_id}) do
     with {:ok, %User{} = user} <- conn.assigns |> Map.fetch(:user),
-         {:ok, payments} <-
+         {:ok, _payments} <-
            create_or_update_card_info(%{
              user_id: user.id,
              customer_id: customer_id,
@@ -104,11 +104,11 @@ defmodule Skoller.Users.Subscription do
         items: [%{plan: plan_id}],
         payment_behavior: "allow_incomplete"
       }) do
-        {:ok, subscription} ->
-          {:ok, subscription}
         {:ok, %{status: "incomplete"}} ->
           Stripe.Customer.delete(customer_stripe_id)
           {:error, %{message: "Unable to complete payment. Please contact support."}}
+        {:ok, subscription} ->
+          {:ok, subscription}
         {:error, %Stripe.Error{} = error} -> {:ok, error}
       end
     else
@@ -182,9 +182,7 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  @doc """
-    Set user's lifetime_subscription to true.
-  """
+  # Set user's lifetime_subscription to true.
   defp set_lifetime_subscription(%User{} = user) do
     from(u in User,
       where: u.id == ^user.id,

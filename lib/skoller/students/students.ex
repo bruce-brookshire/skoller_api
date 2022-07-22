@@ -11,7 +11,6 @@ defmodule Skoller.Students do
   alias Skoller.StudentPoints.StudentPoint
   alias Skoller.CustomSignups.Signup
   alias Skoller.Organizations.Organization
-  alias Skoller.Users.User
 
   import Ecto.Query
 
@@ -230,7 +229,6 @@ defmodule Skoller.Students do
   """
   def get_referred_students_by_student_id(referring_student_id) do
     subscriptions = subscriptions()
-    inactive_users = inactive_users(subscriptions)
     active_users = active_users(subscriptions)
 
     from(student in Student,
@@ -263,12 +261,6 @@ defmodule Skoller.Students do
   defp subscriptions do
     {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
     subscriptions
-  end
-
-  defp inactive_users(subscriptions) do
-    subscriptions
-    |> Enum.reject(&(&1.status == "active"))
-    |> Enum.map(&(&1.customer))
   end
 
   defp active_users(subscriptions) do

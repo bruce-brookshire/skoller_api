@@ -22,19 +22,20 @@ defmodule Skoller.Students.StudentReferralsReport do
       left_join: referred_students in Skoller.Students.Student, on: referred_students.enrolled_by_student_id == referring_student.id,
       left_join: referred_user in Skoller.Users.User, on: referred_user.student_id == referred_students.id,
       left_join: payment in Skoller.Payments.Stripe, on: referred_user.id == payment.user_id,
+      preload: [enrolled_students: [user: :customer_info]],
+      where: not is_nil(referred_user),
       select: %{
-        referring_first_name: referring_student.name_first,
-        referring_last_name: referring_student.name_last,
-        referring_phone: referring_student.phone,
-        referring_email: referring_user.email,
+        referring_student: referring_student,
+        referring_user: referring_user,
         venmo_handle: referring_student.venmo_handle,
-        trial: fragment("SUM(CASE WHEN ? AND ? = ANY(?) THEN 0 WHEN ? THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^active_users, referred_user.trial),
-        premium: fragment("SUM(CASE WHEN ? = ANY(?) THEN 1 ELSE 0 END)", payment.customer_id, ^active_users),
-        expired: fragment("SUM(CASE WHEN ? THEN 0 WHEN ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^inactive_users)
+        trial: fragment("SUM(CASE WHEN ? AND ? BETWEEN ? AND ? THEN 1 ELSE 0 END)", referred_user.trial, ^DateTime.utc_now, referred_user.trial_start, referred_user.trial_end),
+        premium: fragment("SUM(CASE WHEN ? = ANY(?) AND ? = false THEN 1 ELSE 0 END)", payment.customer_id, ^active_users, referred_user.trial),
+        expired: fragment("SUM(CASE WHEN ? = false AND ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^inactive_users)
       },
       group_by: [referring_student.id, referring_user.id]
     )
     |> Skoller.Repo.all
+    |> gather_collections_and_commissions(subscriptions)
     |> parse_to_list()
     |> CSV.encode()
     |> Enum.to_list()
@@ -61,19 +62,70 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> Enum.map(&(&1.customer))
   end
 
+  defp gather_collections_and_commissions(query_results, subscriptions) do
+    Enum.reduce(query_results, [], fn result, acc ->
+      [
+        result
+        |> Map.put(:collections, get_collections(result.referring_student, subscriptions))
+
+        | acc
+      ]
+    end)
+  end
+
+  defp get_collections(referring_student, subscriptions) do
+    Map.get(referring_student, :enrolled_students, nil)
+    |> then(fn enrolled_students ->
+      if !is_nil(enrolled_students) do
+        collection =
+        Enum.reduce(enrolled_students, 0, fn enrolled_student, acc ->
+          if !is_nil(enrolled_student.user.customer_info) do
+            subscription = Enum.find(subscriptions, nil, & &1.customer == enrolled_student.user.customer_info.customer_id)
+            calculate_collection(subscription)
+          else
+            0.0
+          end + acc
+        end)
+
+        commission =
+          Enum.reduce(enrolled_students, 0, fn enrolled_student, acc ->
+            if !is_nil(enrolled_student.user.customer_info) do
+              subscription = Enum.find(subscriptions, nil, & &1.customer == enrolled_student.user.customer_info.customer_id)
+              calculate_commission(subscription)
+            else
+              0.0
+            end + acc
+          end)
+
+          %{
+            collection: collection |> :erlang.float_to_binary([decimals: 2]),
+            commission: commission |> :erlang.float_to_binary([decimals: 2])
+          }
+      end
+    end)
+  end
+
+  defp calculate_collection(%{plan: %{amount: amount}}) when amount > 0, do: amount / 100
+  defp calculate_collection(%{plan: %{amount: 0}}), do: 0
+  defp calculate_collection(nil), do: 0
+
+  defp calculate_commission(%{plan: %{amount: amount}}) when amount > 0, do: (amount / 100) * (1.0 / 3.0)
+  defp calculate_commission(%{plan: %{amount: 0}}), do: 0
+  defp calculate_commission(nil), do: 0
+
   defp parse_to_list(data) do
     Enum.reduce(data, [],  fn data, acc ->
       [
         [
-          data.referring_first_name,
-          data.referring_last_name,
-          data.referring_email,
-          data.referring_phone,
+          data.referring_student.name_first,
+          data.referring_student.name_last,
+          data.referring_user.email,
+          data.referring_student.phone,
           data.trial,
           data.expired,
           data.premium,
-          0, # collections
-          0, # commission
+          data.collections.collection,
+          data.collections.commission,
           data.venmo_handle
         ]
         | acc
@@ -116,7 +168,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     Documents.set_current_student_referrals_csv_path(path, %{status: "success"})
   end
 
-  defp store_document({:error, error}, %{:dir => "student_referrals_csv"} = scope) do
+  defp store_document({:error, error}, %{:dir => "student_referrals_csv"}) do
     Logger.info("Failed to store Student Referrals Report")
     Documents.set_current_student_referrals_csv_path(nil, %{status: Atom.to_string(error)})
   end

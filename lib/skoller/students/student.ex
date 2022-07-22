@@ -49,11 +49,12 @@ defmodule Skoller.Students.Student do
     many_to_many :fields_of_study, FieldOfStudy, join_through: "student_fields_of_study"
     many_to_many :classes, Class, join_through: "student_classes"
 
-    has_many :users, User
     has_many :student_classes, StudentClass
     has_many :student_assignments, through: [:student_classes, :student_assignments]
     has_many :schools, through: [:classes, :school]
     has_many :enrolled_students, Student, foreign_key: :enrolled_by_student_id
+
+    has_one :user, User
 
     belongs_to :enrolled_by_student, Student
     belongs_to :primary_school, School, define_field: false

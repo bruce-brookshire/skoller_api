@@ -1,7 +1,6 @@
 defmodule SkollerWeb.Organization.OrgOwnerView do
-  alias SkollerWeb.Organization.OrgOwnerView
   alias Skoller.Organizations.OrgOwners.OrgOwner
-  
+
 
   use ExMvc.View, model: OrgOwner
 
