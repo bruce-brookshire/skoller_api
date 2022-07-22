@@ -109,7 +109,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     File.write(file_path, content)
     result = AnalyticsDocs.store({file_path, scope})
     |> IO.inspect(label: "RESULT")
-    File.rm(file_path)
+    #File.rm(file_path)
     result
   end
 
