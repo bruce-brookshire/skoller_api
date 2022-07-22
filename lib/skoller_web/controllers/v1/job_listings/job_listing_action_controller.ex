@@ -30,7 +30,7 @@ defmodule SkollerWeb.Api.V1.SkollerJobs.JobListingActionController do
     send_resp(conn, status, message)
   end
 
-  def create(conn, params) do
+  def create(conn, _params) do
     send_resp(conn, 422, "Invalid Action or sender reference missing")
   end
 end

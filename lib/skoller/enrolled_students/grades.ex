@@ -30,7 +30,7 @@ defmodule Skoller.EnrolledStudents.Grades do
   defp check_class_completion({:ok, student_class}) do
     complete = Decimal.new(1)
     student_class = student_class |> Map.put(:completion, StudentAssignments.get_class_completion(student_class))
-    case Decimal.cmp(complete, Decimal.round(student_class.completion, 5)) do
+    case Decimal.compare(complete, Decimal.round(student_class.completion, 5)) do
       :eq -> {:error, "Class is already complete."}
       _ -> {:ok, student_class}
     end

@@ -8,7 +8,7 @@ defmodule SkollerWeb.Api.V1.Organization.OrgGroupStudent.ClassesController do
   alias Skoller.Mods.Assignments
   alias Skoller.Organizations.OrgGroupStudents
 
-  def index(conn, %{"org_group_student_id" => org_student_id} = params) do
+  def index(conn, %{"org_group_student_id" => org_student_id}) do
     %{student: %{id: student_id}} = OrgGroupStudents.get_by_id(org_student_id)
 
     student_classes =
