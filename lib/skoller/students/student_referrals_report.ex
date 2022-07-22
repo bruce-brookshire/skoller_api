@@ -41,7 +41,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> add_headers()
     |> to_string()
     |> upload_document(file_path, scope)
-    |> IO.inspect
+    |> IO.inspect(label: "POST UPLOAD DOCUMENT")
     |> store_document(scope)
   end
 
@@ -105,8 +105,10 @@ defmodule Skoller.Students.StudentReferralsReport do
   end
 
   defp upload_document(content, file_path, scope) do
+    IO.inspect(file_path, label: "FILE PATH")
     File.write(file_path, content)
     result = AnalyticsDocs.store({file_path, scope})
+    |> IO.inspect(label: "RESULT")
     File.rm(file_path)
     result
   end
@@ -115,5 +117,9 @@ defmodule Skoller.Students.StudentReferralsReport do
     Logger.info("Student Referrals Report stored successfully")
     path = AnalyticsDocs.url({inserted, scope})
     Documents.set_current_student_referrals_csv_path(path)
+  end
+
+  defp store_document({:error, :invalid_file_path}, %{:dir => "student_referrals_csv"} = scope) do
+    IO.inspect(scope, label: "SCOPE")
   end
 end
