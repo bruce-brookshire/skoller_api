@@ -38,11 +38,9 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> parse_to_list()
     |> CSV.encode()
     |> Enum.to_list()
-    |> IO.inspect
     |> add_headers()
     |> to_string()
     |> upload_document(file_path, scope)
-    |> IO.inspect(label: "POST UPLOAD DOCUMENT")
     |> store_document(scope)
   end
 
@@ -106,22 +104,20 @@ defmodule Skoller.Students.StudentReferralsReport do
   end
 
   defp upload_document(content, file_path, scope) do
-    IO.inspect(file_path, label: "FILE PATH")
     File.write(file_path, content)
-    |> IO.inspect(label: "AFTRER FILE WRITE")
     result = AnalyticsDocs.store({file_path, scope})
-    |> IO.inspect(label: "RESULT")
-    #File.rm(file_path)
+    File.rm(file_path)
     result
   end
 
   defp store_document({:ok, inserted}, %{:dir => "student_referrals_csv"} = scope) do
     Logger.info("Student Referrals Report stored successfully")
     path = AnalyticsDocs.url({inserted, scope})
-    Documents.set_current_student_referrals_csv_path(path)
+    Documents.set_current_student_referrals_csv_path(path, %{status: "success"})
   end
 
-  defp store_document({:error, :invalid_file_path}, %{:dir => "student_referrals_csv"} = scope) do
-    IO.inspect(scope, label: "SCOPE")
+  defp store_document({:error, error}, %{:dir => "student_referrals_csv"} = scope) do
+    Logger.info("Failed to store Student Referrals Report")
+    Documents.set_current_student_referrals_csv_path(nil, %{status: Atom.to_string(error)})
   end
 end

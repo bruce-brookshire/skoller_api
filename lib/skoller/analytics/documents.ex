@@ -42,9 +42,9 @@ defmodule Skoller.Analytics.Documents do
           |> Repo.insert
     end
 
-    def set_current_student_referrals_csv_path(path) do
+    def set_current_student_referrals_csv_path(path, %{status: status}) do
         %Document{}
-        |> Document.changeset(%{path: path, analytics_document_type_id: @student_fkey_id})
+        |> Document.changeset(%{path: path, analytics_document_type_id: @student_fkey_id, status: status})
         |> Repo.insert
     end
 
