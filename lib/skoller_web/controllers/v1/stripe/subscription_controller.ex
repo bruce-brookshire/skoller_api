@@ -47,7 +47,6 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   def create_subscription(conn, params) do
     case Subscription.create(conn, params) do
       {:ok, data} ->
-        IO.inspect(data)
         json(conn, %{status: :ok, message: "Your subscription was successful", user: data.user, subscription: data.subscription})
       {:error, data} ->
         process_errors(conn, data)
