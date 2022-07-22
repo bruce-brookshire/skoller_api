@@ -38,6 +38,7 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> parse_to_list()
     |> CSV.encode()
     |> Enum.to_list()
+    |> IO.inspect
     |> add_headers()
     |> to_string()
     |> upload_document(file_path, scope)
@@ -107,6 +108,7 @@ defmodule Skoller.Students.StudentReferralsReport do
   defp upload_document(content, file_path, scope) do
     IO.inspect(file_path, label: "FILE PATH")
     File.write(file_path, content)
+    |> IO.inspect(label: "AFTRER FILE WRITE")
     result = AnalyticsDocs.store({file_path, scope})
     |> IO.inspect(label: "RESULT")
     #File.rm(file_path)
