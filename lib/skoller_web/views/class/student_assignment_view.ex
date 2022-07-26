@@ -34,7 +34,6 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
       class_name: student_assignment.student_class.class.name
     })
     |> Map.merge(get_pending_mods(student_assignment))
-    |> IO.inspect
   end
 
   def render("student_assignment-short.json", %{student_assignment: student_assignment}) do
