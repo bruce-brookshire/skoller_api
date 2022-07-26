@@ -94,7 +94,6 @@ defmodule Skoller.StudentAssignments.StudentClasses do
     enumerable
     |> date_filter(params)
     |> completed_filter(params)
-    |> Enum.map(& Repo.preload(&1, [student_class: :class]))
   end
 
   defp date_filter(enumerable, %{"date" => date}) do
