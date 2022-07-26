@@ -1,7 +1,6 @@
 defmodule Skoller.Payments.Stripe do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Skoller.Users.User
 
   schema "customers_info" do
     field :customer_id, :string

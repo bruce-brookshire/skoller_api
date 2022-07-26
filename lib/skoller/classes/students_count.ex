@@ -65,26 +65,22 @@ defmodule Skoller.Classes.StudentsCount do
     |> Repo.stream()
   end
 
-  @doc """
-    Load subscriptions from stripe
-  """
+  # Load subscriptions from stripe
   defp subscriptions do
     {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
     subscriptions
   end
 
-  @doc """
-    Filter active customers from subscriptions
-  """
+
+  # Filter active customers from subscriptions
   defp active_customers(subscriptions) do
     subscriptions
     |> Enum.reject(&(&1.status != "active"))
     |> Enum.map(&(&1.customer))
   end
 
-  @doc """
-    Filter inactive customers from subscriptions
-  """
+
+  # Filter inactive customers from subscriptions
   defp inactive_customers(subscriptions) do
     subscriptions
     |> Enum.reject(&(&1.status == "active"))

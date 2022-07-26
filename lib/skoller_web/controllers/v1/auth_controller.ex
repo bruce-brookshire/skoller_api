@@ -44,7 +44,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
       when verification_code == code ->
         if DateTime.diff(DateTime.utc_now(), last_attempt, :seconds) <= 300 do
           user = Users.get_user_by_student_id(student.id)
-          subscriptions = Task.async(fn  -> get_subscription_list(user.id) end)
+          Task.async(fn  -> get_subscription_list(user.id) end)
           user
           |> Users.update_user(%{last_login: DateTime.utc_now()})
 
