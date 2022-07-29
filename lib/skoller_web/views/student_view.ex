@@ -24,7 +24,7 @@ defmodule SkollerWeb.StudentView do
   end
 
   def render("link.json", %{student: student}) do
-    student = student |> Repo.preload([:users])
+    student = student |> Repo.preload([:user])
 
     %{
       student_id: student.id,
@@ -84,7 +84,7 @@ defmodule SkollerWeb.StudentView do
   end
 
   def render("student-short.json", %{student: student}) do
-    student = student |> Repo.preload(:users)
+    student = student |> Repo.preload(:user)
 
     %{
       id: student.id,
@@ -93,7 +93,7 @@ defmodule SkollerWeb.StudentView do
       organization: student.organization,
       bio: student.bio,
       points: Skoller.StudentPoints.get_points_by_student_id(student.id),
-      user: render_one(student.users |> List.first(), UserView, "user.json")
+      user: render_one(student.user, UserView, "user.json")
     }
   end
 

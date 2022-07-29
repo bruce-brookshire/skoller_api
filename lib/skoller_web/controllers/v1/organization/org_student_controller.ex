@@ -12,8 +12,8 @@ defmodule SkollerWeb.Api.V1.Organization.OrgStudentController do
   def upload_avatar(conn, %{"file" => file, "org_student_id" => org_student_id}) do
     scope = %{"id" => UUID.generate()}
 
-    with %{users: users} <- OrgStudents.get_by_id(org_student_id),
-         %Users.User{} = user_old <- List.first(users),
+    with %{user: user} <- OrgStudents.get_by_id(org_student_id),
+         %Users.User{} = user_old <- user,
          {:ok, inserted} <- ProfilePics.store({file, scope}),
          location <- ProfilePics.url({inserted, scope}, :thumb),
          {:ok, %{user: _user}} <-

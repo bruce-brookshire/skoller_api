@@ -16,7 +16,7 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
   end
 
   def render("student_assignment.json", %{student_assignment: student_assignment}) do
-    student_assignment = student_assignment |> Repo.preload([:assignment, :student_class])
+    student_assignment = student_assignment |> Repo.preload([:assignment, [student_class: :class]])
 
     student_assignment
     |> render_one(AssignmentView, "assignment.json")
@@ -30,7 +30,8 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
       is_reminder_notifications: student_assignment.is_reminder_notifications,
       is_post_notifications: student_assignment.is_post_notifications,
       notes: student_assignment.notes,
-      is_read: student_assignment.is_read
+      is_read: student_assignment.is_read,
+      class_name: student_assignment.student_class.class.name
     })
     |> Map.merge(get_pending_mods(student_assignment))
   end
@@ -69,4 +70,3 @@ defmodule SkollerWeb.Class.StudentAssignmentView do
   defp is_completed(nil), do: false
   defp is_completed(val), do: val
 end
-  
