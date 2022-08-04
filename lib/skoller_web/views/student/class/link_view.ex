@@ -15,7 +15,7 @@ defmodule SkollerWeb.Student.Class.LinkView do
     %{
       student_name_first: student.name_first,
       student_name_last: student.name_last,
-      student_image_path: (student.users |> List.first()).pic_path,
+      student_image_path: student.user.pic_path,
       student_class: render_one(student_class, ClassView, "show.json")
     }
   end
