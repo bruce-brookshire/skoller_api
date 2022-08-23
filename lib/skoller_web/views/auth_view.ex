@@ -18,9 +18,10 @@ defmodule SkollerWeb.AuthView do
       |> Map.put(:token, token)
       |> Map.put(:user, user)
 
+
     render_one(auth, AuthView, "auth.json")
   end
-  
+
   def render("show.json", %{token: token, user: user}) do
     auth = Map.new()
     |> Map.put(:token, token)
@@ -30,7 +31,7 @@ defmodule SkollerWeb.AuthView do
 
   def render("auth.json", %{auth: %{token: token} = auth}) do
     %{token: token}
-    |> Map.merge(%{
+  |> Map.merge(%{
       subscriptions: (render_many(auth.subscriptions, SubscriptionView, "subscription.json", as: :subscription)),
       user: render_one(auth.user, UserView, "user_detail.json")
     })
@@ -38,7 +39,8 @@ defmodule SkollerWeb.AuthView do
 
   def render("auth.json", %{auth: auth}) do
     %{
-      user: render_one(auth, UserView, "user_detail.json")
+      user: render_one(auth, UserView, "user_detail.json"),
+      subscriptions: render_many(auth.subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
     }
   end
 end
