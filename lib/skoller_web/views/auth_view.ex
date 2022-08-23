@@ -41,7 +41,8 @@ defmodule SkollerWeb.AuthView do
 
   def render("auth.json", %{auth: auth}) do
     %{
-      user: render_one(auth, UserView, "user_detail.json")
+      user: render_one(auth, UserView, "user_detail.json"),
+      subscriptions: render_many(auth.subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
     }
   end
 end
