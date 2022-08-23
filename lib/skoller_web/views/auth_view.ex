@@ -17,7 +17,6 @@ defmodule SkollerWeb.AuthView do
       Map.new()
       |> Map.put(:token, token)
       |> Map.put(:user, user)
-      |> Map.put(:subscriptions, [])
 
 
     render_one(auth, AuthView, "auth.json")
@@ -27,7 +26,6 @@ defmodule SkollerWeb.AuthView do
     auth = Map.new()
     |> Map.put(:token, token)
     |> Map.put(:user, user)
-    |> Map.put(:subscriptions, [])
     render_one(auth, AuthView, "auth.json")
   end
 
