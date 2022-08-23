@@ -17,20 +17,23 @@ defmodule SkollerWeb.AuthView do
       Map.new()
       |> Map.put(:token, token)
       |> Map.put(:user, user)
+      |> Map.put(:subscriptions, [])
+
 
     render_one(auth, AuthView, "auth.json")
   end
-  
+
   def render("show.json", %{token: token, user: user}) do
     auth = Map.new()
     |> Map.put(:token, token)
     |> Map.put(:user, user)
+    |> Map.put(:subscriptions, [])
     render_one(auth, AuthView, "auth.json")
   end
 
   def render("auth.json", %{auth: %{token: token} = auth}) do
     %{token: token}
-    |> Map.merge(%{
+  |> Map.merge(%{
       subscriptions: (render_many(auth.subscriptions, SubscriptionView, "subscription.json", as: :subscription)),
       user: render_one(auth.user, UserView, "user_detail.json")
     })
