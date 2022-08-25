@@ -23,7 +23,7 @@ defmodule SkollerWeb.UserView do
       |> Map.put(:org_group_owners, View.render_association(user.org_group_owners))
       |> Map.put(:org_members, View.render_association(user.org_members))
 
-  def render("user_detail.json", %{user: user}) do
+  def render("user_detail.json", %{user: %{subscriptions: subscriptions} = user}) do
     user = user |> Repo.preload([:student, :roles, :org_owners, :org_members])
 
     user
@@ -36,6 +36,21 @@ defmodule SkollerWeb.UserView do
       lifetime_subscription: user.lifetime_subscription,
       lifetime_trial: user.lifetime_trial,
       subscriptions: render_many(user.subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
+    })
+  end
+
+  def render("user_detail.json", %{user: user}) do
+    user = user |> Repo.preload([:student, :roles, :org_owners, :org_members])
+
+    user
+    |> render_one(UserView, "user.json")
+    |> Map.merge(%{
+      student: render_one(user.student, SkollerWeb.StudentView, "student.json"),
+      roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
+      trial: Trial.now?(user),
+      trial_days_left: Trial.days_left(user),
+      lifetime_subscription: user.lifetime_subscription,
+      lifetime_trial: user.lifetime_trial
     })
   end
 end
