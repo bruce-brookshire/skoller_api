@@ -35,7 +35,7 @@ defmodule SkollerWeb.UserView do
       trial_days_left: Trial.days_left(user),
       lifetime_subscription: user.lifetime_subscription,
       lifetime_trial: user.lifetime_trial,
-      subscriptions: render_many(user.subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
+      subscriptions: render_many(subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
     })
   end
 
