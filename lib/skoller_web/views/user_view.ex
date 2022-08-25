@@ -6,6 +6,7 @@ defmodule SkollerWeb.UserView do
   alias Skoller.Repo
   alias ExMvc.View
   alias Skoller.Users.Trial
+  alias SkollerWeb.Api.V1.Stripe.SubscriptionView
 
   def render("index.json", %{users: users}) do
     render_many(users, UserView, "user.json")
@@ -33,7 +34,8 @@ defmodule SkollerWeb.UserView do
       trial: Trial.now?(user),
       trial_days_left: Trial.days_left(user),
       lifetime_subscription: user.lifetime_subscription,
-      lifetime_trial: user.lifetime_trial
+      lifetime_trial: user.lifetime_trial,
+      subscriptions: render_many(user.subscriptions, SubscriptionView, "subscription.json", as: :subscriptions)
     })
   end
 end
