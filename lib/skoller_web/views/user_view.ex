@@ -6,6 +6,7 @@ defmodule SkollerWeb.UserView do
   alias Skoller.Repo
   alias ExMvc.View
   alias Skoller.Users.Trial
+  alias SkollerWeb.Api.V1.Stripe.SubscriptionView
 
   def render("index.json", %{users: users}) do
     render_many(users, UserView, "user.json")
@@ -22,6 +23,22 @@ defmodule SkollerWeb.UserView do
       |> Map.put(:org_group_owners, View.render_association(user.org_group_owners))
       |> Map.put(:org_members, View.render_association(user.org_members))
 
+  def render("user_detail.json", %{user: %{subscriptions: subscriptions} = user}) do
+    user = user |> Repo.preload([:student, :roles, :org_owners, :org_members])
+
+    user
+    |> render_one(UserView, "user.json")
+    |> Map.merge(%{
+      student: render_one(user.student, SkollerWeb.StudentView, "student.json"),
+      roles: render_many(user.roles, SkollerWeb.RoleView, "role.json"),
+      trial: Trial.now?(user),
+      trial_days_left: Trial.days_left(user),
+      lifetime_subscription: user.lifetime_subscription,
+      lifetime_trial: user.lifetime_trial,
+      subscriptions: render_many(subscriptions, SubscriptionView, "subscription.json")
+    })
+  end
+
   def render("user_detail.json", %{user: user}) do
     user = user |> Repo.preload([:student, :roles, :org_owners, :org_members])
 
@@ -33,7 +50,8 @@ defmodule SkollerWeb.UserView do
       trial: Trial.now?(user),
       trial_days_left: Trial.days_left(user),
       lifetime_subscription: user.lifetime_subscription,
-      lifetime_trial: user.lifetime_trial
+      lifetime_trial: user.lifetime_trial,
+      subscriptions: []
     })
   end
 end
