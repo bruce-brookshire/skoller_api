@@ -12,7 +12,7 @@ defmodule Skoller.Application do
     # Define workers and child supervisors to be supervised
     children = [
       Skoller.Repo,
-      {Oban, Application.fetch_env!(:oban, Oban)},
+      #{Oban, Application.fetch_env!(:oban, Oban)},
       SkollerWeb.Endpoint,
       {Phoenix.PubSub, [name: Skoller.PubSub, adapter: Phoenix.PubSub.PG2]},
       %{id: AirtableSyncJob, start: {Skoller.AirtableSyncJob, :start_link, []}},
