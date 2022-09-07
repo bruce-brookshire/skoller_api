@@ -14,12 +14,15 @@ defmodule Skoller.Analytics.Jobs do
   def run_analytics(job, curtime) do
     curtime
     |> check_sending_time(job)
-    |> generate_csv()
+    |> generate_csv(job, curtime)
   end
 
-  def generate_csv(nil), do: nil
+  def generate_csv(nil, job, curtime) do
+    Logger.info("It wasn't time to run the #{job.name} job yet.\n Current Time: #{inspect(get_converted_time(curtime))} | Job Time: #{job.time}")
+    nil
+  end
 
-  def generate_csv(job_id) do
+  def generate_csv(job_id, _job, _curtime) do
     # Get context for job. If it's nil, theres no action implemented for the job
     case get_context(job_id) do
       {filename, dir} ->
@@ -29,11 +32,11 @@ defmodule Skoller.Analytics.Jobs do
         Logger.info("Calculating analytics " <> filename)
 
         job_id
-        |> get_analytics
+        |> get_analytics()
         |> CSV.encode()
         |> Enum.to_list()
         |> add_headers(job_id)
-        |> to_string
+        |> to_string()
         |> upload_document(file_path, scope)
         |> store_document(scope)
 
@@ -165,11 +168,15 @@ defmodule Skoller.Analytics.Jobs do
   end
 
   defp check_sending_time(curtime, job) do
-    converted_datetime = curtime |> Timex.Timezone.convert("America/Chicago")
-    {:ok, time} = Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
+    {:ok, time} = get_converted_time(curtime)
 
     job_time = job.time |> Time.from_iso8601!()
 
     if(Time.compare(time, job_time) == :eq, do: job.id, else: nil)
+  end
+
+  defp get_converted_time(curtime) do
+    converted_datetime = curtime |> Timex.Timezone.convert("America/Chicago")
+    Time.new(converted_datetime.hour, converted_datetime.minute, 0, 0)
   end
 end
