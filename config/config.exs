@@ -69,15 +69,15 @@ config :oban, Oban,
      crontab: [
       {"@daily", Skoller.CronJobs.StudentsCountJob},
       {"@monthly", Skoller.CronJobs.StudentReferralsReportJob},
-      {"*/10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
-      {"*/10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
-      {"*/10 * * * *", Skoller.CronJobs.ClassLocksJob},
-      {"*/5 * * * *", Skoller.CronJobs.ClassPeriodJob},
-      {"*/5 * * * *", Skoller.CronJobs.ClassSetupJob},
-      {"*/5 * * * *", Skoller.CronJobs.NoClassesJob},
-      {"*/10 * * * *", Skoller.CronJobs.EmailManagerJob},
-      {"*/5 * * * *", Skoller.CronJobs.AnalyticsJob},
-      {"*/10 * * * *", Skoller.CronJobs.TrialJob}
+      {"10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
+      {"10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
+      {"10 * * * *", Skoller.CronJobs.ClassLocksJob},
+      {"5 * * * *", Skoller.CronJobs.ClassPeriodJob},
+      {"5 * * * *", Skoller.CronJobs.ClassSetupJob},
+      {"5 * * * *", Skoller.CronJobs.NoClassesJob},
+      {"10 * * * *", Skoller.CronJobs.EmailManagerJob},
+      {"5 * * * *", Skoller.CronJobs.AnalyticsJob},
+      {"10 * * * *", Skoller.CronJobs.TrialJob}
      ]}
   ],
   queues: [
