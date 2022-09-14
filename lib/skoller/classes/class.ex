@@ -70,11 +70,11 @@ defmodule Skoller.Classes.Class do
   end
 
   @req_fields [:name, :is_editable, :class_period_id, :is_chat_enabled, :is_assignment_posts_enabled,
-    :is_syllabus, :is_points, :section]
-  @opt_fields [:premium, :trial, :expired, :received, :days_left, :professor_id, :location, :meet_end_time, :meet_start_time, :class_upload_key, :grade_scale]
+    :is_syllabus, :is_points]
+  @opt_fields [:premium, :trial, :expired, :received, :days_left, :professor_id, :location, :meet_end_time, :meet_start_time, :class_upload_key, :grade_scale, :section]
 
-  @req_uni_fields @req_fields ++ [:code, :subject, :meet_days]
-  @opt_uni_fields @opt_fields ++ [:crn, :credits, :class_type, :campus, :seat_count]
+  @req_uni_fields @req_fields
+  @opt_uni_fields @opt_fields ++ [:crn, :credits, :class_type, :campus, :seat_count, :code, :subject, :meet_days]
   @all_uni_fields @req_uni_fields ++ @opt_uni_fields
 
   @req_hs_fields @req_fields
@@ -88,14 +88,14 @@ defmodule Skoller.Classes.Class do
     |> validate_required(@req_hs_fields)
     |> mandatory_validations
   end
-  
+
   @doc false
   #TODO: Remove this temp jank code once flutter is deployed
   def university_changeset(%Class{} = class, attrs) do
 
     #This makes sure that meet_start_time being "online" doesnt fail the creation
-    {_, attrs} = Map.get_and_update(attrs, "meet_start_time", 
-      fn current_value -> 
+    {_, attrs} = Map.get_and_update(attrs, "meet_start_time",
+      fn current_value ->
         if current_value == nil do
           :pop
         else
@@ -120,4 +120,3 @@ defmodule Skoller.Classes.Class do
     |> unique_constraint(:class, name: :unique_class_index)
   end
 end
-  
