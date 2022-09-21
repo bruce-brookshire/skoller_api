@@ -16,6 +16,7 @@ defmodule Skoller.Students.StudentAnalytics do
   alias Skoller.Mods.Mod
   alias Skoller.Students.FieldOfStudy, as: StudentField
   alias Skoller.FieldsOfStudy.FieldOfStudy
+  alias Skoller.Payments.Stripe, as: CustomerInfo
 
   import Ecto.Query
 
@@ -30,6 +31,9 @@ defmodule Skoller.Students.StudentAnalytics do
   defp analytics_query() do
     active_sc_subq = subquery(active_student_classes_subquery())
     inactive_sc_subq = subquery(inactive_student_classes_subquery())
+    subscriptions = subscriptions()
+    inactive_users = inactive_users(subscriptions)
+    active_users = active_users(subscriptions)
 
     #### LEGEND ####
     # sc_a: active student classes
@@ -103,6 +107,8 @@ defmodule Skoller.Students.StudentAnalytics do
       on: i_m_a_c.student_id == s.id
     )
     |> join(:left, [u, s], f in subquery(aggregated_majors_subquery()), on: f.student_id == s.id)
+    |> join(:left, [u, s], subscription_status in subquery(subscription_status_subquery(active_users, inactive_users)), on: subscription_status.student_id == s.id)
+    |> join(:left, [u, s], premium_status in subquery(premium_status_subquery()), on: premium_status.student_id == s.id)
     |> order_by([u, s], desc: u.inserted_at)
     |> select(
       [
@@ -125,38 +131,46 @@ defmodule Skoller.Students.StudentAnalytics do
         i_a_g,
         i_m_c_c,
         i_m_a_c,
-        f
+        f,
+        subscription_status,
+        premium_status
       ],
       [
-        fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.inserted_at),
-        cl.link,
-        sp.count,
-        s.name_first,
-        s.name_last,
-        u.email,
-        s.phone,
-        sc.name,
-        sc.adr_locality,
-        sc.adr_region,
-        s.grad_year,
-        f.fields,
-        s.id,
-        fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", se.inserted_at),
-        sc_a.count,
-        sc_a_s.count,
-        a_a.count,
-        a_a_g.count,
-        a_m_c_c.count,
-        a_m_a_c.count,
-        sc_i.count,
-        sc_i_s.count,
-        i_a.count,
-        i_a_g.count,
-        i_m_c_c.count,
-        i_m_a_c.count
+          user_created: fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", u.inserted_at),
+          signup_route: cl.link,
+          successful_invites: sp.count,
+          first_name: s.name_first,
+          last_name: s.name_last,
+          email: u.email,
+          phone: s.phone,
+          school_name: sc.name,
+          school_city: sc.adr_locality,
+          school_state: sc.adr_region,
+          grad_year: s.grad_year,
+          majors: f.fields,
+          student_id: s.id,
+          last_session: fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", se.inserted_at),
+          active_enrolled_classes: sc_a.count,
+          active_setup_classes: sc_a_s.count,
+          active_assignments: a_a.count,
+          active_grades_entered: a_a_g.count,
+          active_mods_created: a_m_c_c.count,
+          active_mods_responded: a_m_a_c.count,
+          inactive_enrolled_classes: sc_i.count,
+          inactive_setup_classes: sc_i_s.count,
+          inactive_assignments: i_a.count,
+          inactive_grades_entered: i_a_g.count,
+          inactive_mods_created: i_m_c_c.count,
+          inactive_mods_responded: i_m_a_c.count,
+          subscription_status: subscription_status.status,
+          stripe_customer_id: subscription_status.customer_id,
+          premium_enrollment: premium_status.created,
+          total_premium_charges: "$0"
       ]
     )
     |> Repo.all()
+    |> apply_charges(subscriptions)
+    |> Enum.map(& Keyword.values(&1))
   end
 
   defp recent_session_subquery() do
@@ -178,6 +192,71 @@ defmodule Skoller.Students.StudentAnalytics do
     |> join(:inner, [f], sf in StudentField, on: sf.field_of_study_id == f.id)
     |> group_by([f, sf], sf.student_id)
     |> select([f, sf], %{student_id: sf.student_id, fields: fragment("string_agg(field, '|')")})
+  end
+
+  def subscription_status_subquery(active_users, inactive_users) do
+    from(u in User)
+    |> join(:inner, [u], s in Student, on: s.id == u.student_id)
+    |> join(:left, [u, s], ci in CustomerInfo, on: ci.user_id == u.id)
+    |> select([u, s, ci], %{
+      student_id: s.id,
+      customer_id: ci.customer_id,
+      status: fragment("
+        CASE
+          WHEN ? AND ? BETWEEN ? AND ? AND NOT ? = ANY(?) THEN 'Trial'
+          WHEN ? = ANY(?) AND ? IS NOT NULL THEN 'Premium'
+          WHEN ? = false AND ? = ANY(?) THEN 'Expired'
+          ELSE 'Inactive'
+        END",
+        u.trial, ^DateTime.utc_now, u.trial_start, u.trial_end, ci.customer_id, ^active_users,
+        ci.customer_id, ^active_users, ci.customer_id,
+        u.trial, ci.customer_id, ^inactive_users)
+    })
+  end
+
+  def premium_status_subquery() do
+    from(u in User)
+    |> join(:inner, [u], s in Student, on: s.id == u.student_id)
+    |> join(:left, [u, s], ci in CustomerInfo, on: ci.user_id == u.id)
+    |> select([u, s, ci], %{
+      student_id: s.id,
+      created: fragment("
+        CASE
+          WHEN ? = NULL THEN 'N/A' ELSE ? END
+      ", ci.inserted_at, fragment("to_char(?, 'MM/DD/YYYY HH24:MI:SS')", ci.inserted_at))
+    })
+  end
+
+  def get_charges(subscriptions) do
+    Enum.reduce(subscriptions, [], fn subsc, acc ->
+      {:ok, %Stripe.List{data: cust_charges}} = Stripe.Charge.list(%{customer: subsc.customer})
+      charges = Enum.reduce(cust_charges, 0, fn charge, acc ->
+        charge.amount + acc
+      end)
+      refunds = Enum.reduce(cust_charges, 0, fn charge, acc ->
+        charge.amount_refunded + acc
+      end)
+      [
+        %{
+          customer_id: subsc.customer,
+          total_charged: "$#{(charges - refunds) / 100}"
+        }
+        | acc
+      ]
+    end)
+  end
+
+  def apply_charges(query_results, subscriptions) do
+    charges = get_charges(subscriptions)
+    Enum.map(query_results, fn result ->
+      cust_id = Keyword.get(result, :stripe_customer_id, nil)
+      if !is_nil(cust_id) do
+        customer_charge = Enum.find(charges, fn charge -> charge.customer_id == cust_id end)
+        Keyword.replace(result, :total_premium_charges, customer_charge.total_charged)
+      else
+        result
+      end
+    end)
   end
 
   # Classes subqueries
@@ -263,5 +342,22 @@ defmodule Skoller.Students.StudentAnalytics do
     |> join(:inner, [p, c], sc in StudentClass, on: c.id == sc.class_id)
     |> where([p, c, sc], p.end_date < ^current_datetime)
     |> select([p, c, sc], sc)
+  end
+
+  defp subscriptions do
+    {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
+    subscriptions
+  end
+
+  defp inactive_users(subscriptions) do
+    subscriptions
+    |> Enum.reject(&(&1.status == "active"))
+    |> Enum.map(&(&1.customer))
+  end
+
+  defp active_users(subscriptions) do
+    subscriptions
+    |> Enum.reject(&(&1.status != "active"))
+    |> Enum.map(&(&1.customer))
   end
 end

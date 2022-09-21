@@ -133,7 +133,11 @@ defmodule Skoller.Analytics.Jobs do
         "Setup Classes (inactive)," <>
         "Assignments (inactive)," <>
         "Grades Entered (inactive) ," <>
-        "Mods Created (inactive)," <> "Mods Responded (inactive)\r\n"
+        "Mods Created (inactive)," <> "Mods Responded (inactive)," <>
+        "Account Status," <>
+        "Stripe Customer ID, " <>
+        "Premium Date/Time," <>
+        "Total Charged\r\n"
       | list
     ]
   end
