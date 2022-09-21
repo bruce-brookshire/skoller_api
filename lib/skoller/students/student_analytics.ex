@@ -252,7 +252,11 @@ defmodule Skoller.Students.StudentAnalytics do
       cust_id = Keyword.get(result, :stripe_customer_id, nil)
       if !is_nil(cust_id) do
         customer_charge = Enum.find(charges, fn charge -> charge.customer_id == cust_id end)
-        Keyword.replace(result, :total_premium_charges, customer_charge.total_charged)
+        if !is_nil(customer_charge) do
+          Keyword.replace(result, :total_premium_charges, customer_charge.total_charged)
+        else
+          result
+        end
       else
         result
       end
