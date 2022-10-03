@@ -32,8 +32,8 @@ defmodule Skoller.Users.Trial do
         update: [
           set: [
             trial: true,
-            trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
-            trial_end: datetime_add(^NaiveDateTime.utc_now(), 30, "day"),
+            trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "day"),
+            trial_end: datetime_add(^NaiveDateTime.utc_now(), 7, "day"),
             lifetime_trial: false
           ]
         ]
@@ -53,7 +53,7 @@ defmodule Skoller.Users.Trial do
   def expire(%User{} = user) do
     from(u in User,
       where: u.id == ^user.id,
-      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now(), 0, "month"), trial: false]]
+      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now(), 0, "day"), trial: false]]
     )
     |> Repo.update_all([])
   end
@@ -67,8 +67,8 @@ defmodule Skoller.Users.Trial do
       update: [
         set: [
           trial: true,
-          trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "month"),
-          trial_end: datetime_add(^NaiveDateTime.utc_now(), 30, "day")
+          trial_start: datetime_add(^NaiveDateTime.utc_now(), 0, "day"),
+          trial_end: datetime_add(^NaiveDateTime.utc_now(), 7, "day")
         ]
       ]
     )
@@ -81,7 +81,7 @@ defmodule Skoller.Users.Trial do
   def update_users_trial_status do
     from(u in User,
       where:
-        u.trial_end > datetime_add(^NaiveDateTime.utc_now(), 0, "month") and
+        u.trial_end > datetime_add(^NaiveDateTime.utc_now(), 0, "day") and
           u.trial == false,
       update: [set: [trial: true]]
     )
@@ -89,7 +89,7 @@ defmodule Skoller.Users.Trial do
 
     from(u in User,
       where:
-        (u.trial_end < datetime_add(^NaiveDateTime.utc_now(), 0, "month") or
+        (u.trial_end < datetime_add(^NaiveDateTime.utc_now(), 0, "day") or
            is_nil(u.trial_end)) and
           u.trial == true,
       update: [set: [trial: false]]

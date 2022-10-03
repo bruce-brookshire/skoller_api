@@ -66,7 +66,7 @@ defmodule Skoller.Users.User do
     |> change(%{trial_start: DateTime.utc_now() |> DateTime.truncate(:second)})
     |> change(%{
       trial_end:
-        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 30) |> DateTime.truncate(:second)
+        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 7) |> DateTime.truncate(:second)
     })
     |> unique_constraint(:email)
     |> cast_assoc(:student)
