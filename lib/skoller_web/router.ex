@@ -435,4 +435,12 @@ defmodule SkollerWeb.Router do
       end
     end
   end
+
+  scope "/api", SkollerWeb.Api do
+    scope "/v1", V1 do
+      scope "/apple", Apple do
+        post "/in-app-purchases/submit-receipt", InAppPurchasesController, :submit_receipt
+      end
+    end
+  end
 end
