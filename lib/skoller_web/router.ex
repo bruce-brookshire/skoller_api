@@ -440,6 +440,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1 do
       scope "/apple", Apple do
         post "/in-app-purchases/submit-receipt", InAppPurchasesController, :submit_receipt
+        post "/in-app-purchases/transaction-updated", InAppPurchasesController, :transaction_updated
       end
     end
   end
