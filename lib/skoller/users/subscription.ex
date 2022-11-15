@@ -8,7 +8,7 @@ defmodule Skoller.Users.Subscription do
 
   import Ecto.Query
 
-  def create(conn, %{"payment_method" => payment_method}) do
+  def create(conn, %{"payment_method" => payment_method, "email" => email}) do
     token = payment_method["token"]
     payment_method_id = payment_method["payment_method_id"]
 
@@ -20,6 +20,7 @@ defmodule Skoller.Users.Subscription do
            find_or_create_stripe_customer(
              token,
              user,
+             email,
              payment_method_id
            ),
          {:ok, %Stripe.Subscription{} = subscription} <-
@@ -117,40 +118,40 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  defp find_or_create_stripe_customer(token, user, payment_method_id) do
+  defp find_or_create_stripe_customer(token, user, email, payment_method_id) do
     case Payments.get_stripe_by_user_id(user.id) do
       nil ->
-        create_stripe_customer(token, payment_method_id, user)
+        create_stripe_customer(token, payment_method_id, user, email)
 
       %Skoller.Payments.Stripe{customer_id: customer_id} ->
-        maybe_create_stripe_customer(token, customer_id, payment_method_id, user)
+        maybe_create_stripe_customer(token, customer_id, payment_method_id, user, email)
 
       error ->
         error
     end
   end
 
-  defp maybe_create_stripe_customer(token, customer_id, payment_method_id, user) do
+  defp maybe_create_stripe_customer(token, customer_id, payment_method_id, user, email) do
     case Stripe.Customer.retrieve(customer_id) do
       {:ok, customer} ->
         {:ok, customer}
 
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
-        create_stripe_customer(token, payment_method_id, user)
+        create_stripe_customer(token, payment_method_id, user, email)
 
       error ->
         error
     end
   end
 
-  defp create_stripe_customer(token, payment_method_id, user) do
+  defp create_stripe_customer(token, payment_method_id, user, email) do
     Stripe.Customer.create(
       %{
         metadata: %{
           student_id: user.student.id,
           user_id: user.id,
         },
-        email: user.email,
+        email: email,
         phone: user.student.phone,
         name: "#{user.student.name_first} #{user.student.name_last}"
       }
