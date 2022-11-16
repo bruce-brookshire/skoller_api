@@ -11,6 +11,9 @@ config :skoller,
   env: config_env(),
   apple_in_app_purchase_secret: System.get_env("APPLE_IN_APP_PURCHASE_SECRET")
 
+config :logger,
+  truncate: :infinity
+
 # Configures the endpoint
 config :skoller, SkollerWeb.Endpoint,
   url: [host: "localhost"],

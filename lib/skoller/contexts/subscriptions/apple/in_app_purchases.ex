@@ -1,4 +1,4 @@
-defmodule Skoller.Contexts.Apple.InAppPurchases do
+defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   @moduledoc false
 
   require Logger
@@ -22,6 +22,7 @@ defmodule Skoller.Contexts.Apple.InAppPurchases do
   end
 
   defp handle_results({:ok, %{status_code: 200, body: body}}) do
+    IO.inspect(Jason.decode!(body))
     case handle_status(Jason.decode!(body)) do
       {:error, resp} -> {:error, resp}
       {:ok, _} -> IO.inspect("hurray!")
@@ -151,7 +152,7 @@ defmodule Skoller.Contexts.Apple.InAppPurchases do
     |> then(fn info ->
       case info do
         nil -> nil
-        _ -> if is_list(renewal)
+        # _ -> if is_list(renewal)
       end
     end)
 

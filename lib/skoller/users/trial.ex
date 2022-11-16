@@ -53,9 +53,10 @@ defmodule Skoller.Users.Trial do
   def expire(%User{} = user) do
     from(u in User,
       where: u.id == ^user.id,
-      update: [set: [trial_end: datetime_add(^NaiveDateTime.utc_now(), 0, "day"), trial: false]]
     )
-    |> Repo.update_all([])
+    |> Repo.one()
+    |> User.changeset_update(%{trial_end: NaiveDateTime.utc_now(), trial: false})
+    |> Repo.update!()
   end
 
   @doc """

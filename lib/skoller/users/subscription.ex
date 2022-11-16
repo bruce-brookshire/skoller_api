@@ -5,6 +5,9 @@ defmodule Skoller.Users.Subscription do
 
   alias Skoller.{Repo, Payments}
   alias Skoller.Users.{User, Trial}
+  alias Skoller.Contexts.Subscriptions.Stripe.StripePurchases
+  alias Skoller.Contexts.Subscriptions
+  alias Skoller.Schema.Subscription
 
   import Ecto.Query
 
@@ -29,8 +32,10 @@ defmodule Skoller.Users.Subscription do
              payment_method["plan_id"],
              user
            ) do
+
       create_or_update_card_info(
         %{
+          subscription: subscription,
           user_id: user.id,
           customer_id: customer_stripe_id,
           payment_method: "card"
@@ -172,14 +177,20 @@ defmodule Skoller.Users.Subscription do
     )
   end
 
-  defp create_or_update_card_info(%{user_id: user_id} = params) do
-    case Payments.get_stripe_by_user_id(user_id) do
+  @spec create_or_update_card_info(Stripe.Subscription.t()) ::
+    {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
+  defp create_or_update_card_info(%{user_id: user_id} = subscription) do
+    case Subscriptions.get_subscription_by_user_id(user_id) do
+      %Skoller.Schema.Subscription{} = subscription -> {:ok, subscription}
       nil ->
-        Payments.create_stripe(params)
-
-      stripe ->
-        stripe
-        |> Payments.update_stripe(params)
+        case StripePurchases.create_stripe_subscription(%{
+          subscription: subscription,
+          payment_method: :card,
+          user_id: user_id
+        }) do
+          %Subscription{} = subscription -> {:ok, subscription}
+          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+        end
     end
   end
 

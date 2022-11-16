@@ -4,7 +4,7 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
   use SkollerWeb, :controller
 
   alias SkollerWeb.Apple.InAppPurchasesView
-  alias Skoller.Contexts.Apple.InAppPurchases
+  alias Skoller.Contexts.Subscriptions.Apple.InAppPurchases
 
   def submit_receipt(conn,
     %{

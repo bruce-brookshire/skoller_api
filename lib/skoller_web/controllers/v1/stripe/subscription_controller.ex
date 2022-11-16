@@ -1,14 +1,14 @@
 defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   use SkollerWeb, :controller
-  alias Skoller.Payments
   alias Skoller.Users.{Trial, Subscription}
+  alias Skoller.Contexts.Subscriptions
+  alias Skoller.Contexts.Subscriptions.Stripe.StripePurchases
 
-  def list_user_subscriptions(conn, _params)do
-    with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
-                                                           |> Map.fetch(:user),
-         %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
-         {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{customer: customer_id, status: "all"}) do
-      render(conn, "index.json", %{subscriptions: subscriptions})
+  def list_user_subscriptions(conn, _params) do
+    with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns |> Map.fetch(:user),
+         %Skoller.Schema.Subscription{} = subscription <-
+          Subscriptions.get_subscription_by_user_id(user_id) do
+      render(conn, "index.json", %{subscription: subscription})
     else
       data ->
         unless data do
@@ -66,7 +66,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   def list_upcoming_payments(conn, _params)do
     with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
                                                            |> Map.fetch(:user),
-         %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
+         %Skoller.Schema.Subscription{customer_id: customer_id} <- Subscriptions.get_subscription_by_user_id(user_id),
          {:ok, invoice} <- Stripe.Invoice.upcoming(%{customer: customer_id})do
       render(conn, "invoice.json", invoice: invoice)
     else
@@ -78,7 +78,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   def list_billing_history(conn, _params)do
     with {:ok, %Skoller.Users.User{id: user_id}} <- conn.assigns
                                                            |> Map.fetch(:user),
-         %Skoller.Payments.Stripe{customer_id: customer_id} <- Payments.get_stripe_by_user_id(user_id),
+         %Skoller.Schema.Subscription{customer_id: customer_id} <- Subscriptions.get_subscription_by_user_id(user_id),
          {:ok, invoice} <- Stripe.Invoice.upcoming(%{customer: customer_id}) do
       render(conn, "invoice.json", invoice: invoice)
     else
@@ -93,10 +93,12 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
 
 
   def cancel_subscription(conn, %{"subscription_id" => subscription_id}) do
-    with {:ok, subscription} <- Stripe.Subscription.update(subscription_id, %{cancel_at_period_end: true}) do
+    with {:ok, subscription} <- Stripe.Subscription.update(subscription_id, %{cancel_at_period_end: true}),
+    %Skoller.Schema.Subscription{} = subscription <- StripePurchases.cancel_stripe_subscription(subscription) do
       render(conn, "show.json", %{subscription: subscription})
     else
-      data -> process_errors(conn, data)
+      data ->
+        process_errors(conn, data)
     end
   end
 
@@ -108,7 +110,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
-  defp process_errors(conn, data)do
+  defp process_errors(conn, data) do
     case data do
       {:error, %Stripe.Error{code: _code, message: message}} ->
         conn
