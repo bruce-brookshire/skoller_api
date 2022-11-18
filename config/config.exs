@@ -83,7 +83,7 @@ config :oban, Oban,
       # {"*/10 * * * *", Skoller.CronJobs.EmailManagerJob},
       # {"*/5 * * * *", Skoller.CronJobs.AnalyticsJob},
       # {"*/10 * * * *", Skoller.CronJobs.TrialJob},
-      {"*/1 * * * *", Skoller.CronJobs.SubscriptionsJob}
+      {"0 * * * *", Skoller.CronJobs.SubscriptionsJob}
      ]}
   ],
   queues: [
