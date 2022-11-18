@@ -6,8 +6,8 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
   alias SkollerWeb.Api.V1.Stripe.InvoiceView
   alias SkollerWeb.Api.V1.Stripe.ProductView
 
-  def render("index.json", %{subscriptions: subscriptions}) do
-    %{data: render_many(subscriptions, SubscriptionView, "subscription.json")}
+  def render("index.json", %{subscription: subscription}) do
+    %{data: render_one(subscription, SubscriptionView, "subscription.json")}
   end
 
   def render("plans.json", %{plans: plans}) do
@@ -16,6 +16,15 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
 
   def render("products.json", %{products: products}) do
     %{data: render_many(products, ProductView, "product.json", as: :product)}
+  end
+
+  def render("plans_and_products.json", %{plans: plans, products: products}) do
+    %{
+      data: %{
+        plans: render_many(plans, PlanView, "plan.json", as: :plan),
+        products: render_many(products, ProductView, "products_with_price.json", as: :product)
+      }
+    }
   end
 
   def render("invoice.json", %{invoice: invoice}) do
@@ -31,21 +40,13 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
   end
 
   def render("subscription.json", %{subscription: subscription}) do
-    %Stripe.List{data: items} = subscription.items
     %{
-      id: subscription.id,
-      current_period_start: subscription.current_period_start,
-      cancel_at_period_end: subscription.cancel_at_period_end,
-      created: subscription.created,
-      canceled_at: subscription.canceled_at,
-      status: subscription.status,
-      plan: render_one(subscription.plan, PlanView, "plan.json", as: :plan),
-      latest_invoice: subscription.latest_invoice,
-      trial_start: subscription.trial_start,
-      customer: subscription.customer,
-      days_until_due: subscription.days_until_due,
-    quantity: subscription.quantity,
-    items:  render_many(items, SubscriptionItemView, "item.json", as: :item),
+      id: subscription.transaction_id,
+      cancelAt: subscription.cancel_at_ms,
+      created: subscription.created_at_ms,
+      status: subscription.current_status,
+      expirationIntent: subscription.expiration_intent,
+      interval: subscription.renewal_interval,
     }
   end
 end

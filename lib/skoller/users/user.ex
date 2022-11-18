@@ -50,7 +50,7 @@ defmodule Skoller.Users.User do
   @opt_fields [:pic_path, :password]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
-  @upd_opt [:password, :pic_path, :last_login]
+  @upd_opt [:password, :pic_path, :last_login, :trial, :trial_end]
   @upd_fields @upd_req ++ @upd_opt
   @adm_upd_req [:is_active, :is_unsubscribed, :email]
   @adm_upd_opt [:password, :pic_path, :last_login]

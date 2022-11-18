@@ -7,4 +7,10 @@ defmodule SkollerWeb.Apple.InAppPurchasesView do
       status: "Receipt Received"
     }
   end
+
+  def render("transaction_updated.json", params) do
+    %{
+      status: "Receieved Update"
+    }
+  end
 end

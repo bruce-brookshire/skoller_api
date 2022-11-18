@@ -418,6 +418,8 @@ defmodule SkollerWeb.Router do
         pipe_through :api_auth
         get "/my-subscriptions", SubscriptionController, :list_user_subscriptions
         get "/all-subscriptions", SubscriptionController, :list_all_subscriptions
+        get "/available-plans-and-products", SubscriptionController, :get_available_plans_and_products
+        get "/lifetime-product", SubscriptionController, :get_lifetime_product
         get "/all-products", SubscriptionController, :list_all_products
         get "/all-plans", SubscriptionController, :list_all_plans
         post "/save-card-and-subscription", SubscriptionController, :create_subscription
@@ -440,6 +442,7 @@ defmodule SkollerWeb.Router do
     scope "/v1", V1 do
       scope "/apple", Apple do
         post "/in-app-purchases/submit-receipt", InAppPurchasesController, :submit_receipt
+        post "/in-app-purchases/transaction-updated", InAppPurchasesController, :transaction_updated
       end
     end
   end

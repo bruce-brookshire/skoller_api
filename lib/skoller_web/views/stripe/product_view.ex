@@ -14,4 +14,8 @@ defmodule SkollerWeb.Api.V1.Stripe.ProductView do
       updated: product.updated
     }
   end
+
+  def render("products_with_price.json", %{product: product_item}) do
+    product_item
+  end
 end
