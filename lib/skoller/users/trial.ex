@@ -50,11 +50,15 @@ defmodule Skoller.Users.Trial do
   @doc """
     Expire user's trial
   """
+  @spec expire(integer() | User.t()) :: {:ok, User.t()} | {:error, %Ecto.Changeset{}}
+  def expire(user_id) when is_integer(user_id) do
+    Repo.get(User, user_id)
+    |> User.changeset_update(%{trial_end: NaiveDateTime.utc_now(), trial: false})
+    |> Repo.update!()
+  end
+
   def expire(%User{} = user) do
-    from(u in User,
-      where: u.id == ^user.id,
-    )
-    |> Repo.one()
+    user
     |> User.changeset_update(%{trial_end: NaiveDateTime.utc_now(), trial: false})
     |> Repo.update!()
   end

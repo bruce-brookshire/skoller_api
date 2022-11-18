@@ -54,8 +54,8 @@ defmodule Skoller.Repo.Migrations.CreateSubscriptionsTable do
       add(:auto_renew_status, :auto_renew, null: true)
       add(:billing_retry_status, :billing_retry, null: true)
       add(:current_status, :current_subscription_status)
-      add(:current_status_unix_ts, :integer)
-      add(:cancel_at_unix_ts, :integer)
+      add(:created_at_ms, :bigint)
+      add(:cancel_at_ms, :bigint)
       add(:renewal_interval, :renewal_interval_type)
 
       timestamps()

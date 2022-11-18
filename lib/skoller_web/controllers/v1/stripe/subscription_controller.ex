@@ -28,9 +28,36 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     end
   end
 
+  def get_available_plans_and_products(conn, _params) do
+    with {:ok, %Stripe.List{data: plans}} <- Stripe.Plan.list(%{active: true}),
+      {:ok, %Stripe.List{data: products}} <- Stripe.Product.list(%{active: true}) do
+        products =
+          products
+          |> Enum.filter(& &1.name == "Lifetime")
+          |> Enum.reduce([], fn product, acc ->
+
+            [
+              %{
+                product: product,
+                price: with {:ok, %Stripe.Price{unit_amount: price_amt}} <- Stripe.Price.retrieve(product.default_price) do
+                    price_amt
+                  else
+                    data -> nil
+                  end
+              }
+              | acc
+            ]
+          end)
+          |> Enum.sort_by(& &1.product.updated, :desc)
+
+      render(conn, "plans_and_products.json", %{plans: plans |> Enum.sort_by(& &1.amount, :desc), products: products})
+    else
+      data -> process_errors(conn, data)
+    end
+  end
 
   def list_all_products(conn, _params)do
-    with {:ok, %Stripe.List{data: products}} <- Stripe.Product.list() do
+    with {:ok, %Stripe.List{data: products}} <- Stripe.Product.list(%{active: true}) do
       render(conn, "products.json", %{products: products})
     else
       data -> process_errors(conn, data)
@@ -38,7 +65,7 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
   end
 
   def list_all_plans(conn, _params)do
-    with {:ok, %Stripe.List{data: plans}} <- Stripe.Plan.list() do
+    with {:ok, %Stripe.List{data: plans}} <- Stripe.Plan.list(%{active: true}) do
       render(conn, "plans.json", %{plans: plans})
     else
       data -> process_errors(conn, data)
@@ -90,7 +117,6 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionController do
     Trial.start_trial_for_all_users()
     json(conn, %{status: :ok, message: "Your successfully started all users' trial"})
   end
-
 
   def cancel_subscription(conn, %{"subscription_id" => subscription_id}) do
     with {:ok, subscription} <- Stripe.Subscription.update(subscription_id, %{cancel_at_period_end: true}),

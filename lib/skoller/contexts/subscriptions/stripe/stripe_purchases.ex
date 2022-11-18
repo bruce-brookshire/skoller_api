@@ -5,6 +5,7 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
 
   alias Skoller.Schema.Subscription
   alias Skoller.Contexts.Subscriptions, as: SubscriptionsContext
+  alias Skoller.Users.Trial
 
   @spec get_subscription_by_user_id(integer()) :: Subscription.t()
   def get_subscription_by_user_id(user_id) do
@@ -33,12 +34,38 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
       customer_id: subscription.customer,
       transaction_id: subscription.id,
       current_status: current_item.current_status,
-      current_status_unix_ts: current_item.created,
+      created_at_ms: current_item.created,
       expiration_intent: current_item.cancel_status,
       auto_renew_status: current_item.renew_status,
       renewal_interval: current_item.renewal_interval
     })
     |> Skoller.Repo.insert!()
+    |> case do
+      %Skoller.Schema.Subscription{} = subscription ->
+        Trial.expire(user_id)
+        {:ok, subscription}
+      %Ecto.Changeset{} = changeset ->
+        {:error, changeset}
+    end
+  end
+
+  @spec update_stripe_subscription(Skoller.Schema.Subscription.t(), Stripe.Subscription.t()) :: Subscription.t()
+  def update_stripe_subscription(existing_subscription, %{subscription: new_subscription}) do
+    current_item = get_current_item(new_subscription)
+
+    existing_subscription
+    |> Skoller.Schema.Subscription.changeset(
+      %{
+        cancel_at_ms: nil,
+        transaction_id: new_subscription.id,
+        current_status: current_item.current_status,
+        created_at_ms: current_item.created,
+        expiration_intent: current_item.cancel_status,
+        auto_renew_status: current_item.renew_status,
+        renewal_interval: current_item.renewal_interval
+      }
+    )
+    |> Skoller.Repo.update!()
   end
 
   @spec cancel_stripe_subscription(Stripe.Subscription.t()) :: Subscription.t()
@@ -47,7 +74,7 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     |> Subscription.changeset(
       %{
         expiration_intent: map_cancel_status(subscription),
-        cancel_at_unix_ts: subscription.cancel_at,
+        cancel_at_ms: subscription.cancel_at,
         auto_renew_status: :stripe_auto_renew_disabled,
         renewal_interval: nil
       }

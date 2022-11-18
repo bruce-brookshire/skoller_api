@@ -20,8 +20,8 @@ defmodule Skoller.Schema.Subscription do
     auto_renew_status: auto_renew_type(),
     billing_retry_status: billing_retry_type(),
     current_status: current_subscription_status_type(),
-    current_status_unix_ts: integer(),
-    cancel_at_unix_ts: integer(),
+    created_at_ms: integer(),
+    cancel_at_ms: integer(),
     renewal_interval: renewal_interval_type()
   }
 
@@ -34,8 +34,8 @@ defmodule Skoller.Schema.Subscription do
     field(:auto_renew_status, Ecto.Enum, values: @auto_renew_values)
     field(:billing_retry_status, Ecto.Enum, values: @billing_retry_values)
     field(:current_status, Ecto.Enum, values: @current_subscription_status_values)
-    field(:current_status_unix_ts, :integer)
-    field(:cancel_at_unix_ts, :integer)
+    field(:created_at_ms, :integer)
+    field(:cancel_at_ms, :integer)
     field(:renewal_interval, Ecto.Enum, values: @renewal_interval_values)
 
     belongs_to(:user, User)
@@ -55,8 +55,8 @@ defmodule Skoller.Schema.Subscription do
     :billing_retry_status,
     :customer_id,
     :current_status,
-    :current_status_unix_ts,
-    :cancel_at_unix_ts,
+    :created_at_ms,
+    :cancel_at_ms,
     :renewal_interval
   ]
 
