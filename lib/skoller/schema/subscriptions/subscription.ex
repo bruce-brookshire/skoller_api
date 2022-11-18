@@ -57,7 +57,7 @@ defmodule Skoller.Schema.Subscription do
     :current_status,
     :created_at_ms,
     :cancel_at_ms,
-    :renewal_interval
+    :renewal_interval,
   ]
 
   def changeset(%__MODULE__{} = subscription, attrs) do

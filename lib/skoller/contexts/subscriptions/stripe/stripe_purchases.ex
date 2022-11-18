@@ -82,8 +82,12 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     |> Skoller.Repo.update!()
   end
 
-  @spec get_current_item(map()) :: map()
-  defp get_current_item(%{items: %{data: data}} = subscription) do
+  @spec get_current_item(map()) :: map() | nil
+  def get_current_item([]) do
+    nil
+  end
+
+  def get_current_item(%{items: %{data: data}} = subscription) do
     data
     |> Enum.sort_by(& &1.created, :desc)
     |> List.first()
@@ -106,12 +110,12 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     end
   end
 
-  @spec map_renew_status(%{collection_method: String.t()}) ::
+  @spec map_renew_status(%{cancel_at_period_end: boolean()}) ::
     :stripe_will_renew | :stripe_auto_renew_disabled
-  defp map_renew_status(%{collection_method: collection_method}) do
-    case collection_method do
-      "charge_automatically" -> :stripe_will_renew
-      _ -> :stripe_auto_renew_disabled
+  defp map_renew_status(%{cancel_at_period_end: cancel_at_period_end}) do
+    case cancel_at_period_end do
+      false -> :stripe_will_renew
+      true -> :stripe_auto_renew_disabled
     end
   end
 
