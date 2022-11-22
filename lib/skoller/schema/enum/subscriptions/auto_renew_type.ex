@@ -18,7 +18,7 @@ defmodule Skoller.Schema.Enum.Subscriptions.AutoRenewType do
           value: :apple_auto_rewnewal_disabled,
           verbage: "The customer has turned off automatic renewal for the subscription."
         },
-        "2" => %{
+        "1" => %{
           value: :apple_will_renew,
           verbage: "The subscription will renew at the end of the current subscription period."
         },

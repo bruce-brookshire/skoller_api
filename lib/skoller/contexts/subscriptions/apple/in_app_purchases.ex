@@ -3,6 +3,12 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
   require Logger
 
+  use Skoller.Schema.Enum.Subscriptions.ExpirationIntentType
+  use Skoller.Schema.Enum.Subscriptions.AutoRenewType
+
+  alias Skoller.Schema.Subscription
+  alias Skoller.Contexts.Subscriptions, as: SubscriptionContext
+
   @spec verify_receipt(String.t()) :: any()
   def verify_receipt(serverVerificationData) do
     HTTPoison.post(
@@ -13,6 +19,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> handle_results()
   end
 
+  @spec compile_payload(String.t()) :: map()
   defp compile_payload(verificationData) do
     %{
       "receipt-data" => verificationData,
@@ -21,15 +28,129 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     } |> Jason.encode!()
   end
 
+  @spec handle_results({:ok, %{status_code: integer(), body: map()}}) ::
+    {:error, {:error, map()}} | {:ok, map()} | {:error, nil}
   defp handle_results({:ok, %{status_code: 200, body: body}}) do
-    IO.inspect(Jason.decode!(body))
     case handle_status(Jason.decode!(body)) do
+      {:ok, data} -> {:ok, data}
       {:error, resp} -> {:error, resp}
-      {:ok, _} -> IO.inspect("hurray!")
-      nil -> IO.puts "wtf?"
+      nil ->
+        Logger.error("Received nil from handle_status/1")
+        {:error, nil}
     end
   end
 
+  @spec create_update_subscription(%{latest_receipt: list(), renewal_info: list()}, integer()) ::
+    {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
+  def create_update_subscription(%{latest_receipt: latest_receipt, renewal_info: renewal_info}, user_id) do
+    case SubscriptionContext.get_subscription_by_user_id(user_id) do
+      %Subscription{} = subscription ->
+        update_subscription(subscription, latest_receipt, renewal_info)
+      nil ->
+        create_subscription(user_id, latest_receipt, renewal_info)
+    end
+  end
+
+  @spec create_subscription(integer(), list(), list()) ::
+    {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
+  defp create_subscription(user_id, latest_receipt, renewal_info) do
+    current_receipt = get_current_receipt(latest_receipt)
+    |> IO.inspect
+    current_renewal_info = List.first(renewal_info)
+    |> IO.inspect
+
+    interval = map_interval(Map.get(current_receipt, "product_id", :nil)) |> IO.inspect(label: "interval")
+    created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
+    expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", :error), interval)
+
+    %Subscription{}
+    |> Subscription.changeset(%{
+      platform: :in_app,
+      user_id: user_id,
+      transaction_id: Map.get(current_receipt, "transaction_id", nil),
+      created_at_ms: created_at,
+      renewal_interval: interval,
+      payment_method: :in_app,
+      expiration_intent: expiration_intent,
+      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "auto_renew_status", :error)),
+      cancel_at_ms: get_cancel_at_for_creation(created_at, interval, expiration_intent),
+      current_status: :active
+    })
+    |> Skoller.Repo.insert!()
+  end
+
+  @spec update_subscription(Subscription.t(), list(), list()) ::
+    {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
+  defp update_subscription(subscription, latest_receipt, renewal_info) do
+
+  end
+
+  @spec get_current_receipt(list()) :: map()
+  defp get_current_receipt(latest_receipt) when is_list(latest_receipt) do
+    latest_receipt
+    |> Enum.sort_by(& &1["original_purchase_date_ms"], :desc)
+    |> List.first()
+  end
+
+  defp get_current_receipt(latest_receipt), do: latest_receipt
+
+  defp map_interval(nil), do: nil
+
+  # TODO Different subscription names for prod/staging/dev
+  # Make this cleaner
+  defp map_interval(product_id) do
+    case product_id do
+      "monthly" -> :month
+      "yearly" -> :year
+      "lifetime" -> :lifetime
+      "monthlyStaging" -> :month
+      "annualStaging" -> :year
+      "annualStaging2" -> :year
+      "lifetimeStaging" -> :lifetime
+    end
+  end
+
+  defp map_expiration_intent(:error, _interval), do: :error
+  defp map_expiration_intent(_expiration_intent, :lifetime), do: nil
+  defp map_expiration_intent(expiration_intent, _interval) do
+    case Map.get(@expiration_intent_map, expiration_intent, :error) do
+      :error -> :error
+      map -> map.value
+    end
+  end
+
+  defp map_auto_renew(:error), do: :error
+  defp map_auto_renew(auto_renew) do
+    case Map.get(@auto_renew_map, auto_renew, :error) do
+      :error -> :error
+      map -> map.value
+    end
+  end
+
+  defp get_cancel_at_for_creation(nil, _interval, _expiration_intent), do: nil
+  defp get_cancel_at_for_creation(_created_at, :lifetime, _expiration_intent), do: nil
+  defp get_cancel_at_for_creation(created_at, :year, expiration_intent)
+    when not is_nil(expiration_intent) do
+    created_at
+    |> DateTime.from_unix!()
+    |> DateTime.to_naive()
+    |> Timex.shift(years: 1)
+    |> Timex.to_unix()
+  end
+
+  defp get_cancel_at_for_creation(created_at, :month, expiration_intent)
+    when not is_nil(expiration_intent) do
+    created_at
+    |> DateTimem.from_unix!()
+    |> DateTime.to_naive()
+    |> Timex.shift(months: 1)
+    |> Timex.to_unix()
+    |> IO.inspect
+  end
+
+
+  @spec handle_status(%{String.t() => integer()}) ::
+    {:error, map()} | {:error, String.t()} | {:ok, map()}
   defp handle_status(%{"status" => 21000}) do
     Logger.warn("In App Purchase - Verify receipt failed. Status Code: 21000 - The App Store could not read the JSON object you provided.")
 
@@ -148,11 +269,15 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   end
 
   defp handle_status(%{"status" => 0} = response) do
-    renewal_info = Map.get(response, "pending_renewal_info", nil)
-    |> then(fn info ->
-      case info do
-        nil -> nil
-        # _ -> if is_list(renewal)
+    response
+    |> then(fn resp ->
+      latest_receipt = Map.get(resp, "latest_receipt_info", nil)
+      renewal_info = Map.get(resp, "pending_renewal_info", nil)
+
+      if is_nil(latest_receipt) || is_nil(renewal_info) do
+        {:error, "Unable to process IAP receipt. latest_receipt is nil #{is_nil(latest_receipt)}. renewal_info is nil #{is_nil(renewal_info)}"}
+      else
+        {:ok, %{latest_receipt: latest_receipt, renewal_info: renewal_info}}
       end
     end)
 
