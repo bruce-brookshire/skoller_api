@@ -9,7 +9,7 @@ import Config
 config :skoller,
   ecto_repos: [Skoller.Repo],
   env: config_env(),
-  apple_in_app_purchase_secret: System.get_env("APPLE_IN_APP_PURCHASE_SECRET")
+  apple_in_app_purchase_secret: System.get_env("APPLE_IN_APP_PURCHASE_SECRET"),
   apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_TEST")
 
 config :logger,
