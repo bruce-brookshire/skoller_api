@@ -51,7 +51,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
         end
       nil ->
         case create_subscription(user_id, latest_receipt, renewal_info) do
-          {:ok, %Subscription{}} = subscription -> {:ok, subscription}
+          {:ok, %Subscription{}} = subscription -> subscription
           {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
         end
     end

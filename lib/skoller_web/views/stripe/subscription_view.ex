@@ -47,7 +47,8 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
       status: subscription.current_status,
       expirationIntent: subscription.expiration_intent,
       interval: subscription.renewal_interval,
-      platform: subscription.platform
+      platform: subscription.platform,
+      user_id: subscription.user_id
     }
   end
 
