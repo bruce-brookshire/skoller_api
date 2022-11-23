@@ -49,4 +49,11 @@ defmodule SkollerWeb.Api.V1.Stripe.SubscriptionView do
       interval: subscription.renewal_interval,
     }
   end
+
+  def render("subscription_not_found.json", nil) do
+    %{
+      status: 404,
+      message: "Subscription not found."
+    }
+  end
 end
