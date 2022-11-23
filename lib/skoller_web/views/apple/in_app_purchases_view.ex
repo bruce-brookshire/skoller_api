@@ -2,10 +2,12 @@ defmodule SkollerWeb.Apple.InAppPurchasesView do
   @moduledoc false
   use SkollerWeb, :view
 
-  def render("submit_receipt_success.json", %{data: resp}) do
+  alias SkollerWeb.Api.V1.Stripe.SubscriptionView
+
+  def render("submit_receipt_success.json", %{data: subscription}) do
     %{
       message: "Receipt validated successfully and subscription created/updated",
-      data: resp
+      data: render_one(subscription, SubscriptionView, "subscription.json")
     }
   end
 

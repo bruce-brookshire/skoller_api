@@ -11,9 +11,7 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
 
   def submit_receipt(conn,
     %{
-      "purchaseID" => purchase_id,
       "skollerUserId" => user_id,
-      "productID" => product_id,
       "verificationData" => %{
         "serverVerificationData" => encoded_receipt_data
       }

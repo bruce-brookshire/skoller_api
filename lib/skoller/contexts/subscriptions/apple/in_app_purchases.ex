@@ -98,6 +98,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     subscription
     |> Subscription.changeset(%{
       transaction_id: Map.get(current_receipt, "transaction_id", nil),
+      platform: :in_app,
       created_at_ms: created_at,
       renewal_interval: interval,
       payment_method: :in_app,
@@ -107,7 +108,6 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
       current_status: :active
     })
     |> Skoller.Repo.update()
-    |> IO.inspect(label: "updated")
   end
 
   @spec get_current_receipt(list()) :: map()

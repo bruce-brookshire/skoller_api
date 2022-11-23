@@ -57,6 +57,7 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     |> Skoller.Schema.Subscription.changeset(
       %{
         cancel_at_ms: nil,
+        platform: :stripe,
         transaction_id: new_subscription.id,
         current_status: current_item.current_status,
         created_at_ms: current_item.created,
