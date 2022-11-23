@@ -22,14 +22,14 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
     |> case do
       {:ok, data} ->
         case InAppPurchases.create_update_subscription(data, user_id) do
-          {:ok, resp} ->
+          {:ok, subscription} ->
             conn
             |> put_view(InAppPurchasesView)
-            |> render("submit_receipt_success.json", %{data: resp})
-          {:error, resp} ->
+            |> render("submit_receipt_success.json", %{data: subscription})
+          {:error, changeset} ->
             conn
             |> put_view(InAppPurchasesView)
-            |> render("submit_receipt_validation_success_subscription_failed.json", %{data: resp})
+            |> render("submit_receipt_validation_success_subscription_failed.json", %{data: changeset.errors})
         end
 
       {:error, resp} ->

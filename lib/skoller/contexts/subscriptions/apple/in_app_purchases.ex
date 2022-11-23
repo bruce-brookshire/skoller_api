@@ -45,23 +45,28 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   def create_update_subscription(%{latest_receipt: latest_receipt, renewal_info: renewal_info}, user_id) do
     case SubscriptionContext.get_subscription_by_user_id(user_id) do
       %Subscription{} = subscription ->
-        update_subscription(subscription, latest_receipt, renewal_info)
+        case update_subscription(subscription, latest_receipt, renewal_info) do
+          {:ok, %Subscription{} = subscription} -> {:ok, subscription}
+          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+        end
       nil ->
-        create_subscription(user_id, latest_receipt, renewal_info)
+        case create_subscription(user_id, latest_receipt, renewal_info) do
+          {:ok, %Subscription{}} = subscription -> {:ok, subscription}
+          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+        end
     end
   end
 
   @spec create_subscription(integer(), list(), list()) ::
     {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
   defp create_subscription(user_id, latest_receipt, renewal_info) do
+    Logger.info("Creating IAP subscription for user: #{user_id}")
     current_receipt = get_current_receipt(latest_receipt)
-    |> IO.inspect
     current_renewal_info = List.first(renewal_info)
-    |> IO.inspect
 
-    interval = map_interval(Map.get(current_receipt, "product_id", :nil)) |> IO.inspect(label: "interval")
+    interval = map_interval(Map.get(current_receipt, "product_id", :nil))
     created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
-    expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", :error), interval)
+    expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
 
     %Subscription{}
     |> Subscription.changeset(%{
@@ -76,13 +81,33 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
       cancel_at_ms: get_cancel_at_for_creation(created_at, interval, expiration_intent),
       current_status: :active
     })
-    |> Skoller.Repo.insert!()
+    |> Skoller.Repo.insert()
   end
 
   @spec update_subscription(Subscription.t(), list(), list()) ::
     {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
   defp update_subscription(subscription, latest_receipt, renewal_info) do
+    Logger.info("Updating IAP subscription for user: #{subscription.user_id}")
+    current_receipt = get_current_receipt(latest_receipt)
+    current_renewal_info = List.first(renewal_info)
 
+    interval = map_interval(Map.get(current_receipt, "product_id", :nil))
+    created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
+    expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
+
+    subscription
+    |> Subscription.changeset(%{
+      transaction_id: Map.get(current_receipt, "transaction_id", nil),
+      created_at_ms: created_at,
+      renewal_interval: interval,
+      payment_method: :in_app,
+      expiration_intent: expiration_intent,
+      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "auto_renew_status", :error)),
+      cancel_at_ms: get_cancel_at_for_creation(created_at, interval, expiration_intent),
+      current_status: :active
+    })
+    |> Skoller.Repo.update()
+    |> IO.inspect(label: "updated")
   end
 
   @spec get_current_receipt(list()) :: map()
@@ -110,7 +135,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     end
   end
 
-  defp map_expiration_intent(:error, _interval), do: :error
+  defp map_expiration_intent(:error, _interval), do: nil
   defp map_expiration_intent(_expiration_intent, :lifetime), do: nil
   defp map_expiration_intent(expiration_intent, _interval) do
     case Map.get(@expiration_intent_map, expiration_intent, :error) do
