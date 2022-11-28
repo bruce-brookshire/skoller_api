@@ -104,7 +104,7 @@ defmodule Skoller.Users do
         {:ok, user}
 
       {:error, _, failed_val, _} ->
-        Logger.error("Signup failure. Failed value: #{failed_val}")
+        Logger.error("Signup failure. Failed value: #{inspect(failed_val)}")
         {:error, failed_val}
     end
   end
