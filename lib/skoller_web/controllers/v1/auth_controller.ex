@@ -94,10 +94,7 @@ defmodule SkollerWeb.Api.V1.AuthController do
   end
 
   def token(conn, _params) do
-    user = conn.assigns[:user]
-    subscriptions = Task.async(fn  -> get_subscription_list(user.id)   end)
-    token = user
-            |> Map.merge(%{subscriptions: Task.await(subscriptions, :infinity)})
+    token = conn.assigns[:user]
 
     conn
     |> put_view(AuthView)

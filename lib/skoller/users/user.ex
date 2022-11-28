@@ -13,6 +13,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Organizations.OrgOwners.OrgOwner
   alias Skoller.Organizations.OrgMembers.OrgMember
   alias Skoller.CancellationReasons.CancellationReason
+  alias Skoller.Schema.Subscription
 
   schema "users" do
     field :email, :string
@@ -35,6 +36,7 @@ defmodule Skoller.Users.User do
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
+    has_one :subscription, Subscription
 
     has_many :org_owners, OrgOwner
     has_many :org_members, OrgMember
@@ -46,7 +48,7 @@ defmodule Skoller.Users.User do
     timestamps()
   end
 
-  @req_fields []
+  @req_fields [:phone]
   @opt_fields [:pic_path, :password]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
