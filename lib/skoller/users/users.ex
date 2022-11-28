@@ -104,7 +104,7 @@ defmodule Skoller.Users do
         {:ok, user}
 
       {:error, _, failed_val, _} ->
-        IO.puts("ATTENTION SIGNUP 404:")
+        Logger.error("Signup failure. Failed value: #{failed_val}")
         {:error, failed_val}
     end
   end
