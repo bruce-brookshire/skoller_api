@@ -157,7 +157,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   defp get_cancel_at_for_creation(created_at, :year, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
-    |> DateTime.from_unix!()
+    |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_naive()
     |> Timex.shift(years: 1)
     |> Timex.to_unix()
@@ -167,7 +167,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   defp get_cancel_at_for_creation(created_at, :month, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
-    |> DateTime.from_unix!()
+    |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_naive()
     |> Timex.shift(months: 1)
     |> Timex.to_unix()
