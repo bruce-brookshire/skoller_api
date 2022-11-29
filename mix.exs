@@ -50,6 +50,7 @@ defmodule Skoller.Mixfile do
       {:ex_mvc, "~> 0.3.0", github: "flyrboy96/ex_mvc"},
       {:ex_twilio, "~> 0.9.1"},
       {:gettext, "~> 0.11"},
+      {:jose, "~> 1.11"},
       {:httpoison, "~> 1.8.2"},
       {:faker, "~> 0.17.0"},
       {:guardian, "~> 2.1"},
