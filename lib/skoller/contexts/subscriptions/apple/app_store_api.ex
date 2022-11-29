@@ -2,11 +2,15 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
 
   def get_subscription_info_by_transaction_id(transaction_id) do
     token = get_signed_token()
-    HTTPoison.get(
+    with {:ok, %HTTPoison.Response{body: body, status_code: 200}} <- HTTPoison.get(
       Application.fetch_env!(:skoller, :apple_app_store_connect_api) <> "/subscriptions/#{transaction_id}",
-      [{"Content-Type", "application/json"}, {"Accept", "application/json"}, {"Authorization", "Bearer #{token}"}]
-    )
-    |> IO.inspect()
+        [{"Content-Type", "application/json"}, {"Accept", "application/json"}, {"Authorization", "Bearer #{token}"}]
+      ),
+      {:ok, %{} = parsed_body} <- Jason.decode!(body) do
+        {:ok, parsed_body}
+      end
+      |> IO.inspect
+
   end
 
   defp get_signed_token() do
