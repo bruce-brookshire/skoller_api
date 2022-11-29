@@ -48,7 +48,7 @@ defmodule Skoller.Users.User do
     timestamps()
   end
 
-  @req_fields [:phone]
+  @req_fields []
   @opt_fields [:pic_path, :password]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
