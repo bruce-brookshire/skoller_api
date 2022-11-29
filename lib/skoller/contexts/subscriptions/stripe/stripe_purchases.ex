@@ -60,7 +60,7 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
         platform: :stripe,
         transaction_id: new_subscription.id,
         current_status: current_item.current_status,
-        created_at_ms: current_item.created,
+        created_at_ms: current_item.created * 1000,
         expiration_intent: current_item.cancel_status,
         auto_renew_status: current_item.renew_status,
         renewal_interval: current_item.renewal_interval
@@ -75,7 +75,7 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     |> Subscription.changeset(
       %{
         expiration_intent: map_cancel_status(subscription),
-        cancel_at_ms: subscription.cancel_at,
+        cancel_at_ms: subscription.cancel_at * 1000,
         auto_renew_status: :stripe_auto_renew_disabled,
         renewal_interval: nil
       }
