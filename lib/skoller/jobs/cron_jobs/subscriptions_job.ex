@@ -47,7 +47,7 @@ defmodule Skoller.CronJobs.SubscriptionsJob do
               current_status: current_item.current_status,
               expiration_intent: current_item.cancel_status,
               renew_status: :stripe_auto_renew_disabled,
-              cancel_at_ms: subscription.cancel_at
+              cancel_at_ms: subscription.cancel_at * 1000
             }
           )
           |> Skoller.Repo.update!()
