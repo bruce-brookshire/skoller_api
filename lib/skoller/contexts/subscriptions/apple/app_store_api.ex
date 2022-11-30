@@ -1,17 +1,44 @@
 defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
 
+  alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.Response, as: SubscriptionResponse
+
   def get_subscription_info_by_transaction_id(transaction_id) do
+    case get_subscription_info(transaction_id) do
+      %SubscriptionResponse{} = resp ->
+        %{
+          renewal_info: SubscriptionResponse.get_signed_renewal_info(resp),
+          transaction_info: SubscriptionResponse.get_signed_transaction_info(resp)
+        }
+      {:error, %Ecto.Changeset{} = changeset} -> changeset
+    end
+  end
+
+  def handle_notification(note) do
+
+  end
+
+  defp get_subscription_info(transaction_id) do
     token = get_signed_token()
+
     with {:ok, %HTTPoison.Response{body: body, status_code: 200}} <- HTTPoison.get(
       Application.fetch_env!(:skoller, :apple_app_store_connect_api) <> "/subscriptions/#{transaction_id}",
         [{"Content-Type", "application/json"}, {"Accept", "application/json"}, {"Authorization", "Bearer #{token}"}]
       ),
-      {:ok, %{} = parsed_body} <- Jason.decode!(body) do
-        {:ok, parsed_body}
+      resp <- Jason.decode!(body, keys: :atoms),
+      {:ok, parsed_resp} <- EctoMorph.cast_to_struct(resp, SubscriptionResponse) do
+        parsed_resp
+      else
+        result -> result
       end
-      |> IO.inspect
-
+      |> case do
+        {:error, %Ecto.Changeset{} = changeset} ->
+          Logger.error("Unable to cast subscription response to Subscription.Response: #{inspect(changeset)}")
+          changeset
+        resp -> resp
+      end
   end
+
+  defp handle_notification(notification)
 
   defp get_signed_token() do
     create_signed_jwt(
@@ -36,7 +63,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
   end
 
   @spec compile_jwt_payload() :: map()
-  def compile_jwt_payload() do
+  defp compile_jwt_payload() do
     %{
       "iss" => Application.fetch_env!(:skoller, :apple_issuer_id),
       "iat" => DateTime.utc_now() |> Timex.to_unix(),
@@ -47,7 +74,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
   end
 
   @spec create_signed_jwt(JOSE.JWK.t(), map(), map()) :: String.t()
-  def create_signed_jwt(jwk, jws, jwt) do
+  defp create_signed_jwt(jwk, jws, jwt) do
     JOSE.JWT.sign(jwk, jws, jwt)
     |> JOSE.JWS.compact()
     |> elem(1)

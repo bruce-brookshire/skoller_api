@@ -40,6 +40,7 @@ defmodule Skoller.Mixfile do
       {:credo, "~> 1.6.4", only: [:dev, :test], runtime: false},
       {:csv, "~> 3.0.1"},
       {:ecto, "~> 3.9.1"},
+      {:ecto_morph, "~> 0.1.28"},
       {:ecto_sql, "~> 3.9.0"},
       {:ecto_enum, "~> 1.4"},
       {:elixir_xml_to_map, "~> 3.0.0"},
