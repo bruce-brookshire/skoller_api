@@ -58,6 +58,8 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
   def transaction_updated(conn, params) do
     IO.inspect(params, label: "TRANSACTION UPDATED WEBHOOK")
 
+    IO.inspect(JOSE.JWT.peek_payload(params["signedPayload"]), label: "PAYLOAD PEEKED")
+
     conn
     |> Plug.Conn.send_resp(200, "Received")
   end
