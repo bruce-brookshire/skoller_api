@@ -110,6 +110,8 @@ defmodule Skoller.ClassDocs do
       |> Ecto.Multi.run(:status, fn _, changes -> ClassStatuses.check_status(class, changes) end)
       |> Repo.transaction()
 
+    IO.inspect(result, label: "RESULT RESULT RESULT**********")
+
     case result do
       {:ok, doc} ->
         {:ok, doc}
