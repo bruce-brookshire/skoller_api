@@ -15,7 +15,9 @@ config :skoller,
   apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_PRIVATE_KEY"),
   apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_KEY_ID"),
   apple_issuer_id: System.get_env("APPLE_STAGING_APP_ISSUER_ID"),
-  apple_bundle_id: System.get_env("APPLE_STAGING_APP_BUNDLE_ID")
+  apple_bundle_id: System.get_env("APPLE_STAGING_APP_BUNDLE_ID"),
+  aws_s3_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
+  aws_s3_secret_key: System.get_env("S3_STAGING_API_DOCS_SECRET_KEY")
 
 config :logger,
   truncate: :infinity
@@ -35,7 +37,7 @@ config :logger, :console,
 # This is for file uploads.
 config :arc,
   storage: Arc.Storage.S3,
-  bucket: {:system, "AWS_S3_BUCKET"}
+  bucket: {:system, "S3_STAGING_API_DOCS_BUCKET"}
 
 # Configuration for simplified MVC+S module declarations
 config :ex_mvc,
@@ -44,8 +46,9 @@ config :ex_mvc,
 
 #this is for AWS access
 config :ex_aws,
-  access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
-  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
+  json_codec: Jason,
+  access_key_id: {:system, "S3_STAGING_API_DOCS_KEY_ID"},
+  secret_access_key: {:system, "S3_STAGING_API_DOCS_SECRET_KEY"}
 
 #this is for texting
 config :ex_twilio,
