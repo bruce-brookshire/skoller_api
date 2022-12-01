@@ -47,8 +47,8 @@ config :ex_mvc,
 #this is for AWS access
 config :ex_aws,
   json_codec: Jason,
-  access_key_id: {:system, "S3_STAGING_API_DOCS_KEY_ID"},
-  secret_access_key: {:system, "S3_STAGING_API_DOCS_SECRET_KEY"}
+  access_key_id: System.get_env("S3_PROD_API_DOCS_KEY_ID"),
+  secret_access_key: System.get_env("S3_PROD_API_DOCS_SECRET_KEY")
 
 #this is for texting
 config :ex_twilio,
