@@ -30,8 +30,9 @@ defmodule SkollerWeb.Endpoint do
 
   plug Plug.Parsers,
   parsers: [:urlencoded, :multipart, :json, {:xml, length: 100_000_000}],
+  length: 100_000_000,
   pass: ["*/*"],
-  json_decoder: Poison
+  json_decoder: Jason
 
   plug Plug.MethodOverride
   plug Plug.Head
