@@ -22,11 +22,17 @@ defmodule SkollerWeb.Api.V1.Class.DocController do
            sammi: true
          ) do
       {:ok, %{doc: doc}} ->
+        IO.inspect(doc, label: "DOC IN DOCS CONTROLLER***********")
         conn
         |> put_view(DocView)
         |> render("show.json", doc: doc)
+      {:error, changeset} ->
+        IO.inspect(changeset, label: "ERROR CHANGESET **********")
+        conn
+        |> put_status(:unprocessable_entity)
 
       {:error, _, failed_value, _} ->
+        IO.inspect(failed_value)
         conn
         |> put_status(:unprocessable_entity)
         |> put_view(ChangesetView)
