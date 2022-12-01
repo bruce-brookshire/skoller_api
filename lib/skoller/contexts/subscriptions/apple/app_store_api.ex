@@ -19,8 +19,6 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
       |> Map.get(:fields)
       |> EctoMorph.cast_to_struct(NotificationResponse)
       |> elem(1)
-      |> Map.put(:notificationType, "DID_CHANGE_RENEWAL_STATUS")
-      |> Map.put(:subtype, "AUTO_RENEW_DISABLED")
       |> case do
         %NotificationResponse{} = resp -> NotificationResponse.handle_notification_type(resp.notificationType, resp)
         %Ecto.Changeset{} = changeset -> {:error, changeset}
