@@ -1,4 +1,4 @@
-defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.SignedRenewal do
+defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedRenewal do
   use Ecto.Schema
 
   @type t :: %__MODULE__{

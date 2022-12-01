@@ -8,6 +8,7 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
   alias Skoller.Contexts.Subscriptions.Apple.InAppPurchases
   alias Skoller.Contexts.Subscriptions, as: SubscriptionContexts
   alias SkollerWeb.Api.V1.Stripe.SubscriptionView
+  alias Skoller.Contexts.Subscriptions.Apple.AppStoreApi
 
   def submit_receipt(conn,
     %{
@@ -55,10 +56,8 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
     end
   end
 
-  def transaction_updated(conn, params) do
-    IO.inspect(params, label: "TRANSACTION UPDATED WEBHOOK")
-
-    IO.inspect(JOSE.JWT.peek_payload(params["signedPayload"]), label: "PAYLOAD PEEKED")
+  def transaction_updated(conn, %{"signedPayload" => payload}) do
+    AppStoreApi.handle_webhook_notification(payload)
 
     conn
     |> Plug.Conn.send_resp(200, "Received")

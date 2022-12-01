@@ -1,6 +1,7 @@
 defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
 
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.Response, as: SubscriptionResponse
+  alias Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response, as: NotificationResponse
 
   def get_subscription_info_by_transaction_id(transaction_id) do
     case get_subscription_info(transaction_id) do
@@ -13,8 +14,18 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
     end
   end
 
-  def handle_notification(note) do
-
+  def handle_webhook_notification(resp) do
+      JOSE.JWT.peek_payload(resp)
+      |> Map.get(:fields)
+      |> EctoMorph.cast_to_struct(NotificationResponse)
+      |> elem(1)
+      |> Map.put(:notificationType, "DID_CHANGE_RENEWAL_STATUS")
+      |> Map.put(:subtype, "AUTO_RENEW_DISABLED")
+      |> case do
+        %NotificationResponse{} = resp -> NotificationResponse.handle_notification_type(resp.notificationType, resp)
+        %Ecto.Changeset{} = changeset -> {:error, changeset}
+      end
+      |> IO.inspect()
   end
 
   defp get_subscription_info(transaction_id) do
@@ -37,8 +48,6 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
         resp -> resp
       end
   end
-
-  defp handle_notification(notification)
 
   defp get_signed_token() do
     create_signed_jwt(

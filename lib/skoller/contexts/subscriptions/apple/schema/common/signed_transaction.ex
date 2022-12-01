@@ -1,4 +1,4 @@
-defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.SignedTransaction do
+defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedTransaction do
   use Ecto.Schema
 
   @type t :: %__MODULE__{

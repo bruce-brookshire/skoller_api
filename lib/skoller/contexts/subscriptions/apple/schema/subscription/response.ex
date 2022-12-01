@@ -5,8 +5,8 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.Response do
   require Logger
 
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.Data
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.SignedTransaction
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.SignedRenewal
+  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedTransaction
+  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedRenewal
 
   @type t :: %__MODULE__{
     bundleId: String.t(),
