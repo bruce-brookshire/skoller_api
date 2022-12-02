@@ -37,9 +37,3 @@ defmodule Skoller.Repo.Migrations.ModifyPlatformTypeForSubscriptions do
     end
   end
 end
-
-
-# execute("""
-# UPDATE plaid_transactions SET sync_status =
-#   CASE WHEN sijome_transaction_match_id IS NOT NULL THEN 'synced'::transaction_sync_status ELSE 'not_synced'::transaction_sync_status END
-# """)
