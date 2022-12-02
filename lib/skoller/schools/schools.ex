@@ -252,11 +252,9 @@ defmodule Skoller.Schools do
   end
 
   defp add_future_periods(school) do
-    # Hard coded because this should not be the way this is done.
-    # 2019 will be the default only for now.
-    # TODO: Figure out the long term solution based on success or failure of new
-    # onboarding.
-    Periods.generate_periods_for_year_for_school(school.id, 2020)
+    current_year = DateTime.utc_now().year
+    Periods.generate_periods_for_year_for_school(school.id, current_year)
+    Periods.generate_periods_for_year_for_school(school.id, current_year + 1)
     school
   end
 
