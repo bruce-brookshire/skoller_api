@@ -83,7 +83,7 @@ defmodule Skoller.ClassDocs do
     `{:ok, doc}` or `{:error, changeset}`
   """
   def upload_doc(file, user_id, class_id, is_syllabus, opts \\ []) do
-    location = file |> upload_class_doc() |> IO.inspect(label: "path")
+    location = file |> upload_class_doc()
 
     if Keyword.get(opts, :sammi, false) do
       Task.start(Sammi, :sammi, [
