@@ -7,9 +7,9 @@ defmodule Skoller.Students.StudentReferralsReport do
   require Logger
 
   def compile_referred_students_report() do
-    subscriptions = subscriptions()
-    inactive_users = inactive_users(subscriptions)
+    subscriptions = Skoller.Repo.all(Skoller.Schema.Subscription)
     active_users = active_users(subscriptions)
+    inactive_users = inactive_users(subscriptions)
 
     filename = "StudentReferalsReport-" <> get_file_base()
     dir = "student_referrals_csv"
@@ -21,16 +21,16 @@ defmodule Skoller.Students.StudentReferralsReport do
       left_join: referring_user in Skoller.Users.User, on: referring_user.student_id == referring_student.id,
       left_join: referred_students in Skoller.Students.Student, on: referred_students.enrolled_by_student_id == referring_student.id,
       left_join: referred_user in Skoller.Users.User, on: referred_user.student_id == referred_students.id,
-      left_join: payment in Skoller.Payments.Stripe, on: referred_user.id == payment.user_id,
-      preload: [enrolled_students: [user: :customer_info]],
+      left_join: subscription in Skoller.Schema.Subscription, on: referred_user.id == subscription.user_id,
+      preload: [enrolled_students: [user: :subscription]],
       where: not is_nil(referred_user),
       select: %{
         referring_student: referring_student,
         referring_user: referring_user,
         venmo_handle: referring_student.venmo_handle,
         trial: fragment("SUM(CASE WHEN ? AND ? BETWEEN ? AND ? THEN 1 ELSE 0 END)", referred_user.trial, ^DateTime.utc_now, referred_user.trial_start, referred_user.trial_end),
-        premium: fragment("SUM(CASE WHEN ? = ANY(?) AND ? = false THEN 1 ELSE 0 END)", payment.customer_id, ^active_users, referred_user.trial),
-        expired: fragment("SUM(CASE WHEN ? = false AND ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, payment.customer_id, ^inactive_users)
+        premium: fragment("SUM(CASE WHEN ? = ANY(?) AND ? = false THEN 1 ELSE 0 END)", subscription.user_id, ^active_users, referred_user.trial),
+        expired: fragment("SUM(CASE WHEN ? = false AND ? = ANY(?) THEN 1 ELSE 0 END)", referred_user.trial, subscription.user_id, ^inactive_users)
       },
       group_by: [referring_student.id, referring_user.id]
     )
@@ -45,21 +45,16 @@ defmodule Skoller.Students.StudentReferralsReport do
     |> store_document(scope)
   end
 
-  defp subscriptions do
-    {:ok, %Stripe.List{data: subscriptions}} = Stripe.Subscription.list(%{status: "all"})
-    subscriptions
-  end
-
   defp inactive_users(subscriptions) do
     subscriptions
-    |> Enum.reject(&(&1.status == "active"))
-    |> Enum.map(&(&1.customer))
+    |> Enum.reject(&(&1.current_status == :active))
+    |> Enum.map(&(&1.user_id))
   end
 
   defp active_users(subscriptions) do
     subscriptions
-    |> Enum.reject(&(&1.status != "active"))
-    |> Enum.map(&(&1.customer))
+    |> Enum.reject(&(&1.current_status != :active))
+    |> Enum.map(&(&1.user_id))
   end
 
   defp gather_collections_and_commissions(query_results, subscriptions) do
@@ -79,8 +74,8 @@ defmodule Skoller.Students.StudentReferralsReport do
       if !is_nil(enrolled_students) do
         collection =
         Enum.reduce(enrolled_students, 0, fn enrolled_student, acc ->
-          if !is_nil(enrolled_student.user.customer_info) do
-            subscription = Enum.find(subscriptions, nil, & &1.customer == enrolled_student.user.customer_info.customer_id)
+          if !is_nil(enrolled_student.user.subscription) do
+            subscription = Enum.find(subscriptions, nil, & &1.user_id == enrolled_student.user.subscription.user_id)
             calculate_collection(subscription)
           else
             0.0
@@ -89,8 +84,9 @@ defmodule Skoller.Students.StudentReferralsReport do
 
         commission =
           Enum.reduce(enrolled_students, 0, fn enrolled_student, acc ->
-            if !is_nil(enrolled_student.user.customer_info) do
-              subscription = Enum.find(subscriptions, nil, & &1.customer == enrolled_student.user.customer_info.customer_id)
+            if !is_nil(enrolled_student.user.subscription) do
+
+              subscription = Enum.find(subscriptions, nil, & &1.user_id == enrolled_student.user.subscription.user_id)
               calculate_commission(subscription)
             else
               0.0
@@ -105,13 +101,15 @@ defmodule Skoller.Students.StudentReferralsReport do
     end)
   end
 
-  defp calculate_collection(%{plan: %{amount: amount}}) when amount > 0, do: amount / 100
-  defp calculate_collection(%{plan: %{amount: 0}}), do: 0
-  defp calculate_collection(nil), do: 0
+  defp calculate_collection(%{renewal_interval: :year, platform: :ios}), do: 54.99
+  defp calculate_collection(%{renewal_interval: :month, platform: :ios}), do: 5.49
+  defp calculate_collection(%{renewal_interval: :year, platform: :stripe}), do: 40.00
+  defp calculate_collection(%{renewal_interval: :month, platform: :stripe}), do: 4.00
+  defp calculate_collection(_), do: 0
 
-  defp calculate_commission(%{plan: %{amount: amount}}) when amount > 0, do: (amount / 100) * (1.0 / 3.0)
-  defp calculate_commission(%{plan: %{amount: 0}}), do: 0
-  defp calculate_commission(nil), do: 0
+  defp calculate_commission(%{renewal_interval: :year}), do: 10.00
+  defp calculate_commission(%{renewal_interval: :month}), do: 1.00
+  defp calculate_commission(_), do: 0
 
   defp parse_to_list(data) do
     Enum.reduce(data, [],  fn data, acc ->
