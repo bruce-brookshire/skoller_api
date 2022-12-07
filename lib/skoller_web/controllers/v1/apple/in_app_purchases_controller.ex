@@ -10,6 +10,8 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
   alias SkollerWeb.Api.V1.Stripe.SubscriptionView
   alias Skoller.Contexts.Subscriptions.Apple.AppStoreApi
 
+  require Logger
+
   def submit_receipt(conn,
     %{
       "skollerUserId" => user_id,
