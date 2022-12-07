@@ -21,11 +21,12 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
       |> IO.inspect(label: "PEEKING PAYLOAD**********")
       |> Map.get(:fields)
       |> EctoMorph.cast_to_struct(NotificationResponse)
+      |> IO.inspect(label: "handle_webhook_notification/1 after cast_to_strict for NotificationResponse")
       |> elem(1)
       |> case do
         %NotificationResponse{} = resp -> NotificationResponse.handle_notification_type(resp.notificationType, resp)
         %Ecto.Changeset{} = changeset ->
-          Logger.error("Unable to parse payload into a notification response in AppStoreApi.handle_webhook_notification/2. Changeset: #{changeset}")
+          Logger.error("Unable to parse payload into a notification response in AppStoreApi.handle_webhook_notification/1. Changeset: #{changeset}")
           {:error, changeset}
       end
   end

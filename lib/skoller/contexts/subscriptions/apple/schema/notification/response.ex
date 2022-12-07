@@ -31,7 +31,9 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   def get_signed_renewal_info(%{data: %{signedRenewalInfo: renewal_info}}) do
     renewal_info
     |> JOSE.JWT.peek_payload()
+    |> IO.inspect(label: "PEEKING SIGNED RENEWAL INFO***************")
     |> EctoMorph.cast_to_struct(SignedRenewal)
+    |> IO.inspect(label: "get_signed_renewal_info/1 after cast_to_strict for SignedRenewal")
     |> case do
       {:ok, %SignedRenewal{} = renewal_info} -> renewal_info
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -44,7 +46,9 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   def get_signed_transaction_info(%{data: %{signedTransactionInfo: signed_transaction}}) do
     signed_transaction
     |> JOSE.JWT.peek_payload()
+    |> IO.inspect(label: "PEEKING SIGNED TRANSACTION INFO***************")
     |> EctoMorph.cast_to_struct(SignedTransaction)
+    |> IO.inspect(label: "get_signed_transaction_info/1 after cast_to_strict for SignedTransaction")
     |> case do
       {:ok, %SignedTransaction{} = transaction} -> transaction
       {:error, %Ecto.Changeset{} = changeset} ->
