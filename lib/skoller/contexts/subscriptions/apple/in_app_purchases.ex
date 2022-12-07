@@ -70,7 +70,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
     %Subscription{}
     |> Subscription.changeset(%{
-      platform: :in_app,
+      platform: :ios,
       user_id: user_id,
       transaction_id: Map.get(current_receipt, "transaction_id", nil),
       created_at_ms: created_at,
@@ -98,7 +98,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     subscription
     |> Subscription.changeset(%{
       transaction_id: Map.get(current_receipt, "transaction_id", nil),
-      platform: :in_app,
+      platform: :ios,
       created_at_ms: created_at,
       renewal_interval: interval,
       payment_method: :in_app,

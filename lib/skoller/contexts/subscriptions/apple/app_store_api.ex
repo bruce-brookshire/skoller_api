@@ -3,6 +3,8 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Subscription.Response, as: SubscriptionResponse
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response, as: NotificationResponse
 
+  require Logger
+
   def get_subscription_info_by_transaction_id(transaction_id) do
     case get_subscription_info(transaction_id) do
       %SubscriptionResponse{} = resp ->
@@ -16,14 +18,16 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
 
   def handle_webhook_notification(resp) do
       JOSE.JWT.peek_payload(resp)
+      |> IO.inspect(label: "PEEKING PAYLOAD**********")
       |> Map.get(:fields)
       |> EctoMorph.cast_to_struct(NotificationResponse)
       |> elem(1)
       |> case do
         %NotificationResponse{} = resp -> NotificationResponse.handle_notification_type(resp.notificationType, resp)
-        %Ecto.Changeset{} = changeset -> {:error, changeset}
+        %Ecto.Changeset{} = changeset ->
+          Logger.error("Unable to parse payload into a notification response in AppStoreApi.handle_webhook_notification/2. Changeset: #{changeset}")
+          {:error, changeset}
       end
-      |> IO.inspect()
   end
 
   defp get_subscription_info(transaction_id) do
