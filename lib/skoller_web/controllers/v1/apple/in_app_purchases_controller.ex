@@ -57,6 +57,8 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
   end
 
   def transaction_updated(conn, %{"signedPayload" => payload}) do
+    Logger.info("IOS Transaction Event Received: #{inspect(payload)}")
+    IO.inspect(payload, label: "PAYLOAD DATA******", limit: :infinity)
     AppStoreApi.handle_webhook_notification(payload)
 
     conn
