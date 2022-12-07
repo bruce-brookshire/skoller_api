@@ -95,9 +95,11 @@ defmodule Skoller.Periods do
   """
   def create_period(params, opts \\ []) do
     ClassPeriod.changeset_insert(%ClassPeriod{}, params)
+    |> IO.inspect()
     |> find_changeset_status()
     |> find_changeset_main_period(params, opts)
     |> Repo.insert()
+    |> IO.inspect()
   end
 
   @doc """
