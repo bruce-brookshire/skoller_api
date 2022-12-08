@@ -29,6 +29,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.AppStoreApi do
           Logger.error("Unable to parse payload into a notification response in AppStoreApi.handle_webhook_notification/1. Changeset: #{changeset}")
           {:error, changeset}
       end
+      |> IO.inspect(label: "AFTER handle_webhook_notification/1")
   end
 
   defp get_subscription_info(transaction_id) do
