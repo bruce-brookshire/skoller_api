@@ -88,6 +88,9 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
   defp update_subscription(subscription, latest_receipt, renewal_info) do
     Logger.info("Updating IAP subscription for user: #{subscription.user_id}")
+    Logger.info("subscription: #{inspect(subscription)}")
+    Logger.info("latest_receipt #{inspect(latest_recepit)}")
+    Logger.info("renewal_info #{inspect(renewal_info)}")
     current_receipt = get_current_receipt(latest_receipt)
     current_renewal_info = List.first(renewal_info)
 
