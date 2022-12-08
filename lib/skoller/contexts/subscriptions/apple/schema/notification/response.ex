@@ -33,6 +33,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     renewal_info
     |> JOSE.JWT.peek_payload()
     |> IO.inspect(label: "PEEKING SIGNED RENEWAL INFO***************")
+    |> Map.get(:fields)
     |> EctoMorph.cast_to_struct(SignedRenewal)
     |> IO.inspect(label: "get_signed_renewal_info/1 after cast_to_strict for SignedRenewal")
     |> case do
@@ -48,6 +49,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     signed_transaction
     |> JOSE.JWT.peek_payload()
     |> IO.inspect(label: "PEEKING SIGNED TRANSACTION INFO***************")
+    |> Map.get(:fields)
     |> EctoMorph.cast_to_struct(SignedTransaction)
     |> IO.inspect(label: "get_signed_transaction_info/1 after cast_to_strict for SignedTransaction")
     |> case do
