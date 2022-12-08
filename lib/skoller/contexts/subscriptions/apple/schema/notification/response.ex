@@ -113,4 +113,14 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     IO.inspect(renewal_info, label: "morphed renewal info")
     IO.inspect(transaction_info, label: "morphed transaction info")
   end
+
+  defp handle_subtype(nil, resp) do
+    IO.puts "DID_RENEW/nil"
+    IO.inspect(resp.data.signedRenewalInfo, label: "renewalInfo")
+    IO.inspect(resp.data.signedTransactionInfo, label: "transactionInfo")
+    renewal_info = get_signed_renewal_info(resp)
+    transaction_info = get_signed_transaction_info(resp)
+    IO.inspect(renewal_info, label: "morphed renewal info")
+    IO.inspect(transaction_info, label: "morphed transaction info")
+  end
 end
