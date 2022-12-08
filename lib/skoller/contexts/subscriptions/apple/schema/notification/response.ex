@@ -67,7 +67,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   end
 
   def handle_notification_type("DID_RENEW", resp) do
-    IO.inspect("DID_RENEW - #{inspect(resp)}")
+    handle_subtype(resp.subtype, resp)
   end
 
   def handle_notification_type("EXPIRED", resp) do
@@ -92,12 +92,20 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     transaction_info = get_signed_transaction_info(resp)
     IO.inspect(renewal_info, label: "morphed renewal info")
     IO.inspect(transaction_info, label: "morphed transaction info")
-
-    # TODO NEED TO DO THIS STUFF
   end
 
   defp handle_subtype("RESUBSCRIBE", resp) do
     IO.puts "SUBSCRIBED/RESUBSCRIBE"
+    IO.inspect(resp.data.signedRenewalInfo, label: "renewalInfo")
+    IO.inspect(resp.data.signedTransactionInfo, label: "transactionInfo")
+    renewal_info = get_signed_renewal_info(resp)
+    transaction_info = get_signed_transaction_info(resp)
+    IO.inspect(renewal_info, label: "morphed renewal info")
+    IO.inspect(transaction_info, label: "morphed transaction info")
+  end
+
+  defp handle_subtype("BILLING_RECOVERY", resp) do
+    IO.puts "DID_RENEW/BILLING_RECOVERY"
     IO.inspect(resp.data.signedRenewalInfo, label: "renewalInfo")
     IO.inspect(resp.data.signedTransactionInfo, label: "transactionInfo")
     renewal_info = get_signed_renewal_info(resp)
