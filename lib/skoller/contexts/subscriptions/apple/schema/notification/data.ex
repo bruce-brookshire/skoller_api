@@ -13,7 +13,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Data do
   embedded_schema do
     field(:bundleId, :string)
     field(:environment, :string)
-    embeds_one(:signedRenewalInfo, SignedRenewal)
-    embeds_one(:signedTransactionInfo, SignedTransaction)
+    field(:signedRenewalInfo, :string)
+    field(:signedTransactionInfo, :string)
   end
 end

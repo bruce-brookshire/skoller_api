@@ -21,6 +21,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   embedded_schema do
     embeds_one(:data, Data)
     field(:notificationType, :string)
+    field(:notificationUUID, :string)
     field(:subtype, :string)
     field(:signedDate, :integer)
     field(:version, :string)
