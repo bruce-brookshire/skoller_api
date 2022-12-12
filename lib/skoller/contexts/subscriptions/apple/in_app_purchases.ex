@@ -95,6 +95,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     current_renewal_info = List.first(renewal_info)
 
     interval = map_interval(Map.get(current_receipt, "product_id", :nil))
+    |> IO.inspect()
     created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
     expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
 
@@ -160,6 +161,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   defp get_cancel_at_for_creation(created_at, :year, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
+    |> convert_ms_time()
     |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_naive()
     |> Timex.shift(years: 1)
@@ -170,12 +172,16 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   defp get_cancel_at_for_creation(created_at, :month, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
+    |> convert_ms_time()
     |> DateTime.from_unix!(:millisecond)
     |> DateTime.to_naive()
     |> Timex.shift(months: 1)
     |> Timex.to_unix()
     |> Kernel.*(1000)
   end
+
+  defp convert_ms_time(ms_time), when is_binary(ms_time), do: elem(Integer.parse(ms_time), 0)
+  defp convert_ms_time(ms_time), when is_integer(ms_time), do: ms_time
 
 
   @spec handle_status(%{String.t() => integer()}) ::
@@ -300,6 +306,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   defp handle_status(%{"status" => 0} = response) do
     response
     |> then(fn resp ->
+      IO.inspect(resp)
       latest_receipt = Map.get(resp, "latest_receipt_info", nil)
       renewal_info = Map.get(resp, "pending_renewal_info", nil)
 
