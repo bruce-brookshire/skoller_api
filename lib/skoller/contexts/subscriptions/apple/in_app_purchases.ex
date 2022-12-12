@@ -95,7 +95,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     current_renewal_info = List.first(renewal_info)
 
     interval = map_interval(Map.get(current_receipt, "product_id", :nil))
-    |> IO.inspect()
+    |> IO.inspect(label: "interval")
     created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
     expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
 
@@ -180,8 +180,8 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> Kernel.*(1000)
   end
 
-  defp convert_ms_time(ms_time), when is_binary(ms_time), do: elem(Integer.parse(ms_time), 0)
-  defp convert_ms_time(ms_time), when is_integer(ms_time), do: ms_time
+  defp convert_ms_time(ms_time) when is_binary(ms_time), do: elem(Integer.parse(ms_time), 0)
+  defp convert_ms_time(ms_time) when is_integer(ms_time), do: ms_time
 
 
   @spec handle_status(%{String.t() => integer()}) ::
