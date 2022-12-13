@@ -34,6 +34,7 @@ defmodule Skoller.Mixfile do
   defp deps do
     [
       {:arc, "~> 0.11.0"},
+      {:aws, "~> 0.13.0"},
       {:basic_auth, "~> 2.2"},
       {:bcrypt_elixir, "~> 3.0"},
       {:cors_plug, "~> 3.0.3"},
