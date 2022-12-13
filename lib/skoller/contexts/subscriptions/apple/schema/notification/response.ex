@@ -7,8 +7,6 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   require Logger
 
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Data
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedTransaction
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedRenewal
   alias Skoller.Contexts.Subscriptions.Apple.InAppPurchases
 
   @type t :: %__MODULE__{
@@ -76,7 +74,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     subscription = Skoller.Repo.get_by(Skoller.Schema.Subscription, %{transaction_id: transaction_info["originalTransactionId"]})
     if !is_nil(subscription) do
       IO.inspect(subscription, label: "FOUND SUBSCRIPTION")
-      InAppPurchases.cancel_subscription(subscription, transaction_info, renewal_info)
+      InAppPurchases.cancel_subscription(subscription, renewal_info)
     else
       IO.inspect("Subscription not found")
       IO.inspect(transaction_info)

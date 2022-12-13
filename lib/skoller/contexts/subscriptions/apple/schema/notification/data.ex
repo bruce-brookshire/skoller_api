@@ -1,9 +1,6 @@
 defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Data do
   use Ecto.Schema
 
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedTransaction
-  alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedRenewal
-
   @type t :: %__MODULE__{
     bundleId: String.t(),
     environment: String.t()
