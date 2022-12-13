@@ -75,7 +75,12 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     transaction_info = get_signed_transaction_info(resp)
     subscription = Skoller.Repo.get_by(Skoller.Schema.Subscription, %{transaction_id: transaction_info["originalTransactionId"]})
     if !is_nil(subscription) do
+      IO.inspect(subscription, label: "FOUND SUBSCRIPTION")
       InAppPurchases.create_update_subscription(%{latest_receipt: [renewal_info], renewal_info: [transaction_info]}, subscription.user_id)
+    else
+      IO.inspect("Subscription not found")
+      IO.inspect(transaction_info)
+      IO.inspect(renewal_info)s
     end
   end
 
