@@ -160,10 +160,10 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     end
   end
 
-  def get_cancel_at_for_creation(nil, _interval, _expiration_intent), do: nil
-  def get_cancel_at_for_creation(_created_at, :lifetime, _expiration_intent), do: nil
-  def get_cancel_at_for_creation(_created_at, _interval, nil), do: nil
-  def get_cancel_at_for_creation(created_at, :year, expiration_intent)
+  defp get_cancel_at_for_creation(nil, _interval, _expiration_intent), do: nil
+  defp get_cancel_at_for_creation(_created_at, :lifetime, _expiration_intent), do: nil
+  defp get_cancel_at_for_creation(_created_at, _interval, nil), do: nil
+  defp get_cancel_at_for_creation(created_at, :year, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
     |> convert_ms_time()
@@ -174,7 +174,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> Kernel.*(1000)
   end
 
-  def get_cancel_at_for_creation(created_at, :month, expiration_intent)
+  defp get_cancel_at_for_creation(created_at, :month, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
     |> convert_ms_time()
