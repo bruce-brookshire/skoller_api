@@ -80,7 +80,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
     else
       IO.inspect("Subscription not found")
       IO.inspect(transaction_info)
-      IO.inspect(renewal_info)s
+      IO.inspect(renewal_info)
     end
   end
 
