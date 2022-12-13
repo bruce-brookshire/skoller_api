@@ -162,6 +162,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
   defp get_cancel_at_for_creation(nil, _interval, _expiration_intent), do: nil
   defp get_cancel_at_for_creation(_created_at, :lifetime, _expiration_intent), do: nil
+  defp get_cancel_at_for_creation(_created_at, _interval, nil), do: nil
   defp get_cancel_at_for_creation(created_at, :year, expiration_intent)
     when not is_nil(expiration_intent) do
     created_at
