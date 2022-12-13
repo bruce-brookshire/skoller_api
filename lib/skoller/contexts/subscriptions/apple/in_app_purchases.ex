@@ -169,8 +169,8 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     end
   end
 
-  def map_auto_renew(:error), do: :error
-  def map_auto_renew(auto_renew) when is_integer(auto_renew) do
+  defp map_auto_renew(:error), do: :error
+  defp map_auto_renew(auto_renew) when is_integer(auto_renew) do
 
     # We can parse this to integer because apple always sends integers (or integers as strings)
     # as auto renew statuses.
@@ -180,7 +180,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> map_auto_renew()
   end
 
-  def map_auto_renew(auto_renew) when is_binary(auto_renew) do
+  defp map_auto_renew(auto_renew) when is_binary(auto_renew) do
     IO.inspect(auto_renew, label: "AUTO REMENEWI*(*((((#*#*@#*#*#@*@#*#@*@#*#@*@#*#@#@**#")
     case Map.get(@auto_renew_map, auto_renew, :error) do
       :error -> :error
