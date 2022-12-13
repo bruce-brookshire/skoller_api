@@ -43,6 +43,10 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   @spec create_update_subscription(%{latest_receipt: list(), renewal_info: list()}, integer()) ::
     {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
   def create_update_subscription(%{latest_receipt: latest_receipt, renewal_info: renewal_info}, user_id) do
+
+    IO.inspect(latest_receipt, label: "LATEST RECEIPT **************************")
+    IO.inspect(renewal_info, label: "RENEWAL INFO **************************")
+    IO.inspect(user_id, label: "USER ID **************************")
     case SubscriptionContext.get_subscription_by_user_id(user_id) do
       %Subscription{} = subscription ->
         case update_subscription(subscription, latest_receipt, renewal_info) do
@@ -154,6 +158,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
   defp map_auto_renew(:error), do: :error
   defp map_auto_renew(auto_renew) do
+    IO.inspect(auto_renew, "AUTO REMENEWI*(*((((#*#*@#*#*#@*@#*#@*@#*#@*@#*#@#@**#")
     case Map.get(@auto_renew_map, auto_renew, :error) do
       :error -> :error
       map -> map.value
