@@ -9,6 +9,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Data
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedTransaction
   alias Skoller.Contexts.Subscriptions.Apple.Schema.Common.SignedRenewal
+  alias Skoller.Contexts.Subscriptions.Apple.InAppPurchases
 
   @type t :: %__MODULE__{
     notificationType: String.t(),
@@ -32,32 +33,14 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   def get_signed_renewal_info(%{data: %{signedRenewalInfo: renewal_info}}) do
     renewal_info
     |> JOSE.JWT.peek_payload()
-    |> IO.inspect(label: "PEEKING SIGNED RENEWAL INFO***************")
     |> Map.get(:fields)
-    |> EctoMorph.cast_to_struct(SignedRenewal)
-    |> IO.inspect(label: "get_signed_renewal_info/1 after cast_to_strict for SignedRenewal")
-    |> case do
-      {:ok, %SignedRenewal{} = renewal_info} -> renewal_info
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error("Unable to parse signed renewal info to SignedRenewal: #{inspect(changeset)}")
-        {:error, changeset}
-    end
   end
 
   def get_signed_transaction_info(%{data: %{signedTransactionInfo: nil}}), do: nil
   def get_signed_transaction_info(%{data: %{signedTransactionInfo: signed_transaction}}) do
     signed_transaction
     |> JOSE.JWT.peek_payload()
-    |> IO.inspect(label: "PEEKING SIGNED TRANSACTION INFO***************")
     |> Map.get(:fields)
-    |> EctoMorph.cast_to_struct(SignedTransaction)
-    |> IO.inspect(label: "get_signed_transaction_info/1 after cast_to_strict for SignedTransaction")
-    |> case do
-      {:ok, %SignedTransaction{} = transaction} -> transaction
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error("Unable to parse signed transaction info into SignedTransaction: #{inspect(changeset)}")
-        {:error, changeset}
-    end
   end
 
   def handle_notification_type("DID_CHANGE_RENEWAL_STATUS", resp) do
@@ -87,13 +70,13 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   def handle_notification_type(_type, _resp), do: nil
 
   defp handle_subtype("AUTO_RENEW_DISABLED", resp) do
-    IO.puts "DID_CHANGE_RENEWAL_STATUS/AUTO_RENEW_DISABLED"
-    IO.inspect(resp.data.signedRenewalInfo, label: "renewalInfo")
-    IO.inspect(resp.data.signedTransactionInfo, label: "transactionInfo")
+    Logger.info("Cancelling subscription *************")
     renewal_info = get_signed_renewal_info(resp)
     transaction_info = get_signed_transaction_info(resp)
-    IO.inspect(renewal_info, label: "morphed renewal info")
-    IO.inspect(transaction_info, label: "morphed transaction info")
+    subscription = Skoller.Repo.get_by(Skoller.Schema.Subscription, %{transaction_id: transaction_info["originalTransactionId"]})
+    if !is_nil(subscription) do
+      InAppPurchases.create_update_subscription(%{latest_receipt: [renewal_info], renewal_info: [transaction_info]}, subscription.user_id)
+    end
   end
 
   defp handle_subtype("RESUBSCRIBE", resp) do
