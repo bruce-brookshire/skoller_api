@@ -103,22 +103,31 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
     interval = map_interval(Map.get(current_receipt, "product_id", :nil))
     |> IO.inspect(label: "interval")
-    created_at = Map.get(current_receipt, "original_purchase_date_ms", nil)
+    created_at = Map.get(current_receipt, "originalPurchaseDate", nil)
     expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
 
     subscription
     |> Subscription.changeset(%{
-      transaction_id: Map.get(current_receipt, "original_transaction_id", nil),
+      transaction_id: Map.get(current_receipt, "originalTransactionId", nil),
       platform: :ios,
       created_at_ms: created_at,
       renewal_interval: interval,
       payment_method: :in_app,
       expiration_intent: expiration_intent,
-      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "auto_renew_status", :error)),
-      cancel_at_ms: get_cancel_at_for_creation(created_at, interval, expiration_intent),
+      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "autoRenewStatus", :error)),
+      cancel_at_ms: Map.get(current_renewal_info, "expiresDate", nil),
       current_status: :active
     })
     |> Skoller.Repo.update()
+  end
+
+  defp cancel_subscription(subscription, latest_receipt, renewal_info) do
+    subscription
+    |> Subscription.changeset(%{
+      auto_renew_status: map_auto_renew(Map.get(renewal_info, "autoRenewStatus", :error)),
+      cancel_at_ms: Map.get(renewal_info, "expiresDate", nil),
+      renewal_interval: nil
+    })
   end
 
   @spec get_current_receipt(list()) :: map()
