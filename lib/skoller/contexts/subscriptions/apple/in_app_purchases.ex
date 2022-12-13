@@ -121,7 +121,9 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> Skoller.Repo.update()
   end
 
-  defp cancel_subscription(subscription, latest_receipt, renewal_info) do
+  def cancel_subscription(subscription, latest_receipt, renewal_info) do
+    Logger.info("Cncelling subscription in method")
+    IO.inspect(renewal_info)
     subscription
     |> Subscription.changeset(%{
       auto_renew_status: map_auto_renew(Map.get(renewal_info, "autoRenewStatus", :error)),
