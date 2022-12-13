@@ -117,13 +117,14 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     |> Skoller.Repo.update()
   end
 
-  def cancel_subscription(subscription, renewal_info) do
+  def cancel_subscription(subscription, latest_receipt, renewal_info) do
     Logger.info("Cncelling subscription in method")
     IO.inspect(renewal_info)
+    IO.inspect(latest_receipt)
     subscription
     |> Subscription.changeset(%{
       auto_renew_status: map_auto_renew(Map.get(renewal_info, "autoRenewStatus", :error)),
-      cancel_at_ms: Map.get(renewal_info, "expiresDate", nil),
+      cancel_at_ms: Map.get(latest_receipt, "expiresDate", nil),
       renewal_interval: nil
     })
     |> IO.inspect()
