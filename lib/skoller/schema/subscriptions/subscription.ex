@@ -44,7 +44,6 @@ defmodule Skoller.Schema.Subscription do
   end
 
   @required [
-    :transaction_id,
     :payment_method,
     :platform,
     :user_id
