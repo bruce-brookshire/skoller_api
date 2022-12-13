@@ -158,7 +158,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
 
   defp map_auto_renew(:error), do: :error
   defp map_auto_renew(auto_renew) do
-    IO.inspect(auto_renew, "AUTO REMENEWI*(*((((#*#*@#*#*#@*@#*#@*@#*#@*@#*#@#@**#")
+    IO.inspect(auto_renew, label: "AUTO REMENEWI*(*((((#*#*@#*#*#@*@#*#@*@#*#@*@#*#@#@**#")
     case Map.get(@auto_renew_map, auto_renew, :error) do
       :error -> :error
       map -> map.value
