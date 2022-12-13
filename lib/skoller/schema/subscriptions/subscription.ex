@@ -50,6 +50,7 @@ defmodule Skoller.Schema.Subscription do
   ]
   @optional [
     :expiration_intent,
+    :transaction_id,
     :auto_renew_status,
     :billing_retry_status,
     :customer_id,

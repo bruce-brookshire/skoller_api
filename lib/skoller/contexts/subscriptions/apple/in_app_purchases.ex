@@ -44,9 +44,6 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
   def create_update_subscription(%{latest_receipt: latest_receipt, renewal_info: renewal_info}, user_id) do
 
-    IO.inspect(latest_receipt, label: "LATEST RECEIPT **************************")
-    IO.inspect(renewal_info, label: "RENEWAL INFO **************************")
-    IO.inspect(user_id, label: "USER ID **************************")
     case SubscriptionContext.get_subscription_by_user_id(user_id) do
       %Subscription{} = subscription ->
         case update_subscription(subscription, latest_receipt, renewal_info) do
@@ -102,26 +99,25 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     current_renewal_info = List.first(renewal_info)
 
     interval = map_interval(Map.get(current_receipt, "product_id", :nil))
-    |> IO.inspect(label: "interval")
     created_at = Map.get(current_receipt, "originalPurchaseDate", nil)
     expiration_intent = map_expiration_intent(Map.get(current_renewal_info, "expiration_intent", nil), interval)
 
     subscription
     |> Subscription.changeset(%{
-      transaction_id: Map.get(current_receipt, "originalTransactionId", nil),
+      transaction_id: Map.get(current_receipt, "original_transaction_id", nil),
       platform: :ios,
       created_at_ms: created_at,
       renewal_interval: interval,
       payment_method: :in_app,
       expiration_intent: expiration_intent,
-      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "autoRenewStatus", :error)),
+      auto_renew_status: map_auto_renew(Map.get(current_renewal_info, "auto_renew_status", :error)),
       cancel_at_ms: Map.get(current_renewal_info, "expiresDate", nil),
       current_status: :active
     })
     |> Skoller.Repo.update()
   end
 
-  def cancel_subscription(subscription, latest_receipt, renewal_info) do
+  def cancel_subscription(subscription, renewal_info) do
     Logger.info("Cncelling subscription in method")
     IO.inspect(renewal_info)
     subscription
