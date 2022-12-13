@@ -128,6 +128,8 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
       cancel_at_ms: Map.get(renewal_info, "expiresDate", nil),
       renewal_interval: nil
     })
+    |> IO.inspect()
+    |> Skoller.Repo.update()
   end
 
   @spec get_current_receipt(list()) :: map()
