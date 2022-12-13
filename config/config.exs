@@ -20,17 +20,18 @@ config :skoller,
 config :logger,
   truncate: :infinity
 
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id],
+  truncate: :infinity
+
 # Configures the endpoint
 config :skoller, SkollerWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
   render_errors: [view: SkollerWeb.ErrorView, accepts: ~w(json)],
   pubsub_server: Skoller.PubSub
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
 
 # This is for file uploads.
 config :arc,
