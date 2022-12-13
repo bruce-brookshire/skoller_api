@@ -24,20 +24,25 @@ defmodule SkollerWeb.Api.V1.Apple.InAppPurchasesController do
       {:ok, data} ->
         case InAppPurchases.create_update_subscription(data, user_id) do
           {:ok, subscription} ->
+            IO.inspect(subscription, label: "created subscription")
             conn
             |> put_view(InAppPurchasesView)
             |> render("submit_receipt_success.json", %{data: subscription})
           {:error, changeset} ->
+            IO.inspect(changeset, label: "ERror changeset")
             conn
             |> put_view(InAppPurchasesView)
             |> render("submit_receipt_validation_success_subscription_failed.json", %{data: changeset.errors})
         end
 
       {:error, resp} ->
+        IO.inspect(resp, label: "Failed respo")
+
         conn
         |> put_view(InAppPurchasesView)
         |> render("submit_receipt_validation_failed.json", %{data: resp})
       {:error, nil} ->
+        IO.inspect("failed resp nil")
         conn
         |> put_view(InAppPurchasesView)
         |> render("submit_receipt_nil_failure.json", nil)
