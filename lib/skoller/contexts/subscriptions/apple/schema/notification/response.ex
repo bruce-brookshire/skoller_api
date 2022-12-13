@@ -54,7 +54,14 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   end
 
   def handle_notification_type("EXPIRED", resp) do
-    IO.inspect("EXPIRED - #{inspect(resp)}")
+    transaction_info = get_signed_transaction_info(resp)
+    subscription = Skoller.Repo.get_by(Skoller.Schema.Subscription, %{transaction_id: transaction_info["originalTransactionId"]})
+    if !is_nil(subscription) do
+      Logger.info("Expiring subscription for transaction: #{inspect(transaction_info["originalTransactionId"])} for user: #{inspect(subscription.user_id)}")
+      InAppPurchases.expire_subscription(subscription)
+    else
+      Logger.error("Unable to find subscription for transaction_id: #{inspect(transaction_info["originalTransactionId"])}")
+    end
   end
 
   def handle_notification_type("PRICE_INCREASE", resp) do
@@ -68,17 +75,14 @@ defmodule Skoller.Contexts.Subscriptions.Apple.Schema.Notification.Response do
   def handle_notification_type(_type, _resp), do: nil
 
   defp handle_subtype("AUTO_RENEW_DISABLED", resp) do
-    Logger.info("Cancelling subscription *************")
     renewal_info = get_signed_renewal_info(resp)
     transaction_info = get_signed_transaction_info(resp)
     subscription = Skoller.Repo.get_by(Skoller.Schema.Subscription, %{transaction_id: transaction_info["originalTransactionId"]})
     if !is_nil(subscription) do
-      IO.inspect(subscription, label: "FOUND SUBSCRIPTION")
+      Logger.info("Cancelling subscription for transaction: #{inspect(transaction_info["originalTransactionId"])} for user: #{inspect(subscription.user_id)}")
       InAppPurchases.cancel_subscription(subscription, transaction_info, renewal_info)
     else
-      IO.inspect("Subscription not found")
-      IO.inspect(transaction_info)
-      IO.inspect(renewal_info)
+      Logger.error("Unable to find subscription for transaction_id: #{inspect(transaction_info["originalTransactionId"])}")
     end
   end
 

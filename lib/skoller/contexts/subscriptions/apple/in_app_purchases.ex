@@ -118,16 +118,21 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
   end
 
   def cancel_subscription(subscription, latest_receipt, renewal_info) do
-    Logger.info("Cncelling subscription in method")
-    IO.inspect(renewal_info)
-    IO.inspect(latest_receipt)
     subscription
     |> Subscription.changeset(%{
       auto_renew_status: map_auto_renew(Map.get(renewal_info, "autoRenewStatus", :error)),
       cancel_at_ms: Map.get(latest_receipt, "expiresDate", nil),
-      renewal_interval: nil
+      renewal_interval: nil,
+      expiration_intent: :apple_cancelled
     })
-    |> IO.inspect()
+    |> Skoller.Repo.update()
+  end
+
+  def expire_subscription(subscription) do
+    subscription
+    |> Subscription.changeset(%{
+      current_status: :inactive
+    })
     |> Skoller.Repo.update()
   end
 
