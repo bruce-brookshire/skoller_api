@@ -52,7 +52,7 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
       nil ->
         case create_subscription(user_id, latest_receipt, renewal_info) do
           {:ok, %Subscription{}} = subscription ->
-            user = Repo.get(Skoller.Users.User, user_id)
+            user = Skoller.Repo.get(Skoller.Users.User, user_id)
             Skoller.Users.Trial.cancel(user)
             subscription
           {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
@@ -142,11 +142,12 @@ defmodule Skoller.Contexts.Subscriptions.Apple.InAppPurchases do
     end
   end
 
+  defp map_expiration_intent(nil, _interval), do: nil
   defp map_expiration_intent(:error, _interval), do: nil
   defp map_expiration_intent(_expiration_intent, :lifetime), do: nil
   defp map_expiration_intent(expiration_intent, _interval) do
     case Map.get(@expiration_intent_map, expiration_intent, :error) do
-      :error -> :error
+      :error -> nil
       map -> map.value
     end
   end
