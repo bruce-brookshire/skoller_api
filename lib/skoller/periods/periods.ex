@@ -13,6 +13,8 @@ defmodule Skoller.Periods do
 
   import Ecto.Query
 
+  require Logger
+
   @past_status 100
   @active_status 200
   @prompt_status 300
@@ -98,6 +100,11 @@ defmodule Skoller.Periods do
     |> find_changeset_status()
     |> find_changeset_main_period(params, opts)
     |> Repo.insert()
+    |> case do
+      {:error, %Ecto.Changeset{} = changeset} ->
+        Logger.info("Unable to create period #{params.name} for school id #{params.school_id}. Reason: #{inspect(changeset.errors)} ")
+      _ -> Logger.info("Created period #{params.name} form school id #{params.school_id}.")
+    end
   end
 
   @doc """
@@ -242,8 +249,11 @@ defmodule Skoller.Periods do
   Generates a year's worth of periods for all schools.
   """
   def generate_periods_for_all_schools_for_year(year) do
-    Schools.get_schools()
-    |> Enum.each(&generate_periods_for_year_for_school(&1.id, year))
+    Repo.all(Skoller.Schools.School)
+    |> Enum.each(fn school ->
+      Logger.info("Attempting to generate #{year} periods for school: #{school.name} - school_id: #{school.id}")
+      generate_periods_for_year_for_school(school.id, year)
+    end)
   end
 
   @doc """
