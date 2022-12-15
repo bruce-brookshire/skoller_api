@@ -242,9 +242,11 @@ defmodule Skoller.Periods do
   Generates a year's worth of periods for all schools.
   """
   def generate_periods_for_all_schools_for_year(year) do
-    Repo.all(Skoller.Schools.School)
-    |> Enum.map(fn school ->
-      generate_periods_for_year_for_school(school.id, year)
+    Task.async(fn ->
+      Repo.all(Skoller.Schools.School)
+      |> Enum.each(fn school ->
+        generate_periods_for_year_for_school(school.id, year)
+      end)
     end)
   end
 
