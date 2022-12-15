@@ -13,6 +13,8 @@ defmodule Skoller.Periods do
 
   import Ecto.Query
 
+  require Logger
+
   @past_status 100
   @active_status 200
   @prompt_status 300
@@ -245,6 +247,7 @@ defmodule Skoller.Periods do
     Task.async(fn ->
       Repo.all(Skoller.Schools.School)
       |> Enum.each(fn school ->
+        Logger.info("Generating #{year} periods for school: #{school.name}")
         generate_periods_for_year_for_school(school.id, year)
       end)
     end)
