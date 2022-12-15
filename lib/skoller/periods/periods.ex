@@ -251,7 +251,7 @@ defmodule Skoller.Periods do
   def generate_periods_for_all_schools_for_year(year) do
     Repo.all(Skoller.Schools.School)
     |> Enum.each(fn school ->
-      Logger.info("Generating #{year} periods for school: #{school.name}")
+      Logger.info("Attempting to generate #{year} periods for school: #{school.name} - school_id: #{school.id}")
       generate_periods_for_year_for_school(school.id, year)
     end)
   end
