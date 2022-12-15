@@ -95,11 +95,9 @@ defmodule Skoller.Periods do
   """
   def create_period(params, opts \\ []) do
     ClassPeriod.changeset_insert(%ClassPeriod{}, params)
-    |> IO.inspect()
     |> find_changeset_status()
     |> find_changeset_main_period(params, opts)
     |> Repo.insert()
-    |> IO.inspect()
   end
 
   @doc """
@@ -244,8 +242,10 @@ defmodule Skoller.Periods do
   Generates a year's worth of periods for all schools.
   """
   def generate_periods_for_all_schools_for_year(year) do
-    Schools.get_schools()
-    |> Enum.each(&generate_periods_for_year_for_school(&1.id, year))
+    Repo.all(Skoller.Schools.School)
+    |> Enum.map(fn school ->
+      generate_periods_for_year_for_school(school.id, year)
+    end)
   end
 
   @doc """
