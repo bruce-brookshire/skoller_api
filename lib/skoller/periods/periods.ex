@@ -102,8 +102,8 @@ defmodule Skoller.Periods do
     |> Repo.insert()
     |> case do
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.info("Unable to create period #{params.name} for school id #{params.school_id}. Reason: #{inspect(changeset.errors)} ")
-      _ -> Logger.info("Created period #{params.name} form school id #{params.school_id}.")
+        Logger.info("Unable to create period #{params["name"]} for school id #{params["school_id"]}. Reason: #{inspect(changeset.errors)} ")
+      _ -> Logger.info("Created period #{params["name"]} form school id #{params["school_id"]}.")
     end
   end
 
