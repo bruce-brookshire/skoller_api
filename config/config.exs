@@ -10,10 +10,10 @@ config :skoller,
   ecto_repos: [Skoller.Repo],
   env: config_env(),
   apple_in_app_purchase_secret: System.get_env("APPLE_IN_APP_PURCHASE_SECRET"),
-  apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_TEST"),
-  apple_app_store_connect_api: System.get_env("APPLE_APP_STORE_CONNECT_API_TEST"),
-  apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_PRIVATE_KEY"),
-  apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_KEY_ID"),
+  apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_LIVE"),
+  apple_app_store_connect_api: System.get_env("APPLE_APP_STORE_CONNECT_API_LIVE"),
+  apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_PROD_PRIVATE_KEY"),
+  apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_PROD_KEY_ID"),
   apple_issuer_id: System.get_env("APPLE_STAGING_APP_ISSUER_ID"),
   apple_bundle_id: System.get_env("APPLE_STAGING_APP_BUNDLE_ID")
 
@@ -63,7 +63,7 @@ config :pigeon, :apns,
 
 config :stripity_stripe,
        hackney_opts: [{:connect_timeout, 1_000_000}, {:recv_timeout, 5_000_000}],
-       api_key: System.get_env("STRIPE_API_TEST_SK")
+       api_key: System.get_env("STRIPE_API_LIVE_SK")
 
 config :pigeon, :fcm,
   fcm_default: %{
@@ -81,15 +81,15 @@ config :oban, Oban,
      crontab: [
       {"@daily", Skoller.CronJobs.StudentsCountJob},
       {"@monthly", Skoller.CronJobs.StudentReferralsReportJob},
-      # {"*/10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
-      # {"*/10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
-      # {"*/10 * * * *", Skoller.CronJobs.ClassLocksJob},
-      # {"*/5 * * * *", Skoller.CronJobs.ClassPeriodJob},
-      # {"*/5 * * * *", Skoller.CronJobs.ClassSetupJob},
-      # {"*/5 * * * *", Skoller.CronJobs.NoClassesJob},
-      # {"*/10 * * * *", Skoller.CronJobs.EmailManagerJob},
-      # {"*/5 * * * *", Skoller.CronJobs.AnalyticsJob},
-      # {"*/10 * * * *", Skoller.CronJobs.TrialJob},
+      {"*/10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
+      {"*/10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
+      {"*/10 * * * *", Skoller.CronJobs.ClassLocksJob},
+      {"*/5 * * * *", Skoller.CronJobs.ClassPeriodJob},
+      {"*/5 * * * *", Skoller.CronJobs.ClassSetupJob},
+      {"*/5 * * * *", Skoller.CronJobs.NoClassesJob},
+      {"*/10 * * * *", Skoller.CronJobs.EmailManagerJob},
+      {"*/5 * * * *", Skoller.CronJobs.AnalyticsJob},
+      {"*/10 * * * *", Skoller.CronJobs.TrialJob},
       {"0 * * * *", Skoller.CronJobs.SubscriptionsJob}
      ]}
   ],
