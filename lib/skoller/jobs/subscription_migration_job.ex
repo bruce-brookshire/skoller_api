@@ -23,6 +23,7 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
                 List.first(data)
               !is_list(data) -> data
             end
+            |> IO.inspect()
 
             current_item = StripePurchases.get_current_item(data)
             |> IO.inspect()
