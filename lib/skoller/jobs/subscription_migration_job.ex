@@ -20,6 +20,7 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
                 IO.puts("is list and > 1")
                 data
                 |> Enum.sort_by(& &1.created, :desc)
+                |> List.first()
               is_list(data) && length(data) == 1 ->
                 IO.puts("is list and 1")
                 List.first(data)
