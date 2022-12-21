@@ -25,6 +25,7 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
             end
 
             current_item = StripePurchases.get_current_item(data)
+            |> IO.inspect()
 
           %Subscription{}
           |> Subscription.changeset(
