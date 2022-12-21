@@ -5,13 +5,15 @@ defmodule Skoller.Users.Subscription do
 
   alias Skoller.{Repo, Payments}
   alias Skoller.Users.{User, Trial}
+  alias Skoller.Contexts.Subscriptions.Stripe.StripePurchases
+  alias Skoller.Contexts.Subscriptions
+  alias Skoller.Schema.Subscription
 
   import Ecto.Query
 
-  def create(conn, %{"payment_method" => payment_method}) do
+  def create(conn, %{"payment_method" => payment_method, "email" => email}) do
     token = payment_method["token"]
     payment_method_id = payment_method["payment_method_id"]
-
     with {:ok, %Stripe.Token{card: %Stripe.Card{} = card}} <- retrieve_token(token),
          {:ok, %Stripe.PaymentMethod{} = stripe_payment_method} <-
            retrieve_payment_method(payment_method_id),
@@ -20,6 +22,7 @@ defmodule Skoller.Users.Subscription do
            find_or_create_stripe_customer(
              token,
              user,
+             email,
              payment_method_id
            ),
          {:ok, %Stripe.Subscription{} = subscription} <-
@@ -28,8 +31,10 @@ defmodule Skoller.Users.Subscription do
              payment_method["plan_id"],
              user
            ) do
+
       create_or_update_card_info(
         %{
+          subscription: subscription,
           user_id: user.id,
           customer_id: customer_stripe_id,
           payment_method: "card"
@@ -117,40 +122,40 @@ defmodule Skoller.Users.Subscription do
     end
   end
 
-  defp find_or_create_stripe_customer(token, user, payment_method_id) do
-    case Payments.get_stripe_by_user_id(user.id) do
+  defp find_or_create_stripe_customer(token, user, email, payment_method_id) do
+    case Subscriptions.get_subscription_by_user_id(user.id) do
       nil ->
-        create_stripe_customer(token, payment_method_id, user)
+        create_stripe_customer(token, payment_method_id, user, email)
 
-      %Skoller.Payments.Stripe{customer_id: customer_id} ->
-        maybe_create_stripe_customer(token, customer_id, payment_method_id, user)
+      %Skoller.Schema.Subscription{customer_id: customer_id} ->
+        maybe_create_stripe_customer(token, customer_id, payment_method_id, user, email)
 
       error ->
         error
     end
   end
 
-  defp maybe_create_stripe_customer(token, customer_id, payment_method_id, user) do
+  defp maybe_create_stripe_customer(token, customer_id, payment_method_id, user, email) do
     case Stripe.Customer.retrieve(customer_id) do
       {:ok, customer} ->
         {:ok, customer}
 
       {:error, %Stripe.Error{code: :invalid_request_error}} ->
-        create_stripe_customer(token, payment_method_id, user)
+        create_stripe_customer(token, payment_method_id, user, email)
 
       error ->
         error
     end
   end
 
-  defp create_stripe_customer(token, payment_method_id, user) do
+  defp create_stripe_customer(token, payment_method_id, user, email) do
     Stripe.Customer.create(
       %{
         metadata: %{
           student_id: user.student.id,
           user_id: user.id,
         },
-        email: user.email,
+        email: email,
         phone: user.student.phone,
         name: "#{user.student.name_first} #{user.student.name_last}"
       }
@@ -171,14 +176,21 @@ defmodule Skoller.Users.Subscription do
     )
   end
 
-  defp create_or_update_card_info(%{user_id: user_id} = params) do
-    case Payments.get_stripe_by_user_id(user_id) do
+  @spec create_or_update_card_info(Stripe.Subscription.t()) ::
+    {:ok, Subscription.t()} | {:error, Ecto.Changeset.t()}
+  defp create_or_update_card_info(%{user_id: user_id} = new_subscription) do
+    case Subscriptions.get_subscription_by_user_id(user_id) do
+      %Skoller.Schema.Subscription{} = existing_subscription ->
+        StripePurchases.update_stripe_subscription(existing_subscription, new_subscription)
       nil ->
-        Payments.create_stripe(params)
-
-      stripe ->
-        stripe
-        |> Payments.update_stripe(params)
+        case StripePurchases.create_stripe_subscription(%{
+          subscription: new_subscription,
+        payment_method: :card,
+          user_id: user_id
+        }) do
+          {:ok, %Subscription{} = subscription} -> {:ok, subscription}
+          {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
+        end
     end
   end
 

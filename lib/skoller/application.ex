@@ -15,7 +15,7 @@ defmodule Skoller.Application do
       {Oban, Application.fetch_env!(:oban, Oban)},
       SkollerWeb.Endpoint,
       {Phoenix.PubSub, [name: Skoller.PubSub, adapter: Phoenix.PubSub.PG2]},
-      %{id: AirtableSyncJob, start: {Skoller.AirtableSyncJob, :start_link, []}},
+      %{id: AirtableSyncJob, start: {Skoller.AirtableSyncJob, :start_link, []}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

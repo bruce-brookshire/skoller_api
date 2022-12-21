@@ -25,6 +25,8 @@ defmodule Skoller.Users do
 
   import Ecto.Query
 
+  require Logger
+
   @student_role 100
 
   @student_referral_points_name "Student Referral"
@@ -90,6 +92,7 @@ defmodule Skoller.Users do
       |> Ecto.Multi.run(:points, fn _, changes -> add_points_to_student(changes.user) end)
       |> Ecto.Multi.run(:org_invites, fn _, changes -> convert_org_invite(changes.user) end)
       |> Repo.transaction()
+      |> IO.inspect
       |> send_link_used_notification()
       |> send_verification_text(opts)
 
@@ -103,9 +106,9 @@ defmodule Skoller.Users do
 
         {:ok, user}
 
-      {:error, _, failed_val, _} ->
-        IO.puts("ATTENTION SIGNUP 404:")
-        {:error, failed_val}
+      {:error, _, %Ecto.Changeset{} = changeset, _} ->
+        Logger.error("Signup failure. Failed value: #{inspect(changeset)}", pretty: true)
+        {:error, changeset}
     end
   end
 

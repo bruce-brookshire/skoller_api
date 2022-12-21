@@ -13,6 +13,7 @@ defmodule Skoller.Users.User do
   alias Skoller.Organizations.OrgOwners.OrgOwner
   alias Skoller.Organizations.OrgMembers.OrgMember
   alias Skoller.CancellationReasons.CancellationReason
+  alias Skoller.Schema.Subscription
 
   schema "users" do
     field :email, :string
@@ -35,6 +36,7 @@ defmodule Skoller.Users.User do
     has_many :reports, Report
 
     has_one :job_profile, JobProfile
+    has_one :subscription, Subscription
 
     has_many :org_owners, OrgOwner
     has_many :org_members, OrgMember
@@ -46,11 +48,11 @@ defmodule Skoller.Users.User do
     timestamps()
   end
 
-  @req_fields [:email]
+  @req_fields []
   @opt_fields [:pic_path, :password]
   @all_fields @req_fields ++ @opt_fields
   @upd_req [:is_unsubscribed]
-  @upd_opt [:password, :pic_path, :last_login]
+  @upd_opt [:password, :pic_path, :last_login, :trial, :trial_end]
   @upd_fields @upd_req ++ @upd_opt
   @adm_upd_req [:is_active, :is_unsubscribed, :email]
   @adm_upd_opt [:password, :pic_path, :last_login]
@@ -61,16 +63,12 @@ defmodule Skoller.Users.User do
     user
     |> cast(attrs, @all_fields)
     |> validate_required(@req_fields)
-    |> update_change(:email, &String.downcase(&1))
-    |> update_change(:email, &String.trim(&1))
     |> change(%{trial_start: DateTime.utc_now() |> DateTime.truncate(:second)})
     |> change(%{
       trial_end:
-        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 30) |> DateTime.truncate(:second)
+        DateTime.utc_now() |> DateTime.add(60 * 60 * 24 * 7) |> DateTime.truncate(:second)
     })
-    |> unique_constraint(:email)
     |> cast_assoc(:student)
-    |> validate_format(:email, ~r/@/)
     |> put_pass_hash()
   end
 

@@ -1,5 +1,15 @@
 import Config
 
+config :skoller,
+  apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_TEST"),
+  apple_app_store_connect_api: System.get_env("APPLE_APP_STORE_CONNECT_API_TEST"),
+  apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_PRIVATE_KEY"),
+  apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_STAGING_KEY_ID")
+
+config :stripity_stripe,
+  hackney_opts: [{:connect_timeout, 1_000_000}, {:recv_timeout, 5_000_000}],
+  api_key: System.get_env("STRIPE_API_TEST_SK")
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #

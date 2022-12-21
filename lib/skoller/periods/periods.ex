@@ -102,8 +102,10 @@ defmodule Skoller.Periods do
     |> Repo.insert()
     |> case do
       {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.info("Unable to create period #{params.name} for school id #{params.school_id}. Reason: #{inspect(changeset.errors)} ")
-      _ -> Logger.info("Created period #{params.name} form school id #{params.school_id}.")
+        Logger.info("Unable to create period #{params["name"]} for school id #{params["school_id"]}. Reason: #{inspect(changeset.errors)} ")
+      {:ok, period} ->
+        Logger.info("Created period #{params["name"]} form school id #{params["school_id"]}.")
+        {:ok, period}
     end
   end
 
@@ -251,7 +253,7 @@ defmodule Skoller.Periods do
   def generate_periods_for_all_schools_for_year(year) do
     Repo.all(Skoller.Schools.School)
     |> Enum.each(fn school ->
-      Logger.info("Attempting to generate #{year} periods for school: #{school.name} - school_id: #{school.id}")
+      Logger.info("Generating #{year} periods for school: #{school.name}")
       generate_periods_for_year_for_school(school.id, year)
     end)
   end

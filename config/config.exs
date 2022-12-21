@@ -7,7 +7,24 @@ import Config
 
 # General application configuration
 config :skoller,
-  ecto_repos: [Skoller.Repo]
+  ecto_repos: [Skoller.Repo],
+  env: config_env(),
+  apple_in_app_purchase_secret: System.get_env("APPLE_PROD_IN_APP_PURCHASE_SECRET"),
+  apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_LIVE"),
+  apple_app_store_connect_api: System.get_env("APPLE_APP_STORE_CONNECT_API_LIVE"),
+  apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_PROD_PRIVATE_KEY"),
+  apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_PROD_KEY_ID"),
+  apple_issuer_id: System.get_env("APPLE_APP_ISSUER_ID"),
+  apple_bundle_id: System.get_env("APPLE_PROD_APP_BUNDLE_ID")
+
+config :logger,
+  truncate: :infinity
+
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id],
+  truncate: :infinity
 
 # Configures the endpoint
 config :skoller, SkollerWeb.Endpoint,
@@ -15,11 +32,6 @@ config :skoller, SkollerWeb.Endpoint,
   secret_key_base: "MoERdAtL9LkdMJHFVJolqyZr6rLHxHDMyKnbEl3Sag054kzU0xhRICcooJNLE+Ie",
   render_errors: [view: SkollerWeb.ErrorView, accepts: ~w(json)],
   pubsub_server: Skoller.PubSub
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
 
 # This is for file uploads.
 config :arc,
@@ -69,15 +81,16 @@ config :oban, Oban,
      crontab: [
       {"@daily", Skoller.CronJobs.StudentsCountJob},
       {"@monthly", Skoller.CronJobs.StudentReferralsReportJob},
-      {"10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
-      {"10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
-      {"10 * * * *", Skoller.CronJobs.ClassLocksJob},
-      {"5 * * * *", Skoller.CronJobs.ClassPeriodJob},
-      {"5 * * * *", Skoller.CronJobs.ClassSetupJob},
-      {"5 * * * *", Skoller.CronJobs.NoClassesJob},
-      {"10 * * * *", Skoller.CronJobs.EmailManagerJob},
-      {"5 * * * *", Skoller.CronJobs.AnalyticsJob},
-      {"10 * * * *", Skoller.CronJobs.TrialJob}
+      {"*/10 * * * *", Skoller.CronJobs.AssignmentReminderJob},
+      {"*/10 * * * *", Skoller.CronJobs.AssignmentCompletionJob},
+      {"*/10 * * * *", Skoller.CronJobs.ClassLocksJob},
+      {"*/5 * * * *", Skoller.CronJobs.ClassPeriodJob},
+      {"*/5 * * * *", Skoller.CronJobs.ClassSetupJob},
+      {"*/5 * * * *", Skoller.CronJobs.NoClassesJob},
+      {"*/10 * * * *", Skoller.CronJobs.EmailManagerJob},
+      {"*/5 * * * *", Skoller.CronJobs.AnalyticsJob},
+      {"*/10 * * * *", Skoller.CronJobs.TrialJob},
+      {"0 * * * *", Skoller.CronJobs.SubscriptionsJob}
      ]}
   ],
   queues: [
