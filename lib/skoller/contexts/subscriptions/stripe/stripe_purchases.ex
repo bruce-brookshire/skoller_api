@@ -88,6 +88,10 @@ defmodule Skoller.Contexts.Subscriptions.Stripe.StripePurchases do
     nil
   end
 
+  def get_current_item([first | _remaining]) do
+    get_current_item(first)
+  end
+
   def get_current_item(%{items: %{data: data}} = subscription) do
     data
     |> Enum.sort_by(& &1.created, :desc)

@@ -19,9 +19,11 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
               is_list(data) && length(data) > 1 ->
                 data
                 |> Enum.sort_by(& &1.created, :desc)
+                |> List.first()
               is_list(data) && length(data) == 1 ->
                 List.first(data)
-              !is_list(data) -> data
+              !is_list(data) ->
+                data
             end
 
             current_item = StripePurchases.get_current_item(data)
