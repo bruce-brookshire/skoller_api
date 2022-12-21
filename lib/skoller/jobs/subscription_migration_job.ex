@@ -17,11 +17,15 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
           data =
             cond do
               is_list(data) && length(data) > 1 ->
+                IO.puts("is list and > 1")
                 data
                 |> Enum.sort_by(& &1.created, :desc)
               is_list(data) && length(data) == 1 ->
+                IO.puts("is list and 1")
                 List.first(data)
-              !is_list(data) -> data
+              !is_list(data) ->
+                IO.puts("not list")
+                data
             end
             |> IO.inspect(label: "DATA")
 
