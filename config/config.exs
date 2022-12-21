@@ -9,13 +9,13 @@ import Config
 config :skoller,
   ecto_repos: [Skoller.Repo],
   env: config_env(),
-  apple_in_app_purchase_secret: System.get_env("APPLE_IN_APP_PURCHASE_SECRET"),
+  apple_in_app_purchase_secret: System.get_env("APPLE_PROD_IN_APP_PURCHASE_SECRET"),
   apple_receipt_verification_url: System.get_env("APPLE_RECEIPT_VERIFICATION_URL_LIVE"),
   apple_app_store_connect_api: System.get_env("APPLE_APP_STORE_CONNECT_API_LIVE"),
   apple_app_store_connect_key: System.get_env("APPLE_APP_STORE_CONNECT_PROD_PRIVATE_KEY"),
   apple_app_store_connect_key_id: System.get_env("APPLE_APP_STORE_CONNECT_PROD_KEY_ID"),
-  apple_issuer_id: System.get_env("APPLE_STAGING_APP_ISSUER_ID"),
-  apple_bundle_id: System.get_env("APPLE_STAGING_APP_BUNDLE_ID")
+  apple_issuer_id: System.get_env("APPLE_APP_ISSUER_ID"),
+  apple_bundle_id: System.get_env("APPLE_PROD_APP_BUNDLE_ID")
 
 config :logger,
   truncate: :infinity
