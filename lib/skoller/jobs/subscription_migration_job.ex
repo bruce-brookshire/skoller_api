@@ -37,11 +37,11 @@ defmodule Skoller.Jobs.SubscriptionMigrationJob do
               customer_id: s.customer_id,
               transaction_id: data.id,
               current_status: current_item.current_status,
-              created_at_ms: current_item.created,
+              created_at_ms: current_item.created * 1000,
               expiration_intent: current_item.cancel_status,
               auto_renew_status: current_item.renew_status,
               renewal_interval: current_item.renewal_interval,
-              cancel_at_ms: data.cancel_at
+              cancel_at_ms: data.cancel_at * 1000
             }
           )
           |> Skoller.Repo.insert!()
